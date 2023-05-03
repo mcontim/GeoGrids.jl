@@ -1,8 +1,6 @@
 ### A Pluto.jl notebook ###
 # v0.19.25
 
-#> custom_attrs = ["hide-enabled"]
-
 using Markdown
 using InteractiveUtils
 
@@ -101,9 +99,9 @@ md"""
 ## 1. Classical Implementation
 """
 
-# ╔═╡ 4457e406-3b1b-4237-b02d-767f76a0d6e2
+# ╔═╡ c63cac75-8eb1-47d2-88ef-7fbe418ae57b
 md"""
-The main source can be found at this [link](http://extremelearning.com.au/how-to-evenly-distribute-points-on-a-sphere-more-effectively-than-the-canonical-fibonacci-lattice/).
+The function ```fibonaccisphere_classic()``` uses calssical implementation of the Fibonacci Sphere.
 """
 
 # ╔═╡ d91d92b4-0e7c-40fc-97d3-4ae6f731d121
@@ -111,6 +109,11 @@ md"""
 This mapping has 2 main problems:
 - The first is that this mapping is **area-preserving**, not distance-preserving. If you are attempting to optimize distance measures such as those related to nearest-neighbor, then it is not guaranteed that such distance-based constraints and relationships will hold after an area-based projection.
 - The second, and from a pragmatic point of view possibly the trickiest to resolve, is that the spiral mapping has a **singularity** point at the centre (and the spherical mapping has a singularity at each pole)
+"""
+
+# ╔═╡ 4457e406-3b1b-4237-b02d-767f76a0d6e2
+md"""
+The main source can be found at this [link](http://extremelearning.com.au/how-to-evenly-distribute-points-on-a-sphere-more-effectively-than-the-canonical-fibonacci-lattice/).
 """
 
 # ╔═╡ 9fdf7569-cb6d-4a4a-bcfe-a5335927874f
@@ -291,8 +294,9 @@ end
 # ╟─d111b9a5-2d79-4eb7-b577-7b186b68016c
 # ╟─e78dca27-5288-4d90-a025-36790563c76b
 # ╟─2dbe0a40-f961-41c5-8556-c0c2df83f9cf
-# ╟─4457e406-3b1b-4237-b02d-767f76a0d6e2
+# ╟─c63cac75-8eb1-47d2-88ef-7fbe418ae57b
 # ╟─d91d92b4-0e7c-40fc-97d3-4ae6f731d121
+# ╟─4457e406-3b1b-4237-b02d-767f76a0d6e2
 # ╠═9fdf7569-cb6d-4a4a-bcfe-a5335927874f
 # ╠═c3f4e539-bc0b-4125-aa2c-5d4ccc685376
 # ╠═60827814-1ecf-443e-8446-d504bfddfea9
