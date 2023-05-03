@@ -1,0 +1,14 @@
+name = "GeoGrids"
+uuid = "22c7c615-cf67-4787-b800-cc81b4f1a63f"
+authors = ["mconti "]
+version = "0.1.0"
+
+[deps]
+HypertextLiteral = "ac1192a8-f4b3-4bfe-ba22-af5b92cd3ab2"
+PlotlyBase = "a03496cd-edff-5a9b-9e67-9cda94a718b5"
+PlotlyKaleido = "f2990250-8cf9-495f-b13a-cce12b45703c"
+PlutoDevMacros = "a0499f29-c39b-4c5c-807c-88074221b949"
+PlutoExtras = "ed5d0301-4775-4676-b788-cf71e66ff8ed"
+PlutoPlotly = "8e989ff0-3d88-8e9f-f020-2b208a939ff0"
+PlutoUI = "7f904dfe-b85e-4ff6-b463-dae2292396a8"
+UUIDs = "cf7118a7-6976-5b1a-9a39-7adc72f591a4"
