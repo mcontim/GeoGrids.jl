@@ -30,13 +30,12 @@ begin
 	using HypertextLiteral
 	using UUIDs
 	using PlutoPlotly
-	using PlotlyKaleido
 end
 
 # ╔═╡ 49b913f4-c717-4a8a-855d-cdb54b3e74b5
 begin
 	using GeoGrids
-	using GeoGrids: plot_geo,fibonaccisphere_optimization1,fibonaccisphere_alternative1
+	using GeoGrids: plot_geo_2D,plot_geo_3D,plot_unitarysphere,fibonaccisphere_optimization1,fibonaccisphere_alternative1
 end
 
 # ╔═╡ 8450f4d6-20e5-4459-9a21-2a2aeaf78de4
@@ -116,47 +115,14 @@ md"""
 The main source can be found at this [link](http://extremelearning.com.au/how-to-evenly-distribute-points-on-a-sphere-more-effectively-than-the-canonical-fibonacci-lattice/).
 """
 
-# ╔═╡ 9fdf7569-cb6d-4a4a-bcfe-a5335927874f
-function fibonacci_sphere_distribution_1bis(N::Int)
-	cart = zeros(N, 3)
-	latlon = zeros(N, 2)
-	goldenRatio = (1 + sqrt(5))/2
-	for k in 0:N-1
-		θ = 2π * k/ goldenRatio # Longitude
-		ϕ = acos(1 - 2(k+0.5)/N) # Latitude
-		cart[k+1,:] = [sin(ϕ)*cos(θ), sin(ϕ)*sin(θ), cos(ϕ)]
-		latlon[k+1,:] = [ϕ, θ]
-	end
-
-	return cart,latlon
-end
-
-# ╔═╡ c3f4e539-bc0b-4125-aa2c-5d4ccc685376
-cart,latlon = fibonacci_sphere_distribution_1bis(2000)
-
-# ╔═╡ 60827814-1ecf-443e-8446-d504bfddfea9
-latlon .* 180/pi
-
-# ╔═╡ 7441b671-45dd-4117-baf4-19d27fb1bd52
-lat = asin.(cart[:,3]) .* 180 / π
-
-# ╔═╡ 54341997-6e51-4a49-bc27-8fc8bb91e929
-lon = atan.(cart[:,2], cart[:,1]) .* 180 / π
-
-# ╔═╡ f2925689-80a9-460c-aa64-40780ca0609d
-plot_geo(lat,lon)
-
-# ╔═╡ ecbb4bc9-3c10-45c6-a00d-b39d27ef3f90
-plot_geo(latlon[:,1],latlon[:,2])
-
 # ╔═╡ e7e7a9d5-6f6c-45ab-b1cd-5a20a4569176
 md"""
 ## 2. Optimization #1
 """
 
-# ╔═╡ 0752c0d0-6ec6-4290-b15d-513f521698e4
+# ╔═╡ 85434a87-b158-44ed-ac2e-e2188b1228fa
 md"""
-The main source can be found at this [link](http://extremelearning.com.au/how-to-evenly-distribute-points-on-a-sphere-more-effectively-than-the-canonical-fibonacci-lattice/).
+The function ```fibonaccisphere_optimization1()``` uses an optimization of the Fibonacci Sphere.
 """
 
 # ╔═╡ ea04e7ab-4fb8-4045-9015-f342d916c010
@@ -168,6 +134,11 @@ We need to move (offset) all the points slightly farther away from the poles. Th
 Offsetting the points of the Fibonacci lattice slightly away from the poles produces a packing that is up to 8.3% tighter than the canonical Fibonacci lattice.
 
 For $n>100$, an improvement can be made beyond this, by initially placing a point at each pole, and then placing the remaining $n-2$ points. This not only (very sightly) improves minimal nearest packing, but it also prevents a large gap at each pole.
+"""
+
+# ╔═╡ 0752c0d0-6ec6-4290-b15d-513f521698e4
+md"""
+The main source can be found at this [link](http://extremelearning.com.au/how-to-evenly-distribute-points-on-a-sphere-more-effectively-than-the-canonical-fibonacci-lattice/).
 """
 
 # ╔═╡ 75f1a094-72c2-49f5-a9b0-be0783a7f135
@@ -186,55 +157,13 @@ md"""
 points1 = fibonaccisphere_classic(n)
 
 # ╔═╡ a5da23ce-9407-4120-9117-66ba9072aad7
-let
-	# Reference Sphere
-	n_sphere = 100
-	u = range(-π, π; length = n_sphere)
-	v = range(0, π; length = n_sphere)
-	x_sphere = cos.(u) * sin.(v)'
-	y_sphere = sin.(u) * sin.(v)'
-	z_sphere = ones(n_sphere) * cos.(v)'
-	color = ones(size(z_sphere))
-	sphere = surface(z=z_sphere, x=x_sphere, y=y_sphere, surfacecolor = color, colorbar=false )
-	
-	markers = scatter3d(
-				x = points1[:,1],
-				y = points1[:,2],
-				z = points1[:,3],
-				mode = "markers",
-				marker_size = 4,
-				marker_color = "rgb(0,0,0)",
-				)
-	
-	plot([sphere,markers])
-end
+plot_unitarysphere(points1)
 
 # ╔═╡ 19f09d99-4b9f-40d2-b09d-551930d0e677
 points2 = fibonaccisphere_optimization1(n)
 
-# ╔═╡ af51160b-bb44-40dd-953d-79facfc76422
-let
-	# Reference Sphere
-	n_sphere = 100
-	u = range(-π, π; length = n_sphere)
-	v = range(0, π; length = n_sphere)
-	x_sphere = cos.(u) * sin.(v)'
-	y_sphere = sin.(u) * sin.(v)'
-	z_sphere = ones(n_sphere) * cos.(v)'
-	color = ones(size(z_sphere))
-	sphere = surface(z=z_sphere, x=x_sphere, y=y_sphere, surfacecolor = color, colorbar=false )
-	
-	markers = scatter3d(
-				x = points2[:,1],
-				y = points2[:,2],
-				z = points2[:,3],
-				mode = "markers",
-				marker_size = 4,
-				marker_color = "rgb(0,0,0)",
-				)
-	
-	plot([sphere,markers])
-end
+# ╔═╡ 4e8c0d63-a135-490b-bcb5-7ae76fba2ec3
+plot_unitarysphere(points2)
 
 # ╔═╡ e5a8a3aa-4a7a-4170-a543-e64ec79071b8
 md"""
@@ -258,29 +187,25 @@ The results should be equivalent to the Classical implementation (to be verified
 # ╔═╡ 37c0c4de-daba-4591-b19b-a15a8ebe75ad
 points3 = fibonaccisphere_alternative1(n)
 
-# ╔═╡ 73a05a74-17a9-467b-8049-5299060e2dd9
-let
-	# Reference Sphere
-	n_sphere = 100
-	u = range(-π, π; length = n_sphere)
-	v = range(0, π; length = n_sphere)
-	x_sphere = cos.(u) * sin.(v)'
-	y_sphere = sin.(u) * sin.(v)'
-	z_sphere = ones(n_sphere) * cos.(v)'
-	color = ones(size(z_sphere))
-	sphere = surface(z=z_sphere, x=x_sphere, y=y_sphere, surfacecolor = color, colorbar=false )
-	
-	markers = scatter3d(
-				x = points3[:,1],
-				y = points3[:,2],
-				z = points3[:,3],
-				mode = "markers",
-				marker_size = 4,
-				marker_color = "rgb(0,0,0)",
-				)
-	
-	plot([sphere,markers])
-end
+# ╔═╡ 5c1ed0da-e5f7-498c-8e46-570db5e258d8
+plot_unitarysphere(points3)
+
+# ╔═╡ 9b8cf4cc-39ed-461c-8cea-7b2cdd92f0f3
+md"""
+# Test vs similar (previous) MATLAB implementation
+"""
+
+# ╔═╡ 7441b671-45dd-4117-baf4-19d27fb1bd52
+lat = asin.(cart[:,3]) .* 180 / π
+
+# ╔═╡ 54341997-6e51-4a49-bc27-8fc8bb91e929
+lon = atan.(cart[:,2], cart[:,1]) .* 180 / π
+
+# ╔═╡ f2925689-80a9-460c-aa64-40780ca0609d
+plot_geo(lat,lon)
+
+# ╔═╡ ecbb4bc9-3c10-45c6-a00d-b39d27ef3f90
+plot_geo(latlon[:,1],latlon[:,2])
 
 # ╔═╡ Cell order:
 # ╠═347c69aa-a901-4a16-ac2e-8da3c314965e
@@ -297,23 +222,22 @@ end
 # ╟─c63cac75-8eb1-47d2-88ef-7fbe418ae57b
 # ╟─d91d92b4-0e7c-40fc-97d3-4ae6f731d121
 # ╟─4457e406-3b1b-4237-b02d-767f76a0d6e2
-# ╠═9fdf7569-cb6d-4a4a-bcfe-a5335927874f
-# ╠═c3f4e539-bc0b-4125-aa2c-5d4ccc685376
-# ╠═60827814-1ecf-443e-8446-d504bfddfea9
-# ╠═7441b671-45dd-4117-baf4-19d27fb1bd52
-# ╠═54341997-6e51-4a49-bc27-8fc8bb91e929
-# ╠═f2925689-80a9-460c-aa64-40780ca0609d
-# ╠═ecbb4bc9-3c10-45c6-a00d-b39d27ef3f90
 # ╠═2edabb82-7ac0-4b37-a947-b9e9e23ef00a
 # ╠═a5da23ce-9407-4120-9117-66ba9072aad7
 # ╟─e7e7a9d5-6f6c-45ab-b1cd-5a20a4569176
+# ╟─85434a87-b158-44ed-ac2e-e2188b1228fa
+# ╠═ea04e7ab-4fb8-4045-9015-f342d916c010
 # ╟─0752c0d0-6ec6-4290-b15d-513f521698e4
-# ╟─ea04e7ab-4fb8-4045-9015-f342d916c010
 # ╠═19f09d99-4b9f-40d2-b09d-551930d0e677
-# ╠═af51160b-bb44-40dd-953d-79facfc76422
+# ╠═4e8c0d63-a135-490b-bcb5-7ae76fba2ec3
 # ╠═75f1a094-72c2-49f5-a9b0-be0783a7f135
 # ╟─e5a8a3aa-4a7a-4170-a543-e64ec79071b8
 # ╟─3636cb43-10e0-465c-9d6a-e96f540a4acf
 # ╟─01ca2945-7838-4fb7-aafc-3c646612b8ea
 # ╠═37c0c4de-daba-4591-b19b-a15a8ebe75ad
-# ╠═73a05a74-17a9-467b-8049-5299060e2dd9
+# ╠═5c1ed0da-e5f7-498c-8e46-570db5e258d8
+# ╟─9b8cf4cc-39ed-461c-8cea-7b2cdd92f0f3
+# ╠═7441b671-45dd-4117-baf4-19d27fb1bd52
+# ╠═54341997-6e51-4a49-bc27-8fc8bb91e929
+# ╠═f2925689-80a9-460c-aa64-40780ca0609d
+# ╠═ecbb4bc9-3c10-45c6-a00d-b39d27ef3f90

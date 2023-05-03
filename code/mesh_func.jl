@@ -2,9 +2,7 @@
     meshgrid(xin, yin)
 
 Create a 2D grid of coordinates using the input vectors `xin` and `yin`.
-The output arrays `xout` and `yout` are the same size, and contain all possible
-combinations of the elements of `xin` and `yin`, with `xout` corresponding to the
-horizontal coordinates and `yout` corresponding to the vertical coordinates.
+The output arrays `xout` and `yout` are the same size, and contain all possible combinations of the elements of `xin` and `yin`, with `xout` corresponding to the horizontal coordinates and `yout` corresponding to the vertical coordinates.
 
 ### Arguments
 - `xin::AbstractVector`: 1D input array of horizontal coordinates.
