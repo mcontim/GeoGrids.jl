@@ -1,11 +1,10 @@
-function plot_geo_2D(lat,lon)
+function plot_geo_2D(points_latlon)
 	# Markers for the points
 	points = scattergeo(
-		lat = lat,
-		lon = lon,
+		lat = points_latlon[:,1],
+		lon = points_latlon[:,2],
 		mode = "markers",
-		marker_size = 5, 
-		name = "Points"
+		marker_size = 5
 	)
 	
 	# Create the geo layout
@@ -45,7 +44,7 @@ function plot_geo_3D(points_latlon)
 		lat = points_latlon[:,1],
 		lon = points_latlon[:,2],
 		mode = "markers",
-		marker_size = 5,
+		marker_size = 5
 	)
 	
 	# Create the geo layout
