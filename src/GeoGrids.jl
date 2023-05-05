@@ -1,6 +1,7 @@
 module GeoGrids
 
 using LinearAlgebra
+using StaticArrays
 using PlutoPlotly
 
 include("../code/aux_func.jl")
