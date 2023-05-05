@@ -262,7 +262,7 @@ md"""
 # ╔═╡ 75f1a094-72c2-49f5-a9b0-be0783a7f135
 # Sim Parameters
 begin
-	n_bond = @bind n Editable(50)
+	n_bond = @bind n Editable(1000)
 end;
 
 # ╔═╡ 7def6caf-2105-4230-9acc-7b3db15c7689
@@ -271,40 +271,28 @@ md"""
 - Number of Points: $(n_bond)
 """ |> x -> position_fixed(x;top = 65, left = 15, width = 350)
 
-# ╔═╡ 2edabb82-7ac0-4b37-a947-b9e9e23ef00a
+# ╔═╡ 173eb8a1-c2bb-4c73-8345-6b9f0f5b7d90
 points1 = fibonaccisphere_classic(n; coord=:cart)
-
-# ╔═╡ 5fd8a2d6-a1fb-40ca-bdc0-ffc403625592
-points1[1][1]
 
 # ╔═╡ 256e751b-d868-4b41-9f94-e54672a3f571
 plot_unitarysphere(points1)
 
 # ╔═╡ a5da23ce-9407-4120-9117-66ba9072aad7
 # Check for the growing of point in Fibonacci spiral
-plot_unitarysphere(points1[1:20,:])
-
-# ╔═╡ 19f09d99-4b9f-40d2-b09d-551930d0e677
-points2 = fibonaccisphere_optimization1(n)
+plot_unitarysphere(points1[1:20])
 
 # ╔═╡ 4e8c0d63-a135-490b-bcb5-7ae76fba2ec3
-plot_unitarysphere(points2)
-
-# ╔═╡ 37c0c4de-daba-4591-b19b-a15a8ebe75ad
-points3 = fibonaccisphere_alternative1(n)
+plot_unitarysphere(fibonaccisphere_optimization1(n))
 
 # ╔═╡ 5c1ed0da-e5f7-498c-8e46-570db5e258d8
-plot_unitarysphere(points3)
-
-# ╔═╡ fddf545c-2d3c-4c5f-bdd6-6e58302808e8
-latlonPoints_fibonacci = rad2deg.(fibonaccisphere_classic(n)[:,1:2])
+plot_unitarysphere(fibonaccisphere_alternative1(n))
 
 # ╔═╡ ec3c88ba-972f-4b0f-ac25-75e779b1c33a
-plot_geo_2D(latlonPoints_fibonacci)
+plot_geo_2D(map(x -> rad2deg.(x), fibonaccisphere_classic(n)))
 
 # ╔═╡ 900cc195-8c5a-47c0-a48b-e04baa15fc61
 # Check for the growing of point in Fibonacci spiral
-plot_geo_2D(latlonPoints_fibonacci[1:20,:])
+plot_geo_2D(map(x -> rad2deg.(x), fibonaccisphere_classic(n)[1:20]))
 
 # ╔═╡ fe9d0374-824d-4756-b887-5a852aab9d68
 md"""
@@ -337,25 +325,21 @@ collect(values(Revise.queue_errors))[1][1].exc.msg
 # ╟─c63cac75-8eb1-47d2-88ef-7fbe418ae57b
 # ╟─d91d92b4-0e7c-40fc-97d3-4ae6f731d121
 # ╟─4457e406-3b1b-4237-b02d-767f76a0d6e2
-# ╠═2edabb82-7ac0-4b37-a947-b9e9e23ef00a
-# ╠═5fd8a2d6-a1fb-40ca-bdc0-ffc403625592
+# ╠═173eb8a1-c2bb-4c73-8345-6b9f0f5b7d90
 # ╠═256e751b-d868-4b41-9f94-e54672a3f571
 # ╠═a5da23ce-9407-4120-9117-66ba9072aad7
 # ╟─e7e7a9d5-6f6c-45ab-b1cd-5a20a4569176
 # ╟─85434a87-b158-44ed-ac2e-e2188b1228fa
 # ╟─ea04e7ab-4fb8-4045-9015-f342d916c010
 # ╟─0752c0d0-6ec6-4290-b15d-513f521698e4
-# ╠═19f09d99-4b9f-40d2-b09d-551930d0e677
 # ╠═4e8c0d63-a135-490b-bcb5-7ae76fba2ec3
 # ╟─e5a8a3aa-4a7a-4170-a543-e64ec79071b8
 # ╟─3636cb43-10e0-465c-9d6a-e96f540a4acf
 # ╟─01ca2945-7838-4fb7-aafc-3c646612b8ea
-# ╠═37c0c4de-daba-4591-b19b-a15a8ebe75ad
 # ╠═5c1ed0da-e5f7-498c-8e46-570db5e258d8
 # ╟─e687a108-7608-46cc-98a6-2e930886d022
 # ╟─e5ab7623-f708-489b-a130-8e33eb985aa6
 # ╟─d60e27a0-d518-475d-8a09-427fb42fd4c1
-# ╠═fddf545c-2d3c-4c5f-bdd6-6e58302808e8
 # ╠═ec3c88ba-972f-4b0f-ac25-75e779b1c33a
 # ╠═900cc195-8c5a-47c0-a48b-e04baa15fc61
 # ╠═4a4e3121-3d6b-485f-9690-5000e1e01e87

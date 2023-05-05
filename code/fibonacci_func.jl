@@ -180,10 +180,12 @@ function fibonaccisphere_optimization1(N::Int)
 	end
 	
 	goldenRatio = (1 + sqrt(5))/2
-	for k in 0:N-1
+
+	points = map(0:N-1) do k
 		θ = 2π * k / goldenRatio # Longitude
 		ϕ = acos(1 - 2*(k+epsilon)/(N-1+2*epsilon)) # Latitude
-		points[k+1,:] = [sin(ϕ)*cos(θ), sin(ϕ)*sin(θ), cos(ϕ)]
+
+		SVector(sin(ϕ)*cos(θ), sin(ϕ)*sin(θ), cos(ϕ))
 	end
 
 	return points
@@ -205,11 +207,12 @@ function fibonaccisphere_alternative1(N::Int)
 	goldenSphere = π * (3.0 - sqrt(5.0))
 	off = 2.0 / N
 
-	for k in 0:N-1
+	points = map(0:N-1) do k
 		y = k * off - 1.0 + (off / 2.0)
 		r = sqrt(1.0 - y * y)
 		phi = k * goldenSphere
-		points[k+1,:] = [cos(phi) * r, y, sin(phi) * r]
+
+		SVector(cos(phi) * r, y, sin(phi) * r)
 	end
 
 	return points

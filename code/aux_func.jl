@@ -1,8 +1,8 @@
 function plot_geo_2D(points_latlon)
 	# Markers for the points
 	points = scattergeo(
-		lat = points_latlon[:,1],
-		lon = points_latlon[:,2],
+		lat = map(x -> x[1], points_latlon),
+		lon = map(x -> x[2], points_latlon),
 		mode = "markers",
 		marker_size = 5
 	)
@@ -40,9 +40,9 @@ end
 
 function plot_geo_3D(points_latlon)
 	# Markers for the points
-	markers = scattergeo(
-		lat = points_latlon[:,1],
-		lon = points_latlon[:,2],
+	points = scattergeo(
+		lat = map(x -> x[1], points_latlon),
+		lon = map(x -> x[2], points_latlon),
 		mode = "markers",
 		marker_size = 5
 	)
@@ -91,13 +91,13 @@ function plot_unitarysphere(points_cart)
 	sphere = surface(z=z_sphere, x=x_sphere, y=y_sphere, surfacecolor = color, colorbar=false)
 	
 	markers = scatter3d(
-				x = points_cart[:,1],
-				y = points_cart[:,2],
-				z = points_cart[:,3],
-				mode = "markers",
-				marker_size = 4,
-				marker_color = "rgb(0,0,0)",
-				)
+		x = map(x -> x[1], points_cart),
+		y = map(x -> x[2], points_cart),
+		z = map(x -> x[3], points_cart),
+		mode = "markers",
+		marker_size = 4,
+		marker_color = "rgb(0,0,0)",
+		)
 
 	layout = Layout(title = "Point on Unitary Sphere")
 	
