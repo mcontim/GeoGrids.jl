@@ -4,6 +4,8 @@ authors = ["mconti "]
 version = "0.1.0"
 
 [deps]
+AngleBetweenVectors = "ec570357-d46e-52ed-9726-18773498274d"
+BenchmarkTools = "6e4b80f9-dd63-53aa-95a3-0cdb28fa8baf"
 HypertextLiteral = "ac1192a8-f4b3-4bfe-ba22-af5b92cd3ab2"
 LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
 MAT = "23992714-dd62-5051-b70f-ba57cb901cac"

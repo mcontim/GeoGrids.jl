@@ -2,6 +2,7 @@ module GeoGrids
 
 using LinearAlgebra
 using StaticArrays
+using AngleBetweenVectors
 using PlutoPlotly
 
 include("../code/aux_func.jl")

@@ -33,6 +33,9 @@ begin
 	using PlutoPlotly
 	using LinearAlgebra
 	using MAT
+	using StaticArrays
+	using AngleBetweenVectors
+	using BenchmarkTools
 end
 
 # ╔═╡ 49b913f4-c717-4a8a-855d-cdb54b3e74b5
@@ -43,7 +46,7 @@ end
 # ╔═╡ 6846c9d5-525c-4311-a2d7-a515923d5efa
 # Export all functions from package for easy test
 begin
-	using GeoGrids: plot_geo_2D,plot_geo_3D,plot_unitarysphere,fibonaccisphere_classic,fibonaccisphere_optimization1,fibonaccisphere_alternative1,points_required_for_separation_angle
+	using GeoGrids: plot_geo_2D,plot_geo_3D,plot_unitarysphere,fibonaccisphere_classic,fibonaccisphere_optimization1,fibonaccisphere_alternative1,points_required_for_separation_angle,points_required_for_separation_angle_var1,points_required_for_separation_angle_var2,plot_geo
 end
 
 # ╔═╡ 8450f4d6-20e5-4459-9a21-2a2aeaf78de4
@@ -188,39 +191,24 @@ md"""
 ## Fibonacci
 """
 
-# ╔═╡ 4a4e3121-3d6b-485f-9690-5000e1e01e87
-# latlonPoints_fibonacci2 = fibonaccigrid(angle=0.25)
+# ╔═╡ 9cb4a573-a745-4314-a1ac-76ce01b9af55
+md"""
+#### Test by Number of Points
+"""
 
-# ╔═╡ 601cd375-b40b-4d8a-98b3-9660adabdeff
-# lol(deg2rad(1))
+# ╔═╡ c09b1bbf-dc06-4ff0-a660-d68708b6fa2f
+md"""
+#### Test by Separation Angle
+"""
 
-# ╔═╡ 6f89470d-ded3-4842-89e0-96b1c89b348a
-function lol(angle)
-    N = 2
-	min_angle = 999
-    while true
-        points = fibonaccisphere_classic(N)
-        for i in 1:N, j in 1:N
-            if i != j
-				temp = acos(dot(points[i,:],points[j,:]) / norm(points[i,:])*norm(points[j,:]))
-                # angles[i,j] = acos(dot(points[i,:], points[j,:]))
-				if temp < min_angle
-					min_angle = temp
-				end
-            end
-        end
-        if min_angle <= angle
-            return N
-        end
-        N += 1
-		# if N>1000
-		# 	return N
-		# end
-    end
-end
+# ╔═╡ 589e967e-3373-4708-b3dc-e17eae300bdd
+# @benchmark points_required_for_separation_angle(deg2rad(5))
 
-# ╔═╡ e690615a-7678-4624-b0cc-43ae6af319f4
-points = fibonaccisphere_classic(1000)
+# ╔═╡ 021472ba-6998-455d-a6d4-84a840f1412c
+# @benchmark points_required_for_separation_angle_var1(deg2rad(5))
+
+# ╔═╡ 58acf19c-e394-4bb5-8c2d-2cb266806c5d
+# @benchmark points_required_for_separation_angle_var2(deg2rad(5))
 
 # ╔═╡ 9b8cf4cc-39ed-461c-8cea-7b2cdd92f0f3
 md"""
@@ -228,7 +216,10 @@ md"""
 """
 
 # ╔═╡ 85e83e10-849c-4d57-9343-7328393e30b0
-MATLABgridRes = "32"
+begin
+	MATLABgridRes = "4"
+	fibRes = 4
+end
 
 # ╔═╡ 14178dd8-c96b-4db7-af7a-b89d08f1e060
 begin
@@ -237,22 +228,49 @@ begin
 	ut_lon_unsorted = read(file, "lon")
 	ut_alt_unsorted = ones(size(ut_lat_unsorted)) .* 10e3
 	close(file)
-end
+
+	svecMAT = []
+	for ii=1:length(ut_lat_unsorted)
+		push!(svecMAT,SVector(ut_lat_unsorted[ii],ut_lon_unsorted[ii]))
+	end
+end;
 
 # ╔═╡ e3426da3-e213-49b2-917b-d58504eb1530
-ut_lat_unsorted
+length(svecMAT)
 
-# ╔═╡ 7441b671-45dd-4117-baf4-19d27fb1bd52
-lat = asin.(cart[:,3]) .* 180 / π
+# ╔═╡ d532c096-048d-49c5-ab95-b3d0520f85b9
+points_required_for_separation_angle(deg2rad(fibRes))
 
-# ╔═╡ 54341997-6e51-4a49-bc27-8fc8bb91e929
-lon = atan.(cart[:,2], cart[:,1]) .* 180 / π
+# ╔═╡ 59a8f573-9413-4ff6-b2b9-707a83c361de
+md"""
+### Fibonacci
+"""
 
-# ╔═╡ f2925689-80a9-460c-aa64-40780ca0609d
-plot_geo(lat,lon)
+# ╔═╡ 32e67099-d63f-4319-8f74-95e8c74d6e89
+plot_geo_2D(map(x -> rad2deg.(x), fibonaccigrid(angle=deg2rad(fibRes))))
 
-# ╔═╡ ecbb4bc9-3c10-45c6-a00d-b39d27ef3f90
-plot_geo(latlon[:,1],latlon[:,2])
+# ╔═╡ 857cec97-06d8-4d48-b335-8f358b65b39c
+plot_geo_3D(map(x -> rad2deg.(x), fibonaccigrid(angle=deg2rad(fibRes))))
+
+# ╔═╡ 6191b1d1-2b46-410d-96a4-5c9e9835283a
+md"""
+### Icosahedron
+"""
+
+# ╔═╡ 136e0c87-9b04-4031-9bc7-8ec3acd0670f
+plot_geo_2D(svecMAT)
+
+# ╔═╡ 320f235b-b7fa-4752-93e3-f34cfe82fdbb
+plot_geo_3D(svecMAT)
+
+# ╔═╡ ba76f023-4e8b-44ad-8605-3014413dfd04
+plot_geo(svecMAT;camera=:threedim)
+
+# ╔═╡ d1f49d5d-6e13-45af-9d82-71540e737d73
+svecMAT
+
+# ╔═╡ 0cccae4f-9176-4f6e-9f20-27ff543a8e89
+map(x -> rad2deg.(x), fibonaccigrid(angle=deg2rad(fibRes)))
 
 # ╔═╡ 281ce87b-9c81-4580-8425-537ec9efa36e
 md"""
@@ -263,12 +281,14 @@ md"""
 # Sim Parameters
 begin
 	n_bond = @bind n Editable(1000)
+	ang_bond = @bind ang Editable(5)
 end;
 
 # ╔═╡ 7def6caf-2105-4230-9acc-7b3db15c7689
 md"""
 **Parameters:**
 - Number of Points: $(n_bond)
+- Separation angle `[deg]`: $(ang_bond)
 """ |> x -> position_fixed(x;top = 65, left = 15, width = 350)
 
 # ╔═╡ 173eb8a1-c2bb-4c73-8345-6b9f0f5b7d90
@@ -288,11 +308,24 @@ plot_unitarysphere(fibonaccisphere_optimization1(n))
 plot_unitarysphere(fibonaccisphere_alternative1(n))
 
 # ╔═╡ ec3c88ba-972f-4b0f-ac25-75e779b1c33a
-plot_geo_2D(map(x -> rad2deg.(x), fibonaccisphere_classic(n)))
+plot_geo_2D(map(x -> rad2deg.(x), fibonaccigrid(N=n)))
+
+# ╔═╡ f97a8555-086b-48f6-950e-fc583d0afa11
+plot_geo_3D(map(x -> rad2deg.(x), fibonaccigrid(N=n)))
 
 # ╔═╡ 900cc195-8c5a-47c0-a48b-e04baa15fc61
-# Check for the growing of point in Fibonacci spiral
-plot_geo_2D(map(x -> rad2deg.(x), fibonaccisphere_classic(n)[1:20]))
+# Check for the growing of points in Fibonacci spiral
+plot_geo_2D(map(x -> rad2deg.(x), fibonaccigrid(N=n)[1:50]))
+
+# ╔═╡ d005be58-3be7-4b2a-a3f7-edf0fd095259
+# Check for the growing of points in Fibonacci spiral
+plot_geo_3D(map(x -> rad2deg.(x), fibonaccigrid(N=n)[1:50]))
+
+# ╔═╡ 6b1c8079-bab5-4951-b564-500bba378781
+plot_geo_2D(map(x -> rad2deg.(x), fibonaccigrid(angle=deg2rad(ang))))
+
+# ╔═╡ 88704126-cdc6-486f-bd68-e8fee558eac4
+plot_geo_3D(map(x -> rad2deg.(x), fibonaccigrid(angle=deg2rad(ang))))
 
 # ╔═╡ fe9d0374-824d-4756-b887-5a852aab9d68
 md"""
@@ -340,20 +373,31 @@ collect(values(Revise.queue_errors))[1][1].exc.msg
 # ╟─e687a108-7608-46cc-98a6-2e930886d022
 # ╟─e5ab7623-f708-489b-a130-8e33eb985aa6
 # ╟─d60e27a0-d518-475d-8a09-427fb42fd4c1
+# ╟─9cb4a573-a745-4314-a1ac-76ce01b9af55
 # ╠═ec3c88ba-972f-4b0f-ac25-75e779b1c33a
+# ╠═f97a8555-086b-48f6-950e-fc583d0afa11
 # ╠═900cc195-8c5a-47c0-a48b-e04baa15fc61
-# ╠═4a4e3121-3d6b-485f-9690-5000e1e01e87
-# ╠═601cd375-b40b-4d8a-98b3-9660adabdeff
-# ╠═6f89470d-ded3-4842-89e0-96b1c89b348a
-# ╠═e690615a-7678-4624-b0cc-43ae6af319f4
+# ╠═d005be58-3be7-4b2a-a3f7-edf0fd095259
+# ╟─c09b1bbf-dc06-4ff0-a660-d68708b6fa2f
+# ╠═589e967e-3373-4708-b3dc-e17eae300bdd
+# ╠═021472ba-6998-455d-a6d4-84a840f1412c
+# ╠═58acf19c-e394-4bb5-8c2d-2cb266806c5d
+# ╠═6b1c8079-bab5-4951-b564-500bba378781
+# ╠═88704126-cdc6-486f-bd68-e8fee558eac4
 # ╟─9b8cf4cc-39ed-461c-8cea-7b2cdd92f0f3
 # ╠═85e83e10-849c-4d57-9343-7328393e30b0
 # ╠═14178dd8-c96b-4db7-af7a-b89d08f1e060
 # ╠═e3426da3-e213-49b2-917b-d58504eb1530
-# ╠═7441b671-45dd-4117-baf4-19d27fb1bd52
-# ╠═54341997-6e51-4a49-bc27-8fc8bb91e929
-# ╠═f2925689-80a9-460c-aa64-40780ca0609d
-# ╠═ecbb4bc9-3c10-45c6-a00d-b39d27ef3f90
+# ╠═d532c096-048d-49c5-ab95-b3d0520f85b9
+# ╟─59a8f573-9413-4ff6-b2b9-707a83c361de
+# ╠═32e67099-d63f-4319-8f74-95e8c74d6e89
+# ╠═857cec97-06d8-4d48-b335-8f358b65b39c
+# ╟─6191b1d1-2b46-410d-96a4-5c9e9835283a
+# ╠═136e0c87-9b04-4031-9bc7-8ec3acd0670f
+# ╠═320f235b-b7fa-4752-93e3-f34cfe82fdbb
+# ╠═ba76f023-4e8b-44ad-8605-3014413dfd04
+# ╠═d1f49d5d-6e13-45af-9d82-71540e737d73
+# ╠═0cccae4f-9176-4f6e-9f20-27ff543a8e89
 # ╟─281ce87b-9c81-4580-8425-537ec9efa36e
 # ╠═75f1a094-72c2-49f5-a9b0-be0783a7f135
 # ╟─fe9d0374-824d-4756-b887-5a852aab9d68
