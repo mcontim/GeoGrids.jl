@@ -1,6 +1,8 @@
 ### A Pluto.jl notebook ###
 # v0.19.25
 
+#> custom_attrs = ["hide-enabled"]
+
 using Markdown
 using InteractiveUtils
 
@@ -46,7 +48,7 @@ end
 # ╔═╡ 6846c9d5-525c-4311-a2d7-a515923d5efa
 # Export all functions from package for easy test
 begin
-	using GeoGrids: plot_geo_2D,plot_geo_3D,plot_unitarysphere,fibonaccisphere_classic,fibonaccisphere_optimization1,fibonaccisphere_alternative1,points_required_for_separation_angle,points_required_for_separation_angle_var1,points_required_for_separation_angle_var2,plot_geo
+	using GeoGrids: fibonaccisphere_classic,fibonaccisphere_optimization1,fibonaccisphere_alternative1,points_required_for_separation_angle,points_required_for_separation_angle_var1,points_required_for_separation_angle_var2,plot_geo,plot_unitarysphere
 end
 
 # ╔═╡ 8450f4d6-20e5-4459-9a21-2a2aeaf78de4
@@ -80,11 +82,6 @@ end;
 
 # ╔═╡ ac88e13f-73dc-451c-b3f3-2a4b4a422f19
 ExtendedTableOfContents()
-
-# ╔═╡ de5322c4-e0d9-43db-b73c-74935fb20b2f
-md"""
-# Foce export of functions from package
-"""
 
 # ╔═╡ af33dff0-3b77-48e3-abab-d6a610123be9
 md"""
@@ -210,16 +207,32 @@ md"""
 # ╔═╡ 58acf19c-e394-4bb5-8c2d-2cb266806c5d
 # @benchmark points_required_for_separation_angle_var2(deg2rad(5))
 
+# ╔═╡ 9549fdb3-af94-4b3f-ba22-043c4e8be52e
+md"""
+## Meshgrid
+"""
+
+# ╔═╡ d8066dfb-a481-41d3-9793-13d86f55cecd
+get_meshgrid(0:90,0:180)[1]
+
+# ╔═╡ a00c8114-a5b5-4288-be4a-dff7489ebaed
+# plot_geo(map(x -> rad2deg.(x), mashgrid(angle=deg2rad(tableVal.ang))))
+
 # ╔═╡ 9b8cf4cc-39ed-461c-8cea-7b2cdd92f0f3
 md"""
-# Test vs similar (previous) MATLAB implementation
+# Test vs old MATLAB implementation
+"""
+
+# ╔═╡ 45e2a04d-1414-4168-bca8-2ea557fb1cab
+md"""
+It is possible to see that the two methods do not exactly correspond but the freedom of exact number of points selection given by the Fibonacci Spiral gives the edge to the latter.
 """
 
 # ╔═╡ 85e83e10-849c-4d57-9343-7328393e30b0
 begin
 	MATLABgridRes = "4"
 	fibRes = 4
-end
+end;
 
 # ╔═╡ 14178dd8-c96b-4db7-af7a-b89d08f1e060
 begin
@@ -247,10 +260,10 @@ md"""
 """
 
 # ╔═╡ 32e67099-d63f-4319-8f74-95e8c74d6e89
-plot_geo_2D(map(x -> rad2deg.(x), fibonaccigrid(angle=deg2rad(fibRes))))
+plot_geo(map(x -> rad2deg.(x), fibonaccigrid(angle=deg2rad(fibRes))))
 
 # ╔═╡ 857cec97-06d8-4d48-b335-8f358b65b39c
-plot_geo_3D(map(x -> rad2deg.(x), fibonaccigrid(angle=deg2rad(fibRes))))
+plot_geo(map(x -> rad2deg.(x), fibonaccigrid(angle=deg2rad(fibRes)));camera=:threedim)
 
 # ╔═╡ 6191b1d1-2b46-410d-96a4-5c9e9835283a
 md"""
@@ -258,41 +271,35 @@ md"""
 """
 
 # ╔═╡ 136e0c87-9b04-4031-9bc7-8ec3acd0670f
-plot_geo_2D(svecMAT)
+plot_geo(svecMAT)
 
 # ╔═╡ 320f235b-b7fa-4752-93e3-f34cfe82fdbb
-plot_geo_3D(svecMAT)
-
-# ╔═╡ ba76f023-4e8b-44ad-8605-3014413dfd04
 plot_geo(svecMAT;camera=:threedim)
 
-# ╔═╡ d1f49d5d-6e13-45af-9d82-71540e737d73
-svecMAT
-
-# ╔═╡ 0cccae4f-9176-4f6e-9f20-27ff543a8e89
-map(x -> rad2deg.(x), fibonaccigrid(angle=deg2rad(fibRes)))
-
-# ╔═╡ 281ce87b-9c81-4580-8425-537ec9efa36e
+# ╔═╡ fe9d0374-824d-4756-b887-5a852aab9d68
 md"""
-# Bonds
+# Check on Notebook status
 """
 
-# ╔═╡ 75f1a094-72c2-49f5-a9b0-be0783a7f135
-# Sim Parameters
+# ╔═╡ d6549e61-1eec-4ad3-83ad-5c2d5dc3685c
 begin
-	n_bond = @bind n Editable(1000)
-	ang_bond = @bind ang Editable(5)
-end;
+"""
+	struct TABLE
+"""
+Base.@kwdef struct TABLE
+	n::Int 
+	ang::Number
+end
+@fielddata TABLE begin
+	n = (md"Number of Points to be generated:", Editable(1000))
+	ang = (md"Target separation angle `[deg]`:", Editable(5.0))
 
-# ╔═╡ 7def6caf-2105-4230-9acc-7b3db15c7689
-md"""
-**Parameters:**
-- Number of Points: $(n_bond)
-- Separation angle `[deg]`: $(ang_bond)
-""" |> x -> position_fixed(x;top = 65, left = 15, width = 350)
+end
+tableVal_bond = @bind tableVal StructBond(TABLE; description = "Grid Parameters")
+end
 
 # ╔═╡ 173eb8a1-c2bb-4c73-8345-6b9f0f5b7d90
-points1 = fibonaccisphere_classic(n; coord=:cart)
+points1 = fibonaccisphere_classic(tableVal.n; coord=:cart)
 
 # ╔═╡ 256e751b-d868-4b41-9f94-e54672a3f571
 plot_unitarysphere(points1)
@@ -302,35 +309,36 @@ plot_unitarysphere(points1)
 plot_unitarysphere(points1[1:20])
 
 # ╔═╡ 4e8c0d63-a135-490b-bcb5-7ae76fba2ec3
-plot_unitarysphere(fibonaccisphere_optimization1(n))
+plot_unitarysphere(fibonaccisphere_optimization1(tableVal.n))
 
 # ╔═╡ 5c1ed0da-e5f7-498c-8e46-570db5e258d8
-plot_unitarysphere(fibonaccisphere_alternative1(n))
+plot_unitarysphere(fibonaccisphere_alternative1(tableVal.n))
 
 # ╔═╡ ec3c88ba-972f-4b0f-ac25-75e779b1c33a
-plot_geo_2D(map(x -> rad2deg.(x), fibonaccigrid(N=n)))
+plot_geo(map(x -> rad2deg.(x), fibonaccigrid(N=tableVal.n)))
 
 # ╔═╡ f97a8555-086b-48f6-950e-fc583d0afa11
-plot_geo_3D(map(x -> rad2deg.(x), fibonaccigrid(N=n)))
+plot_geo(map(x -> rad2deg.(x), fibonaccigrid(N=tableVal.n));camera=:threedim)
 
 # ╔═╡ 900cc195-8c5a-47c0-a48b-e04baa15fc61
 # Check for the growing of points in Fibonacci spiral
-plot_geo_2D(map(x -> rad2deg.(x), fibonaccigrid(N=n)[1:50]))
+plot_geo(map(x -> rad2deg.(x), fibonaccigrid(N=tableVal.n)[1:50]))
 
 # ╔═╡ d005be58-3be7-4b2a-a3f7-edf0fd095259
 # Check for the growing of points in Fibonacci spiral
-plot_geo_3D(map(x -> rad2deg.(x), fibonaccigrid(N=n)[1:50]))
+plot_geo(map(x -> rad2deg.(x), fibonaccigrid(N=tableVal.n)[1:50]);camera=:threedim)
 
 # ╔═╡ 6b1c8079-bab5-4951-b564-500bba378781
-plot_geo_2D(map(x -> rad2deg.(x), fibonaccigrid(angle=deg2rad(ang))))
+plot_geo(map(x -> rad2deg.(x), fibonaccigrid(angle=deg2rad(tableVal.ang))))
 
 # ╔═╡ 88704126-cdc6-486f-bd68-e8fee558eac4
-plot_geo_3D(map(x -> rad2deg.(x), fibonaccigrid(angle=deg2rad(ang))))
+plot_geo(map(x -> rad2deg.(x), fibonaccigrid(angle=deg2rad(tableVal.ang)));camera=:threedim)
 
-# ╔═╡ fe9d0374-824d-4756-b887-5a852aab9d68
-md"""
-# Catch Revise Errors
-"""
+# ╔═╡ 8ed3bf0f-534e-4b12-a905-2b25b8c8e13a
+BondTable([
+	tableVal_bond,
+
+]; description = "Grid Parameters")
 
 # ╔═╡ b8cb81aa-9b26-4929-9b8c-551d59bc872b
 collect(values(Revise.queue_errors))
@@ -348,10 +356,8 @@ collect(values(Revise.queue_errors))[1][1].exc.msg
 # ╠═8450f4d6-20e5-4459-9a21-2a2aeaf78de4
 # ╠═e975f523-b6b0-4aca-8c74-22db0ec3a30f
 # ╠═ac88e13f-73dc-451c-b3f3-2a4b4a422f19
-# ╟─de5322c4-e0d9-43db-b73c-74935fb20b2f
 # ╠═6846c9d5-525c-4311-a2d7-a515923d5efa
 # ╟─af33dff0-3b77-48e3-abab-d6a610123be9
-# ╟─7def6caf-2105-4230-9acc-7b3db15c7689
 # ╟─d111b9a5-2d79-4eb7-b577-7b186b68016c
 # ╟─e78dca27-5288-4d90-a025-36790563c76b
 # ╟─2dbe0a40-f961-41c5-8556-c0c2df83f9cf
@@ -384,7 +390,11 @@ collect(values(Revise.queue_errors))[1][1].exc.msg
 # ╠═58acf19c-e394-4bb5-8c2d-2cb266806c5d
 # ╠═6b1c8079-bab5-4951-b564-500bba378781
 # ╠═88704126-cdc6-486f-bd68-e8fee558eac4
+# ╟─9549fdb3-af94-4b3f-ba22-043c4e8be52e
+# ╠═d8066dfb-a481-41d3-9793-13d86f55cecd
+# ╠═a00c8114-a5b5-4288-be4a-dff7489ebaed
 # ╟─9b8cf4cc-39ed-461c-8cea-7b2cdd92f0f3
+# ╟─45e2a04d-1414-4168-bca8-2ea557fb1cab
 # ╠═85e83e10-849c-4d57-9343-7328393e30b0
 # ╠═14178dd8-c96b-4db7-af7a-b89d08f1e060
 # ╠═e3426da3-e213-49b2-917b-d58504eb1530
@@ -395,12 +405,9 @@ collect(values(Revise.queue_errors))[1][1].exc.msg
 # ╟─6191b1d1-2b46-410d-96a4-5c9e9835283a
 # ╠═136e0c87-9b04-4031-9bc7-8ec3acd0670f
 # ╠═320f235b-b7fa-4752-93e3-f34cfe82fdbb
-# ╠═ba76f023-4e8b-44ad-8605-3014413dfd04
-# ╠═d1f49d5d-6e13-45af-9d82-71540e737d73
-# ╠═0cccae4f-9176-4f6e-9f20-27ff543a8e89
-# ╟─281ce87b-9c81-4580-8425-537ec9efa36e
-# ╠═75f1a094-72c2-49f5-a9b0-be0783a7f135
-# ╟─fe9d0374-824d-4756-b887-5a852aab9d68
+# ╠═fe9d0374-824d-4756-b887-5a852aab9d68
+# ╠═d6549e61-1eec-4ad3-83ad-5c2d5dc3685c
+# ╠═8ed3bf0f-534e-4b12-a905-2b25b8c8e13a
 # ╠═b8cb81aa-9b26-4929-9b8c-551d59bc872b
 # ╠═32ef4b79-5981-4d95-b437-60b80d4397bb
 # ╠═8d7e7f4e-1e41-48dd-9469-2723f3a5930f

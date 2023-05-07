@@ -1,7 +1,35 @@
 """
+	fibonaccigrid(;N=nothing, angle=nothing)
+
+This function returns a vector `Nx2` of LAT, LON values for a `N` points grid built with the Fibonacci Spiral method.
+
+### Arguments:
+- `N`: The number of points to generate.
+- `sepAng`: The separation angle for the grid of points to be generated.
+
+### Output:
+- A `Nx2` matrix containing the generated points. Each row of the matrix corresponds to a point on the surface of the sphere, and the columns correspond to the LAT, LON coordinates of the point.	
+"""
+function fibonaccigrid(;N=nothing, sepAng=nothing)	
+	if N isa Nothing && sepAng isa Nothing
+		error("Input one argument between N and sepAng...")
+	elseif sepAng isa Nothing
+		geoPoints = fibonaccisphere_classic(N; coord=:sphe)
+	elseif N isa Nothing
+		N,sepAng = points_required_for_separation_angle(sepAng)
+		geoPoints = fibonaccisphere_classic(N; coord=:sphe)
+	else
+		error("Input one argument between N and sepAng...")
+	end
+
+	return geoPoints
+end
+
+"""
 	fibonaccisphere_classic(N::Int)
 	
-This function generates `N` uniformly distributed points on the surface of a unitary sphere using the classic Fibonacci spiral method as described in [1].
+This function generates `N` uniformly distributed points on the surface of a unitary sphere using the classic Fibonacci Spiral method as described in [1].
+Contrary to the Ichosahedral grid generation process, with the Fibonacci Spiral method it is possible to generate a grid of points uniformly distributed in the area for a generic `N` value. As a drawback, the structure of the points do not follow a "perfect simmetry" however, the density of points in the area is preserved quasi-constant.
 
 ### Arguments:
 - `N::Int`: The number of points to generate.
@@ -9,7 +37,7 @@ This function generates `N` uniformly distributed points on the surface of a uni
 - `radius`: the sphere radius in meters (unitary as default)
 
 ### Output:
-- `N x 1` array containing the SVector of the generated points. Each element corresponds to a point on the surface of the sphere, the SVector contains either the x, y, and z (:cart) or lat, lon, alt (:sphe) coordinates of the point.
+- `N x 1` array containing the SVector of the generated points. Each element corresponds to a point on the surface of the sphere, the SVector contains either the x, y, and z (:cart) or lat, lon (:sphe) coordinates of the point.
 
 ### References
 1. http://extremelearning.com.au/how-to-evenly-distribute-points-on-a-sphere-more-effectively-than-the-canonical-fibonacci-lattice/
@@ -29,7 +57,7 @@ function fibonaccisphere_classic(N::Int; coord::Symbol=:sphe, spheRadius=1.0)
 			θ = 2π * k/ goldenRatio # [0,2π] [LON]
 			ϕ = acos(1 - 2(k+0.5)/N) # [0,π] from North Pole [LAT]
 			
-			SVector(π/2 - ϕ, rem2pi(θ, RoundNearest), spheRadius) # wrap
+			SVector(π/2 - ϕ, rem2pi(θ, RoundNearest)) # wrap
 		end
 	else
 		points = map(0:N-1) do k
@@ -42,7 +70,6 @@ function fibonaccisphere_classic(N::Int; coord::Symbol=:sphe, spheRadius=1.0)
 
 	return points
 end
-
 
 """
 	points_required_for_separation_angle(angle)
@@ -94,6 +121,36 @@ function points_required_for_separation_angle(sepAng; spheRadius=1.0, pointsToCh
   end
 
 """
+	find_separation_angle(points)
+
+This function takes an array of 3D points as input and computes the smallest angle between any two points in the array. It does this by iterating over all unique pairs of points in the array and computing the angle between them using the `angle`` function. The smallest angle encountered during the iteration is stored in the variable `sep` and returned as the output of the function.
+
+### Arguments:
+- `points``: an array of 3D points in the Cartesian plane represented as Tuples, Arrays, SVectors.
+
+### Output:
+- `sep`: the smallest angle between any two points in the input array, measured in radians.
+"""
+function find_separation_angle(points)
+	sep = Inf
+	L = length(points)
+
+	if L<2
+		error("The input vector must contain at least 2 points...")
+	end
+
+	@inbounds for i in 1:L-1
+		for j in i+1:L # Check triang sup (avoid repeating pairs of points, order is not important)
+			# acos(dot(points[i],points[j]) / norm(points[i])*norm(points[j]))
+			temp = angle(points[i],points[j]) # avoid errors with float approximations (<-1, >1)
+			sep = temp < sep ? temp : sep
+		end
+	end
+	
+	return sep
+end
+
+"""
 	fibonaccisphere_classic_partial(N, spheRadius, pointsToCheck)
 
 ### Arguments:
@@ -114,59 +171,6 @@ function fibonaccisphere_classic_partial(N, spheRadius, pointsToCheck)
 	end
 
 	return points
-end
-
-"""
-	find_separation_angle(points)
-
-This function takes an array of 3D points as input and computes the smallest angle between any two points in the array. It does this by iterating over all unique pairs of points in the array and computing the angle between them using the `angle`` function. The smallest angle encountered during the iteration is stored in the variable `sep` and returned as the output of the function.
-
-### Arguments:
-- `points``: an array of 3D points in the Cartesian plane represented as Tuples, Arrays, SVectors.
-
-### Output:
-- `sep`: the smallest angle between any two points in the input array, measured in radians.
-"""
-function find_separation_angle(points)
-	sep = Inf
-	L = length(points)
-
-	@inbounds for i in 1:L-1
-		for j in i+1:L # Check triang sup (avoid repeating pairs of points, order is not important)
-			# acos(dot(points[i],points[j]) / norm(points[i])*norm(points[j]))
-			temp = angle(points[i],points[j]) # avoid errors with float approximations (<-1, >1)
-			sep = temp < sep ? temp : sep
-		end
-	end
-	
-	return sep
-end
-  
-
-"""
-	fibonaccigrid(;N=nothing, angle=nothing)
-
-This function call fibonaccisphere_classic(N) an returns a vector `Nx2` of LAT LON values for each of the points.
-
-### Arguments:
-- `N::Int`: The number of points to generate.
-
-### Output:
-- A `N x 2` matrix containing the generated points. Each row of the matrix corresponds to a point on the surface of the sphere, and the columns correspond to the LAT, LON coordinates of the point.	
-"""
-function fibonaccigrid(;N=nothing, angle=nothing, altitude=1.0)	
-	if N isa Nothing && angle isa Nothing
-		error("Input one argument between N and angle...")
-	elseif angle isa Nothing
-		geoPoints = fibonaccisphere_classic(N; coord=:sphe, spheRadius=altitude)
-	elseif N isa Nothing
-		N,sepAng = points_required_for_separation_angle(angle)
-		geoPoints = fibonaccisphere_classic(N; coord=:sphe, spheRadius=altitude)
-	else
-		error("Input one argument between N and angle...")
-	end
-
-	return geoPoints
 end
 
 ## Alternative implementations ------------------------------------------------------------------------------
