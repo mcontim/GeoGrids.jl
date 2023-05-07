@@ -32,7 +32,7 @@ function plot_unitarysphere(points_cart)
 
 	layout = Layout(title = "Point on Unitary Sphere")
 	
-	plot([sphere,markers],layout)
+	Plot([sphere,markers],layout)
 end
 
 """
@@ -90,5 +90,5 @@ function plot_geo(points_latlon; title="Point Position GEO Map", camera::Symbol=
 		geo_projection_type = projection
 	)
 	
-	plot([points],layout)
+	Plot([points],layout)
 end

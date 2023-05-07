@@ -1,8 +1,6 @@
 ### A Pluto.jl notebook ###
 # v0.19.25
 
-#> custom_attrs = ["hide-enabled"]
-
 using Markdown
 using InteractiveUtils
 
@@ -23,20 +21,23 @@ begin
   using Revise
 end
 
+# ╔═╡ b5995830-daa5-4869-8274-92cb5ac76882
+begin
+	using LinearAlgebra
+	using StaticArrays
+	using AngleBetweenVectors
+	using PlotlyBase
+end
+
 # ╔═╡ 5f32ed86-7613-4337-b6fd-bc42537baef1
 begin
-	using PlotlyBase
 	using PlutoUI
 	using PlutoExtras
 	using PlutoExtras.StructBondModule
 	using PlutoDevMacros
-	using HypertextLiteral
 	using UUIDs
 	using PlutoPlotly
-	using LinearAlgebra
-	using MAT
-	using StaticArrays
-	using AngleBetweenVectors
+	using MAT	
 	using BenchmarkTools
 end
 
@@ -60,25 +61,6 @@ main {
 }
 </style>
 """
-
-# ╔═╡ e975f523-b6b0-4aca-8c74-22db0ec3a30f
-function position_fixed(x;left = 10, top = 10, width = 300, zindex = 500)
-    id = "fixed_div_$(uuid4())"
-    @htl """
-    <div id=$id>
-        $x
-    </div>
-    <style>
-        #$id {
-            position: fixed;
-            top: $(top)px;
-            left: $(left)px;
-            width: $(width)px;
-            z-index: $zindex;
-        }
-    </style>
-    """
-end;
 
 # ╔═╡ ac88e13f-73dc-451c-b3f3-2a4b4a422f19
 ExtendedTableOfContents()
@@ -254,10 +236,10 @@ md"""
 """
 
 # ╔═╡ 32e67099-d63f-4319-8f74-95e8c74d6e89
-plot_geo(map(x -> rad2deg.(x), fibonaccigrid(sepAng=deg2rad(fibRes))))
+plot(plot_geo(map(x -> rad2deg.(x), fibonaccigrid(sepAng=deg2rad(fibRes)))))
 
 # ╔═╡ 857cec97-06d8-4d48-b335-8f358b65b39c
-plot_geo(map(x -> rad2deg.(x), fibonaccigrid(sepAng=deg2rad(fibRes)));camera=:threedim)
+plot(plot_geo(map(x -> rad2deg.(x), fibonaccigrid(sepAng=deg2rad(fibRes)));camera=:threedim))
 
 # ╔═╡ 6191b1d1-2b46-410d-96a4-5c9e9835283a
 md"""
@@ -265,10 +247,10 @@ md"""
 """
 
 # ╔═╡ 136e0c87-9b04-4031-9bc7-8ec3acd0670f
-plot_geo(svecMAT)
+plot(plot_geo(svecMAT))
 
 # ╔═╡ 320f235b-b7fa-4752-93e3-f34cfe82fdbb
-plot_geo(svecMAT;camera=:threedim)
+plot(plot_geo(svecMAT;camera=:threedim))
 
 # ╔═╡ fe9d0374-824d-4756-b887-5a852aab9d68
 md"""
@@ -296,46 +278,47 @@ end
 points1 = fibonaccisphere_classic(tableVal.n; coord=:cart)
 
 # ╔═╡ 256e751b-d868-4b41-9f94-e54672a3f571
-plot_unitarysphere(points1)
+# plot() is used to wrap the Plot() output for a proper visualization. PlutoPlotly or PlutoJS are required in the notebook
+plot(plot_unitarysphere(points1))
 
 # ╔═╡ a5da23ce-9407-4120-9117-66ba9072aad7
 # Check for the growing of point in Fibonacci spiral
-plot_unitarysphere(points1[1:20])
+plot(plot_unitarysphere(points1[1:20]))
 
 # ╔═╡ 4e8c0d63-a135-490b-bcb5-7ae76fba2ec3
-plot_unitarysphere(fibonaccisphere_optimization1(tableVal.n))
+plot(plot_unitarysphere(fibonaccisphere_optimization1(tableVal.n)))
 
 # ╔═╡ 5c1ed0da-e5f7-498c-8e46-570db5e258d8
-plot_unitarysphere(fibonaccisphere_alternative1(tableVal.n))
+plot(plot_unitarysphere(fibonaccisphere_alternative1(tableVal.n)))
 
 # ╔═╡ ec3c88ba-972f-4b0f-ac25-75e779b1c33a
-plot_geo(map(x -> rad2deg.(x), fibonaccigrid(N=tableVal.n)))
+plot(plot_geo(map(x -> rad2deg.(x), fibonaccigrid(N=tableVal.n))))
 
 # ╔═╡ f97a8555-086b-48f6-950e-fc583d0afa11
-plot_geo(map(x -> rad2deg.(x), fibonaccigrid(N=tableVal.n));camera=:threedim)
+plot(plot_geo(map(x -> rad2deg.(x), fibonaccigrid(N=tableVal.n));camera=:threedim))
 
 # ╔═╡ 900cc195-8c5a-47c0-a48b-e04baa15fc61
 # Check for the growing of points in Fibonacci spiral
-plot_geo(map(x -> rad2deg.(x), fibonaccigrid(N=tableVal.n)[1:50]))
+plot(plot_geo(map(x -> rad2deg.(x), fibonaccigrid(N=tableVal.n)[1:50])))
 
 # ╔═╡ d005be58-3be7-4b2a-a3f7-edf0fd095259
 # Check for the growing of points in Fibonacci spiral
-plot_geo(map(x -> rad2deg.(x), fibonaccigrid(N=tableVal.n)[1:50]);camera=:threedim)
+plot(plot_geo(map(x -> rad2deg.(x), fibonaccigrid(N=tableVal.n)[1:50]);camera=:threedim))
 
 # ╔═╡ 6b1c8079-bab5-4951-b564-500bba378781
-plot_geo(map(x -> rad2deg.(x), fibonaccigrid(sepAng=deg2rad(tableVal.ang))))
+plot(plot_geo(map(x -> rad2deg.(x), fibonaccigrid(sepAng=deg2rad(tableVal.ang)))))
 
 # ╔═╡ 88704126-cdc6-486f-bd68-e8fee558eac4
-plot_geo(map(x -> rad2deg.(x), fibonaccigrid(sepAng=deg2rad(tableVal.ang)));camera=:threedim)
+plot(plot_geo(map(x -> rad2deg.(x), fibonaccigrid(sepAng=deg2rad(tableVal.ang)));camera=:threedim))
 
 # ╔═╡ f1d6ee2f-01d2-4b79-b326-cb202c58d74d
 meshGrid = meshgrid(deg2rad(tableVal.ang))
 
 # ╔═╡ 3eeeffc0-3ba5-427b-b75b-0bf5f6286c9b
-plot_geo(map(x -> rad2deg.(x), meshGrid[1]))
+plot(plot_geo(map(x -> rad2deg.(x), meshGrid[1])))
 
 # ╔═╡ 00055125-7c7e-459e-b79e-f22e3d74866d
-plot_geo(map(x -> rad2deg.(x), meshGrid[1]);camera=:threedim)
+plot(plot_geo(map(x -> rad2deg.(x), meshGrid[1]);camera=:threedim))
 
 # ╔═╡ 8ed3bf0f-534e-4b12-a905-2b25b8c8e13a
 BondTable([
@@ -354,10 +337,10 @@ collect(values(Revise.queue_errors))[1][1].exc.msg
 
 # ╔═╡ Cell order:
 # ╠═347c69aa-a901-4a16-ac2e-8da3c314965e
+# ╠═b5995830-daa5-4869-8274-92cb5ac76882
 # ╠═5f32ed86-7613-4337-b6fd-bc42537baef1
 # ╠═49b913f4-c717-4a8a-855d-cdb54b3e74b5
 # ╠═8450f4d6-20e5-4459-9a21-2a2aeaf78de4
-# ╠═e975f523-b6b0-4aca-8c74-22db0ec3a30f
 # ╠═ac88e13f-73dc-451c-b3f3-2a4b4a422f19
 # ╠═6846c9d5-525c-4311-a2d7-a515923d5efa
 # ╟─af33dff0-3b77-48e3-abab-d6a610123be9
