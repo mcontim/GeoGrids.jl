@@ -8,7 +8,7 @@ This function returns a vector `Nx2` of LAT, LON values for a `N` points grid bu
 - `sepAng`: The separation angle for the grid of points to be generated.
 
 ### Output:
-- A `Nx2` matrix containing the generated points. Each row of the matrix corresponds to a point on the surface of the sphere, and the columns correspond to the LAT, LON coordinates of the point.	
+- A `Nx2` Vector of SVector(lon,lat) the generated points. Each element corresponds to the LAT, LON coordinates of the point (LAT=y, LON=x).	
 """
 function fibonaccigrid(;N=nothing, sepAng=nothing)	
 	if N isa Nothing && sepAng isa Nothing
@@ -37,7 +37,7 @@ Contrary to the Ichosahedral grid generation process, with the Fibonacci Spiral 
 - `radius`: the sphere radius in meters (unitary as default)
 
 ### Output:
-- `N x 1` array containing the SVector of the generated points. Each element corresponds to a point on the surface of the sphere, the SVector contains either the x, y, and z (:cart) or lat, lon (:sphe) coordinates of the point.
+- `N x 1` array containing the SVector of the generated points. Each element corresponds to a point on the surface of the sphere, the SVector contains either the x, y, and z (:cart) or lon, lat (:sphe) (LAT=y, LON=x) coordinates of the point.
 
 ### References
 1. http://extremelearning.com.au/how-to-evenly-distribute-points-on-a-sphere-more-effectively-than-the-canonical-fibonacci-lattice/
@@ -57,7 +57,7 @@ function fibonaccisphere_classic(N::Int; coord::Symbol=:sphe, spheRadius=1.0)
 			θ = 2π * k/ goldenRatio # [0,2π] [LON]
 			ϕ = acos(1 - 2(k+0.5)/N) # [0,π] from North Pole [LAT]
 			
-			SVector(π/2 - ϕ, rem2pi(θ, RoundNearest)) # wrap
+			SVector(rem2pi(θ, RoundNearest), π/2 - ϕ) # wrap (lon,lat)
 		end
 	else
 		points = map(0:N-1) do k
@@ -123,7 +123,7 @@ function points_required_for_separation_angle(sepAng; spheRadius=1.0, pointsToCh
 """
 	find_separation_angle(points)
 
-This function takes an array of 3D points as input and computes the smallest angle between any two points in the array. It does this by iterating over all unique pairs of points in the array and computing the angle between them using the `angle`` function. The smallest angle encountered during the iteration is stored in the variable `sep` and returned as the output of the function.
+This function takes an array of 3D Cartesian points as input and computes the smallest angle between any two points in the array. It does this by iterating over all unique pairs of points in the array and computing the angle between them using the `angle`` function. The smallest angle encountered during the iteration is stored in the variable `sep` and returned as the output of the function.
 
 ### Arguments:
 - `points``: an array of 3D points in the Cartesian plane represented as Tuples, Arrays, SVectors.

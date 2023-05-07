@@ -1,16 +1,16 @@
 """
 	meshgrid(gridRes)
 
-This function call get_meshgrid with the specified resolution given as input and return the LAT, LON meshgrid.
+This function call get_meshgrid with the specified resolution given as input and return the LAT, LON meshgrid (LAT=y, LON=x).
 
 ### Arguments
-- `gridRes`: resolution of the meshgrid
+- `gridRes`: resolution of the meshgrid in rad
 
 ### Output
-- `vec`: A vector of SVector objects.
-- `grid`: A tuple of two 2-dimensional grids of x-coordinates and y-coordinates.
+- `vec`: A vector of SVector{2}(lon,lat) objects of LAT-LON coordinates in rad (LAT=y, LON=x).
+- `grid`: A tuple of two 2-dimensional grids of LAT-LON coordinates in rad (LAT=y, LON=x).
 """
-meshgrid(gridRes) = get_meshgrid(-180:gridRes:180,-90:gridRes:90)
+meshgrid(gridRes) = get_meshgrid(-π:gridRes:π-gridRes,-π/2:gridRes:π/2)
 
 """
 	get_meshgrid(xin, yin)
@@ -37,10 +37,10 @@ function get_meshgrid(xin,yin)
 	    for ix = 1:ny
 	        xout[ix,jx] = xin[jx]
 	        yout[ix,jx] = yin[ix]
-			push!(vec,SVector(xout[ix,jx],yout[ix,jx]))
+			push!(vec,SVector(xin[jx],yin[ix]))
 	    end
 	end
-	grid = (xout,yout)
+	grid = (x=xout,y=yout)
 
     return vec,grid
 end

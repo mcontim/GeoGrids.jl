@@ -48,7 +48,7 @@ end
 # ╔═╡ 6846c9d5-525c-4311-a2d7-a515923d5efa
 # Export all functions from package for easy test
 begin
-	using GeoGrids: fibonaccisphere_classic,fibonaccisphere_optimization1,fibonaccisphere_alternative1,points_required_for_separation_angle,points_required_for_separation_angle_var1,points_required_for_separation_angle_var2,plot_geo,plot_unitarysphere
+	using GeoGrids: fibonaccisphere_classic,fibonaccisphere_optimization1,fibonaccisphere_alternative1,points_required_for_separation_angle,points_required_for_separation_angle_var1,points_required_for_separation_angle_var2,get_meshgrid,plot_geo,plot_unitarysphere
 end
 
 # ╔═╡ 8450f4d6-20e5-4459-9a21-2a2aeaf78de4
@@ -212,12 +212,6 @@ md"""
 ## Meshgrid
 """
 
-# ╔═╡ d8066dfb-a481-41d3-9793-13d86f55cecd
-meshgrid(gridRes=0.5)[2]
-
-# ╔═╡ a00c8114-a5b5-4288-be4a-dff7489ebaed
-# plot_geo(map(x -> rad2deg.(x), mashgrid(angle=deg2rad(tableVal.ang))))
-
 # ╔═╡ 9b8cf4cc-39ed-461c-8cea-7b2cdd92f0f3
 md"""
 # Test vs old MATLAB implementation
@@ -244,7 +238,7 @@ begin
 
 	svecMAT = []
 	for ii=1:length(ut_lat_unsorted)
-		push!(svecMAT,SVector(ut_lat_unsorted[ii],ut_lon_unsorted[ii]))
+		push!(svecMAT,SVector(ut_lon_unsorted[ii],ut_lat_unsorted[ii]))
 	end
 end;
 
@@ -260,10 +254,10 @@ md"""
 """
 
 # ╔═╡ 32e67099-d63f-4319-8f74-95e8c74d6e89
-plot_geo(map(x -> rad2deg.(x), fibonaccigrid(angle=deg2rad(fibRes))))
+plot_geo(map(x -> rad2deg.(x), fibonaccigrid(sepAng=deg2rad(fibRes))))
 
 # ╔═╡ 857cec97-06d8-4d48-b335-8f358b65b39c
-plot_geo(map(x -> rad2deg.(x), fibonaccigrid(angle=deg2rad(fibRes)));camera=:threedim)
+plot_geo(map(x -> rad2deg.(x), fibonaccigrid(sepAng=deg2rad(fibRes)));camera=:threedim)
 
 # ╔═╡ 6191b1d1-2b46-410d-96a4-5c9e9835283a
 md"""
@@ -329,10 +323,19 @@ plot_geo(map(x -> rad2deg.(x), fibonaccigrid(N=tableVal.n)[1:50]))
 plot_geo(map(x -> rad2deg.(x), fibonaccigrid(N=tableVal.n)[1:50]);camera=:threedim)
 
 # ╔═╡ 6b1c8079-bab5-4951-b564-500bba378781
-plot_geo(map(x -> rad2deg.(x), fibonaccigrid(angle=deg2rad(tableVal.ang))))
+plot_geo(map(x -> rad2deg.(x), fibonaccigrid(sepAng=deg2rad(tableVal.ang))))
 
 # ╔═╡ 88704126-cdc6-486f-bd68-e8fee558eac4
-plot_geo(map(x -> rad2deg.(x), fibonaccigrid(angle=deg2rad(tableVal.ang)));camera=:threedim)
+plot_geo(map(x -> rad2deg.(x), fibonaccigrid(sepAng=deg2rad(tableVal.ang)));camera=:threedim)
+
+# ╔═╡ f1d6ee2f-01d2-4b79-b326-cb202c58d74d
+meshGrid = meshgrid(deg2rad(tableVal.ang))
+
+# ╔═╡ 3eeeffc0-3ba5-427b-b75b-0bf5f6286c9b
+plot_geo(map(x -> rad2deg.(x), meshGrid[1]))
+
+# ╔═╡ 00055125-7c7e-459e-b79e-f22e3d74866d
+plot_geo(map(x -> rad2deg.(x), meshGrid[1]);camera=:threedim)
 
 # ╔═╡ 8ed3bf0f-534e-4b12-a905-2b25b8c8e13a
 BondTable([
@@ -391,8 +394,9 @@ collect(values(Revise.queue_errors))[1][1].exc.msg
 # ╠═6b1c8079-bab5-4951-b564-500bba378781
 # ╠═88704126-cdc6-486f-bd68-e8fee558eac4
 # ╟─9549fdb3-af94-4b3f-ba22-043c4e8be52e
-# ╠═d8066dfb-a481-41d3-9793-13d86f55cecd
-# ╠═a00c8114-a5b5-4288-be4a-dff7489ebaed
+# ╠═f1d6ee2f-01d2-4b79-b326-cb202c58d74d
+# ╠═3eeeffc0-3ba5-427b-b75b-0bf5f6286c9b
+# ╠═00055125-7c7e-459e-b79e-f22e3d74866d
 # ╟─9b8cf4cc-39ed-461c-8cea-7b2cdd92f0f3
 # ╟─45e2a04d-1414-4168-bca8-2ea557fb1cab
 # ╠═85e83e10-849c-4d57-9343-7328393e30b0
@@ -405,7 +409,7 @@ collect(values(Revise.queue_errors))[1][1].exc.msg
 # ╟─6191b1d1-2b46-410d-96a4-5c9e9835283a
 # ╠═136e0c87-9b04-4031-9bc7-8ec3acd0670f
 # ╠═320f235b-b7fa-4752-93e3-f34cfe82fdbb
-# ╠═fe9d0374-824d-4756-b887-5a852aab9d68
+# ╟─fe9d0374-824d-4756-b887-5a852aab9d68
 # ╠═d6549e61-1eec-4ad3-83ad-5c2d5dc3685c
 # ╠═8ed3bf0f-534e-4b12-a905-2b25b8c8e13a
 # ╠═b8cb81aa-9b26-4929-9b8c-551d59bc872b

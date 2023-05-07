@@ -41,7 +41,7 @@ end
 This function takes an AbstractVector of SVector{2, <:Real} of LAT-LON coordinates (deg) and generates a plot on a world map projection using the PlotlyJS package.
 
 ### Arguments
-- `points_latlon::AbstractVector{SVector{2, <:Real}}:` List of 2-dimensional coordinates (lat, lon) in the form of an AbstractVector of SVector{2, <:Real} elements.
+- `points_latlon::AbstractVector{SVector{2, <:Real}}:` List of 2-dimensional coordinates (lon,lat) in the form of an AbstractVector of SVector{2, <:Real} elements (LAT=y, LON=x).
 - `title::String`: (optional) Title for the plot, default is "Point Position 3D Map".
 - `camera::Symbol`: (optional) The camera projection to use, either :twodim (default) or :threedim. If :threedim, the map will be displayed as an orthographic projection, while :twodim shows the map with a natural earth projection.
 """
@@ -49,8 +49,8 @@ function plot_geo(points_latlon; title="Point Position GEO Map", camera::Symbol=
 	# Markers for the points
 	# Take an array of SVector
 	points = scattergeo(
-		lat = map(x -> x[1], points_latlon),
-		lon = map(x -> x[2], points_latlon),
+		lat = map(x -> x[2], points_latlon),
+		lon = map(x -> x[1], points_latlon),
 		mode = "markers",
 		marker_size = 5
 	)
