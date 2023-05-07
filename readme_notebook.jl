@@ -213,7 +213,7 @@ md"""
 """
 
 # ╔═╡ d8066dfb-a481-41d3-9793-13d86f55cecd
-get_meshgrid(0:90,0:180)[1]
+meshgrid(gridRes=0.5)[2]
 
 # ╔═╡ a00c8114-a5b5-4288-be4a-dff7489ebaed
 # plot_geo(map(x -> rad2deg.(x), mashgrid(angle=deg2rad(tableVal.ang))))

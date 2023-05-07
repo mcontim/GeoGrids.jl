@@ -1,16 +1,17 @@
-function meshgrid(;N=nothing, angle=nothing)	
-	if N isa Nothing && angle isa Nothing
-		error("Input one argument between N and angle...")
-	elseif angle isa Nothing
-		geoPoints = fibonaccisphere_classic(N; coord=:sphe)
+function meshgrid(;N=nothing, gridRes=nothing)	
+	if N isa Nothing && gridRes isa Nothing
+		error("Input one argument between N and gridRes...")
+	elseif gridRes isa Nothing
+		# Find the separation angle corresponding to the Fibonacci Grid for that N
+		this_gridRes = round(find_separation_angle(fibonaccisphere_classic_partial(N)); digits=2)
+		geoPoints_vec,geoPoints_grid = get_meshgrid(-180:this_gridRes:180,-90:this_gridRes:90)
 	elseif N isa Nothing
-		N,sepAng = points_required_for_separation_angle(angle)
-		geoPoints = fibonaccisphere_classic(N; coord=:sphe)
+		geoPoints_vec,geoPoints_grid = get_meshgrid(-180:gridRes:180,-90:gridRes:90)
 	else
-		error("Input one argument between N and angle...")
+		error("Input one argument between N and gridRes...")
 	end
 
-	return geoPoints
+	return geoPoints_vec,geoPoints_grid
 end
 
 """

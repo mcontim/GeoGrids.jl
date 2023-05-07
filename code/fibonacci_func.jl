@@ -93,7 +93,7 @@ function points_required_for_separation_angle(sepAng; spheRadius=1.0, pointsToCh
 	
 	## Define Inner Functions ---------------------------------------------------------------------
 	# Find the separation angle for a given N
-	f(N) = find_separation_angle(fibonaccisphere_classic_partial(N,spheRadius,pointsToCheck))
+	f(N) = find_separation_angle(fibonaccisphere_classic_partial(N; spheRadius=spheRadius, pointsToCheck=pointsToCheck))
 	# Distance between the tested points
 	tolerance(v) = v[2] - v[1]
 	
@@ -151,17 +151,17 @@ function find_separation_angle(points)
 end
 
 """
-	fibonaccisphere_classic_partial(N, spheRadius, pointsToCheck)
+	fibonaccisphere_classic_partial(N; spheRadius=1.0, pointsToCheck::Int=50)
 
 ### Arguments:
 - `N`: an integer representing the number of points to generate on the surface of the sphere.
-- `spheRadius`: a float representing the radius of the sphere.
-- `pointsToCheck`: an integer representing the number of points to return starting from the first generated.
+- `spheRadius`: (optional) a float representing the radius of the sphere.
+- `pointsToCheck`: (optional) an integer representing the number of points to return starting from the first generated.
 
 ### Output:
 - `points`: an array of 3D points on the surface of the sphere represented as SVector{3}.
 """
-function fibonaccisphere_classic_partial(N, spheRadius, pointsToCheck)
+function fibonaccisphere_classic_partial(N; spheRadius=1.0, pointsToCheck::Int=50)
 	goldenRatio = (1 + sqrt(5))/2
 	points = map(0:min(pointsToCheck,N)-1) do k
 		θ = 2π * k/ goldenRatio # [0,2π] [LON]
