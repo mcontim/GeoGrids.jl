@@ -57,7 +57,7 @@ html"""
 <style>
 main {
     max-width: min(1000px, calc(95% - 200px));
-    margin-right: 150px !important;
+    margin-right: 50px !important;
 }
 </style>
 """
