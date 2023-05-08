@@ -1,5 +1,5 @@
 """
-	fibonaccigrid(;N=nothing, angle=nothing)
+	fibonaccigrid(;N=nothing, sepAng=nothing)
 
 This function returns a vector `Nx2` of LAT, LON values for a `N` points grid built with the Fibonacci Spiral method.
 
