@@ -8,21 +8,31 @@ This function returns a vector `Nx2` of LAT, LON values for a `N` points grid bu
 - `sepAng`: The separation angle for the grid of points to be generated [rad].
 
 ### Output:
-- A `Nx2` Vector of SVector(lon,lat) the generated points. Each element corresponds to the LAT, LON coordinates of the point in rad (LAT=y, LON=x).	
+- `vec`: A vector of SVector{2}(lon,lat) objects of LAT-LON coordinates in rad (LAT=y, LON=x).
+- `array`: A tuple of two 2-dimensional grids of LAT-LON coordinates in rad (LAT=y, LON=x).
 """
-function fibonaccigrid(;N=nothing, sepAng=nothing)	
+function fibonaccigrid(;N=nothing, sepAng=nothing, unid=:rad)	
 	if N isa Nothing && sepAng isa Nothing
 		error("Input one argument between N and sepAng...")
 	elseif sepAng isa Nothing
-		geoPoints = fibonaccisphere_classic(N; coord=:sphe)
+		coord = fibonaccisphere_classic(N; coord=:sphe)
 	elseif N isa Nothing
 		N,sepAng = points_required_for_separation_angle(sepAng)
-		geoPoints = fibonaccisphere_classic(N; coord=:sphe)
+		coord = fibonaccisphere_classic(N; coord=:sphe)
 	else
 		error("Input one argument between N and sepAng...")
 	end
 
-	return geoPoints
+	# Unit Conversion and output formatting
+	if unit == :rad
+		vec = coord[1]
+		array = coord[2]
+	else
+		vec = map(x -> rad2deg.(x), coord[1])
+		array = (x=rad2deg.(coord[2][1]), y=rad2deg.(coord[2][2]))
+	end
+
+	return vec,array
 end
 
 """
@@ -37,7 +47,8 @@ Contrary to the Ichosahedral grid generation process, with the Fibonacci Spiral 
 - `radius`: the sphere radius in meters (unitary as default)
 
 ### Output:
-- `N x 1` array containing the SVector of the generated points. Each element corresponds to a point on the surface of the sphere, the SVector contains either the x, y, and z (:cart) or lon, lat (:sphe) (LAT=y, LON=x) coordinates of the point.
+- `pointsVec``: `N x 1` array containing the SVector of the generated points. Each element corresponds to a point on the surface of the sphere, the SVector contains either the x, y, and z (:cart) or lon, lat (:sphe) (LAT=y, LON=x) coordinates of the point.
+- `pointsArray``: A tuple of two vectors of LAT-LON coordinates in rad (LAT=y, LON=x).
 
 ### References
 1. http://extremelearning.com.au/how-to-evenly-distribute-points-on-a-sphere-more-effectively-than-the-canonical-fibonacci-lattice/
@@ -53,22 +64,34 @@ points = fibonaccisphere_classic(1000)
 function fibonaccisphere_classic(N::Int; coord::Symbol=:sphe, spheRadius=1.0)
 	goldenRatio = (1 + sqrt(5))/2	
 	if coord==:sphe # :sphe | :cart
-		points = map(0:N-1) do k
+		x = Array{Float64,1}(undef,N)
+		y = Array{Float64,1}(undef,N)
+		pointsVec = map(0:N-1) do k
 			θ = 2π * k/ goldenRatio # [0,2π] [LON]
 			ϕ = acos(1 - 2(k+0.5)/N) # [0,π] from North Pole [LAT]
 			
 			SVector(rem2pi(θ, RoundNearest), π/2 - ϕ) # wrap (lon,lat)
+			x[k+1] = rem2pi(θ, RoundNearest)
+			y[k+1] = π/2 - ϕ
 		end
+		pointsArray = (x=x,y=y)
 	else
-		points = map(0:N-1) do k
+		x = Array{Float64,1}(undef,N)
+		y = Array{Float64,1}(undef,N)
+		z = Array{Float64,1}(undef,N)
+		pointsVec = map(0:N-1) do k
 			θ = 2π * k/ goldenRatio # [0,2π] [LON]
 			ϕ = acos(1 - 2(k+0.5)/N) # [0,π] from North Pole [LAT]
 			
 			SVector(spheRadius.*sin(ϕ)*cos(θ), spheRadius.*sin(ϕ)*sin(θ), spheRadius.*cos(ϕ))
+			x[k+1] = spheRadius.*sin(ϕ)*cos(θ)
+			y[k+1] = spheRadius.*sin(ϕ)*sin(θ)
+			z[k+1] = spheRadius.*cos(ϕ)
 		end
+		pointsArray = (x=x,y=y,z=z)
 	end
 
-	return points
+	return pointsVec,pointsArray
 end
 
 """
