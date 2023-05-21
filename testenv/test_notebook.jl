@@ -1,6 +1,8 @@
 ### A Pluto.jl notebook ###
 # v0.19.25
 
+#> custom_attrs = ["hide-enabled"]
+
 using Markdown
 using InteractiveUtils
 
@@ -236,10 +238,10 @@ md"""
 """
 
 # ╔═╡ 32e67099-d63f-4319-8f74-95e8c74d6e89
-plot(plot_geo(map(x -> rad2deg.(x), fibonaccigrid(sepAng=deg2rad(fibRes)))))
+plot(plot_geo(map(x -> rad2deg.(x), fibonaccigrid(sepAng=deg2rad(fibRes))[1])))
 
 # ╔═╡ 857cec97-06d8-4d48-b335-8f358b65b39c
-plot(plot_geo(map(x -> rad2deg.(x), fibonaccigrid(sepAng=deg2rad(fibRes)));camera=:threedim))
+plot(plot_geo(map(x -> rad2deg.(x), fibonaccigrid(sepAng=deg2rad(fibRes))[1]);camera=:threedim))
 
 # ╔═╡ 6191b1d1-2b46-410d-96a4-5c9e9835283a
 md"""
@@ -251,6 +253,11 @@ plot(plot_geo(svecMAT))
 
 # ╔═╡ 320f235b-b7fa-4752-93e3-f34cfe82fdbb
 plot(plot_geo(svecMAT;camera=:threedim))
+
+# ╔═╡ 8f4a39bf-cfdf-45ae-b7ca-357cc353a8bf
+md"""
+# Test LAT-LON :deg
+"""
 
 # ╔═╡ fe9d0374-824d-4756-b887-5a852aab9d68
 md"""
@@ -275,7 +282,7 @@ tableVal_bond = @bind tableVal StructBond(TABLE; description = "Grid Parameters"
 end
 
 # ╔═╡ 173eb8a1-c2bb-4c73-8345-6b9f0f5b7d90
-points1 = fibonaccisphere_classic(tableVal.n; coord=:cart)
+points1 = fibonaccisphere_classic(tableVal.n; coord=:cart)[1]
 
 # ╔═╡ 256e751b-d868-4b41-9f94-e54672a3f571
 # plot() is used to wrap the Plot() output for a proper visualization. PlutoPlotly or PlutoJS are required in the notebook
@@ -285,6 +292,9 @@ plot(plot_unitarysphere(points1))
 # Check for the growing of point in Fibonacci spiral
 plot(plot_unitarysphere(points1[1:20]))
 
+# ╔═╡ ad4ebdca-b0b1-4b90-aa09-3da77403d8da
+fibonaccisphere_classic(tableVal.n; coord=:cart)[2]
+
 # ╔═╡ 4e8c0d63-a135-490b-bcb5-7ae76fba2ec3
 plot(plot_unitarysphere(fibonaccisphere_optimization1(tableVal.n)))
 
@@ -292,24 +302,24 @@ plot(plot_unitarysphere(fibonaccisphere_optimization1(tableVal.n)))
 plot(plot_unitarysphere(fibonaccisphere_alternative1(tableVal.n)))
 
 # ╔═╡ ec3c88ba-972f-4b0f-ac25-75e779b1c33a
-plot(plot_geo(map(x -> rad2deg.(x), fibonaccigrid(N=tableVal.n))))
+plot(plot_geo(map(x -> rad2deg.(x), fibonaccigrid(N=tableVal.n)[1])))
 
 # ╔═╡ f97a8555-086b-48f6-950e-fc583d0afa11
-plot(plot_geo(map(x -> rad2deg.(x), fibonaccigrid(N=tableVal.n));camera=:threedim))
+plot(plot_geo(map(x -> rad2deg.(x), fibonaccigrid(N=tableVal.n)[1]);camera=:threedim))
 
 # ╔═╡ 900cc195-8c5a-47c0-a48b-e04baa15fc61
 # Check for the growing of points in Fibonacci spiral
-plot(plot_geo(map(x -> rad2deg.(x), fibonaccigrid(N=tableVal.n)[1:50])))
+plot(plot_geo(map(x -> rad2deg.(x), fibonaccigrid(N=tableVal.n)[1][1:50])))
 
 # ╔═╡ d005be58-3be7-4b2a-a3f7-edf0fd095259
 # Check for the growing of points in Fibonacci spiral
-plot(plot_geo(map(x -> rad2deg.(x), fibonaccigrid(N=tableVal.n)[1:50]);camera=:threedim))
+plot(plot_geo(map(x -> rad2deg.(x), fibonaccigrid(N=tableVal.n)[1][1:50]);camera=:threedim))
 
 # ╔═╡ 6b1c8079-bab5-4951-b564-500bba378781
-plot(plot_geo(map(x -> rad2deg.(x), fibonaccigrid(sepAng=deg2rad(tableVal.ang)))))
+plot(plot_geo(map(x -> rad2deg.(x), fibonaccigrid(sepAng=deg2rad(tableVal.ang))[1])))
 
 # ╔═╡ 88704126-cdc6-486f-bd68-e8fee558eac4
-plot(plot_geo(map(x -> rad2deg.(x), fibonaccigrid(sepAng=deg2rad(tableVal.ang)));camera=:threedim))
+plot(plot_geo(map(x -> rad2deg.(x), fibonaccigrid(sepAng=deg2rad(tableVal.ang))[1]);camera=:threedim))
 
 # ╔═╡ f1d6ee2f-01d2-4b79-b326-cb202c58d74d
 meshGrid = meshgrid(deg2rad(tableVal.ang))
@@ -319,6 +329,12 @@ plot(plot_geo(map(x -> rad2deg.(x), meshGrid[1])))
 
 # ╔═╡ 00055125-7c7e-459e-b79e-f22e3d74866d
 plot(plot_geo(map(x -> rad2deg.(x), meshGrid[1]);camera=:threedim))
+
+# ╔═╡ 06a5260c-7d8c-42ad-895a-79f90df4040c
+fibonaccigrid(N=tableVal.n, unit=:deg)
+
+# ╔═╡ 4cb5958e-3d18-40ff-9100-42592e5ad1de
+meshgrid(deg2rad(tableVal.ang); unit=:deg)
 
 # ╔═╡ 8ed3bf0f-534e-4b12-a905-2b25b8c8e13a
 BondTable([
@@ -351,6 +367,7 @@ collect(values(Revise.queue_errors))[1][1].exc.msg
 # ╟─d91d92b4-0e7c-40fc-97d3-4ae6f731d121
 # ╟─4457e406-3b1b-4237-b02d-767f76a0d6e2
 # ╠═173eb8a1-c2bb-4c73-8345-6b9f0f5b7d90
+# ╠═ad4ebdca-b0b1-4b90-aa09-3da77403d8da
 # ╠═256e751b-d868-4b41-9f94-e54672a3f571
 # ╠═a5da23ce-9407-4120-9117-66ba9072aad7
 # ╟─e7e7a9d5-6f6c-45ab-b1cd-5a20a4569176
@@ -392,6 +409,9 @@ collect(values(Revise.queue_errors))[1][1].exc.msg
 # ╟─6191b1d1-2b46-410d-96a4-5c9e9835283a
 # ╠═136e0c87-9b04-4031-9bc7-8ec3acd0670f
 # ╠═320f235b-b7fa-4752-93e3-f34cfe82fdbb
+# ╟─8f4a39bf-cfdf-45ae-b7ca-357cc353a8bf
+# ╠═06a5260c-7d8c-42ad-895a-79f90df4040c
+# ╠═4cb5958e-3d18-40ff-9100-42592e5ad1de
 # ╟─fe9d0374-824d-4756-b887-5a852aab9d68
 # ╠═d6549e61-1eec-4ad3-83ad-5c2d5dc3685c
 # ╠═8ed3bf0f-534e-4b12-a905-2b25b8c8e13a
