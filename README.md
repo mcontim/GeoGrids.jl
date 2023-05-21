@@ -4,9 +4,9 @@ This is a package containing functions for Geographical Grids generation for exa
 
 ## Exported Functions
 
-    fibonaccigrid(; N = nothing, sepAng = nothing)
+    fibonaccigrid(; N = nothing, sepAng = nothing, unit = :rad)
 
-This function returns an Array of `SVector(lon,lat)` of LAT, LON values for a `N` points Global grid built with the **Fibonacci Spiral** method.
+This function returns an Array of `SVector(lon,lat)`, as well as a `Tuple(x=lon,y=lat)`, of LAT, LON values for a `N` points Global grid built with the **Fibonacci Spiral** method.
 
 The grid can be generated starting fom the number of point requested on the grid (`N`) or by the minimum separation angle requested for the points (`sepAng`).
 
@@ -17,17 +17,17 @@ Of these near-optimal solutions, one of the most common simple methods is one ba
 
 This method of points distribution is **Area Preserving** but not distance preserving.
 
-As convention it has been considered: `LAT=y`, `LON=x`.
+As convention it has been considered: `LAT=y`, `LON=x`. The output can be returned either in `:deg` or `:rad` units.
 
 ---
 
-	meshgrid(gridRes)
+	meshgrid(gridRes; unit = :rad)
 
 This function creates a 2D Global grid of coordinates with the specified resolution (`gridRes`) given as input and return the `LAT`, `LON` meshgrid similar to the namesake MATLAB function.
 
 As convention it has been considered: `LAT=y`, `LON=x`.
 
-The output is returned in the form of a vector of SVector{2}(lon,lat) (`vec`) and a tuple of two 2D grids (`grid`).
+The output is returned in the form of a vector of SVector{2}(lon,lat) (`vec`) and a tuple of two 2D grids (`grid`). The output can be returned either in `:deg` or `:rad` units.
 
 ## Useful Internal Functions
 

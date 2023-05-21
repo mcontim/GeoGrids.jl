@@ -6,12 +6,13 @@ This function returns a vector `Nx2` of LAT, LON values for a `N` points grid bu
 ### Arguments:
 - `N`: The number of points to generate.
 - `sepAng`: The separation angle for the grid of points to be generated [rad].
+- `unit`: `:rad` or `:deg`
 
 ### Output:
 - `vec`: A vector of SVector{2}(lon,lat) objects of LAT-LON coordinates in rad (LAT=y, LON=x).
 - `array`: A tuple of two 2-dimensional grids of LAT-LON coordinates in rad (LAT=y, LON=x).
 """
-function fibonaccigrid(;N=nothing, sepAng=nothing, unid=:rad)	
+function fibonaccigrid(;N=nothing, sepAng=nothing, unit=:rad)	
 	if N isa Nothing && sepAng isa Nothing
 		error("Input one argument between N and sepAng...")
 	elseif sepAng isa Nothing
@@ -64,31 +65,21 @@ points = fibonaccisphere_classic(1000)
 function fibonaccisphere_classic(N::Int; coord::Symbol=:sphe, spheRadius=1.0)
 	goldenRatio = (1 + sqrt(5))/2	
 	if coord==:sphe # :sphe | :cart
-		x = Array{Float64,1}(undef,N)
-		y = Array{Float64,1}(undef,N)
 		pointsVec = map(0:N-1) do k
 			θ = 2π * k/ goldenRatio # [0,2π] [LON]
 			ϕ = acos(1 - 2(k+0.5)/N) # [0,π] from North Pole [LAT]
 			
 			SVector(rem2pi(θ, RoundNearest), π/2 - ϕ) # wrap (lon,lat)
-			x[k+1] = rem2pi(θ, RoundNearest)
-			y[k+1] = π/2 - ϕ
 		end
-		pointsArray = (x=x,y=y)
+		pointsArray = (x=map(x -> x[1], pointsVec), y=map(x -> x[2], pointsVec))
 	else
-		x = Array{Float64,1}(undef,N)
-		y = Array{Float64,1}(undef,N)
-		z = Array{Float64,1}(undef,N)
 		pointsVec = map(0:N-1) do k
 			θ = 2π * k/ goldenRatio # [0,2π] [LON]
 			ϕ = acos(1 - 2(k+0.5)/N) # [0,π] from North Pole [LAT]
 			
 			SVector(spheRadius.*sin(ϕ)*cos(θ), spheRadius.*sin(ϕ)*sin(θ), spheRadius.*cos(ϕ))
-			x[k+1] = spheRadius.*sin(ϕ)*cos(θ)
-			y[k+1] = spheRadius.*sin(ϕ)*sin(θ)
-			z[k+1] = spheRadius.*cos(ϕ)
 		end
-		pointsArray = (x=x,y=y,z=z)
+		pointsArray = (x=map(x -> x[1], pointsVec), y=map(x -> x[2], pointsVec), z=map(x -> x[3], pointsVec))
 	end
 
 	return pointsVec,pointsArray

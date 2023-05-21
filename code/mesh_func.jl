@@ -5,6 +5,7 @@ This function call get_meshgrid with the specified resolution given as input and
 
 ### Arguments
 - `gridRes`: resolution of the meshgrid in rad
+- `unit`: `:rad` or `:deg`
 
 ### Output
 - `vec`: A vector of SVector{2}(lon,lat) objects of LAT-LON coordinates in rad (LAT=y, LON=x).
