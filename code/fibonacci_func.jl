@@ -5,10 +5,10 @@ This function returns a vector `Nx2` of LAT, LON values for a `N` points grid bu
 
 ### Arguments:
 - `N`: The number of points to generate.
-- `sepAng`: The separation angle for the grid of points to be generated.
+- `sepAng`: The separation angle for the grid of points to be generated [rad].
 
 ### Output:
-- A `Nx2` Vector of SVector(lon,lat) the generated points. Each element corresponds to the LAT, LON coordinates of the point (LAT=y, LON=x).	
+- A `Nx2` Vector of SVector(lon,lat) the generated points. Each element corresponds to the LAT, LON coordinates of the point in rad (LAT=y, LON=x).	
 """
 function fibonaccigrid(;N=nothing, sepAng=nothing)	
 	if N isa Nothing && sepAng isa Nothing

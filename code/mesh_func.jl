@@ -10,7 +10,17 @@ This function call get_meshgrid with the specified resolution given as input and
 - `vec`: A vector of SVector{2}(lon,lat) objects of LAT-LON coordinates in rad (LAT=y, LON=x).
 - `grid`: A tuple of two 2-dimensional grids of LAT-LON coordinates in rad (LAT=y, LON=x).
 """
-meshgrid(gridRes) = get_meshgrid(-π:gridRes:π-gridRes,-π/2:gridRes:π/2)
+function meshgrid(gridRes; unit=:rad)
+	if unit == :rad 
+		vec,grid = get_meshgrid(-π:gridRes:π-gridRes,-π/2:gridRes:π/2)
+	else
+		coord = get_meshgrid(-π:gridRes:π-gridRes,-π/2:gridRes:π/2)
+		vec = map(x -> rad2deg.(x), coord[1])
+		grid = (x=rad2deg.(coord[2][1]), y=rad2deg.(coord[2][2]))
+	end
+
+	return vec,grid
+end
 
 """
 	get_meshgrid(xin, yin)
