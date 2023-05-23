@@ -322,13 +322,13 @@ plot(plot_geo(map(x -> rad2deg.(x), fibonaccigrid(sepAng=deg2rad(tableVal.ang))[
 plot(plot_geo(map(x -> rad2deg.(x), fibonaccigrid(sepAng=deg2rad(tableVal.ang))[1]);camera=:threedim))
 
 # ╔═╡ f1d6ee2f-01d2-4b79-b326-cb202c58d74d
-meshGrid = meshgrid(deg2rad(tableVal.ang))
+meshGrid = meshgrid(deg2rad(tableVal.ang); unit=:deg)
 
 # ╔═╡ 3eeeffc0-3ba5-427b-b75b-0bf5f6286c9b
-plot(plot_geo(map(x -> rad2deg.(x), meshGrid[1])))
+plot(plot_geo(vec(meshGrid)))
 
 # ╔═╡ 00055125-7c7e-459e-b79e-f22e3d74866d
-plot(plot_geo(map(x -> rad2deg.(x), meshGrid[1]);camera=:threedim))
+plot(plot_geo(vec(meshGrid); camera=:threedim))
 
 # ╔═╡ 06a5260c-7d8c-42ad-895a-79f90df4040c
 fibonaccigrid(N=tableVal.n, unit=:deg)
