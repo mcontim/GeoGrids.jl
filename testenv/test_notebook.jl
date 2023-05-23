@@ -302,24 +302,24 @@ plot(plot_unitarysphere(fibonaccisphere_optimization1(tableVal.n)))
 plot(plot_unitarysphere(fibonaccisphere_alternative1(tableVal.n)))
 
 # ╔═╡ ec3c88ba-972f-4b0f-ac25-75e779b1c33a
-plot(plot_geo(map(x -> rad2deg.(x), fibonaccigrid(N=tableVal.n)[1])))
+plot(plot_geo(fibonaccigrid(N=tableVal.n;unit=:deg)))
 
 # ╔═╡ f97a8555-086b-48f6-950e-fc583d0afa11
-plot(plot_geo(map(x -> rad2deg.(x), fibonaccigrid(N=tableVal.n)[1]);camera=:threedim))
+plot(plot_geo(fibonaccigrid(N=tableVal.n;unit=:deg);camera=:threedim))
 
 # ╔═╡ 900cc195-8c5a-47c0-a48b-e04baa15fc61
 # Check for the growing of points in Fibonacci spiral
-plot(plot_geo(map(x -> rad2deg.(x), fibonaccigrid(N=tableVal.n)[1][1:50])))
+plot(plot_geo(fibonaccigrid(N=tableVal.n;unit=:deg)[1:50]))
 
 # ╔═╡ d005be58-3be7-4b2a-a3f7-edf0fd095259
 # Check for the growing of points in Fibonacci spiral
-plot(plot_geo(map(x -> rad2deg.(x), fibonaccigrid(N=tableVal.n)[1][1:50]);camera=:threedim))
+plot(plot_geo(fibonaccigrid(N=tableVal.n;unit=:deg)[1:50];camera=:threedim))
 
 # ╔═╡ 6b1c8079-bab5-4951-b564-500bba378781
-plot(plot_geo(map(x -> rad2deg.(x), fibonaccigrid(sepAng=deg2rad(tableVal.ang))[1])))
+plot(plot_geo(fibonaccigrid(sepAng=deg2rad(tableVal.ang);unit=:deg)))
 
 # ╔═╡ 88704126-cdc6-486f-bd68-e8fee558eac4
-plot(plot_geo(map(x -> rad2deg.(x), fibonaccigrid(sepAng=deg2rad(tableVal.ang))[1]);camera=:threedim))
+plot(plot_geo(fibonaccigrid(sepAng=deg2rad(tableVal.ang);unit=:deg);camera=:threedim))
 
 # ╔═╡ f1d6ee2f-01d2-4b79-b326-cb202c58d74d
 meshGrid = meshgrid(deg2rad(tableVal.ang); unit=:deg)
