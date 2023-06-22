@@ -12,7 +12,7 @@ The meshgrid cover all the globe with LAT=-90:90 and LON=-180:180
 - `vec`: A vector of SVector{2}(lon,lat) objects of LAT-LON coordinates in rad (or deg) (LAT=y, LON=x).
 """
 function meshgrid(gridRes; unit=:rad)
-	vec = get_meshgrid(-π:gridRes:π-gridRes,-π/2:gridRes:π/2)
+	vec = get_meshgrid(-π:gridRes:π-gridRes+1e-10,-π/2:gridRes:π/2)
 	
 	# Unit Conversion
 	if unit == :deg 

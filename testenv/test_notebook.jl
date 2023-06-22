@@ -1,8 +1,6 @@
 ### A Pluto.jl notebook ###
 # v0.19.25
 
-#> custom_attrs = ["hide-enabled"]
-
 using Markdown
 using InteractiveUtils
 
@@ -282,7 +280,7 @@ tableVal_bond = @bind tableVal StructBond(TABLE; description = "Grid Parameters"
 end
 
 # ╔═╡ 173eb8a1-c2bb-4c73-8345-6b9f0f5b7d90
-points1 = fibonaccisphere_classic(tableVal.n; coord=:cart)[1]
+points1 = fibonaccisphere_classic(tableVal.n; coord=:cart)
 
 # ╔═╡ 256e751b-d868-4b41-9f94-e54672a3f571
 # plot() is used to wrap the Plot() output for a proper visualization. PlutoPlotly or PlutoJS are required in the notebook
@@ -291,9 +289,6 @@ plot(plot_unitarysphere(points1))
 # ╔═╡ a5da23ce-9407-4120-9117-66ba9072aad7
 # Check for the growing of point in Fibonacci spiral
 plot(plot_unitarysphere(points1[1:20]))
-
-# ╔═╡ ad4ebdca-b0b1-4b90-aa09-3da77403d8da
-fibonaccisphere_classic(tableVal.n; coord=:cart)[2]
 
 # ╔═╡ 4e8c0d63-a135-490b-bcb5-7ae76fba2ec3
 plot(plot_unitarysphere(fibonaccisphere_optimization1(tableVal.n)))
@@ -367,9 +362,8 @@ collect(values(Revise.queue_errors))[1][1].exc.msg
 # ╟─d91d92b4-0e7c-40fc-97d3-4ae6f731d121
 # ╟─4457e406-3b1b-4237-b02d-767f76a0d6e2
 # ╠═173eb8a1-c2bb-4c73-8345-6b9f0f5b7d90
-# ╠═ad4ebdca-b0b1-4b90-aa09-3da77403d8da
-# ╠═256e751b-d868-4b41-9f94-e54672a3f571
-# ╠═a5da23ce-9407-4120-9117-66ba9072aad7
+# ╟─256e751b-d868-4b41-9f94-e54672a3f571
+# ╟─a5da23ce-9407-4120-9117-66ba9072aad7
 # ╟─e7e7a9d5-6f6c-45ab-b1cd-5a20a4569176
 # ╟─85434a87-b158-44ed-ac2e-e2188b1228fa
 # ╟─ea04e7ab-4fb8-4045-9015-f342d916c010

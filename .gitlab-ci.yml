@@ -1,0 +1,5 @@
+include:
+  - project: tec-esc-tools/ESAGitlabTools.jl
+    file:
+      - ci_cd/linux.yml
+      - ci_cd/windows.yml
