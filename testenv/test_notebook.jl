@@ -1,5 +1,7 @@
 ### A Pluto.jl notebook ###
-# v0.19.25
+# v0.19.37
+
+#> custom_attrs = ["hide-enabled"]
 
 using Markdown
 using InteractiveUtils
@@ -236,10 +238,10 @@ md"""
 """
 
 # ╔═╡ 32e67099-d63f-4319-8f74-95e8c74d6e89
-plot(plot_geo(map(x -> rad2deg.(x), fibonaccigrid(sepAng=deg2rad(fibRes))[1])))
+plot(plot_geo(map(x -> rad2deg.(x), fibonaccigrid(sepAng=deg2rad(fibRes)))))
 
 # ╔═╡ 857cec97-06d8-4d48-b335-8f358b65b39c
-plot(plot_geo(map(x -> rad2deg.(x), fibonaccigrid(sepAng=deg2rad(fibRes))[1]);camera=:threedim))
+plot(plot_geo(map(x -> rad2deg.(x), fibonaccigrid(sepAng=deg2rad(fibRes)));camera=:threedim))
 
 # ╔═╡ 6191b1d1-2b46-410d-96a4-5c9e9835283a
 md"""
