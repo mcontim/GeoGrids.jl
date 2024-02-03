@@ -13,13 +13,13 @@ makedocs(
     pagesonly = true, # This only build the source files listed in pages
     pages = [
         "Home" => "index.md",
-        "Manual" => Any[
-            "Basic Types" => "man/basic.md",
-            "ReferenceView" => "man/refview.md",
-            "Public API" => "man/api.md",
-            "PROJ API" => "man/proj_api.md",
-            "Extending ReferenceView" => "man/extending.md",
-        ],
+        # "Manual" => Any[
+        #     "Basic Types" => "man/basic.md",
+        #     "ReferenceView" => "man/refview.md",
+        #     "Public API" => "man/api.md",
+        #     "PROJ API" => "man/proj_api.md",
+        #     "Extending ReferenceView" => "man/extending.md",
+        # ],
         (perf_page ? "Performance Examples" => "performance.md" : missing),
     ] |> filter(!ismissing),
 )
