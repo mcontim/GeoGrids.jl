@@ -8,7 +8,18 @@ AngleBetweenVectors = "ec570357-d46e-52ed-9726-18773498274d"
 LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
 StaticArrays = "90137ffa-7385-5640-81b9-e52037218182"
 
+[weakdeps]
+PlotlyBase = "a03496cd-edff-5a9b-9e67-9cda94a718b5"
+PlutoPlotly = "8e989ff0-3d88-8e9f-f020-2b208a939ff0"
+
+[extensions]
+PlotlyBaseExt = "PlotlyBase"
+PlutoPlotlyExt = "PlutoPlotly"
+
 [compat]
 AngleBetweenVectors = "0.3"
 StaticArrays = "1.5.24"
+LinearAlgebra = "1.9"
+PlotlyBase = "0.8"
+PlutoPlotly = "0.3 - 1"
 julia = "1.9"
