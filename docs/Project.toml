@@ -1,0 +1,6 @@
+[deps]
+Documenter = "e30172f5-a6a5-5a46-863b-614d45cd2de4"
+GeoGrids = "22c7c615-cf67-4787-b800-cc81b4f1a63f"
+
+[compat]
+Documenter = "1"
