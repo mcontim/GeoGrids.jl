@@ -1,5 +1,11 @@
 # GeoGrids.jl
 
+[![Docs Stable](https://img.shields.io/badge/docs-stable-blue.svg)](https://tec-esc-tools.io.esa.int/SatelliteOrbitPropagation.jl/stable)
+[![Docs Dev](https://img.shields.io/badge/docs-dev-blue.svg)](https://tec-esc-tools.io.esa.int/SatelliteOrbitPropagation.jl/dev)
+[![Build Status](https://gitlab.esa.int/tec-esc-tools/SatelliteOrbitPropagation.jl/badges/main/pipeline.svg)](https://gitlab.esa.int/tec-esc-tools/SatelliteOrbitPropagation.jl/pipelines)
+[![Coverage](https://gitlab.esa.int/tec-esc-tools/SatelliteOrbitPropagation.jl/badges/main/coverage.svg)](https://gitlab.esa.int/tec-esc-tools/SatelliteOrbitPropagation.jl/commits/main)
+[![Aqua QA](https://raw.githubusercontent.com/JuliaTesting/Aqua.jl/master/badge.svg)](https://github.com/JuliaTesting/Aqua.jl)
+
 This is a package containing functions for Geographical Grids generation for example for terminals distribution for System Level Simulations.
 
 ## Exported Functions
