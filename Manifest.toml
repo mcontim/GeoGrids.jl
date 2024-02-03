@@ -2,7 +2,7 @@
 
 julia_version = "1.10.0"
 manifest_format = "2.0"
-project_hash = "31bcb63ad8b0ef7a225b89e763bacbd4187cadc2"
+project_hash = "888f6ffbe435a6662a3deab03475a79ddf8a3aa5"
 
 [[deps.AngleBetweenVectors]]
 deps = ["LinearAlgebra", "Test"]

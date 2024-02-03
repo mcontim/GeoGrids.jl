@@ -362,7 +362,7 @@ collect(values(Revise.queue_errors))[1][1].exc.msg
 # ╟─d91d92b4-0e7c-40fc-97d3-4ae6f731d121
 # ╟─4457e406-3b1b-4237-b02d-767f76a0d6e2
 # ╠═173eb8a1-c2bb-4c73-8345-6b9f0f5b7d90
-# ╠═256e751b-d868-4b41-9f94-e54672a3f571
+# ╟─256e751b-d868-4b41-9f94-e54672a3f571
 # ╟─a5da23ce-9407-4120-9117-66ba9072aad7
 # ╟─e7e7a9d5-6f6c-45ab-b1cd-5a20a4569176
 # ╟─85434a87-b158-44ed-ac2e-e2188b1228fa
