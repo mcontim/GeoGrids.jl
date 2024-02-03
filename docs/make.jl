@@ -7,7 +7,7 @@ perf_page = get(ENV, "CI", "") === "true"
 makedocs(
     sitename = "GeoGrids",
     format = Documenter.HTML(),
-    modules = [GeoGrids, SatelliteToolboxBase],
+    modules = [GeoGrids],
     warnonly = true,
     repo = Documenter.Remotes.GitLab("gitlab.esa.int","tec-esc-tools","GeoGrids.jl"),
     pagesonly = true, # This only build the source files listed in pages
