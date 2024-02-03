@@ -3,11 +3,10 @@ module GeoGrids
 using LinearAlgebra
 using StaticArrays
 using AngleBetweenVectors
-using PlotlyBase
 
-include("../code/aux_func.jl")
-include("../code/fibonacci_func.jl")
-include("../code/mesh_func.jl")
+include("plot_func.jl")
+include("fibonacci_func.jl")
+include("mesh_func.jl")
 
 export fibonaccigrid, meshgrid
 

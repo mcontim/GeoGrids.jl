@@ -1,3 +1,12 @@
+module PlotlyBaseExt
+
+using GeoGrids
+using GeoGrids: _plotly_plot
+using PlotlyBase
+
+# Load the default PlotlyBase function
+GeoGrids._plotly_plot_func(::Val{:PlotlyBase}) = PlotlyBase.Plot
+
 """
 	plot_unitarysphere(points_cart)
 
@@ -9,7 +18,7 @@ The sphere is defined by a range of angles that are discretized into a grid of n
 ### Output:
 - Plot of the unitary sphere with the input points represented as markers.
 """
-function plot_unitarysphere(points_cart)
+function GeoGrids.plot_unitarysphere(points_cart)
 	# Reference Sphere
 	n_sphere = 100
 	u = range(-π, π; length = n_sphere)
@@ -32,7 +41,8 @@ function plot_unitarysphere(points_cart)
 
 	layout = Layout(title = "Point on Unitary Sphere")
 	
-	Plot([sphere,markers],layout)
+	# Plot([sphere,markers],layout)
+	_plotly_plot([sphere,markers],layout)
 end
 
 """
@@ -45,7 +55,7 @@ This function takes an AbstractVector of SVector{2, <:Real} of LAT-LON coordinat
 - `title::String`: (optional) Title for the plot, default is "Point Position 3D Map".
 - `camera::Symbol`: (optional) The camera projection to use, either :twodim (default) or :threedim. If :threedim, the map will be displayed as an orthographic projection, while :twodim shows the map with a natural earth projection.
 """
-function plot_geo(points_latlon; title="Point Position GEO Map", camera::Symbol=:twodim)
+function GeoGrids.plot_geo(points_latlon; title="Point Position GEO Map", camera::Symbol=:twodim)
 	# Markers for the points
 	# Take an array of SVector
 	points = scattergeo(
@@ -90,5 +100,8 @@ function plot_geo(points_latlon; title="Point Position GEO Map", camera::Symbol=
 		geo_projection_type = projection
 	)
 	
-	Plot([points],layout)
+	# Plot([points],layout)
+	_plotly_plot([points],layout)
+end
+
 end
