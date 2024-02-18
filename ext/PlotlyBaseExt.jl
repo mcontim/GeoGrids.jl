@@ -1,11 +1,8 @@
 module PlotlyBaseExt
 
 using GeoGrids
-using GeoGrids: _plotly_plot
+using PlotlyExtensionsHelper
 using PlotlyBase
-
-# Load the default PlotlyBase function
-GeoGrids._plotly_plot_func(::Val{:PlotlyBase}) = PlotlyBase.Plot
 
 """
 	plot_unitarysphere(points_cart)
@@ -42,7 +39,7 @@ function GeoGrids.plot_unitarysphere(points_cart)
 	layout = Layout(title = "Point on Unitary Sphere")
 	
 	# Plot([sphere,markers],layout)
-	_plotly_plot([sphere,markers],layout)
+	plotly_plot([sphere,markers],layout)
 end
 
 """
@@ -101,7 +98,7 @@ function GeoGrids.plot_geo(points_latlon; title="Point Position GEO Map", camera
 	)
 	
 	# Plot([points],layout)
-	_plotly_plot([points],layout)
+	plotly_plot([points],layout)
 end
 
 end

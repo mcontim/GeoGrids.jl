@@ -2,8 +2,6 @@ using Test
 using GeoGrids
 using StaticArrays
 
-# Test that this thorws 
-@test_throws "No PlotlyBase package has been loaded" GeoGrids._plotly_plot(3)
 @testset "Internal Functions" begin
     @test GeoGrids.fibonaccisphere_classic(100; coord=:cart) isa Vector{SVector{3, Float64}}
     @test GeoGrids.fibonaccisphere_optimization1(100) isa Vector{SVector{3, Float64}}
