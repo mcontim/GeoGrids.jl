@@ -3,6 +3,7 @@ module GeoGrids
 using LinearAlgebra
 using StaticArrays
 using AngleBetweenVectors
+using PlotlyExtensionsHelper
 
 include("plot_func.jl")
 include("fibonacci_func.jl")
