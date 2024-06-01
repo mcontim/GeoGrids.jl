@@ -32,3 +32,39 @@ function CountriesBorders.extract_countries(r::Region)
     @info kwargs
     CountriesBorders.extract_countries(;kwargs...)
 end
+
+
+
+
+
+"""
+    Base.in(p::Tuple{Number, Number}, domain::Meshes.Domain)`
+
+This function determines if a given point `(x, y)` represented as a tuple of two numbers, belongs to a 2-dimensional `Meshes.Domain` object. The `Meshes.Domain` object represents a geometric domain, which is essentially a 2D region in space, specified by its bounds and discretization. 
+
+The function first converts the input tuple into a `Meshes.Point` object, which is then checked if it falls inside the given `Meshes.Domain` object.
+
+### Arguments
+* `p::Tuple{Number, Number}`: A tuple of two numbers `(x,y)` representing a point in 2D space. 
+* `domain::Meshes.Domain`: A `Meshes.Domain` object representing a 2D region in space. 
+
+### Output
+The function returns a boolean value: `true` if the point represented by the input tuple falls inside the `Meshes.Domain` object and `false` otherwise. 
+"""
+# function in_domain(p::Tuple{Number, Number}, domain::Meshes.Domain)
+# 	Meshes.Point{2, Float64}(p) in domain
+# end
+
+# function in_domain(p::SVector{2,Number}, domain::Meshes.Domain)
+# 	Meshes.Point{2, Float64}(p) in domain
+# end
+
+function in_domain(p::LLA, domain)
+    _p = (rad2deg(p.lon), rad2deg(p.lat))
+	Meshes.Point{2, Float64}(_p) in domain # Meshes.Point in Meshes.Geometry
+end
+
+function in_domain(p::LLA, domain::Region)
+    countriesList = extract_countries(domain) # extract Meshes.Geometry
+    in_domain(p, countriesList) # `in` uses lon-lat
+end

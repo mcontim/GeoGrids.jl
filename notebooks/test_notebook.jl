@@ -31,6 +31,17 @@ begin
 	using Unzip
 end
 
+# ╔═╡ 0e205c7f-43ea-4612-830c-d930e8e4522f
+md"""
+# Test
+"""
+
+# ╔═╡ 40653a7f-bc4b-47f2-9006-6856bb89210e
+r = Region(continent = "Europe")
+
+# ╔═╡ 85c54357-ac2a-4c52-81d7-e30df19ffc72
+
+
 # ╔═╡ 6cca736e-7006-4887-83f0-d15f49533903
 md"""
 # Packages
@@ -461,6 +472,9 @@ version = "17.4.0+2"
 """
 
 # ╔═╡ Cell order:
+# ╟─0e205c7f-43ea-4612-830c-d930e8e4522f
+# ╠═40653a7f-bc4b-47f2-9006-6856bb89210e
+# ╠═85c54357-ac2a-4c52-81d7-e30df19ffc72
 # ╟─6cca736e-7006-4887-83f0-d15f49533903
 # ╠═6c7d8bc0-47aa-499b-a0fc-895828c43ec6
 # ╠═cea38f6b-4eaf-4d4d-a882-81bf1e63e902
