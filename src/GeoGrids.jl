@@ -3,9 +3,9 @@ module GeoGrids
 using AngleBetweenVectors
 using CountriesBorders
 using LinearAlgebra
+using Meshes
 using PlotlyExtensionsHelper
 using StaticArrays
-using Meshes
 using TelecomUtils
 
 include("filtering_func.jl")

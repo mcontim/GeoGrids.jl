@@ -1,8 +1,14 @@
-@kwdef mutable struct Region
+abstract type AbstractRegion end
+
+@kwdef mutable struct GeoRegion
     regionName::String = "region_name"
-    continent::String = ""
-    subregion::String = ""
-    admin::String = ""
+    continent::String
+    subregion::String
+    admin::String
+end
+@kwdef mutable struct PolyRegion
+    regionName::String = "region_name"
+    vertex::Union{Vector{Vector{LLA}, SVector{2, Float64}}, Vector{Meshes.Point{2, Float64}}, Vector{Tuple{Number, Number}}}
 end
 
 """
@@ -67,4 +73,8 @@ end
 function in_domain(p::LLA, domain::Region)
     countriesList = extract_countries(domain) # extract Meshes.Geometry
     in_domain(p, countriesList) # `in` uses lon-lat
+end
+
+function in_domain(p::LLA, domain::PolyArea)
+    in_domain(p, domain) # `in` uses lon-lat
 end

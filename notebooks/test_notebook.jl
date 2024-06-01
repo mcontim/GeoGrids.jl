@@ -22,6 +22,8 @@ end
     using >. LinearAlgebra
 	using >. PlotlyExtensionsHelper
 	using >. StaticArrays
+	using >. TelecomUtils
+	using >. Meshes
 end
 
 # ╔═╡ 9b06e2f7-cf71-4317-aecf-f44124ca9fde
@@ -39,8 +41,20 @@ md"""
 # ╔═╡ 40653a7f-bc4b-47f2-9006-6856bb89210e
 r = Region(continent = "Europe")
 
-# ╔═╡ 85c54357-ac2a-4c52-81d7-e30df19ffc72
+# ╔═╡ 01ce8e56-201c-47a6-b925-a1d95f816b60
+methods(in_domain)
 
+# ╔═╡ 85c54357-ac2a-4c52-81d7-e30df19ffc72
+in_domain(LLA(0,0,0), r)
+
+# ╔═╡ 8985fd7b-5625-48d1-9895-fa58871176ac
+extract_countries(r) isa GeometrySet
+
+# ╔═╡ 26ffbfb5-da79-45b1-bf77-ace20102699e
+poly = PolyArea((0.0,0.0),(1.0,0.0),(1.0,1.0),(0.0,1.0),(0.0,0.0))
+
+# ╔═╡ d42d2372-9634-4012-9300-40176d529e12
+in_domain(LLA(0,0,0), poly)
 
 # ╔═╡ 6cca736e-7006-4887-83f0-d15f49533903
 md"""
@@ -474,7 +488,11 @@ version = "17.4.0+2"
 # ╔═╡ Cell order:
 # ╟─0e205c7f-43ea-4612-830c-d930e8e4522f
 # ╠═40653a7f-bc4b-47f2-9006-6856bb89210e
+# ╠═01ce8e56-201c-47a6-b925-a1d95f816b60
 # ╠═85c54357-ac2a-4c52-81d7-e30df19ffc72
+# ╠═d42d2372-9634-4012-9300-40176d529e12
+# ╠═8985fd7b-5625-48d1-9895-fa58871176ac
+# ╠═26ffbfb5-da79-45b1-bf77-ace20102699e
 # ╟─6cca736e-7006-4887-83f0-d15f49533903
 # ╠═6c7d8bc0-47aa-499b-a0fc-895828c43ec6
 # ╠═cea38f6b-4eaf-4d4d-a882-81bf1e63e902
