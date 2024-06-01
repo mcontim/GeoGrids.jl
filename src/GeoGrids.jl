@@ -1,9 +1,10 @@
 module GeoGrids
 
-using LinearAlgebra
-using StaticArrays
 using AngleBetweenVectors
+using CountriesBorders
+using LinearAlgebra
 using PlotlyExtensionsHelper
+using StaticArrays
 
 include("filtering.jl")
 include("plot_func.jl")
