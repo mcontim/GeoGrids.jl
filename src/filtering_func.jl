@@ -14,12 +14,39 @@ function GeoRegion(regionName::String="region_name", continent::String=nothing, 
     _continent = isnothing(continent) ? "" : continent
     _subregion = isnothing(subregion) ? "" : subregion
     _admin = isnothing(admin) ? "" : admin
-    
+
     return GeoRegion(regionName, _continent, _subregion, _admin)
 end
+
 @kwdef mutable struct PolyRegion
     regionName::String = "region_name"
-    vertex::Union{Vector{Vector{LLA}, SVector{2, Float64}}, Vector{Meshes.Point{2, Float64}}, Vector{Tuple{Number, Number}}}
+    "Unless it ia a Vector{LLA}, the points has to be expressed as lon-lat and values must be in rad"	
+    vertex::Union{Vector{LLA}, Vector{SVector{2, Float64}}, Vector{Point2}, Vector{Tuple{Float64, Float64}}, PolyArea}
+end
+
+function PolyRegion(regionName::String="region_name", vertex::Union{Vector{Vector{LLA}, SVector{2, Float64}}, Vector{Meshes.Point{2, Float64}}, Vector{Tuple{Number, Number}}} = nothing)
+    # Inputs check
+    isnothing(vertex) && error("Input the polygon vertex...")
+
+    _vertex = if vertex isa PolyArea
+        vertex
+    elseif (vertex isa Vector{Point2}) || (vertex isa Vector{Tuple{Float64, Float64}}) 
+        PolyArea(vertex)
+    elseif typeof(vertex) == Vector{Vector{LLA}}
+        points = map(vertex) do p
+            (rad2deg(p.lon), rad2deg(p.lat))
+        end
+        PolyArea(points)
+    elseif typeof(vertex) == Vector{SVector{2, Float64}}
+        points = map(vertex) do p
+            (first(p), last(p))
+        end
+        PolyArea(points)
+    else
+        error("The input vertex do not match the expected format...")
+    end
+
+    return PolyRegion(regionName, _vertex)
 end
 
 """
