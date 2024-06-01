@@ -14,16 +14,6 @@ begin
 	using PlotlyBase
 end
 
-# ╔═╡ 6c7d8bc0-47aa-499b-a0fc-895828c43ec6
-@fromparent begin
-	import ^: * # to eport all functions from parent package
-	using >. AngleBetweenVectors
-	using >. CountriesBorders
-    using >. LinearAlgebra
-	using >. PlotlyExtensionsHelper
-	using >. StaticArrays
-end
-
 # ╔═╡ 9b06e2f7-cf71-4317-aecf-f44124ca9fde
 begin
 	using BenchmarkTools
@@ -51,10 +41,10 @@ Unzip = "41fe7b60-77ed-43a1-b4f0-825fd5a5650d"
 [compat]
 BenchmarkTools = "~1.5.0"
 PlotlyBase = "~0.8.19"
-PlutoDevMacros = "~0.7.4"
+PlutoDevMacros = "~0.7.2"
 PlutoExtras = "~0.7.12"
 PlutoPlotly = "~0.4.6"
-PlutoUI = "~0.7.59"
+PlutoUI = "~0.7.58"
 PlutoVSCodeDebugger = "~0.2.0"
 Unzip = "~0.2.0"
 """
@@ -65,7 +55,7 @@ PLUTO_MANIFEST_TOML_CONTENTS = """
 
 julia_version = "1.10.3"
 manifest_format = "2.0"
-project_hash = "c9b329b064ca7106c59b022ffb24c5d1ed1a88a0"
+project_hash = "3a146fbc7d94577d97cb2caaca11047c06fc9823"
 
 [[deps.AbstractPlutoDingetjes]]
 deps = ["Pkg"]
@@ -84,9 +74,9 @@ uuid = "56f22d72-fd6d-98f1-02f0-08ddc0907c33"
 uuid = "2a0f44e3-6c83-55bd-87e4-b1978d98bd5f"
 
 [[deps.BaseDirs]]
-git-tree-sha1 = "cb25e4b105cc927052c2314f8291854ea59bf70a"
+git-tree-sha1 = "3e93fcd95fe8db4704e98dbda14453a0bfc6f6c3"
 uuid = "18cc8868-cbac-4acf-b575-c8ff214dc66f"
-version = "1.2.4"
+version = "1.2.3"
 
 [[deps.BenchmarkTools]]
 deps = ["JSON", "Logging", "Printf", "Profile", "Statistics", "UUIDs"]
@@ -292,9 +282,9 @@ version = "0.8.19"
 
 [[deps.PlutoDevMacros]]
 deps = ["AbstractPlutoDingetjes", "DocStringExtensions", "HypertextLiteral", "InteractiveUtils", "MacroTools", "Markdown", "Pkg", "Random", "TOML"]
-git-tree-sha1 = "c3839362a712e6d9c2845d179edafe74371cb77b"
+git-tree-sha1 = "2944f76ac8c11c913a620da0a6b035e2fadf94c1"
 uuid = "a0499f29-c39b-4c5c-807c-88074221b949"
-version = "0.7.4"
+version = "0.7.2"
 
 [[deps.PlutoExtras]]
 deps = ["AbstractPlutoDingetjes", "HypertextLiteral", "InteractiveUtils", "Markdown", "PlutoDevMacros", "PlutoUI", "REPL"]
@@ -318,9 +308,9 @@ version = "0.4.6"
 
 [[deps.PlutoUI]]
 deps = ["AbstractPlutoDingetjes", "Base64", "ColorTypes", "Dates", "FixedPointNumbers", "Hyperscript", "HypertextLiteral", "IOCapture", "InteractiveUtils", "JSON", "Logging", "MIMEs", "Markdown", "Random", "Reexport", "URIs", "UUIDs"]
-git-tree-sha1 = "ab55ee1510ad2af0ff674dbcced5e94921f867a9"
+git-tree-sha1 = "71a22244e352aa8c5f0f2adde4150f62368a3f2e"
 uuid = "7f904dfe-b85e-4ff6-b463-dae2292396a8"
-version = "0.7.59"
+version = "0.7.58"
 
 [[deps.PlutoVSCodeDebugger]]
 deps = ["AbstractPlutoDingetjes", "InteractiveUtils", "Markdown", "REPL"]
@@ -462,7 +452,6 @@ version = "17.4.0+2"
 
 # ╔═╡ Cell order:
 # ╟─6cca736e-7006-4887-83f0-d15f49533903
-# ╠═6c7d8bc0-47aa-499b-a0fc-895828c43ec6
 # ╠═cea38f6b-4eaf-4d4d-a882-81bf1e63e902
 # ╠═9b06e2f7-cf71-4317-aecf-f44124ca9fde
 # ╟─00000000-0000-0000-0000-000000000001

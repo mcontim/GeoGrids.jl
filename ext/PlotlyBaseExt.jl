@@ -2,8 +2,7 @@ module PlotlyBaseExt
 using PlotlyExtensionsHelper
 using PlotlyBase
 
-using ..GeoGrids
-# using ..GeoGrids.Plotting
+using GeoGrids
 
 """
 	plot_unitarysphere(points_cart)
