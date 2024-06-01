@@ -6,6 +6,17 @@ abstract type AbstractRegion end
     subregion::String
     admin::String
 end
+
+function GeoRegion(regionName::String="region_name", continent::String=nothing, subregion::String=nothing, admin::String=nothing)
+    # Inputs check
+    isnothing(continent) && isnothing(subregion) && isnothing(admin) && error("Input at least one argument between continent, subregion and admin...")
+
+    _continent = isnothing(continent) ? "" : continent
+    _subregion = isnothing(subregion) ? "" : subregion
+    _admin = isnothing(admin) ? "" : admin
+    
+    return GeoRegion(regionName, _continent, _subregion, _admin)
+end
 @kwdef mutable struct PolyRegion
     regionName::String = "region_name"
     vertex::Union{Vector{Vector{LLA}, SVector{2, Float64}}, Vector{Meshes.Point{2, Float64}}, Vector{Tuple{Number, Number}}}
