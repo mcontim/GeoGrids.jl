@@ -48,6 +48,6 @@ SatConstellationVisual/notebooks/OUTPUT/*
 *.orb
 
 # Test notebooks
-/notebooks/
+# /notebooks/
 /testenv/
 /notebooks/assets/

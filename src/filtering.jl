@@ -5,7 +5,8 @@
     admin::String = ""
 end
 
-function _extract_countries(r::Region)
+function CountriesBorders.extract_countries(r::Region)
+    # Overload of CountriesBorders.extract_countries taking Region as input
     names = setdiff(fieldnames(Region), (:regionName,))
      
     all_pairs = map(names) do n

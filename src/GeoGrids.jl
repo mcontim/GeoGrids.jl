@@ -11,6 +11,6 @@ include("plot_func.jl")
 include("fibonacci_func.jl")
 include("mesh_func.jl")
 
-export fibonaccigrid, meshgrid
+export fibonaccigrid, meshgrid, extract_countries
 
 end # module GeoGrids
