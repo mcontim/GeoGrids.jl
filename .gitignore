@@ -49,5 +49,5 @@ SatConstellationVisual/notebooks/OUTPUT/*
 
 # Test notebooks
 # /notebooks/
+# /notebooks/assets/
 /testenv/
-/notebooks/assets/
