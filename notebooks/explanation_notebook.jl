@@ -1,5 +1,5 @@
 ### A Pluto.jl notebook ###
-# v0.19.41
+# v0.19.42
 
 using Markdown
 using InteractiveUtils
@@ -235,19 +235,19 @@ md"""
 """
 
 # ╔═╡ 8450f4d6-20e5-4459-9a21-2a2aeaf78de4
-html"""
-<style>
-	body.static_preview pluto-helpbox {
-		display: none;
-	}
-@media screen and (min-width: 2000px) {
-	main {
-	    max-width: min(1200px, calc(95% - 200px));
-	    margin-right: 80px !important;
-	}
-}
-</style>
-"""
+# html"""
+# <style>
+# 	body.static_preview pluto-helpbox {
+# 		display: none;
+# 	}
+# @media screen and (min-width: 2000px) {
+# 	main {
+# 	    max-width: min(1200px, calc(95% - 200px));
+# 	    margin-right: 80px !important;
+# 	}
+# }
+# </style>
+# """
 
 # ╔═╡ fe9d0374-824d-4756-b887-5a852aab9d68
 # ╠═╡ custom_attrs = ["toc-hidden"]
