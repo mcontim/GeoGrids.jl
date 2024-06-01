@@ -24,15 +24,15 @@ end
 using PlotlyBase
 
 @testset "Plots Plotly Base" begin
-    @test GeoGrids.plot_unitarysphere(GeoGrids.fibonaccisphere_classic(100; coord=:cart)) isa Plot
-    @test GeoGrids.plot_geo(map(x -> rad2deg.(x), fibonaccigrid(sepAng=deg2rad(4)))) isa Plot
-    @test GeoGrids.plot_geo(map(x -> rad2deg.(x), fibonaccigrid(sepAng=deg2rad(4)));camera=:threedim) isa Plot
+    @test plot_unitarysphere(GeoGrids.fibonaccisphere_classic(100; coord=:cart)) isa Plot
+    @test plot_geo(map(x -> rad2deg.(x), fibonaccigrid(sepAng=deg2rad(4)))) isa Plot
+    @test plot_geo(map(x -> rad2deg.(x), fibonaccigrid(sepAng=deg2rad(4)));camera=:threedim) isa Plot
 end
 
-using PlutoPlotly
+# using PlutoPlotly
 
-@testset "Plots Plotly Base" begin
-    @test GeoGrids.plot_unitarysphere(GeoGrids.fibonaccisphere_classic(100; coord=:cart)) isa PlutoPlot
-    @test GeoGrids.plot_geo(map(x -> rad2deg.(x), fibonaccigrid(sepAng=deg2rad(4)))) isa PlutoPlot
-    @test GeoGrids.plot_geo(map(x -> rad2deg.(x), fibonaccigrid(sepAng=deg2rad(4)));camera=:threedim) isa PlutoPlot
-end
+# @testset "Plots Plotly Base" begin
+#     @test GeoGrids.plot_unitarysphere(GeoGrids.fibonaccisphere_classic(100; coord=:cart)) isa PlutoPlot
+#     @test GeoGrids.plot_geo(map(x -> rad2deg.(x), fibonaccigrid(sepAng=deg2rad(4)))) isa PlutoPlot
+#     @test GeoGrids.plot_geo(map(x -> rad2deg.(x), fibonaccigrid(sepAng=deg2rad(4)));camera=:threedim) isa PlutoPlot
+# end

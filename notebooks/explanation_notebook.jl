@@ -1,5 +1,5 @@
 ### A Pluto.jl notebook ###
-# v0.19.42
+# v0.19.41
 
 using Markdown
 using InteractiveUtils
@@ -28,9 +28,11 @@ end
 # ╔═╡ 1aab6599-3b14-422d-acf6-3cbd953c555e
 @fromparent begin
 	import ^: * # to eport all functions from parent package
-    using >. LinearAlgebra
-	using >. StaticArrays
 	using >. AngleBetweenVectors
+	using >. CountriesBorders
+    using >. LinearAlgebra
+	using >. PlotlyExtensionsHelper
+	using >. StaticArrays
 end
 
 # ╔═╡ ac88e13f-73dc-451c-b3f3-2a4b4a422f19
@@ -235,19 +237,19 @@ md"""
 """
 
 # ╔═╡ 8450f4d6-20e5-4459-9a21-2a2aeaf78de4
-# html"""
-# <style>
-# 	body.static_preview pluto-helpbox {
-# 		display: none;
-# 	}
-# @media screen and (min-width: 2000px) {
-# 	main {
-# 	    max-width: min(1200px, calc(95% - 200px));
-# 	    margin-right: 80px !important;
-# 	}
-# }
-# </style>
-# """
+html"""
+<style>
+	body.static_preview pluto-helpbox {
+		display: none;
+	}
+@media screen and (min-width: 2000px) {
+	main {
+	    max-width: min(1200px, calc(95% - 200px));
+	    margin-right: 80px !important;
+	}
+}
+</style>
+"""
 
 # ╔═╡ fe9d0374-824d-4756-b887-5a852aab9d68
 # ╠═╡ custom_attrs = ["toc-hidden"]

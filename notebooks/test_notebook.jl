@@ -1,5 +1,5 @@
 ### A Pluto.jl notebook ###
-# v0.19.42
+# v0.19.41
 
 using Markdown
 using InteractiveUtils
@@ -451,7 +451,7 @@ version = "17.4.0+2"
 """
 
 # ╔═╡ Cell order:
-# ╠═6cca736e-7006-4887-83f0-d15f49533903
+# ╟─6cca736e-7006-4887-83f0-d15f49533903
 # ╠═cea38f6b-4eaf-4d4d-a882-81bf1e63e902
 # ╠═9b06e2f7-cf71-4317-aecf-f44124ca9fde
 # ╟─00000000-0000-0000-0000-000000000001

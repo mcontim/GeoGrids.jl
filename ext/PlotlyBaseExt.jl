@@ -1,8 +1,9 @@
 module PlotlyBaseExt
-
-using GeoGrids
 using PlotlyExtensionsHelper
 using PlotlyBase
+
+using ..GeoGrids
+# using ..GeoGrids.Plotting
 
 """
 	plot_unitarysphere(points_cart)
@@ -15,7 +16,7 @@ The sphere is defined by a range of angles that are discretized into a grid of n
 ### Output:
 - Plot of the unitary sphere with the input points represented as markers.
 """
-function GeoGrids.plot_unitarysphere(points_cart)
+function Plotting.plot_unitarysphere(points_cart)
 	# Reference Sphere
 	n_sphere = 100
 	u = range(-π, π; length = n_sphere)
@@ -52,7 +53,7 @@ This function takes an AbstractVector of SVector{2, <:Real} of LAT-LON coordinat
 - `title::String`: (optional) Title for the plot, default is "Point Position 3D Map".
 - `camera::Symbol`: (optional) The camera projection to use, either :twodim (default) or :threedim. If :threedim, the map will be displayed as an orthographic projection, while :twodim shows the map with a natural earth projection.
 """
-function GeoGrids.plot_geo(points_latlon; title="Point Position GEO Map", camera::Symbol=:twodim)
+function Plotting.plot_geo(points_latlon; title="Point Position GEO Map", camera::Symbol=:twodim)
 	# Markers for the points
 	# Take an array of SVector
 	points = scattergeo(
