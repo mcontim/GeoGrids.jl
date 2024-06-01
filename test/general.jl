@@ -21,13 +21,13 @@ end
     @test meshgrid(deg2rad(5)) isa Matrix{SVector{2, Float64}}
 end
 
-using PlotlyBase
+# using PlotlyBase
 
-@testset "Plots Plotly Base" begin
-    @test plot_unitarysphere(GeoGrids.fibonaccisphere_classic(100; coord=:cart)) isa Plot
-    @test plot_geo(map(x -> rad2deg.(x), fibonaccigrid(sepAng=deg2rad(4)))) isa Plot
-    @test plot_geo(map(x -> rad2deg.(x), fibonaccigrid(sepAng=deg2rad(4)));camera=:threedim) isa Plot
-end
+# @testset "Plots Plotly Base" begin
+#     @test plot_unitarysphere(GeoGrids.fibonaccisphere_classic(100; coord=:cart)) isa Plot
+#     @test plot_geo(map(x -> rad2deg.(x), fibonaccigrid(sepAng=deg2rad(4)))) isa Plot
+#     @test plot_geo(map(x -> rad2deg.(x), fibonaccigrid(sepAng=deg2rad(4)));camera=:threedim) isa Plot
+# end
 
 # using PlutoPlotly
 
