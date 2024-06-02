@@ -1,6 +1,8 @@
 ### A Pluto.jl notebook ###
 # v0.19.41
 
+#> custom_attrs = ["hide-enabled"]
+
 using Markdown
 using InteractiveUtils
 
@@ -33,9 +35,17 @@ begin
 	using Unzip
 end
 
+# ╔═╡ 282b928a-fc7d-4487-a056-6c2626cf7179
+ExtendedTableOfContents()
+
 # ╔═╡ 0e205c7f-43ea-4612-830c-d930e8e4522f
 md"""
 # Test
+"""
+
+# ╔═╡ 152ae683-dbad-4c2c-9c4a-5e14a31d2748
+md"""
+## GeoRegion
 """
 
 # ╔═╡ 40653a7f-bc4b-47f2-9006-6856bb89210e
@@ -47,69 +57,48 @@ GeoRegion("Europe", "Europe")
 # ╔═╡ 974a09cd-fffb-40c6-b277-8a27fd827f92
 methods(GeoRegion)
 
+# ╔═╡ 8f960ccd-a95d-403f-a6f8-0c8da617c009
+md"""
+## PolyRegion
+"""
+
+# ╔═╡ 16558f4f-0d6c-4f0f-90fe-6f43b023f33e
+methods(PolyRegion)
+
 # ╔═╡ 01ce8e56-201c-47a6-b925-a1d95f816b60
 methods(in_domain)
-
-# ╔═╡ 85c54357-ac2a-4c52-81d7-e30df19ffc72
-in_domain(LLA(0,0,0), r)
-
-# ╔═╡ 8985fd7b-5625-48d1-9895-fa58871176ac
-extract_countries(r) isa GeometrySet
 
 # ╔═╡ 26ffbfb5-da79-45b1-bf77-ace20102699e
 poly = PolyArea((0.0,0.0),(1.0,0.0),(1.0,1.0),(0.0,1.0),(0.0,0.0))
 
-# ╔═╡ d42d2372-9634-4012-9300-40176d529e12
-in_domain(LLA(0,0,0), poly)
-
-# ╔═╡ 2e60fb3c-da67-4538-878a-4d040160b1fb
-isempty(poly.outer)
-
-# ╔═╡ d0e14e10-178a-4003-884b-3b6e7f97f630
-
-
 # ╔═╡ 20d397c3-9d37-4fd1-b62c-c93b931d5c97
 a = [(0.0,0.0),(1.0,0.0),(1.0,1.0),(0.0,1.0),(0.0,0.0)]
-
-# ╔═╡ 50f45900-ca84-4ff4-9591-db44e2f8b949
-last(a[2])
-
-# ╔═╡ f01a704a-5d7d-421e-b5b9-75450913504e
-TelecomUtils._check_angle(a[1]; limit = π/2, msg = "Minimum Elevation Angle provided as numbers must be expressed in radians and satisfy 0 ≤ x ≤ π/2 Consider using `°` from Unitful (Also re-exported by TelecomUtils) if you want to pass numbers in degrees, by doing `x * °`.")
-    
-
-# ╔═╡ 2db4e379-d0c2-4888-9d68-e6f950e79e74
-PolyArea(a)
 
 # ╔═╡ f9cf5ae3-661d-42f6-b30b-fd7ef3fb2879
 b = [SVector(0.0,0.0),SVector(1.0,0.0),SVector(1.0,1.0),SVector(0.0,1.0),SVector(0.0,0.0)]
 
-# ╔═╡ 4f5f3c06-5e03-47d4-9b7a-423003cd7a6a
-typeof(b)
-
-# ╔═╡ 40e72b90-6d9e-40b1-ad95-3d750a209628
-PolyArea(b)
-
-# ╔═╡ 195c28f7-4760-4348-85f2-32cc608ce2a5
-lla=LLA(pi/2,pi/4)
-
-# ╔═╡ 06d695dc-1039-43dd-9b53-36b5c104653b
-lla.lat
-
 # ╔═╡ 4e508a67-c8b6-47f8-a160-420b7f881769
 c = [Meshes.Point(0.0,0.0),Meshes.Point(1.0,0.0),Meshes.Point(1.0,1.0),Meshes.Point(0.0,1.0),Meshes.Point(0.0,0.0)]
 
-# ╔═╡ 0bc12818-d217-4989-af92-bc9b50e21853
-typeof(c)
+# ╔═╡ 3052ad94-14f6-42f9-bbf1-ff744138d8a1
+PolyRegion(vertex=poly)
 
-# ╔═╡ 6313b4d1-24c0-4aae-97cb-4d399a9f611b
-PolyArea(c)
+# ╔═╡ ee9f61e3-dd7c-40a8-b7a8-41009b4a3518
+PolyRegion(vertex=a)
 
-# ╔═╡ d2826d83-2077-4959-9fc4-c68c72628aee
-c
+# ╔═╡ 850942e4-95f3-4f07-9493-9c3e709cb080
+PolyRegion(vertex=b)
 
-# ╔═╡ 08ea0905-e19a-49d0-b463-6870e09dfca9
-c isa Vector{Point2}
+# ╔═╡ c74bde8a-74d3-45e9-9857-330d0f9ff411
+PolyRegion(vertex=c)
+
+# ╔═╡ 17368f79-0fe4-4d2f-b1be-f04b7534e9eb
+map(c) do c
+	@info c
+end
+
+# ╔═╡ af925d73-c416-4b82-b77b-c89dbc5f692b
+first(c[1].coords)
 
 # ╔═╡ 6cca736e-7006-4887-83f0-d15f49533903
 md"""
@@ -541,31 +530,25 @@ version = "17.4.0+2"
 """
 
 # ╔═╡ Cell order:
+# ╠═282b928a-fc7d-4487-a056-6c2626cf7179
 # ╟─0e205c7f-43ea-4612-830c-d930e8e4522f
+# ╟─152ae683-dbad-4c2c-9c4a-5e14a31d2748
 # ╠═40653a7f-bc4b-47f2-9006-6856bb89210e
 # ╠═82fb5dfb-28cf-44d7-b0e9-c50671344453
 # ╠═974a09cd-fffb-40c6-b277-8a27fd827f92
+# ╟─8f960ccd-a95d-403f-a6f8-0c8da617c009
+# ╠═16558f4f-0d6c-4f0f-90fe-6f43b023f33e
 # ╠═01ce8e56-201c-47a6-b925-a1d95f816b60
-# ╠═85c54357-ac2a-4c52-81d7-e30df19ffc72
-# ╠═d42d2372-9634-4012-9300-40176d529e12
-# ╠═8985fd7b-5625-48d1-9895-fa58871176ac
 # ╠═26ffbfb5-da79-45b1-bf77-ace20102699e
-# ╠═2e60fb3c-da67-4538-878a-4d040160b1fb
-# ╠═d0e14e10-178a-4003-884b-3b6e7f97f630
 # ╠═20d397c3-9d37-4fd1-b62c-c93b931d5c97
-# ╠═50f45900-ca84-4ff4-9591-db44e2f8b949
-# ╠═f01a704a-5d7d-421e-b5b9-75450913504e
-# ╠═2db4e379-d0c2-4888-9d68-e6f950e79e74
 # ╠═f9cf5ae3-661d-42f6-b30b-fd7ef3fb2879
-# ╠═4f5f3c06-5e03-47d4-9b7a-423003cd7a6a
-# ╠═40e72b90-6d9e-40b1-ad95-3d750a209628
-# ╠═195c28f7-4760-4348-85f2-32cc608ce2a5
-# ╠═06d695dc-1039-43dd-9b53-36b5c104653b
 # ╠═4e508a67-c8b6-47f8-a160-420b7f881769
-# ╠═0bc12818-d217-4989-af92-bc9b50e21853
-# ╠═6313b4d1-24c0-4aae-97cb-4d399a9f611b
-# ╠═d2826d83-2077-4959-9fc4-c68c72628aee
-# ╠═08ea0905-e19a-49d0-b463-6870e09dfca9
+# ╠═3052ad94-14f6-42f9-bbf1-ff744138d8a1
+# ╠═ee9f61e3-dd7c-40a8-b7a8-41009b4a3518
+# ╠═850942e4-95f3-4f07-9493-9c3e709cb080
+# ╠═c74bde8a-74d3-45e9-9857-330d0f9ff411
+# ╠═17368f79-0fe4-4d2f-b1be-f04b7534e9eb
+# ╠═af925d73-c416-4b82-b77b-c89dbc5f692b
 # ╟─6cca736e-7006-4887-83f0-d15f49533903
 # ╠═6c7d8bc0-47aa-499b-a0fc-895828c43ec6
 # ╠═cea38f6b-4eaf-4d4d-a882-81bf1e63e902
