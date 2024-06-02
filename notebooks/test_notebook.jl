@@ -72,7 +72,7 @@ methods(in_domain)
 poly = PolyArea((0.0,0.0),(1.0,0.0),(1.0,1.0),(0.0,1.0),(0.0,0.0))
 
 # ╔═╡ 20d397c3-9d37-4fd1-b62c-c93b931d5c97
-a = [(0.0,0.0),(1.0,0.0),(1.0,1.0),(0.0,1.0),(0.0,0.0)]
+a = [(0.0,0.0),(1.0,0.0),(1.0,1.0),(0.0,1.0)]
 
 # ╔═╡ f9cf5ae3-661d-42f6-b30b-fd7ef3fb2879
 b = [SVector(0.0,0.0),SVector(1.0,0.0),SVector(1.0,1.0),SVector(0.0,1.0),SVector(0.0,0.0)]
@@ -91,14 +91,6 @@ PolyRegion(vertex=b)
 
 # ╔═╡ c74bde8a-74d3-45e9-9857-330d0f9ff411
 PolyRegion(vertex=c)
-
-# ╔═╡ 17368f79-0fe4-4d2f-b1be-f04b7534e9eb
-map(c) do c
-	@info c
-end
-
-# ╔═╡ af925d73-c416-4b82-b77b-c89dbc5f692b
-first(c[1].coords)
 
 # ╔═╡ 6cca736e-7006-4887-83f0-d15f49533903
 md"""
@@ -547,8 +539,6 @@ version = "17.4.0+2"
 # ╠═ee9f61e3-dd7c-40a8-b7a8-41009b4a3518
 # ╠═850942e4-95f3-4f07-9493-9c3e709cb080
 # ╠═c74bde8a-74d3-45e9-9857-330d0f9ff411
-# ╠═17368f79-0fe4-4d2f-b1be-f04b7534e9eb
-# ╠═af925d73-c416-4b82-b77b-c89dbc5f692b
 # ╟─6cca736e-7006-4887-83f0-d15f49533903
 # ╠═6c7d8bc0-47aa-499b-a0fc-895828c43ec6
 # ╠═cea38f6b-4eaf-4d4d-a882-81bf1e63e902

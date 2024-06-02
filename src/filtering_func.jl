@@ -33,10 +33,17 @@ If a PolyArea is provided, the points are considered as LON-LAT, in rad, as it i
                 _check_angle(last(p); limit = π, msg = "LON must be provided as numbers must be expressed in radians and satisfy -π ≤ x ≤ π Consider using `°` from Unitful (Also re-exported by TelecomUtils) if you want to pass numbers in degrees, by doing `x * °`.") # Check LON
                 (to_radians(last(p)), to_radians(first(p)))
             end
+            # Check if the first and last points are the same to create a valid polygon
+            if !(first(points[1])==first(points[end])) || !(last(points[1])==last(points[end]))
+                @warn "First and last points are not the same, adding them to the end..."
+                push!(points, points[1])
+            end
             PolyArea(points) # Create a simple PolyArea with only the Outer Chain
         end
+
         # Inputs check
         isnothing(vertex) && error("Input the polygon vertex...")
+
         _vertex = if vertex isa PolyArea
             vertex
         elseif (vertex isa Vector{Tuple{Float64, Float64}}) || (vertex isa Vector{SVector{2, Float64}})
@@ -50,6 +57,7 @@ If a PolyArea is provided, the points are considered as LON-LAT, in rad, as it i
         else
             error("The input vertex do not match the expected format...")
         end
+
         new(regionName, _vertex)
     end
 end
