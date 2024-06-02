@@ -29,37 +29,26 @@ If a PolyArea is provided, the points are considered as LON-LAT, in rad, as it i
     function PolyRegion(regionName::String="region_name", vertex::Union{Vector{LLA}, Vector{SVector{2, Float64}}, Vector{Point2}, Vector{Tuple{Float64, Float64}}, PolyArea} = nothing)
         # Inputs check
         isnothing(vertex) && error("Input the polygon vertex...")
-    
         _vertex = if vertex isa PolyArea
             vertex
-        elseif (vertex isa Vector{Point2}) || (vertex isa Vector{Tuple{Float64, Float64}}) 
-            newVertex = map(vertex) do p
-                # Check LAT
-                _check_angle(first(p); limit = π/2, msg = "LAT must be provided as numbers must be expressed in radians and satisfy -π/2 ≤ x ≤ π/2 Consider using `°` from Unitful (Also re-exported by TelecomUtils) if you want to pass numbers in degrees, by doing `x * °`.")
-                # Check LON
-                _check_angle(last(p); limit = π, msg = "LON must be provided as numbers must be expressed in radians and satisfy -π ≤ x ≤ π Consider using `°` from Unitful (Also re-exported by TelecomUtils) if you want to pass numbers in degrees, by doing `x * °`.")
+        elseif (vertex isa Vector{Point2}) || (vertex isa Vector{Tuple{Float64, Float64}}) || (vertex isa Vector{SVector{2, Float64}})
+            points = map(vertex) do p
+                _check_angle(first(p); limit = π/2, msg = "LAT must be provided as numbers must be expressed in radians and satisfy -π/2 ≤ x ≤ π/2 Consider using `°` from Unitful (Also re-exported by TelecomUtils) if you want to pass numbers in degrees, by doing `x * °`.") # Check LAT
+                _check_angle(last(p); limit = π, msg = "LON must be provided as numbers must be expressed in radians and satisfy -π ≤ x ≤ π Consider using `°` from Unitful (Also re-exported by TelecomUtils) if you want to pass numbers in degrees, by doing `x * °`.") # Check LON
                 (to_radians(last(p)), to_radians(first(p)))
             end
-
-            PolyArea(vertex) # Create a simple PolyArea with only the Outer Chain
+            PolyArea(points) # Create a simple PolyArea with only the Outer Chain
         elseif typeof(vertex) == Vector{Vector{LLA}}
             points = map(vertex) do p
                 (p.lon, p.lat)
             end
             PolyArea(points)
-        elseif typeof(vertex) == Vector{SVector{2, Float64}}
-            points = map(vertex) do p
-                (first(p), last(p))
-            end
-            PolyArea(points)
         else
             error("The input vertex do not match the expected format...")
         end
-        
         new(regionName, _vertex)
     end
 end
-
 
 """
     CountriesBorders.extract_countries(r::GeoRegion)
