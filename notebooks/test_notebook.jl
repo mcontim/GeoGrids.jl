@@ -39,7 +39,13 @@ md"""
 """
 
 # ╔═╡ 40653a7f-bc4b-47f2-9006-6856bb89210e
-r = GeoRegion(continent = "Europe")
+r = GeoRegion(;continent = "Europe", admin="Italy")
+
+# ╔═╡ 82fb5dfb-28cf-44d7-b0e9-c50671344453
+GeoRegion("Europe", "Europe")
+
+# ╔═╡ 974a09cd-fffb-40c6-b277-8a27fd827f92
+methods(GeoRegion)
 
 # ╔═╡ 01ce8e56-201c-47a6-b925-a1d95f816b60
 methods(in_domain)
@@ -55,6 +61,9 @@ poly = PolyArea((0.0,0.0),(1.0,0.0),(1.0,1.0),(0.0,1.0),(0.0,0.0))
 
 # ╔═╡ d42d2372-9634-4012-9300-40176d529e12
 in_domain(LLA(0,0,0), poly)
+
+# ╔═╡ 2e60fb3c-da67-4538-878a-4d040160b1fb
+poly
 
 # ╔═╡ 20d397c3-9d37-4fd1-b62c-c93b931d5c97
 a = [(0.0,0.0),(1.0,0.0),(1.0,1.0),(0.0,1.0),(0.0,0.0)]
@@ -74,6 +83,12 @@ typeof(b)
 # ╔═╡ 40e72b90-6d9e-40b1-ad95-3d750a209628
 PolyArea(b)
 
+# ╔═╡ 195c28f7-4760-4348-85f2-32cc608ce2a5
+lla=LLA(pi/2,pi/4)
+
+# ╔═╡ 06d695dc-1039-43dd-9b53-36b5c104653b
+lla.lat
+
 # ╔═╡ 4e508a67-c8b6-47f8-a160-420b7f881769
 c = [Meshes.Point(0.0,0.0),Meshes.Point(1.0,0.0),Meshes.Point(1.0,1.0),Meshes.Point(0.0,1.0),Meshes.Point(0.0,0.0)]
 
@@ -82,6 +97,9 @@ typeof(c)
 
 # ╔═╡ 6313b4d1-24c0-4aae-97cb-4d399a9f611b
 PolyArea(c)
+
+# ╔═╡ d2826d83-2077-4959-9fc4-c68c72628aee
+c
 
 # ╔═╡ 08ea0905-e19a-49d0-b463-6870e09dfca9
 c isa Vector{Point2}
@@ -518,20 +536,26 @@ version = "17.4.0+2"
 # ╔═╡ Cell order:
 # ╟─0e205c7f-43ea-4612-830c-d930e8e4522f
 # ╠═40653a7f-bc4b-47f2-9006-6856bb89210e
+# ╠═82fb5dfb-28cf-44d7-b0e9-c50671344453
+# ╠═974a09cd-fffb-40c6-b277-8a27fd827f92
 # ╠═01ce8e56-201c-47a6-b925-a1d95f816b60
 # ╠═85c54357-ac2a-4c52-81d7-e30df19ffc72
 # ╠═d42d2372-9634-4012-9300-40176d529e12
 # ╠═8985fd7b-5625-48d1-9895-fa58871176ac
 # ╠═26ffbfb5-da79-45b1-bf77-ace20102699e
+# ╠═2e60fb3c-da67-4538-878a-4d040160b1fb
 # ╠═20d397c3-9d37-4fd1-b62c-c93b931d5c97
 # ╠═f01a704a-5d7d-421e-b5b9-75450913504e
 # ╠═2db4e379-d0c2-4888-9d68-e6f950e79e74
 # ╠═f9cf5ae3-661d-42f6-b30b-fd7ef3fb2879
 # ╠═4f5f3c06-5e03-47d4-9b7a-423003cd7a6a
 # ╠═40e72b90-6d9e-40b1-ad95-3d750a209628
+# ╠═195c28f7-4760-4348-85f2-32cc608ce2a5
+# ╠═06d695dc-1039-43dd-9b53-36b5c104653b
 # ╠═4e508a67-c8b6-47f8-a160-420b7f881769
 # ╠═0bc12818-d217-4989-af92-bc9b50e21853
 # ╠═6313b4d1-24c0-4aae-97cb-4d399a9f611b
+# ╠═d2826d83-2077-4959-9fc4-c68c72628aee
 # ╠═08ea0905-e19a-49d0-b463-6870e09dfca9
 # ╟─6cca736e-7006-4887-83f0-d15f49533903
 # ╠═6c7d8bc0-47aa-499b-a0fc-895828c43ec6

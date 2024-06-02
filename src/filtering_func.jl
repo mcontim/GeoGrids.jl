@@ -2,52 +2,56 @@ abstract type AbstractRegion end
 
 @kwdef mutable struct GeoRegion
     regionName::String = "region_name"
-    continent::String
-    subregion::String
-    admin::String
+    continent::String = nothing
+    subregion::String = nothing
+    admin::String = nothing
+    
+    # Inner Constructor for inputs sanity check
+    function GeoRegion(regionName="region_name", continent=nothing, subregion=nothing, admin=nothing)
+        isnothing(continent) && isnothing(subregion) && isnothing(admin) && error("Input at least one argument between continent, subregion and admin...")
+    
+        _continent = isnothing(continent) ? "" : continent
+        _subregion = isnothing(subregion) ? "" : subregion
+        _admin = isnothing(admin) ? "" : admin
+    
+        new(regionName, _continent, _subregion, _admin)
+    end
 end
 
-function GeoRegion(regionName::String="region_name", continent::String=nothing, subregion::String=nothing, admin::String=nothing)
-    # Inputs check
-    isnothing(continent) && isnothing(subregion) && isnothing(admin) && error("Input at least one argument between continent, subregion and admin...")
-
-    _continent = isnothing(continent) ? "" : continent
-    _subregion = isnothing(subregion) ? "" : subregion
-    _admin = isnothing(admin) ? "" : admin
-
-    return GeoRegion(regionName, _continent, _subregion, _admin)
-end
-
+"""
+Unless it is a Vector{LLA}, the points has to be expressed as LAT-LON and values must be in ValidAngle. If a PolyArea is provided, the points are considered as LON-LAT as a Meshes.jl domain. In all other cases, the points are reoredered such to be in LON-LAT and a PolyArea is built ."	
+"""
 @kwdef mutable struct PolyRegion
     regionName::String = "region_name"
-    "Unless it ia a Vector{LLA}, the points has to be expressed as lon-lat and values must be in rad"	
-    vertex::Union{Vector{LLA}, Vector{SVector{2, Float64}}, Vector{Point2}, Vector{Tuple{Float64, Float64}}, PolyArea}
-end
-
-function PolyRegion(regionName::String="region_name", vertex::Union{Vector{LLA}, Vector{SVector{2, Float64}}, Vector{Point2}, Vector{Tuple{Float64, Float64}}, PolyArea} = nothing)
-    # Inputs check
-    isnothing(vertex) && error("Input the polygon vertex...")
-
-    _vertex = if vertex isa PolyArea
-        vertex
-    elseif (vertex isa Vector{Point2}) || (vertex isa Vector{Tuple{Float64, Float64}}) 
-        PolyArea(vertex)
-    elseif typeof(vertex) == Vector{Vector{LLA}}
-        points = map(vertex) do p
-            (rad2deg(p.lon), rad2deg(p.lat))
+    vertex::Union{Vector{LLA}, Vector{SVector{2, Float64}}, Vector{Point2}, Vector{Tuple{Float64, Float64}}, PolyArea} = nothing
+    
+    # Inner Constructor for inputs sanity check
+    function PolyRegion(regionName::String="region_name", vertex::Union{Vector{LLA}, Vector{SVector{2, Float64}}, Vector{Point2}, Vector{Tuple{Float64, Float64}}, PolyArea} = nothing)
+        # Inputs check
+        isnothing(vertex) && error("Input the polygon vertex...")
+    
+        _vertex = if vertex isa PolyArea
+            vertex
+        elseif (vertex isa Vector{Point2}) || (vertex isa Vector{Tuple{Float64, Float64}}) 
+            PolyArea(vertex)
+        elseif typeof(vertex) == Vector{Vector{LLA}}
+            points = map(vertex) do p
+                (p.lon, p.lat)
+            end
+            PolyArea(points)
+        elseif typeof(vertex) == Vector{SVector{2, Float64}}
+            points = map(vertex) do p
+                (first(p), last(p))
+            end
+            PolyArea(points)
+        else
+            error("The input vertex do not match the expected format...")
         end
-        PolyArea(points)
-    elseif typeof(vertex) == Vector{SVector{2, Float64}}
-        points = map(vertex) do p
-            (first(p), last(p))
-        end
-        PolyArea(points)
-    else
-        error("The input vertex do not match the expected format...")
+        
+        new(regionName, _vertex)
     end
-
-    return PolyRegion(regionName, _vertex)
 end
+
 
 """
     CountriesBorders.extract_countries(r::GeoRegion)
