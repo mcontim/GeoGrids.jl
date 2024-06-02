@@ -23,7 +23,7 @@ If a PolyArea is provided, the points are considered as LON-LAT, in rad, as it i
 """
 @kwdef mutable struct PolyRegion
     regionName::String = "region_name"
-    vertex::Union{Vector{LLA}, Vector{SVector{2, Float64}}, Vector{Point2}, Vector{Tuple{Float64, Float64}}, PolyArea} = nothing
+    vertex::PolyArea = nothing
     
     # Inner Constructor for inputs sanity check
     function PolyRegion(regionName::String="region_name", vertex::Union{Vector{LLA}, Vector{SVector{2, Float64}}, Vector{Point2}, Vector{Tuple{Float64, Float64}}, PolyArea} = nothing)
