@@ -63,13 +63,20 @@ poly = PolyArea((0.0,0.0),(1.0,0.0),(1.0,1.0),(0.0,1.0),(0.0,0.0))
 in_domain(LLA(0,0,0), poly)
 
 # ╔═╡ 2e60fb3c-da67-4538-878a-4d040160b1fb
-poly
+isempty(poly.outer)
+
+# ╔═╡ d0e14e10-178a-4003-884b-3b6e7f97f630
+
 
 # ╔═╡ 20d397c3-9d37-4fd1-b62c-c93b931d5c97
 a = [(0.0,0.0),(1.0,0.0),(1.0,1.0),(0.0,1.0),(0.0,0.0)]
 
+# ╔═╡ 50f45900-ca84-4ff4-9591-db44e2f8b949
+last(a[2])
+
 # ╔═╡ f01a704a-5d7d-421e-b5b9-75450913504e
-typeof(a)
+TelecomUtils._check_angle(a[1]; limit = π/2, msg = "Minimum Elevation Angle provided as numbers must be expressed in radians and satisfy 0 ≤ x ≤ π/2 Consider using `°` from Unitful (Also re-exported by TelecomUtils) if you want to pass numbers in degrees, by doing `x * °`.")
+    
 
 # ╔═╡ 2db4e379-d0c2-4888-9d68-e6f950e79e74
 PolyArea(a)
@@ -544,7 +551,9 @@ version = "17.4.0+2"
 # ╠═8985fd7b-5625-48d1-9895-fa58871176ac
 # ╠═26ffbfb5-da79-45b1-bf77-ace20102699e
 # ╠═2e60fb3c-da67-4538-878a-4d040160b1fb
+# ╠═d0e14e10-178a-4003-884b-3b6e7f97f630
 # ╠═20d397c3-9d37-4fd1-b62c-c93b931d5c97
+# ╠═50f45900-ca84-4ff4-9591-db44e2f8b949
 # ╠═f01a704a-5d7d-421e-b5b9-75450913504e
 # ╠═2db4e379-d0c2-4888-9d68-e6f950e79e74
 # ╠═f9cf5ae3-661d-42f6-b30b-fd7ef3fb2879

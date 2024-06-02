@@ -19,7 +19,7 @@ abstract type AbstractRegion end
 end
 
 """
-Unless it is a Vector{LLA}, the points has to be expressed as LAT-LON and values must be in ValidAngle. If a PolyArea is provided, the points are considered as LON-LAT as a Meshes.jl domain. In all other cases, the points are reoredered such to be in LON-LAT and a PolyArea is built ."	
+If a PolyArea is provided, the points are considered as LON-LAT, in rad, as it is in Meshes.jl domain. For all the other cases, with single points, unless it is a Vector{LLA}, the points has to be expressed as LAT-LON and values must be in ValidAngle. In all other cases, the points are reordered such to be in LON-LAT and a PolyArea with only an outer chain is built. If the chain is open a point equal to the first one is added at the end."	
 """
 @kwdef mutable struct PolyRegion
     regionName::String = "region_name"
@@ -33,7 +33,15 @@ Unless it is a Vector{LLA}, the points has to be expressed as LAT-LON and values
         _vertex = if vertex isa PolyArea
             vertex
         elseif (vertex isa Vector{Point2}) || (vertex isa Vector{Tuple{Float64, Float64}}) 
-            PolyArea(vertex)
+            newVertex = map(vertex) do p
+                # Check LAT
+                _check_angle(first(p); limit = π/2, msg = "LAT must be provided as numbers must be expressed in radians and satisfy -π/2 ≤ x ≤ π/2 Consider using `°` from Unitful (Also re-exported by TelecomUtils) if you want to pass numbers in degrees, by doing `x * °`.")
+                # Check LON
+                _check_angle(last(p); limit = π, msg = "LON must be provided as numbers must be expressed in radians and satisfy -π ≤ x ≤ π Consider using `°` from Unitful (Also re-exported by TelecomUtils) if you want to pass numbers in degrees, by doing `x * °`.")
+                (to_radians(last(p)), to_radians(first(p)))
+            end
+
+            PolyArea(vertex) # Create a simple PolyArea with only the Outer Chain
         elseif typeof(vertex) == Vector{Vector{LLA}}
             points = map(vertex) do p
                 (p.lon, p.lat)
