@@ -1,5 +1,5 @@
 ### A Pluto.jl notebook ###
-# v0.19.41
+# v0.19.39
 
 using Markdown
 using InteractiveUtils
@@ -39,7 +39,7 @@ md"""
 """
 
 # ╔═╡ 40653a7f-bc4b-47f2-9006-6856bb89210e
-r = Region(continent = "Europe")
+r = GeoRegion(continent = "Europe")
 
 # ╔═╡ 01ce8e56-201c-47a6-b925-a1d95f816b60
 methods(in_domain)

@@ -24,7 +24,7 @@ end
     vertex::Union{Vector{LLA}, Vector{SVector{2, Float64}}, Vector{Point2}, Vector{Tuple{Float64, Float64}}, PolyArea}
 end
 
-function PolyRegion(regionName::String="region_name", vertex::Union{Vector{Vector{LLA}, SVector{2, Float64}}, Vector{Meshes.Point{2, Float64}}, Vector{Tuple{Number, Number}}} = nothing)
+function PolyRegion(regionName::String="region_name", vertex::Union{Vector{LLA}, Vector{SVector{2, Float64}}, Vector{Point2}, Vector{Tuple{Float64, Float64}}, PolyArea} = nothing)
     # Inputs check
     isnothing(vertex) && error("Input the polygon vertex...")
 
@@ -50,23 +50,23 @@ function PolyRegion(regionName::String="region_name", vertex::Union{Vector{Vecto
 end
 
 """
-    CountriesBorders.extract_countries(r::Region)
+    CountriesBorders.extract_countries(r::GeoRegion)
 
 Extracts the countries from a given region.
 
-It first gets the field names of the `Region` type, excluding the `:regionName`, then maps these field names to their corresponding values in the `Region` instance `r`, creating a collection of pairs. It filters out any pairs where the value is empty. It converts this collection of pairs into a `NamedTuple`, finally, it calls `CountriesBorders.extract_countries` with the `NamedTuple` as keyword arguments.
+It first gets the field names of the `GeoRegion` type, excluding the `:regionName`, then maps these field names to their corresponding values in the `GeoRegion` instance `r`, creating a collection of pairs. It filters out any pairs where the value is empty. It converts this collection of pairs into a `NamedTuple`, finally, it calls `CountriesBorders.extract_countries` with the `NamedTuple` as keyword arguments.
 
-This function is an overload of `CountriesBorders.extract_countries` that takes a `Region` object as input. It extracts the countries from the given region and returns them.
+This function is an overload of `CountriesBorders.extract_countries` that takes a `GeoRegion` object as input. It extracts the countries from the given region and returns them.
 
 ## Arguments
-- `r::Region`: The region from which to extract the countries. It should be an instance of the `Region` type.
+- `r::GeoRegion`: The region from which to extract the countries. It should be an instance of the `GeoRegion` type.
 
 ## Returns
 - The function returns the result of `CountriesBorders.extract_countries(;kwargs...)`.
 """
-function CountriesBorders.extract_countries(r::Region)
-    # Overload of CountriesBorders.extract_countries taking Region as input
-    names = setdiff(fieldnames(Region), (:regionName,))
+function CountriesBorders.extract_countries(r::GeoRegion)
+    # Overload of CountriesBorders.extract_countries taking GeoRegion as input
+    names = setdiff(fieldnames(GeoRegion), (:regionName,))
 
     all_pairs = map(names) do n
         n => getfield(r,n)
@@ -108,7 +108,7 @@ function in_domain(p::LLA, domain)
 	Meshes.Point{2, Float64}(_p) in domain # Meshes.Point in Meshes.Geometry
 end
 
-function in_domain(p::LLA, domain::Region)
+function in_domain(p::LLA, domain::GeoRegion)
     countriesList = extract_countries(domain) # extract Meshes.Geometry
     in_domain(p, countriesList) # `in` uses lon-lat
 end

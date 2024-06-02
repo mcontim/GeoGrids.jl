@@ -13,7 +13,7 @@ include("plot_func.jl")
 include("fibonacci_func.jl")
 include("mesh_func.jl")
 
-export Region
+export GeoRegion, PolyRegion
 export fibonaccigrid, meshgrid, 
 extract_countries, in_domain
 
