@@ -1,3 +1,14 @@
+"""
+    _point_check(p)
+
+Checks the validity of the given point `p` in terms of latitude (LAT) and longitude (LON) values. The function expects the input to be in radians and within the valid range for LAT and LON. If you want to pass numbers in degrees, consider using `°` from Unitful (Also re-exported by TelecomUtils) by doing `x * °`.
+
+## Arguments
+- `p`: A tuple representing a point on the globe where the first element is the latitude (LAT) and the second element is the longitude (LON).
+
+## Returns
+- A tuple with the longitude and latitude values converted to radians.
+"""
 function _point_check(p)
     _check_angle(first(p); limit = π/2, msg = "LAT must be provided as numbers must be expressed in radians and satisfy -π/2 ≤ x ≤ π/2 Consider using `°` from Unitful (Also re-exported by TelecomUtils) if you want to pass numbers in degrees, by doing `x * °`.") # Check LAT
     _check_angle(last(p); limit = π, msg = "LON must be provided as numbers must be expressed in radians and satisfy -π ≤ x ≤ π Consider using `°` from Unitful (Also re-exported by TelecomUtils) if you want to pass numbers in degrees, by doing `x * °`.") # Check LON
@@ -121,15 +132,21 @@ function CountriesBorders.extract_countries(r::GeoRegion)
 end
 
 """
-    Base.in(p::Tuple{Number, Number}, domain::Meshes.Domain)`
+    in_domain(p::LLA, domain::Union{GeometrySet,PolyArea})
+    in_domain(p::LLA, domain::Union{GeoRegion, PolyRegion}) = in_domain(p, domain.domain)
+    in_domain(p::Union{Tuple{Float64, Float64},SVector{2,Float64}}, domain::Union{GeometrySet,PolyArea})
+    in_domain(p::Union{Tuple{Float64, Float64},SVector{2,Float64}}, domain::Union{GeoRegion, PolyRegion}) = in_domain(p, domain.domain)
+    in_domain(p::Point2, domain::Union{GeometrySet,PolyArea})
+    in_domain(p::Point2, domain::Union{GeoRegion, PolyRegion}) = in_domain(p, domain.domain)
 
-This function determines if a given point `(x, y)` represented as a tuple of two numbers, belongs to a 2-dimensional `Meshes.Domain` object. The `Meshes.Domain` object represents a geometric domain, which is essentially a 2D region in space, specified by its bounds and discretization. 
+This function determines if a given point belongs to a 2-dimensional `Meshes.Domain` object. The `Meshes.Domain` object represents a geometric domain, which is essentially a 2D region in space, specified by its bounds and discretization. 
 
 The function first converts the input tuple into a `Meshes.Point` object, which is then checked if it falls inside the given `Meshes.Domain` object.
+The `Meshes.Domain` can be either a `GeometrySet` or a `PolyArea` object.
 
-### Arguments
-* `p::Tuple{Number, Number}`: A tuple of two numbers `(x,y)` representing a point in 2D space. 
-* `domain::Meshes.Domain`: A `Meshes.Domain` object representing a 2D region in space. 
+## Arguments
+* `p`: A tuple of two numbers `(x,y)` representing a point in 2D space. 
+* `domain::Union{GeometrySet,PolyArea}`: A `Meshes.Domain` object representing a 2D region in space. 
 
 ### Output
 The function returns a boolean value: `true` if the point represented by the input tuple falls inside the `Meshes.Domain` object and `false` otherwise. 
@@ -138,26 +155,16 @@ function in_domain(p::LLA, domain::Union{GeometrySet,PolyArea})
     _p = (rad2deg(p.lon), rad2deg(p.lat))
     Meshes.Point2(_p) in domain # Meshes.Point in Meshes.Geometry
 end
-in_domain(p::LLA, geoRregion::GeoRegion) = in_domain(p, geoRregion.domain)
-in_domain(p::LLA, polyRegion::PolyRegion) = in_domain(p, polyRegion.domain)
+in_domain(p::LLA, domain::Union{GeoRegion, PolyRegion}) = in_domain(p, domain.domain)
 
-function in_domain(p::Tuple{Float64, Float64}, domain::Union{GeometrySet,PolyArea})
+function in_domain(p::Union{Tuple{Float64, Float64},SVector{2,Float64}}, domain::Union{GeometrySet,PolyArea})
     _p = _point_check(p) # Input check
 	Meshes.Point2(_p) in domain
 end
-in_domain(p::Tuple{Float64, Float64}, geoRregion::GeoRegion) = in_domain(p, geoRregion.domain)
-in_domain(p::Tuple{Float64, Float64}, polyRegion::PolyRegion) = in_domain(p, polyRegion.domain)
-
-function in_domain(p::SVector{2,Float64}, domain::Union{GeometrySet,PolyArea})
-    _p = _point_check(p) # Input check
-	return Meshes.Point2(_p) in domain
-end
-in_domain(p::SVector{2,Float64}, geoRregion::GeoRegion) = in_domain(p, geoRregion.domain)
-in_domain(p::SVector{2,Float64}, polyRegion::PolyRegion) = in_domain(p, polyRegion.domain)
+in_domain(p::Union{Tuple{Float64, Float64},SVector{2,Float64}}, domain::Union{GeoRegion, PolyRegion}) = in_domain(p, domain.domain)
 
 function in_domain(p::Point2, domain::Union{GeometrySet,PolyArea})
     _p = _point_check(p.coords) # Input check
 	return Meshes.Point2(_p) in domain
 end
-in_domain(p::Point2, geoRregion::GeoRegion) = in_domain(p, geoRregion.domain)
-in_domain(p::Point2, polyRegion::PolyRegion) = in_domain(p, polyRegion.domain)
+in_domain(p::Point2, domain::Union{GeoRegion, PolyRegion}) = in_domain(p, domain.domain)
