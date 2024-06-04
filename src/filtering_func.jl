@@ -11,28 +11,25 @@ abstract type AbstractRegion end
     function GeoRegion(regionName="region_name", continent=nothing, subregion=nothing, admin=nothing, domain=nothing)
         isnothing(continent) && isnothing(subregion) && isnothing(admin) && error("Input at least one argument between continent, subregion and admin...")
     
-        kwargs = (;)
+        kwargs = (;) # Collect kwargs for `CountriesBorders.extract_countries`
         _continent = if isnothing(continent)
             ""
         else
             kwargs = (; kwargs..., continent = continent)
             continent
         end
-        
         _subregion = if isnothing(subregion)
             ""
         else
             kwargs = (; kwargs..., subregion = subregion)
             subregion
         end
-        
         _admin = if isnothing(admin)
             ""
         else
             kwargs = (; kwargs..., admin = admin)
             admin
         end
-
         _domain = if isnothing(domain)
             CountriesBorders.extract_countries(;kwargs...)
         else
@@ -49,12 +46,12 @@ If a PolyArea is provided, the points are considered as LON-LAT, in rad, as it i
 """
 @kwdef mutable struct PolyRegion
     regionName::String = "region_name"
-    vertex::PolyArea = nothing
+    domain::PolyArea = nothing
     
     # Inner Constructor for inputs sanity check
-    function PolyRegion(regionName::String="region_name", vertex::Union{Vector{LLA}, Vector{SVector{2, Float64}}, Vector{Point2}, Vector{Tuple{Float64, Float64}}, PolyArea} = nothing)
-        function _polyarea_from_vertex(vertex)
-            points = map(vertex) do p
+    function PolyRegion(regionName::String="region_name", domain::Union{Vector{LLA}, Vector{SVector{2, Float64}}, Vector{Point2}, Vector{Tuple{Float64, Float64}}, PolyArea} = nothing)
+        function _polyarea_from_vertex(domain)
+            points = map(domain) do p
                 _check_angle(first(p); limit = π/2, msg = "LAT must be provided as numbers must be expressed in radians and satisfy -π/2 ≤ x ≤ π/2 Consider using `°` from Unitful (Also re-exported by TelecomUtils) if you want to pass numbers in degrees, by doing `x * °`.") # Check LAT
                 _check_angle(last(p); limit = π, msg = "LON must be provided as numbers must be expressed in radians and satisfy -π ≤ x ≤ π Consider using `°` from Unitful (Also re-exported by TelecomUtils) if you want to pass numbers in degrees, by doing `x * °`.") # Check LON
                 (to_radians(last(p)), to_radians(first(p)))
@@ -68,23 +65,23 @@ If a PolyArea is provided, the points are considered as LON-LAT, in rad, as it i
         end
 
         # Inputs check
-        isnothing(vertex) && error("Input the polygon vertex...")
+        isnothing(domain) && error("Input the polygon domain...")
 
-        _vertex = if vertex isa PolyArea
-            vertex
-        elseif (vertex isa Vector{Tuple{Float64, Float64}}) || (vertex isa Vector{SVector{2, Float64}})
-            _polyarea_from_vertex(vertex)
-        elseif (vertex isa Vector{Point2})
-            points = map(x -> x.coords, vertex)
+        _vertex = if domain isa PolyArea
+            domain
+        elseif (domain isa Vector{Tuple{Float64, Float64}}) || (domain isa Vector{SVector{2, Float64}})
+            _polyarea_from_vertex(domain)
+        elseif (domain isa Vector{Point2})
+            points = map(x -> x.coords, domain)
             _polyarea_from_vertex(points)
-        elseif typeof(vertex) == Vector{Vector{LLA}}
-            points = map(x -> (x.lon, x.lat), vertex)
+        elseif typeof(domain) == Vector{Vector{LLA}}
+            points = map(x -> (x.lon, x.lat), domain)
             PolyArea(points) # Create a simple PolyArea with only the Outer Chain        
         else
-            error("The input vertex do not match the expected format...")
+            error("The input domain do not match the expected format...")
         end
 
-        new(regionName, _vertex)
+        new(regionName, _domain)
     end
 end
 
