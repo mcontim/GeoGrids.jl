@@ -54,6 +54,9 @@ r = GeoRegion(;continent = "Europe", admin="Italy")
 # ╔═╡ 82fb5dfb-28cf-44d7-b0e9-c50671344453
 GeoRegion("Europe", "Europe")
 
+# ╔═╡ 9c977c07-ce0e-4c38-bcac-b2a83cfb3544
+GeoRegion(continent = "Europe", admin="Italy")
+
 # ╔═╡ 974a09cd-fffb-40c6-b277-8a27fd827f92
 methods(GeoRegion)
 
@@ -91,6 +94,12 @@ PolyRegion(vertex=b)
 
 # ╔═╡ c74bde8a-74d3-45e9-9857-330d0f9ff411
 PolyRegion(vertex=c)
+
+# ╔═╡ c21f4e70-77f0-4ea8-bf96-450820f2912d
+nt=(continent="Europe", admin="")
+
+# ╔═╡ c058ccea-4945-416f-9bed-0d1063e398a0
+CountriesBorders.extract_countries(;nt...)
 
 # ╔═╡ 6cca736e-7006-4887-83f0-d15f49533903
 md"""
@@ -527,6 +536,7 @@ version = "17.4.0+2"
 # ╟─152ae683-dbad-4c2c-9c4a-5e14a31d2748
 # ╠═40653a7f-bc4b-47f2-9006-6856bb89210e
 # ╠═82fb5dfb-28cf-44d7-b0e9-c50671344453
+# ╠═9c977c07-ce0e-4c38-bcac-b2a83cfb3544
 # ╠═974a09cd-fffb-40c6-b277-8a27fd827f92
 # ╟─8f960ccd-a95d-403f-a6f8-0c8da617c009
 # ╠═16558f4f-0d6c-4f0f-90fe-6f43b023f33e
@@ -539,6 +549,8 @@ version = "17.4.0+2"
 # ╠═ee9f61e3-dd7c-40a8-b7a8-41009b4a3518
 # ╠═850942e4-95f3-4f07-9493-9c3e709cb080
 # ╠═c74bde8a-74d3-45e9-9857-330d0f9ff411
+# ╠═c058ccea-4945-416f-9bed-0d1063e398a0
+# ╠═c21f4e70-77f0-4ea8-bf96-450820f2912d
 # ╟─6cca736e-7006-4887-83f0-d15f49533903
 # ╠═6c7d8bc0-47aa-499b-a0fc-895828c43ec6
 # ╠═cea38f6b-4eaf-4d4d-a882-81bf1e63e902

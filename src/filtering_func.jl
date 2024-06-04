@@ -5,16 +5,42 @@ abstract type AbstractRegion end
     continent::String = nothing
     subregion::String = nothing
     admin::String = nothing
+    domain::GeometrySet = nothing
     
     # Inner Constructor for inputs sanity check
-    function GeoRegion(regionName="region_name", continent=nothing, subregion=nothing, admin=nothing)
+    function GeoRegion(regionName="region_name", continent=nothing, subregion=nothing, admin=nothing, domain=nothing)
         isnothing(continent) && isnothing(subregion) && isnothing(admin) && error("Input at least one argument between continent, subregion and admin...")
     
-        _continent = isnothing(continent) ? "" : continent
-        _subregion = isnothing(subregion) ? "" : subregion
-        _admin = isnothing(admin) ? "" : admin
-    
-        new(regionName, _continent, _subregion, _admin)
+        kwargs = (;)
+        _continent = if isnothing(continent)
+            ""
+        else
+            kwargs = (; kwargs..., continent = continent)
+            continent
+        end
+        
+        _subregion = if isnothing(subregion)
+            ""
+        else
+            kwargs = (; kwargs..., subregion = subregion)
+            subregion
+        end
+        
+        _admin = if isnothing(admin)
+            ""
+        else
+            kwargs = (; kwargs..., admin = admin)
+            admin
+        end
+
+        _domain = if isnothing(domain)
+            CountriesBorders.extract_countries(;kwargs...)
+        else
+            @warn "GeoRegion domain is not automatically generated from the other arguments, check inputs consistency..."
+            domain
+        end
+
+        new(regionName, _continent, _subregion, _admin, _domain)
     end
 end
 
@@ -79,14 +105,16 @@ This function is an overload of `CountriesBorders.extract_countries` that takes 
 """
 function CountriesBorders.extract_countries(r::GeoRegion)
     # Overload of CountriesBorders.extract_countries taking GeoRegion as input
-    names = setdiff(fieldnames(GeoRegion), (:regionName,))
+    names = setdiff(fieldnames(GeoRegion), (:regionName,:domain))
 
     all_pairs = map(names) do n
         n => getfield(r,n)
     end 
     
     kwargs = NamedTuple(filter(x -> !isempty(x[2]), all_pairs))
+    
     @info kwargs
+    
     CountriesBorders.extract_countries(;kwargs...)
 end
 
