@@ -1,3 +1,10 @@
+function _point_check(p)
+    _check_angle(first(p); limit = π/2, msg = "LAT must be provided as numbers must be expressed in radians and satisfy -π/2 ≤ x ≤ π/2 Consider using `°` from Unitful (Also re-exported by TelecomUtils) if you want to pass numbers in degrees, by doing `x * °`.") # Check LAT
+    _check_angle(last(p); limit = π, msg = "LON must be provided as numbers must be expressed in radians and satisfy -π ≤ x ≤ π Consider using `°` from Unitful (Also re-exported by TelecomUtils) if you want to pass numbers in degrees, by doing `x * °`.") # Check LON
+    
+    return (to_radians(last(p)), to_radians(first(p)))
+end
+
 abstract type AbstractRegion end
 
 @kwdef mutable struct GeoRegion
@@ -52,9 +59,7 @@ If a PolyArea is provided, the points are considered as LON-LAT, in rad, as it i
     function PolyRegion(regionName::String="region_name", domain::Union{Vector{LLA}, Vector{SVector{2, Float64}}, Vector{Point2}, Vector{Tuple{Float64, Float64}}, PolyArea} = nothing)
         function _polyarea_from_vertex(domain)
             points = map(domain) do p
-                _check_angle(first(p); limit = π/2, msg = "LAT must be provided as numbers must be expressed in radians and satisfy -π/2 ≤ x ≤ π/2 Consider using `°` from Unitful (Also re-exported by TelecomUtils) if you want to pass numbers in degrees, by doing `x * °`.") # Check LAT
-                _check_angle(last(p); limit = π, msg = "LON must be provided as numbers must be expressed in radians and satisfy -π ≤ x ≤ π Consider using `°` from Unitful (Also re-exported by TelecomUtils) if you want to pass numbers in degrees, by doing `x * °`.") # Check LON
-                (to_radians(last(p)), to_radians(first(p)))
+                _point_check(p)                
             end
             # Check if the first and last points are the same to create a valid polygon
             if !(first(points[1])==first(points[end])) || !(last(points[1])==last(points[end]))
@@ -67,7 +72,7 @@ If a PolyArea is provided, the points are considered as LON-LAT, in rad, as it i
         # Inputs check
         isnothing(domain) && error("Input the polygon domain...")
 
-        _vertex = if domain isa PolyArea
+        _domain = if domain isa PolyArea
             domain
         elseif (domain isa Vector{Tuple{Float64, Float64}}) || (domain isa Vector{SVector{2, Float64}})
             _polyarea_from_vertex(domain)
@@ -129,22 +134,30 @@ The function first converts the input tuple into a `Meshes.Point` object, which 
 ### Output
 The function returns a boolean value: `true` if the point represented by the input tuple falls inside the `Meshes.Domain` object and `false` otherwise. 
 """
-# function in_domain(p::Tuple{Number, Number}, domain::Meshes.Domain)
-# 	Meshes.Point{2, Float64}(p) in domain
-# end
-
-# function in_domain(p::SVector{2,Number}, domain::Meshes.Domain)
-# 	Meshes.Point{2, Float64}(p) in domain
-# end
-
-function in_domain(p::LLA, domain)
+function in_domain(p::LLA, domain::Union{GeometrySet,PolyArea})
     _p = (rad2deg(p.lon), rad2deg(p.lat))
-	Meshes.Point{2, Float64}(_p) in domain # Meshes.Point in Meshes.Geometry
+    Meshes.Point2(_p) in domain # Meshes.Point in Meshes.Geometry
 end
+in_domain(p::LLA, geoRregion::GeoRegion) = in_domain(p, geoRregion.domain)
+in_domain(p::LLA, polyRegion::PolyRegion) = in_domain(p, polyRegion.domain)
 
-function in_domain(p::LLA, domain::GeoRegion)
-    countriesList = extract_countries(domain) # extract Meshes.Geometry
-    in_domain(p, countriesList) # `in` uses lon-lat
+function in_domain(p::Tuple{Float64, Float64}, domain::Union{GeometrySet,PolyArea})
+    _p = _point_check(p) # Input check
+	Meshes.Point2(_p) in domain
 end
+in_domain(p::Tuple{Float64, Float64}, geoRregion::GeoRegion) = in_domain(p, geoRregion.domain)
+in_domain(p::Tuple{Float64, Float64}, polyRegion::PolyRegion) = in_domain(p, polyRegion.domain)
 
-in_domain(p::LLA, domain::PolyRegion) = in_domain(p, domain) # Multiple dispatch for PolyRegion type
+function in_domain(p::SVector{2,Float64}, domain::Union{GeometrySet,PolyArea})
+    _p = _point_check(p) # Input check
+	return Meshes.Point2(_p) in domain
+end
+in_domain(p::SVector{2,Float64}, geoRregion::GeoRegion) = in_domain(p, geoRregion.domain)
+in_domain(p::SVector{2,Float64}, polyRegion::PolyRegion) = in_domain(p, polyRegion.domain)
+
+function in_domain(p::Point2, domain::Union{GeometrySet,PolyArea})
+    _p = _point_check(p.coords) # Input check
+	return Meshes.Point2(_p) in domain
+end
+in_domain(p::Point2, geoRregion::GeoRegion) = in_domain(p, geoRregion.domain)
+in_domain(p::Point2, polyRegion::PolyRegion) = in_domain(p, polyRegion.domain)

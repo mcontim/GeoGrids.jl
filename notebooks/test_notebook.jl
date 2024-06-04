@@ -77,23 +77,29 @@ poly = PolyArea((0.0,0.0),(1.0,0.0),(1.0,1.0),(0.0,1.0),(0.0,0.0))
 # ╔═╡ 20d397c3-9d37-4fd1-b62c-c93b931d5c97
 a = [(0.0,0.0),(1.0,0.0),(1.0,1.0),(0.0,1.0)]
 
+# ╔═╡ 47d9109b-b546-4279-b2e4-061746214d56
+Meshes.Point2(a[1])
+
 # ╔═╡ f9cf5ae3-661d-42f6-b30b-fd7ef3fb2879
 b = [SVector(0.0,0.0),SVector(1.0,0.0),SVector(1.0,1.0),SVector(0.0,1.0),SVector(0.0,0.0)]
+
+# ╔═╡ 704c0699-4c32-4039-996f-24b314e1f34b
+Meshes.Point2(b[1])
 
 # ╔═╡ 4e508a67-c8b6-47f8-a160-420b7f881769
 c = [Meshes.Point(0.0,0.0),Meshes.Point(1.0,0.0),Meshes.Point(1.0,1.0),Meshes.Point(0.0,1.0),Meshes.Point(0.0,0.0)]
 
 # ╔═╡ 3052ad94-14f6-42f9-bbf1-ff744138d8a1
-PolyRegion(vertex=poly)
+PolyRegion(domain=poly)
 
 # ╔═╡ ee9f61e3-dd7c-40a8-b7a8-41009b4a3518
-PolyRegion(vertex=a)
+PolyRegion(domain=a)
 
 # ╔═╡ 850942e4-95f3-4f07-9493-9c3e709cb080
-PolyRegion(vertex=b)
+PolyRegion(domain=b)
 
 # ╔═╡ c74bde8a-74d3-45e9-9857-330d0f9ff411
-PolyRegion(vertex=c)
+PolyRegion(domain=c)
 
 # ╔═╡ c21f4e70-77f0-4ea8-bf96-450820f2912d
 nt=(continent="Europe", admin="")
@@ -543,6 +549,8 @@ version = "17.4.0+2"
 # ╠═01ce8e56-201c-47a6-b925-a1d95f816b60
 # ╠═26ffbfb5-da79-45b1-bf77-ace20102699e
 # ╠═20d397c3-9d37-4fd1-b62c-c93b931d5c97
+# ╠═47d9109b-b546-4279-b2e4-061746214d56
+# ╠═704c0699-4c32-4039-996f-24b314e1f34b
 # ╠═f9cf5ae3-661d-42f6-b30b-fd7ef3fb2879
 # ╠═4e508a67-c8b6-47f8-a160-420b7f881769
 # ╠═3052ad94-14f6-42f9-bbf1-ff744138d8a1
