@@ -28,17 +28,23 @@ function in_domain(p::Union{Tuple{Float64, Float64},SVector{2,Float64}}, domain:
     _p = _point_check(p) # Input check
 	Meshes.Point2(_p) in domain
 end
-in_domain(p::Union{Tuple{Float64, Float64},SVector{2,Float64}}, domain::Union{GeoRegion, PolyRegion}) = in_domain(p, domain.domain)
+in_domain(p::Union{Tuple{Float64, Float64}, SVector{2,Float64}}, domain::Union{GeoRegion, PolyRegion}) = in_domain(p, domain.domain)
 
-function in_domain(p::Point2, domain::Union{GeometrySet,PolyArea})
+function in_domain(p::Point2, domain::Union{GeometrySet, PolyArea})
     _p = _point_check(p.coords) # Input check
 	return Meshes.Point2(_p) in domain
 end
 in_domain(p::Point2, domain::Union{GeoRegion, PolyRegion}) = in_domain(p, domain.domain)
 
+function in_domain(points::Union{Vector{LLA}, Vector{SVector{2,Float64}}, Vector{Point2}, Vector{Tuple{Float64,Float64}}}, domain::Union{GeometrySet, PolyArea})
+    mask = map(x -> in_domain(x, domain.domain), points) # Bool mask
+    return mask
+end
+in_domain(points::Union{Vector{LLA}, Vector{SVector{2,Float64}}, Vector{Point2}, Vector{Tuple{Float64,Float64}}}, domain::Union{GeoRegion, PolyRegion}) = in_domain(points, domain.domain)
+
 """
-    filter_points(points::Union{Vector{LLA}, Vector{SVector{2,Float64}}, Vector{Point2}, Vector{Tuple{Float64,Float64}}}, domain::Union{GeoRegion, PolyRegion})
     filter_points(points::Union{Vector{LLA}, Vector{SVector{2,Float64}}, Vector{Point2}, Vector{Tuple{Float64,Float64}}}, domain::Union{GeometrySet, PolyArea})
+    filter_points(points::Union{Vector{LLA}, Vector{SVector{2,Float64}}, Vector{Point2}, Vector{Tuple{Float64,Float64}}}, domain::Union{GeoRegion, PolyRegion})
     
 Filters a list of points based on whether they fall within a specified geographical domain.
 
@@ -47,14 +53,10 @@ Filters a list of points based on whether they fall within a specified geographi
 - `domain`: A geographical domain which can be of type `GeoRegion` or `PolyRegion`, in alternative a `Meshes.Domain` of type `GeometrySet` or `PolyArea`.
 
 ## Returns
-- A vector of points that fall within the specified domain.
+- A vector of points that fall within the specified domain, subsection of the input vector.
 """
-function filter_points(points::Union{Vector{LLA}, Vector{SVector{2,Float64}}, Vector{Point2}, Vector{Tuple{Float64,Float64}}}, domain::Union{GeoRegion, PolyRegion})
-    mask = map(x -> in_domain(x, domain.domain), points)
-    return points[mask]
-end
-
 function filter_points(points::Union{Vector{LLA}, Vector{SVector{2,Float64}}, Vector{Point2}, Vector{Tuple{Float64,Float64}}}, domain::Union{GeometrySet, PolyArea})
-    mask = map(x -> in_domain(x, domain), points)
+    mask = in_domain(points, domain)
     return points[mask]
 end
+filter_points(points::Union{Vector{LLA}, Vector{SVector{2,Float64}}, Vector{Point2}, Vector{Tuple{Float64,Float64}}}, domain::Union{GeoRegion, PolyRegion}) = filter_points(points, domain.domain)
