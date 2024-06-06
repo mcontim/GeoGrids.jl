@@ -9,6 +9,7 @@ using StaticArrays
 using TelecomUtils
 using TelecomUtils: _check_angle, ValidAngle, ValidDistance
 
+include("typedef.jl")
 include("filtering_func.jl")
 include("plot_func.jl")
 include("fibonacci_func.jl")

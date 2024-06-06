@@ -38,10 +38,16 @@ end
 # ╔═╡ 282b928a-fc7d-4487-a056-6c2626cf7179
 ExtendedTableOfContents()
 
+# ╔═╡ 2f988a76-9c84-432b-b69f-dbe06f32ea35
+
+
 # ╔═╡ 0e205c7f-43ea-4612-830c-d930e8e4522f
 md"""
 # Test
 """
+
+# ╔═╡ 4a96aafa-1313-444b-a5cb-cb56a1c5189f
+SMatrix{3,3}([1 0 0;0 1 0;0 0 1])
 
 # ╔═╡ 152ae683-dbad-4c2c-9c4a-5e14a31d2748
 md"""
@@ -538,7 +544,9 @@ version = "17.4.0+2"
 
 # ╔═╡ Cell order:
 # ╠═282b928a-fc7d-4487-a056-6c2626cf7179
+# ╠═2f988a76-9c84-432b-b69f-dbe06f32ea35
 # ╟─0e205c7f-43ea-4612-830c-d930e8e4522f
+# ╠═4a96aafa-1313-444b-a5cb-cb56a1c5189f
 # ╟─152ae683-dbad-4c2c-9c4a-5e14a31d2748
 # ╠═40653a7f-bc4b-47f2-9006-6856bb89210e
 # ╠═82fb5dfb-28cf-44d7-b0e9-c50671344453
