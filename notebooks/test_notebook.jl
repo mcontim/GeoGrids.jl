@@ -95,6 +95,24 @@ Meshes.Point2(b[1])
 # ╔═╡ 4e508a67-c8b6-47f8-a160-420b7f881769
 c = [Meshes.Point(0.0,0.0),Meshes.Point(1.0,0.0),Meshes.Point(1.0,1.0),Meshes.Point(0.0,1.0),Meshes.Point(0.0,0.0)]
 
+# ╔═╡ 49a31491-a55f-4fb5-b8f7-d037a346837c
+typeof(c[1].coords)
+
+# ╔═╡ 2e1e519f-0d5e-48b8-800b-f1159a796dca
+c[1].coords isa Vec2
+
+# ╔═╡ 73aff794-81c0-4d1c-89cd-b965415ad8d9
+c[1].coords isa StaticVector{2,Float64}
+
+# ╔═╡ 24b3a8e0-5624-402c-afc4-8203691dc913
+c[1] isa Point2
+
+# ╔═╡ f3a6771f-2e7a-446f-ade5-6fee0091ccb4
+b[1] isa StaticVector{2,Float64}
+
+# ╔═╡ 60f4905c-6f6f-405a-bcf0-05110f5e05e3
+AbstractVector{2}
+
 # ╔═╡ 3052ad94-14f6-42f9-bbf1-ff744138d8a1
 PolyRegion(domain=poly)
 
@@ -561,6 +579,12 @@ version = "17.4.0+2"
 # ╠═704c0699-4c32-4039-996f-24b314e1f34b
 # ╠═f9cf5ae3-661d-42f6-b30b-fd7ef3fb2879
 # ╠═4e508a67-c8b6-47f8-a160-420b7f881769
+# ╠═49a31491-a55f-4fb5-b8f7-d037a346837c
+# ╠═2e1e519f-0d5e-48b8-800b-f1159a796dca
+# ╠═73aff794-81c0-4d1c-89cd-b965415ad8d9
+# ╠═24b3a8e0-5624-402c-afc4-8203691dc913
+# ╠═f3a6771f-2e7a-446f-ade5-6fee0091ccb4
+# ╠═60f4905c-6f6f-405a-bcf0-05110f5e05e3
 # ╠═3052ad94-14f6-42f9-bbf1-ff744138d8a1
 # ╠═ee9f61e3-dd7c-40a8-b7a8-41009b4a3518
 # ╠═850942e4-95f3-4f07-9493-9c3e709cb080
