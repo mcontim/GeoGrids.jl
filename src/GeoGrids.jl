@@ -18,7 +18,7 @@ include("mesh_func.jl")
 export GeoRegion, PolyRegion
 
 export fibonaccigrid, meshgrid, 
-extract_countries, in_domain
+extract_countries, in_region
 
 export °, LLA
 

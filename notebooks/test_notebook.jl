@@ -75,7 +75,7 @@ md"""
 methods(PolyRegion)
 
 # ╔═╡ 01ce8e56-201c-47a6-b925-a1d95f816b60
-methods(in_domain)
+methods(in_region)
 
 # ╔═╡ 26ffbfb5-da79-45b1-bf77-ace20102699e
 poly = PolyArea((0.0,0.0),(1.0,0.0),(1.0,1.0),(0.0,1.0),(0.0,0.0))
