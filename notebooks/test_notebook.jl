@@ -128,6 +128,12 @@ Meshes.Point2(b[1])
 # ╔═╡ 4e508a67-c8b6-47f8-a160-420b7f881769
 c = [Meshes.Point(0.0,0.0),Meshes.Point(1.0,0.0),Meshes.Point(1.0,1.0),Meshes.Point(0.0,1.0),Meshes.Point(0.0,0.0)]
 
+# ╔═╡ b496c282-4de8-442e-b96f-96158375b773
+first(c[2].coords)
+
+# ╔═╡ 03251cdd-55e1-4392-aebd-4e8d8679cf62
+last(c[2].coords)
+
 # ╔═╡ 49a31491-a55f-4fb5-b8f7-d037a346837c
 typeof(c[1].coords)
 
@@ -638,6 +644,8 @@ version = "17.4.0+2"
 # ╠═704c0699-4c32-4039-996f-24b314e1f34b
 # ╠═f9cf5ae3-661d-42f6-b30b-fd7ef3fb2879
 # ╠═4e508a67-c8b6-47f8-a160-420b7f881769
+# ╠═b496c282-4de8-442e-b96f-96158375b773
+# ╠═03251cdd-55e1-4392-aebd-4e8d8679cf62
 # ╠═49a31491-a55f-4fb5-b8f7-d037a346837c
 # ╠═2e1e519f-0d5e-48b8-800b-f1159a796dca
 # ╠═73aff794-81c0-4d1c-89cd-b965415ad8d9

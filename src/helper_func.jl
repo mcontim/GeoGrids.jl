@@ -1,15 +1,17 @@
 """
-    _point_check(p::Union{StaticVector{2,Float64}, Point2, Tuple{Float64,Float64}}) -> Tuple{Float64,Float64}
+    _check_point(p::Union{StaticVector{2,Float64}, Point2, Tuple{Float64,Float64}}) -> Meshes.Point2(lon,lat)
+    _check_point(p::Point2) -> Meshes.Point2(lon,lat)
+    _check_point(p::LLA) -> Meshes.Point2(lon,lat)
 
-Checks the validity of the given point `p` in terms of latitude (LAT) and longitude (LON) values. The function expects the input to be in radians and within the valid range for LAT and LON. If you want to pass numbers in degrees, consider using `°` from Unitful (Also re-exported by TelecomUtils) by doing `x * °`.
+Checks the validity of the given point `p` in terms of latitude (LAT) and longitude (LON) values. The function expects the input to be in radians and within the valid range for LAT and LON. If you want to pass numbers in degrees, consider using `°` from Unitful (Also re-exported by GeoGrids) by doing `x * °`.
 
 ## Arguments
 - `p`: A tuple representing a point on the globe where the first element is the latitude (LAT) and the second element is the longitude (LON).
 
 ## Returns
-- A tuple with the longitude and latitude values converted to radians.
+- A `Point2` with the longitude (LON) in first position and latitude (LAT) value in second position, converted to radians.
 """
-function _point_check(p::Union{StaticVector{2,Float64}, Point2, Tuple{Float64,Float64}})
+function _check_point(p::Union{StaticVector{2,Float64}, Tuple{Float64,Float64}})
     lat = to_radians(first(p))
     lon = to_radians(last(p))
 
@@ -17,8 +19,10 @@ function _point_check(p::Union{StaticVector{2,Float64}, Point2, Tuple{Float64,Fl
     (lat < -π/2 || lat > π/2) && error("LAT provided as numbers must be expressed in radians and satisfy -π/2 ≤ x ≤ π/2. Consider using `°` from `Unitful` (Also re-exported by GeoGrids) if you want to pass numbers in degrees, by doing `x * °`.")
     (lon < -π || lon > π) && error("LON provided as numbers must be expressed in radians and satisfy -π ≤ x ≤ π. Consider using `°` from `Unitful` (Also re-exported by GeoGrids) if you want to pass numbers in degrees, by doing `x * °`.")
 
-    return (lon, lat)
+    return Meshes.Point2(lon, lat)
 end
+_check_point(p::Point2) = _check_point(p.coords)
+_check_point(p::LLA) = Meshes.Point2((p.lon, p.lat)) # The values are already in radians (checked in LLA() constructor)
 
 """
     CountriesBorders.extract_countries(r::GeoRegion)

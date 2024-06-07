@@ -52,7 +52,7 @@ If a PolyArea is provided, the points are considered as LON-LAT, in rad, as it i
     function PolyRegion(regionName::String="region_name", domain::Union{Vector{LLA}, Vector{SVector{2, Float64}}, Vector{Point2}, Vector{Tuple{Float64, Float64}}, PolyArea} = nothing)
         function _polyarea_from_vertex(domain)
             points = map(domain) do p
-                _point_check(p)                
+                _check_point(p)                
             end
             # Check if the first and last points are the same to create a valid polygon
             if !(first(points[1])==first(points[end])) || !(last(points[1])==last(points[end]))
