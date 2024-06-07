@@ -1,10 +1,12 @@
 """
-    in_region(p::LLA, domain::Union{GeometrySet,PolyArea})
-    in_region(p::LLA, domain::Union{GeoRegion, PolyRegion}) = in_region(p, domain.domain)
-    in_region(p::Union{Tuple{Float64, Float64},StaticVector{2,Float64}}, domain::Union{GeometrySet,PolyArea})
-    in_region(p::Union{Tuple{Float64, Float64},StaticVector{2,Float64}}, domain::Union{GeoRegion, PolyRegion}) = in_region(p, domain.domain)
-    in_region(p::Point2, domain::Union{GeometrySet,PolyArea})
-    in_region(p::Point2, domain::Union{GeoRegion, PolyRegion}) = in_region(p, domain.domain)
+    in_region(p::LLA, domain::Union{GeometrySet,PolyArea}) -> Bool
+    in_region(p::LLA, domain::Union{GeoRegion, PolyRegion}) -> Bool
+    in_region(p::Union{Tuple{Float64, Float64},StaticVector{2,Float64}}, domain::Union{GeometrySet,PolyArea}) -> Bool
+    in_region(p::Union{Tuple{Float64, Float64},StaticVector{2,Float64}}, domain::Union{GeoRegion, PolyRegion}) -> Bool
+    in_region(p::Point2, domain::Union{GeometrySet,PolyArea}) -> Bool
+    in_region(p::Point2, domain::Union{GeoRegion, PolyRegion}) -> Bool
+    in_region(points::Union{Vector{LLA}, Vector{StaticVector{2,Float64}}, Vector{Point2}, Vector{Tuple{Float64,Float64}}}, domain::Union{GeometrySet, PolyArea}) -> Vector{Bool}
+    in_region(points::Union{Vector{LLA}, Vector{StaticVector{2,Float64}}, Vector{Point2}, Vector{Tuple{Float64,Float64}}}, domain::Union{GeoRegion, PolyRegion}) -> Vector{Bool}
 
 This function determines if a given point belongs to a 2-dimensional `Meshes.Domain` object. The `Meshes.Domain` object represents a geometric domain, which is essentially a 2D region in space, specified by its bounds and discretization. 
 
@@ -12,19 +14,24 @@ The function first converts the input tuple into a `Meshes.Point` object, which 
 The `Meshes.Domain` can be either a `GeometrySet` or a `PolyArea` object.
 
 ## Arguments
-* `p`: A tuple of two numbers `(x,y)` representing a point in 2D space. 
-* `domain::Union{GeometrySet,PolyArea}`: A `Meshes.Domain` object representing a 2D region in space. 
+* `p`: A point, or a vector of points in 2D space. 
+* `domain::Union{GeometrySet,PolyArea}`: A `Meshes.Domain` object representing a 2D space. 
 
 ### Output
 The function returns a boolean value: `true` if the point represented by the input tuple falls inside the `Meshes.Domain` object and `false` otherwise. 
 """
 function in_region(p::LLA, domain::Union{GeometrySet, PolyArea})
-    _p = (p.lon, p.lat) # Input already in radians, checked in LLA()
+    # Prepare the input. The values are already in radians (checked in LLA() constructor)
+    _p = (p.lon, p.lat)
+    # Check if the point is inside the domain, using a Predicates from Meshes instead of an ExactPredicates.
+    # There is a certain error margin for the point being exaclty inside, on the border or slightly outside. 
+    # However, for the purpose of checking a point belonging to a certain geographical region, this margin 
+    # of error is acceptable.
     Meshes.Point2(_p) in domain # Meshes.Point in Meshes.Geometry
 end
 
 function in_region(p::Union{Tuple{Float64, Float64}, StaticVector{2,Float64}}, domain::Union{GeometrySet, PolyArea})
-    _p = _point_check(p) # Input check
+    _p = _point_check(p)
 	Meshes.Point2(_p) in domain
 end
 
@@ -40,8 +47,8 @@ end
 in_region(points::Union{Vector{LLA}, Vector{StaticVector{2,Float64}}, Vector{Point2}, Vector{Tuple{Float64,Float64}}}, domain::Union{GeoRegion, PolyRegion}) = in_region(points, domain.domain)
 
 """
-    filter_points(points::Union{Vector{LLA}, Vector{StaticVector{2,Float64}}, Vector{Point2}, Vector{Tuple{Float64,Float64}}}, domain::Union{GeometrySet, PolyArea})
-    filter_points(points::Union{Vector{LLA}, Vector{StaticVector{2,Float64}}, Vector{Point2}, Vector{Tuple{Float64,Float64}}}, domain::Union{GeoRegion, PolyRegion})
+    filter_points(points::Union{Vector{LLA}, Vector{StaticVector{2,Float64}}, Vector{Point2}, Vector{Tuple{Float64,Float64}}}, domain::Union{GeometrySet, PolyArea}) -> Vector{Input Type}
+    filter_points(points::Union{Vector{LLA}, Vector{StaticVector{2,Float64}}, Vector{Point2}, Vector{Tuple{Float64,Float64}}}, domain::Union{GeoRegion, PolyRegion}) -> Vector{Input Type}
     
 Filters a list of points based on whether they fall within a specified geographical domain.
 
