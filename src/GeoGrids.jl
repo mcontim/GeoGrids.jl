@@ -7,8 +7,9 @@ using Meshes
 using PlotlyExtensionsHelper
 using StaticArrays
 using TelecomUtils
-using TelecomUtils: _check_angle, ValidAngle, ValidDistance
+using TelecomUtils: ValidAngle, ValidDistance
 
+include("helper_func.jl")
 include("typedef.jl")
 include("filtering_func.jl")
 include("plot_func.jl")
@@ -17,8 +18,8 @@ include("mesh_func.jl")
 
 export GeoRegion, PolyRegion
 
-export fibonaccigrid, meshgrid, 
-extract_countries, in_region
+export fibonaccigrid, meshgrid_geo, 
+extract_countries, in_region, filter_points
 
 export °, LLA
 

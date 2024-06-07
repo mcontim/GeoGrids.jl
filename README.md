@@ -27,9 +27,9 @@ As convention it has been considered: `LAT=y`, `LON=x`. The output can be return
 
 ---
 
-	meshgrid(gridRes; unit = :rad)
+	meshgrid_geo(gridRes; unit = :rad)
 
-This function creates a 2D Global grid of coordinates with the specified resolution (`gridRes`) given as input and return the `LAT`, `LON` meshgrid similar to the namesake MATLAB function.
+This function creates a 2D Global grid of coordinates with the specified resolution (`gridRes`) given as input and return the `LAT`, `LON` meshgrid_geo similar to the namesake MATLAB function.
 
 As convention it has been considered: `LAT=y`, `LON=x`.
 
@@ -37,7 +37,7 @@ The output is returned in the form of a vector of SVector{2}(lon,lat) (`vec`) an
 
 ## Useful Internal Functions
 
-    get_meshgrid(xin,yin)
+    meshgrid(xin,yin)
 
 Create a 2D grid of coordinates using the input vectors `xin` and `yin`.
 The outputs in the form of `SVector(xout,yout)` and `grid=(xout,yout)` contain all possible combinations of the elements of `xin` and `yin`, with `xout` corresponding to the horizontal coordinates and `yout` corresponding to the vertical coordinates.

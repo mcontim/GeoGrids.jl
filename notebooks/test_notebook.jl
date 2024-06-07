@@ -33,6 +33,7 @@ begin
 	using BenchmarkTools
 	using PlutoVSCodeDebugger
 	using Unzip
+	using Unitful
 end
 
 # ╔═╡ 282b928a-fc7d-4487-a056-6c2626cf7179
@@ -46,8 +47,40 @@ md"""
 # Test
 """
 
+# ╔═╡ 278fbecd-f240-4693-b65d-083b02aae797
+www=meshgrid_geo(1;unit=:deg)
+
+# ╔═╡ 658a8bf3-452a-4748-a24d-023200586516
+a1=2.0
+
+# ╔═╡ ac5eb1ce-aa4b-4a3e-ad05-ed47852d1c00
+a3=5°
+
+# ╔═╡ 54ae0273-62ae-45f2-ac1c-870014a098ac
+typeof(ustrip(a3))
+
+# ╔═╡ 620108e4-ed0c-4955-9e04-1d3fe9683aeb
+a2=[1,3]
+
+# ╔═╡ 2fc51681-33db-48a1-8cd0-939615dab9d5
+reverse!(a2)
+
+# ╔═╡ 219b93b6-34a2-4422-a971-da417033effd
+a2
+
+# ╔═╡ 68e99520-e513-4355-8871-70177c936b10
+length((1,2))
+
+# ╔═╡ 925e889f-1a4a-449f-b5dd-b5581a0d169f
+typeof((1,2))
+
 # ╔═╡ 4a96aafa-1313-444b-a5cb-cb56a1c5189f
 SMatrix{3,3}([1 0 0;0 1 0;0 0 1])
+
+# ╔═╡ 3e0a9404-9ec5-40bc-9074-2dee6efccb43
+map(randn(3,3)) do v
+	v*2
+end
 
 # ╔═╡ 152ae683-dbad-4c2c-9c4a-5e14a31d2748
 md"""
@@ -146,6 +179,7 @@ PlutoExtras = "ed5d0301-4775-4676-b788-cf71e66ff8ed"
 PlutoPlotly = "8e989ff0-3d88-8e9f-f020-2b208a939ff0"
 PlutoUI = "7f904dfe-b85e-4ff6-b463-dae2292396a8"
 PlutoVSCodeDebugger = "560812a8-17ff-4261-aab5-f8f600b273e2"
+Unitful = "1986cc42-f94f-5a68-af5c-568840ba703d"
 Unzip = "41fe7b60-77ed-43a1-b4f0-825fd5a5650d"
 
 [compat]
@@ -156,6 +190,7 @@ PlutoExtras = "~0.7.12"
 PlutoPlotly = "~0.4.6"
 PlutoUI = "~0.7.59"
 PlutoVSCodeDebugger = "~0.2.0"
+Unitful = "~1.20.0"
 Unzip = "~0.2.0"
 """
 
@@ -165,7 +200,7 @@ PLUTO_MANIFEST_TOML_CONTENTS = """
 
 julia_version = "1.10.3"
 manifest_format = "2.0"
-project_hash = "c9b329b064ca7106c59b022ffb24c5d1ed1a88a0"
+project_hash = "7bb0ff3e13f58e64aef4531a0caa51f3a83844d3"
 
 [[deps.AbstractPlutoDingetjes]]
 deps = ["Pkg"]
@@ -534,6 +569,20 @@ version = "1.0.2"
 [[deps.Unicode]]
 uuid = "4ec0a83e-493e-50e2-b9ac-8f72acf5a8f5"
 
+[[deps.Unitful]]
+deps = ["Dates", "LinearAlgebra", "Random"]
+git-tree-sha1 = "dd260903fdabea27d9b6021689b3cd5401a57748"
+uuid = "1986cc42-f94f-5a68-af5c-568840ba703d"
+version = "1.20.0"
+
+    [deps.Unitful.extensions]
+    ConstructionBaseUnitfulExt = "ConstructionBase"
+    InverseFunctionsUnitfulExt = "InverseFunctions"
+
+    [deps.Unitful.weakdeps]
+    ConstructionBase = "187b0558-2788-49d3-abe0-74a17ed4e7c9"
+    InverseFunctions = "3587e190-3f89-42d0-90ee-14403ec27112"
+
 [[deps.Unzip]]
 git-tree-sha1 = "ca0969166a028236229f63514992fc073799bb78"
 uuid = "41fe7b60-77ed-43a1-b4f0-825fd5a5650d"
@@ -564,7 +613,17 @@ version = "17.4.0+2"
 # ╠═282b928a-fc7d-4487-a056-6c2626cf7179
 # ╠═2f988a76-9c84-432b-b69f-dbe06f32ea35
 # ╟─0e205c7f-43ea-4612-830c-d930e8e4522f
+# ╠═278fbecd-f240-4693-b65d-083b02aae797
+# ╠═658a8bf3-452a-4748-a24d-023200586516
+# ╠═ac5eb1ce-aa4b-4a3e-ad05-ed47852d1c00
+# ╠═54ae0273-62ae-45f2-ac1c-870014a098ac
+# ╠═620108e4-ed0c-4955-9e04-1d3fe9683aeb
+# ╠═2fc51681-33db-48a1-8cd0-939615dab9d5
+# ╠═219b93b6-34a2-4422-a971-da417033effd
+# ╠═68e99520-e513-4355-8871-70177c936b10
+# ╠═925e889f-1a4a-449f-b5dd-b5581a0d169f
 # ╠═4a96aafa-1313-444b-a5cb-cb56a1c5189f
+# ╠═3e0a9404-9ec5-40bc-9074-2dee6efccb43
 # ╟─152ae683-dbad-4c2c-9c4a-5e14a31d2748
 # ╠═40653a7f-bc4b-47f2-9006-6856bb89210e
 # ╠═82fb5dfb-28cf-44d7-b0e9-c50671344453

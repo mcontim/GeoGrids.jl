@@ -17,8 +17,8 @@ end
 end
 
 @testset "Mesh Grid Functions" begin
-    @test meshgrid(deg2rad(5); unit=:deg) isa Matrix{SVector{2, Float64}}
-    @test meshgrid(deg2rad(5)) isa Matrix{SVector{2, Float64}}
+    @test meshgrid_geo(deg2rad(5); unit=:deg) isa Matrix{SVector{2, Float64}}
+    @test meshgrid_geo(deg2rad(5)) isa Matrix{SVector{2, Float64}}
 end
 
 using PlotlyBase

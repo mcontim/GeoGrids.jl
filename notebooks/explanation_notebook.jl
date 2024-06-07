@@ -314,7 +314,7 @@ plot_geo(fibonaccigrid(sepAng=deg2rad(tableVal.ang);unit=:deg))
 plot_geo(fibonaccigrid(sepAng=deg2rad(tableVal.ang);unit=:deg);camera=:threedim)
 
 # ╔═╡ f1d6ee2f-01d2-4b79-b326-cb202c58d74d
-meshGrid = meshgrid(deg2rad(tableVal.ang); unit=:deg)
+meshGrid = meshgrid_geo(deg2rad(tableVal.ang); unit=:deg)
 
 # ╔═╡ 3eeeffc0-3ba5-427b-b75b-0bf5f6286c9b
 plot_geo(vec(meshGrid))
@@ -326,7 +326,7 @@ plot_geo(vec(meshGrid); camera=:threedim)
 fibonaccigrid(N=tableVal.n, unit=:deg)
 
 # ╔═╡ 4cb5958e-3d18-40ff-9100-42592e5ad1de
-meshgrid(deg2rad(tableVal.ang); unit=:deg)
+meshgrid_geo(deg2rad(tableVal.ang); unit=:deg)
 
 # ╔═╡ 8ed3bf0f-534e-4b12-a905-2b25b8c8e13a
 BondTable([
