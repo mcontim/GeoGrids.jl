@@ -123,7 +123,7 @@ Meshes.Point2(a[1])
 b = [SVector(0.0,0.0),SVector(1.0,0.0),SVector(1.0,1.0),SVector(0.0,1.0),SVector(0.0,0.0)]
 
 # ╔═╡ 704c0699-4c32-4039-996f-24b314e1f34b
-Meshes.Point2(b[1])
+Point2(b[1]) isa Meshes.Point2
 
 # ╔═╡ 4e508a67-c8b6-47f8-a160-420b7f881769
 c = [Meshes.Point(0.0,0.0),Meshes.Point(1.0,0.0),Meshes.Point(1.0,1.0),Meshes.Point(0.0,1.0),Meshes.Point(0.0,0.0)]
