@@ -6,7 +6,7 @@
 
 This function determines if a given point belongs to a 2-dimensional `Meshes.Domain` object. The `Meshes.Domain` object represents a geometric domain, which is essentially a 2D region in space, specified by its bounds and discretization. 
 
-The function first converts the input tuple into a `Meshes.Point` object, which is then checked if it falls inside the given `Meshes.Domain` object.
+The function first converts the input tuple into a `Point` object, which is then checked if it falls inside the given `Meshes.Domain` object.
 The `Meshes.Domain` can be either a `GeometrySet` or a `PolyArea` object.
 
 ## Arguments

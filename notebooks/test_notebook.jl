@@ -117,16 +117,16 @@ poly = PolyArea((0.0,0.0),(1.0,0.0),(1.0,1.0),(0.0,1.0),(0.0,0.0))
 a = [(0.0,0.0),(1.0,0.0),(1.0,1.0),(0.0,1.0)]
 
 # ╔═╡ 47d9109b-b546-4279-b2e4-061746214d56
-Meshes.Point2(a[1])
+Point2(a[1])
 
 # ╔═╡ f9cf5ae3-661d-42f6-b30b-fd7ef3fb2879
 b = [SVector(0.0,0.0),SVector(1.0,0.0),SVector(1.0,1.0),SVector(0.0,1.0),SVector(0.0,0.0)]
 
 # ╔═╡ 704c0699-4c32-4039-996f-24b314e1f34b
-Point2(b[1]) isa Meshes.Point2
+Point2(b[1]) isa Point2
 
 # ╔═╡ 4e508a67-c8b6-47f8-a160-420b7f881769
-c = [Meshes.Point(0.0,0.0),Meshes.Point(1.0,0.0),Meshes.Point(1.0,1.0),Meshes.Point(0.0,1.0),Meshes.Point(0.0,0.0)]
+c = [Point(0.0,0.0),Point(1.0,0.0),Point(1.0,1.0),Point(0.0,1.0),Point(0.0,0.0)]
 
 # ╔═╡ b496c282-4de8-442e-b96f-96158375b773
 first(c[2].coords)
