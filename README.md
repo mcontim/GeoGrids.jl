@@ -10,7 +10,7 @@ This is a package containing functions for Geographical Grids generation for exa
 
 ## Exported Functions
 
-    fibonaccigrid(; N = nothing, sepAng = nothing, unit = :rad)
+    icogrid_geo(; N = nothing, sepAng = nothing, unit = :rad)
 
 This function returns an Array of `SVector(lon,lat)`, as well as a `Tuple(x=lon,y=lat)`, of LAT, LON values for a `N` points Global grid built with the **Fibonacci Spiral** method.
 
@@ -44,7 +44,7 @@ The outputs in the form of `SVector(xout,yout)` and `grid=(xout,yout)` contain a
 
 ---
 
-    fibonaccisphere_classic(N::Int)
+    icogrid(N::Int)
 	
 This function generates `N` uniformly distributed points on the surface of a unitary sphere using the classic Fibonacci Spiral
 

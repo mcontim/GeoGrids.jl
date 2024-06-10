@@ -1,5 +1,5 @@
 """
-	fibonaccigrid(;N=nothing, sepAng=nothing)
+	icogrid_geo(;N=nothing, sepAng=nothing)
 
 This function returns a vector `Nx2` of LAT, LON values for a `N` points grid built with the Fibonacci Spiral method.
 
@@ -11,14 +11,14 @@ This function returns a vector `Nx2` of LAT, LON values for a `N` points grid bu
 ### Output:
 - `vec`: A vector of SVector{2}(lon,lat) objects of LAT-LON coordinates in rad (or deg) (LAT=y, LON=x).
 """
-function fibonaccigrid(;N=nothing, sepAng=nothing, unit=:rad)	
+function icogrid_geo(;N=nothing, sepAng=nothing, unit=:rad)	
 	if N isa Nothing && sepAng isa Nothing
 		error("Input one argument between N and sepAng...")
 	elseif sepAng isa Nothing
-		vec = fibonaccisphere_classic(N; coord=:sphe)
+		vec = icogrid(N; coord=:sphe)
 	elseif N isa Nothing
-		N,sepAng = points_required_for_separation_angle(sepAng)
-		vec = fibonaccisphere_classic(N; coord=:sphe)
+		N,sepAng = _points_required_for_separation_angle(sepAng)
+		vec = icogrid(N; coord=:sphe)
 	else
 		error("Input one argument between N and sepAng...")
 	end
@@ -32,7 +32,7 @@ function fibonaccigrid(;N=nothing, sepAng=nothing, unit=:rad)
 end
 
 """
-	fibonaccisphere_classic(N::Int)
+	icogrid(N::Int)
 	
 This function generates `N` uniformly distributed points on the surface of a unitary sphere using the classic Fibonacci Spiral method as described in [1].
 Contrary to the Ichosahedral grid generation process, with the Fibonacci Spiral method it is possible to generate a grid of points uniformly distributed in the area for a generic `N` value. As a drawback, the structure of the points do not follow a "perfect simmetry" however, the density of points in the area is preserved quasi-constant.
@@ -48,20 +48,15 @@ Contrary to the Ichosahedral grid generation process, with the Fibonacci Spiral 
 ### References
 1. http://extremelearning.com.au/how-to-evenly-distribute-points-on-a-sphere-more-effectively-than-the-canonical-fibonacci-lattice/
 """
-function fibonaccisphere_classic(N::Int; coord::Symbol=:sphe, spheRadius=1.0)
-	goldenRatio = (1 + sqrt(5))/2	
-	if coord == :sphe # :sphe | :cart
+function icogrid(N::Int; coord::Symbol=:sphe, spheRadius=1.0)
+	pointsVec = if coord == :sphe # :sphe | :cart
 		pointsVec = map(0:N-1) do k
-			θ = 2π * k/ goldenRatio # [0,2π] [LON]
-			ϕ = acos(1 - 2(k+0.5)/N) # [0,π] from North Pole [LAT]
-			
+			θ,ϕ = get_theta_phi(k, N)			
 			SVector(rem2pi(θ, RoundNearest), π/2 - ϕ) # wrap (lon,lat)
 		end
 	else
 		pointsVec = map(0:N-1) do k
-			θ = 2π * k/ goldenRatio # [0,2π] [LON]
-			ϕ = acos(1 - 2(k+0.5)/N) # [0,π] from North Pole [LAT]
-			
+			θ,ϕ = get_theta_phi(k, N)
 			SVector(spheRadius.*sin(ϕ)*cos(θ), spheRadius.*sin(ϕ)*sin(θ), spheRadius.*cos(ϕ))
 		end
 	end
@@ -70,7 +65,7 @@ function fibonaccisphere_classic(N::Int; coord::Symbol=:sphe, spheRadius=1.0)
 end
 
 """
-	points_required_for_separation_angle(angle)
+	_points_required_for_separation_angle(angle)
 
 This function computes the minimum number of points required on the surface of a sphere to achieve a desired separation angle between any two adjacent points. The function uses the bisection method to find the minimum number of points needed and returns the higher end of the precision.
 Instead of checking all the possible pairs of the N points generated with the Fibonacci Spiral, only the first `pointsToCheck` are checked in order to evaluate the minimum separation angle.
@@ -85,13 +80,13 @@ Instead of checking all the possible pairs of the N points generated with the Fi
 ### Output:
 - `Ns[2]`: an integer representing the minimum number of points required on the surface of the sphere to achieve the desired separation angle.
 """
-function points_required_for_separation_angle(sepAng; spheRadius=1.0, pointsToCheck::Int=50, maxPrec=10^7, tol=10)
+function _points_required_for_separation_angle(sepAng; spheRadius=1.0, pointsToCheck::Int=50, maxPrec=10^7, tol=10)
 	# Bisection
 	Ns = [2, maxPrec]
 	
 	## Define Inner Functions ---------------------------------------------------------------------
 	# Find the separation angle for a given N
-	f(N) = find_separation_angle(fibonaccisphere_classic_partial(N; spheRadius=spheRadius, pointsToCheck=pointsToCheck))
+	f(N) = _find_separation_angle(_fibonaccisphere_classic_partial(N; spheRadius=spheRadius, pointsToCheck=pointsToCheck))
 	# Distance between the tested points
 	tolerance(v) = v[2] - v[1]
 	
@@ -103,23 +98,23 @@ function points_required_for_separation_angle(sepAng; spheRadius=1.0, pointsToCh
 	thisTol = tolerance(Ns)
 	
 	while thisTol > tol
-	  N = Ns[1] + floor(thisTol/2)
-	  thisSep = f(N)
-	  if thisSep > sepAng
-		# The separation angle is too big, the density of points has to be increased. We keep increasing the lower index
-		Ns[1] = N
-	  else
-		# # The separation angle is too small, the desity of points has to be decreased. We have to start decreasing the upper end
-		Ns[2] = N
-	  end
-	  thisTol = tolerance(Ns)
+		N = Ns[1] + floor(thisTol/2)
+		thisSep = f(N)
+		if thisSep > sepAng
+			# The separation angle is too big, the density of points has to be increased. We keep increasing the lower index
+			Ns[1] = N
+		else
+			# # The separation angle is too small, the desity of points has to be decreased. We have to start decreasing the upper end
+			Ns[2] = N
+		end
+		thisTol = tolerance(Ns)
 	end
 	
 	return Ns[2],rad2deg(thisSep) # We return the higher end of the precision
-  end
+end
 
 """
-	find_separation_angle(points)
+	_find_separation_angle(points)
 
 This function takes an array of 3D Cartesian points as input and computes the smallest angle between any two points in the array. It does this by iterating over all unique pairs of points in the array and computing the angle between them using the `angle`` function. The smallest angle encountered during the iteration is stored in the variable `sep` and returned as the output of the function.
 
@@ -129,7 +124,7 @@ This function takes an array of 3D Cartesian points as input and computes the sm
 ### Output:
 - `sep`: the smallest angle between any two points in the input array, measured in radians.
 """
-function find_separation_angle(points)
+function _find_separation_angle(points)
 	sep = Inf
 	L = length(points)
 
@@ -149,7 +144,7 @@ function find_separation_angle(points)
 end
 
 """
-	fibonaccisphere_classic_partial(N; spheRadius=1.0, pointsToCheck::Int=50)
+	_fibonaccisphere_classic_partial(N; spheRadius=1.0, pointsToCheck::Int=50)
 
 ### Arguments:
 - `N`: an integer representing the number of points to generate on the surface of the sphere.
@@ -159,16 +154,22 @@ end
 ### Output:
 - `points`: an array of 3D points on the surface of the sphere represented as SVector{3}.
 """
-function fibonaccisphere_classic_partial(N; spheRadius=1.0, pointsToCheck::Int=50)
-	goldenRatio = (1 + sqrt(5))/2
+function _fibonaccisphere_classic_partial(N; spheRadius=1.0, pointsToCheck::Int=50)
 	points = map(0:min(pointsToCheck,N)-1) do k
-		θ = 2π * k/ goldenRatio # [0,2π] [LON]
-		ϕ = acos(1 - 2(k+0.5)/N) # [0,π] from North Pole [LAT]
-
+		θ,ϕ = get_theta_phi(k, N)
 		SVector(spheRadius.*sin(ϕ)*cos(θ), spheRadius.*sin(ϕ)*sin(θ), spheRadius.*cos(ϕ))
 	end
 
 	return points
+end
+
+# Helper Functions
+function get_theta_phi(k, N::Int)
+	goldenRatio = (1 + sqrt(5))/2	
+	θ = 2π * k/goldenRatio # [0,2π] [LON]
+	ϕ = acos(1 - 2(k+0.5)/N) # [0,π] from North Pole [LAT]
+
+	return (θ,ϕ)
 end
 
 ## Alternative implementations ------------------------------------------------------------------------------
@@ -196,19 +197,19 @@ function fibonaccisphere_optimization1(N::Int)
 	points = zeros(N,3)
 	
 	if N >= 600000
-	  epsilon = 214
+		epsilon = 214
 	elseif N >= 400000
-	  epsilon = 75
+		epsilon = 75
 	elseif N >= 11000
-	  epsilon = 27
+		epsilon = 27
 	elseif N >= 890
-	  epsilon = 10
+		epsilon = 10
 	elseif N >= 177
-	  epsilon = 3.33
+		epsilon = 3.33
 	elseif N >= 24
-	  epsilon = 1.33
+		epsilon = 1.33
 	else
-	  epsilon = 0.33
+		epsilon = 0.33
 	end
 	
 	goldenRatio = (1 + sqrt(5))/2
@@ -250,68 +251,69 @@ function fibonaccisphere_alternative1(N::Int)
 	return points
 end
 
-function points_required_for_separation_angle_var1(sepAng; pointToCheck::Int=20, altitude=1.0)
-	# Brute Force
-	N = 2
-	goldenRatio = (1 + sqrt(5))/2
-	while true	
-		M = minimum([N,pointToCheck])
-		testAng = 999 .* ones(M,M)
-		# Fibonacci Sphere generation	
-		points = map(0:M-1) do k
-			θ = 2π * k/ goldenRatio # [0,2π] [LON]
-			ϕ = acos(1 - 2(k+0.5)/N) # [0,π] from North Pole [LAT]
+# Old implementations
+# function points_required_for_separation_angle_var1(sepAng; pointToCheck::Int=20, altitude=1.0)
+# 	# Brute Force
+# 	N = 2
+# 	goldenRatio = (1 + sqrt(5))/2
+# 	while true	
+# 		M = minimum([N,pointToCheck])
+# 		testAng = 999 .* ones(M,M)
+# 		# Fibonacci Sphere generation	
+# 		points = map(0:M-1) do k
+# 			θ = 2π * k/ goldenRatio # [0,2π] [LON]
+# 			ϕ = acos(1 - 2(k+0.5)/N) # [0,π] from North Pole [LAT]
 			
-			SVector(altitude.*sin(ϕ)*cos(θ), altitude.*sin(ϕ)*sin(θ), altitude.*cos(ϕ))
-		end
+# 			SVector(altitude.*sin(ϕ)*cos(θ), altitude.*sin(ϕ)*sin(θ), altitude.*cos(ϕ))
+# 		end
 
-		# Angle between vectors computation
-		for i in 1:M
-			for j in 1:M
-				if i!=j
-					# acos(dot(points[i],points[j]) / norm(points[i])*norm(points[j]))
-					testAng[i,j] = angle(points[i],points[j])
-				end
-			end
-		end
+# 		# Angle between vectors computation
+# 		for i in 1:M
+# 			for j in 1:M
+# 				if i!=j
+# 					# acos(dot(points[i],points[j]) / norm(points[i])*norm(points[j]))
+# 					testAng[i,j] = angle(points[i],points[j])
+# 				end
+# 			end
+# 		end
 
-		min_angle = minimum(testAng[:])
-		if min_angle <= sepAng
-			return N,rad2deg(min_angle)
-		end
-		N += 1
-	end
-end
+# 		min_angle = minimum(testAng[:])
+# 		if min_angle <= sepAng
+# 			return N,rad2deg(min_angle)
+# 		end
+# 		N += 1
+# 	end
+# end
 
-function points_required_for_separation_angle_var2(sepAng; pointToCheck::Int=20, altitude=1.0)
-	# Spherical Cap
-	N = Int(round(2/(1-cos(sepAng)))) # Spherical cap
-	goldenRatio = (1 + sqrt(5))/2
-	while true	
-		M = minimum([N,pointToCheck])
-		testAng = 999 .* ones(M,M)
-		# Fibonacci Sphere generation	
-		points = map(0:M-1) do k
-			θ = 2π * k/ goldenRatio # [0,2π] [LON]
-			ϕ = acos(1 - 2(k+0.5)/N) # [0,π] from North Pole [LAT]
+# function points_required_for_separation_angle_var2(sepAng; pointToCheck::Int=20, altitude=1.0)
+# 	# Spherical Cap
+# 	N = Int(round(2/(1-cos(sepAng)))) # Spherical cap
+# 	goldenRatio = (1 + sqrt(5))/2
+# 	while true	
+# 		M = minimum([N,pointToCheck])
+# 		testAng = 999 .* ones(M,M)
+# 		# Fibonacci Sphere generation	
+# 		points = map(0:M-1) do k
+# 			θ = 2π * k/ goldenRatio # [0,2π] [LON]
+# 			ϕ = acos(1 - 2(k+0.5)/N) # [0,π] from North Pole [LAT]
 			
-			SVector(altitude.*sin(ϕ)*cos(θ), altitude.*sin(ϕ)*sin(θ), altitude.*cos(ϕ))
-		end
+# 			SVector(altitude.*sin(ϕ)*cos(θ), altitude.*sin(ϕ)*sin(θ), altitude.*cos(ϕ))
+# 		end
 
-		# Angle between vectors computation
-		for i in 1:M
-			for j in 1:M
-				if i!=j
-					# acos(dot(points[i],points[j]) / norm(points[i])*norm(points[j]))
-					testAng[i,j] = angle(points[i],points[j])
-				end
-			end
-		end
+# 		# Angle between vectors computation
+# 		for i in 1:M
+# 			for j in 1:M
+# 				if i!=j
+# 					# acos(dot(points[i],points[j]) / norm(points[i])*norm(points[j]))
+# 					testAng[i,j] = angle(points[i],points[j])
+# 				end
+# 			end
+# 		end
 
-        min_angle = minimum(testAng[:])
-        if min_angle <= sepAng
-            return N,rad2deg(min_angle)
-        end
-        N += 1
-    end
-end
+#         min_angle = minimum(testAng[:])
+#         if min_angle <= sepAng
+#             return N,rad2deg(min_angle)
+#         end
+#         N += 1
+#     end
+# end
