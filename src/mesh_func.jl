@@ -4,13 +4,13 @@
 This function call meshgrid with the specified resolution given as input and return the LAT, LON meshgrid_geo (LAT=y, LON=x).
 The meshgrid_geo cover all the globe with LAT=-90:90 and LON=-180:180
 
-### Arguments
+## Arguments
 - `gridRes`: resolution of the meshgrid_geo in `ValidAngle`. 
 - `unit`: `:rad` or `:deg`
 - `type`: `:lla` or `:point`. Output type either `LLA` or `Point2`
 
-### Output
-- Matrix{SVector{2,Float64}}, each element of the matrix is either a `LLA` or `Point2`. The order of the elements is LAT, LON.
+## Output
+- `out`: Matrix{Union{LLA,Point2}}, each element of the matrix is either a `LLA` or `Point2`. The order of the elements is LAT, LON.
 """
 function meshgrid_geo(xRes::ValidAngle; yRes::ValidAngle=xRes, height=nothing, unit=:rad, type=:lla)
 	# Input Validation
@@ -24,7 +24,7 @@ function meshgrid_geo(xRes::ValidAngle; yRes::ValidAngle=xRes, height=nothing, u
 	
 	# Unit Conversion
 	out = if type == :lla
-		_heigth = if isnothing(height)
+		_height = if isnothing(height)
 			@warn "Height is not provided, it will be set to 0 by default..." 
 			0.0 
 		else 
@@ -50,11 +50,11 @@ end
 Create a 2D grid of coordinates using the input vectors `xin` and `yin`.
 The outputs contain all possible combinations of the elements of `xin` and `yin`, with `xout` corresponding to the horizontal coordinates and `yout` corresponding to the vertical coordinates.
 
-### Arguments
+## Arguments
 - `xin::AbstractVector`: 1D input array of horizontal coordinates.
 - `yin::AbstractVector`: 1D input array of vertical coordinates.
 
-### Output
+## Output
 - Matrix{SVector{2,Float64}}, each element of the matrix can be considered as (lat, lon) if used by `meshgrid_geo`.
 """
 function meshgrid(xin::AbstractVector, yin::AbstractVector)

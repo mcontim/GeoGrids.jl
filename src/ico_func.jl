@@ -3,15 +3,15 @@
 
 This function returns a vector `Nx2` of LAT, LON values for a `N` points grid built with the Fibonacci Spiral method.
 
-### Arguments:
+## Arguments:
 - `N`: The number of points to generate.
 - `sepAng`: The separation angle for the grid of points to be generated [rad].
 - `unit`: `:rad` or `:deg`
 
-### Output:
-- `vec`: A vector of SVector{2}(lon,lat) objects of LAT-LON coordinates in rad (or deg) (LAT=y, LON=x).
+## Output:
+- `out`: Matrix{Union{LLA,Point2}}, each element of the matrix is either a `LLA` or `Point2`. The order of the elements is LAT, LON.
 """
-function icogrid_geo(;N=nothing, sepAng=nothing, unit=:rad)	
+function icogrid_geo(;N=nothing, sepAng=nothing, unit=:rad, height=nothing, type=:lla)	
 	if N isa Nothing && sepAng isa Nothing
 		error("Input one argument between N and sepAng...")
 	elseif sepAng isa Nothing
@@ -23,13 +23,31 @@ function icogrid_geo(;N=nothing, sepAng=nothing, unit=:rad)
 		error("Input one argument between N and sepAng...")
 	end
 
-	# Unit Conversion
-	if unit == :deg
-		vec = map(x -> rad2deg.(x), vec)
+	out = if type == :lla
+		_height = if isnothing(height)
+			@warn "Height is not provided, it will be set to 0 by default..." 
+			0.0 
+		else 
+			height
+		end
+		map(x -> LLA(x..., _height), vec)
+	else
+		!isnothing(height) && @warn "Height is ignored when type is set to :point..."
+		# Unit Conversion
+		conv = if unit == :deg 
+			map(x -> rad2deg.(x), vec)
+		else
+			vec
+		end
+		map(x -> Point2(x...), conv) # lat-lon
 	end
 
-	return vec
+	return out
 end
+
+
+# function meshgrid_geo(xRes::ValidAngle; yRes::ValidAngle=xRes, height=nothing, unit=:rad, type=:lla)
+
 
 """
 	icogrid(N::Int)
@@ -37,25 +55,25 @@ end
 This function generates `N` uniformly distributed points on the surface of a unitary sphere using the classic Fibonacci Spiral method as described in [1].
 Contrary to the Ichosahedral grid generation process, with the Fibonacci Spiral method it is possible to generate a grid of points uniformly distributed in the area for a generic `N` value. As a drawback, the structure of the points do not follow a "perfect simmetry" however, the density of points in the area is preserved quasi-constant.
 
-### Arguments:
+## Arguments:
 - `N::Int`: The number of points to generate.
 - `coord::Symbol`: The type of coordinates of generated points (`:sphe` | `:cart`).
 - `radius`: the sphere radius in meters (unitary as default)
 
-### Output:
-- `pointsVec``: `N x 1` array containing the SVector of the generated points. Each element corresponds to a point on the surface of the sphere, the SVector contains either the x, y, and z (:cart) or lon, lat (:sphe) (LAT=y, LON=x) coordinates of the point.
+## Output:
+- `pointsVec``: `N x 1` array containing the SVector of the generated points. Each element corresponds to a point on the surface of the sphere, the SVector contains either the x, y, and z (:cart) or lat, lon (:sphe) (LAT=x, LON=y) coordinates of the point.
 
-### References
+## References
 1. http://extremelearning.com.au/how-to-evenly-distribute-points-on-a-sphere-more-effectively-than-the-canonical-fibonacci-lattice/
 """
 function icogrid(N::Int; coord::Symbol=:sphe, spheRadius=1.0)
 	pointsVec = if coord == :sphe # :sphe | :cart
-		pointsVec = map(0:N-1) do k
+		map(0:N-1) do k
 			θ,ϕ = get_theta_phi(k, N)			
-			SVector(rem2pi(θ, RoundNearest), π/2 - ϕ) # wrap (lon,lat)
+			SVector(π/2 - ϕ, rem2pi(θ, RoundNearest)) # wrap (lat,lon)
 		end
 	else
-		pointsVec = map(0:N-1) do k
+		map(0:N-1) do k
 			θ,ϕ = get_theta_phi(k, N)
 			SVector(spheRadius.*sin(ϕ)*cos(θ), spheRadius.*sin(ϕ)*sin(θ), spheRadius.*cos(ϕ))
 		end
@@ -70,14 +88,14 @@ end
 This function computes the minimum number of points required on the surface of a sphere to achieve a desired separation angle between any two adjacent points. The function uses the bisection method to find the minimum number of points needed and returns the higher end of the precision.
 Instead of checking all the possible pairs of the N points generated with the Fibonacci Spiral, only the first `pointsToCheck` are checked in order to evaluate the minimum separation angle.
 
-### Arguments:
+## Arguments:
 - `sepAng`: a float representing the desired separation angle between two adjacent points on the surface of the sphere.
 - `spheRadius`: an optional float representing the radius of the sphere. If not provided, it defaults to 1.0.
 - `pointsToCheck`: an optional integer representing the number of points to generate on the surface of the sphere. If not provided, it defaults to 50.
 - `maxPrec`: an optional integer representing the maximum precision for the number of points generated on the surface of the sphere. If not provided, it defaults to 10^7.
 - `tol`: an optional integer representing the tolerance for the bisection method used to find the minimum number of points needed to achieve the desired separation angle. If not provided, it defaults to 10.
 
-### Output:
+## Output:
 - `Ns[2]`: an integer representing the minimum number of points required on the surface of the sphere to achieve the desired separation angle.
 """
 function _points_required_for_separation_angle(sepAng; spheRadius=1.0, pointsToCheck::Int=50, maxPrec=10^7, tol=10)
@@ -118,10 +136,10 @@ end
 
 This function takes an array of 3D Cartesian points as input and computes the smallest angle between any two points in the array. It does this by iterating over all unique pairs of points in the array and computing the angle between them using the `angle`` function. The smallest angle encountered during the iteration is stored in the variable `sep` and returned as the output of the function.
 
-### Arguments:
+## Arguments:
 - `points``: an array of 3D points in the Cartesian plane represented as Tuples, Arrays, SVectors.
 
-### Output:
+## Output:
 - `sep`: the smallest angle between any two points in the input array, measured in radians.
 """
 function _find_separation_angle(points)
@@ -146,12 +164,12 @@ end
 """
 	_fibonaccisphere_classic_partial(N; spheRadius=1.0, pointsToCheck::Int=50)
 
-### Arguments:
+## Arguments:
 - `N`: an integer representing the number of points to generate on the surface of the sphere.
 - `spheRadius`: (optional) a float representing the radius of the sphere.
 - `pointsToCheck`: (optional) an integer representing the number of points to return starting from the first generated.
 
-### Output:
+## Output:
 - `points`: an array of 3D points on the surface of the sphere represented as SVector{3}.
 """
 function _fibonaccisphere_classic_partial(N; spheRadius=1.0, pointsToCheck::Int=50)
@@ -184,13 +202,13 @@ We need to move (offset) all the points slightly farther away from the poles. Th
 
 For `n>100`, an improvement can be made beyond this, by initially placing a point at each pole, and then placing the remaining `n-2` points. This not only (very sightly) improves minimal nearest packing, but it also prevents a large gap at each pole.
 
-### Arguments
+## Arguments
 - `N::Int`: The number of points to generate.
 
-### Output
+## Output
 - `points::Matrix{Float64}`: A `N`x`3` matrix where each row corresponds to a point `(x,y,z)` on the surface of the unitary sphere.
 
-### References
+## References
 1. http://extremelearning.com.au/how-to-evenly-distribute-points-on-a-sphere-more-effectively-than-the-canonical-fibonacci-lattice/
 """
 function fibonaccisphere_optimization1(N::Int)
@@ -229,9 +247,9 @@ end
 
 This function generates points on the surface of a unit sphere using the Fibonacci spiral method. The function takes an integer `N` as an input, which specifies the number of points to be generated.
 
-### Arguments
+## Arguments
 - `N::Int`: The number of points to generate. This is an integer value.
-### Output
+## Output
 - `N x 3` matrix containing the generated points. Each row of the matrix corresponds to a point on the surface of the sphere, and the columns correspond to the x, y, and z coordinates of the point.
 """
 function fibonaccisphere_alternative1(N::Int)

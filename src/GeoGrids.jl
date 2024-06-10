@@ -13,7 +13,7 @@ include("helper_func.jl")
 include("typedef.jl")
 include("filtering_func.jl")
 include("plot_func.jl")
-include("fibonacci_func.jl")
+include("ico_func.jl")
 include("mesh_func.jl")
 
 export GeoRegion, PolyRegion
