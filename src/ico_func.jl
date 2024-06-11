@@ -180,7 +180,7 @@ function _fibonaccisphere_classic_partial(N; spheRadius=1.0, pointsToCheck::Int=
 end
 
 # Helper Functions
-function get_theta_phi(k, N::Int)
+function get_theta_phi(k::Number, N::Number)
 	goldenRatio = (1 + sqrt(5))/2	
 	θ = 2π * k/goldenRatio # [0,2π] [LON]
 	ϕ = acos(1 - 2(k+0.5)/N) # [0,π] from North Pole [LAT]

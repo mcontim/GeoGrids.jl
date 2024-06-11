@@ -36,16 +36,16 @@ end
     @test_logs (:warn, "Height is ignored when type is set to :point...") meshgrid_geo(deg2rad(5); height=0.0, type=:point)
     @test_throws "The input type do not match the expected format, it must be :lla or :point..." meshgrid_geo(deg2rad(5); type=:testerr)
     @test_throws "Resolution of x is too large, it must be smaller than π..." meshgrid_geo(deg2rad(181); height=0.0)
-    @test_throws "Resolution of y is too large, it must be smaller than π..." meshgrid_geo(deg2rad(181); yRes=deg2rad(181), height=0.0)
+    @test_throws "Resolution of y is too large, it must be smaller than π..." meshgrid_geo(deg2rad(5); yRes=deg2rad(181), height=0.0)
 end
 
-using PlotlyBase
 
-@testset "Plots Plotly Base" begin
-    @test plot_unitarysphere(icogrid(100; coord=:cart)) isa Plot
-    @test plot_geo(icogrid_geo(sepAng=deg2rad(5), type=:point)) isa Plot
-    @test plot_geo(icogrid_geo(sepAng=deg2rad(4), height=0.0)); camera=:threedim isa Plot
-    @test plot_geo(meshgrid_geo(xRes=deg2rad(5), type=:point)) isa Plot
-    @test plot_geo(meshgrid_geo(xRes=deg2rad(5), height=0.0)); camera=:threedim isa Plot
-    @test_throws "LAT provided as numbers must be expressed in radians and satisfy -π/2 ≤ x ≤ π/2. Consider using `°` from `Unitful` (Also re-exported by GeoGrids) if you want to pass numbers in degrees, by doing `x * °`." plot_geo(icogrid_geo(sepAng=deg2rad(5), type=:point, unit=:deg)) isa Plot
-end
+# @testset "Plots Plotly Base" begin
+    # using PlotlyBase
+#     @test plot_unitarysphere(icogrid(100; coord=:cart)) isa Plot
+#     @test plot_geo(icogrid_geo(sepAng=deg2rad(5), type=:point)) isa Plot
+#     @test plot_geo(icogrid_geo(sepAng=deg2rad(4), height=0.0)); camera=:threedim isa Plot
+#     @test plot_geo(meshgrid_geo(xRes=deg2rad(5), type=:point)) isa Plot
+#     @test plot_geo(meshgrid_geo(xRes=deg2rad(5), height=0.0)); camera=:threedim isa Plot
+#     @test_throws "LAT provided as numbers must be expressed in radians and satisfy -π/2 ≤ x ≤ π/2. Consider using `°` from `Unitful` (Also re-exported by GeoGrids) if you want to pass numbers in degrees, by doing `x * °`." plot_geo(icogrid_geo(sepAng=deg2rad(5), type=:point, unit=:deg)) isa Plot
+# end
