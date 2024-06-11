@@ -82,6 +82,12 @@ map(randn(3,3)) do v
 	v*2
 end
 
+# ╔═╡ f429fdbe-4464-4ca5-a4ba-b7830c12d49f
+s = "a"
+
+# ╔═╡ a41c17a6-b650-4b92-939e-d79cd820ad27
+isempty(s)
+
 # ╔═╡ 152ae683-dbad-4c2c-9c4a-5e14a31d2748
 md"""
 ## GeoRegion
@@ -89,9 +95,6 @@ md"""
 
 # ╔═╡ 40653a7f-bc4b-47f2-9006-6856bb89210e
 r = GeoRegion(;continent = "Europe", admin="Italy")
-
-# ╔═╡ 82fb5dfb-28cf-44d7-b0e9-c50671344453
-GeoRegion("Europe", "Europe")
 
 # ╔═╡ 9c977c07-ce0e-4c38-bcac-b2a83cfb3544
 GeoRegion(continent = "Europe", admin="Italy")
@@ -630,9 +633,10 @@ version = "17.4.0+2"
 # ╠═925e889f-1a4a-449f-b5dd-b5581a0d169f
 # ╠═4a96aafa-1313-444b-a5cb-cb56a1c5189f
 # ╠═3e0a9404-9ec5-40bc-9074-2dee6efccb43
+# ╠═f429fdbe-4464-4ca5-a4ba-b7830c12d49f
+# ╠═a41c17a6-b650-4b92-939e-d79cd820ad27
 # ╟─152ae683-dbad-4c2c-9c4a-5e14a31d2748
 # ╠═40653a7f-bc4b-47f2-9006-6856bb89210e
-# ╠═82fb5dfb-28cf-44d7-b0e9-c50671344453
 # ╠═9c977c07-ce0e-4c38-bcac-b2a83cfb3544
 # ╠═974a09cd-fffb-40c6-b277-8a27fd827f92
 # ╟─8f960ccd-a95d-403f-a6f8-0c8da617c009

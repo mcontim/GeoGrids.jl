@@ -1,55 +1,40 @@
 abstract type AbstractRegion end
 
-@kwdef mutable struct GeoRegion
-    regionName::String = "region_name"
-    continent::String = nothing
-    subregion::String = nothing
-    admin::String = nothing
-    domain::GeometrySet = nothing
+mutable struct GeoRegion
+    regionName::String
+    continent::String
+    subregion::String
+    admin::String
+    domain::GeometrySet
     
-    # Inner Constructor for inputs sanity check
-    function GeoRegion(regionName="region_name", continent=nothing, subregion=nothing, admin=nothing, domain=nothing)
-        isnothing(continent) && isnothing(subregion) && isnothing(admin) && error("Input at least one argument between continent, subregion and admin...")
+    # Inner Constructor for inputs sanity check.
+    # No positional arguments allowed.
+    function GeoRegion(;regionName="region_name", continent="", subregion="", admin="", domain=nothing)
+        @something continent subregion admin error("Input at least one argument between continent, subregion and admin...")
     
-        kwargs = (;) # Collect kwargs for `CountriesBorders.extract_countries`
-        _continent = if isnothing(continent)
-            ""
-        else
-            kwargs = (; kwargs..., continent = continent)
-            continent
-        end
-        _subregion = if isnothing(subregion)
-            ""
-        else
-            kwargs = (; kwargs..., subregion = subregion)
-            subregion
-        end
-        _admin = if isnothing(admin)
-            ""
-        else
-            kwargs = (; kwargs..., admin = admin)
-            admin
-        end
         _domain = if isnothing(domain)
+            nt = (;continent, subregion, admin)
+            kwargs = (k=>v for (k,v) in pairs(nt) if !isempty(v))
             CountriesBorders.extract_countries(;kwargs...)
         else
             @warn "GeoRegion domain is not automatically generated from the other arguments, check inputs consistency..."
             domain
         end
 
-        new(regionName, _continent, _subregion, _admin, _domain)
+        new(regionName, continent, subregion, admin, _domain)
     end
 end
 
 """
 If a PolyArea is provided, the points are considered as LON-LAT, in rad, as it is in Meshes.jl domain. For all the other cases, with single points, unless it is a Vector{LLA}, the points has to be expressed as LAT-LON and values must be in ValidAngle. In all other cases, the points are reordered such to be in LON-LAT and a PolyArea with only an outer chain is built. If the chain is open a point equal to the first one is added at the end."	
 """
-@kwdef mutable struct PolyRegion
-    regionName::String = "region_name"
-    domain::PolyArea = nothing
+mutable struct PolyRegion
+    regionName::String
+    domain::PolyArea
     
-    # Inner Constructor for inputs sanity check
-    function PolyRegion(regionName::String="region_name", domain::Union{Vector{LLA}, Vector{SVector{2, Float64}}, Vector{Point2}, Vector{Tuple{Float64, Float64}}, PolyArea} = nothing)
+    # Inner Constructor for inputs sanity check.
+    # No positional arguments allowed.
+    function PolyRegion(regionName::String="region_name", domain::Union{Vector{LLA}, Vector{SVector{2, Float64}}, Vector{Point2}, Vector{Tuple{Float64, Float64}}, PolyArea}=nothing)
         function _polyarea_from_vertex(domain)
             points = map(domain) do p
                 _check_point(p)                
