@@ -31,7 +31,7 @@ function icogrid_geo(;N=nothing, sepAng=nothing, unit=:rad, height=nothing, type
 			height
 		end
 		map(x -> LLA(x..., _height), vec)
-	else
+	elseif type == :point
 		!isnothing(height) && @warn "Height is ignored when type is set to :point..."
 		# Unit Conversion
 		conv = if unit == :deg 
@@ -40,6 +40,8 @@ function icogrid_geo(;N=nothing, sepAng=nothing, unit=:rad, height=nothing, type
 			vec
 		end
 		map(x -> Point2(x...), conv) # lat-lon
+	else
+		error("The input type do not match the expected format, it must be :lla or :point...")
 	end
 
 	return out
