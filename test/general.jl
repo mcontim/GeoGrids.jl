@@ -13,8 +13,10 @@ end
     
     @test icogrid_geo(N=100, height=0.0) isa Vector{LLA}
     @test icogrid_geo(N=100, type=:point) isa Vector{Point2}
+    @test icogrid_geo(N=100, type=:point, unit=:deg) isa Vector{Point2}
     
-    @test icogrid_geo(sepAng=deg2rad(5), unit=:deg) isa Vector{LLA}
+    @test icogrid_geo(sepAng=deg2rad(5), height=0.0) isa Vector{LLA}
+    @test icogrid_geo(sepAng=deg2rad(5), type=:point) isa Vector{Point2}
     @test icogrid_geo(sepAng=deg2rad(5), unit=:deg, type=:point) isa Vector{Point2}
     
     @test_logs (:warn, "Height is not provided, it will be set to 0 by default...") icogrid_geo(N=100)
@@ -24,8 +26,17 @@ end
 end
 
 @testset "Mesh Grid Functions" begin
-    @test meshgrid_geo(deg2rad(5); unit=:deg) isa Matrix{SVector{2, Float64}}
-    @test meshgrid_geo(deg2rad(5)) isa Matrix{SVector{2, Float64}}
+    @test meshgrid_geo(deg2rad(5); height=0.0) isa Matrix{LLA}
+    @test meshgrid_geo(deg2rad(5); yRes=deg2rad(3), height=0.0) isa Matrix{LLA}
+    @test meshgrid_geo(deg2rad(5); type=:point) isa Matrix{Point2}
+    @test meshgrid_geo(deg2rad(5); unit=:deg, type=:point) isa Matrix{Point2}
+    @test meshgrid_geo(deg2rad(5); yRes=deg2rad(3), type=:point) isa Matrix{Point2}
+
+    @test_logs (:warn, "Height is not provided, it will be set to 0 by default...") meshgrid_geo(deg2rad(5)) 
+    @test_logs (:warn, "Height is ignored when type is set to :point...") meshgrid_geo(deg2rad(5); height=0.0, type=:point)
+    @test_throws "The input type do not match the expected format, it must be :lla or :point..." meshgrid_geo(deg2rad(5); type=:testerr)
+    @test_throws "Resolution of x is too large, it must be smaller than π..." meshgrid_geo(deg2rad(181); height=0.0)
+    @test_throws "Resolution of y is too large, it must be smaller than π..." meshgrid_geo(deg2rad(181); yRes=deg2rad(181), height=0.0)
 end
 
 using PlotlyBase
