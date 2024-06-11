@@ -10,9 +10,9 @@ using GeoGrids
 This function takes an SVector{3} of Cartesian coordinates and plots the corresponding points on a unitary sphere. 
 The sphere is defined by a range of angles that are discretized into a grid of n_sphere points.
 
-### Arguments:
+## Arguments:
 - `points_cart`: an array of Cartesian coordinates of the points to be plotted on the unitary sphere.
-### Output:
+## Output:
 - Plot of the unitary sphere with the input points represented as markers.
 """
 function GeoGrids.plot_unitarysphere(points_cart)
@@ -43,23 +43,24 @@ function GeoGrids.plot_unitarysphere(points_cart)
 end
 
 """
-	plot_geo(points_latlon; title="Point Position 3D Map", camera::Symbol=:twodim)
+	plot_geo(points; title="Point Position 3D Map", camera::Symbol=:twodim)
 
 This function takes an AbstractVector of SVector{2, <:Real} of LAT-LON coordinates (deg) and generates a plot on a world map projection using the PlotlyJS package.
 
-### Arguments
-- `points_latlon::AbstractVector{SVector{2, <:Real}}:` List of 2-dimensional coordinates (lon,lat) in the form of an AbstractVector of SVector{2, <:Real} elements (LAT=y, LON=x).
+## Arguments
+- `points::AbstractVector{SVector{2, <:Real}}:` List of 2-dimensional coordinates (lon,lat) in the form of an AbstractVector of SVector{2, <:Real} elements (LAT=y, LON=x).
 - `title::String`: (optional) Title for the plot, default is "Point Position 3D Map".
 - `camera::Symbol`: (optional) The camera projection to use, either :twodim (default) or :threedim. If :threedim, the map will be displayed as an orthographic projection, while :twodim shows the map with a natural earth projection.
 """
-function GeoGrids.plot_geo(points_latlon; title="Point Position GEO Map", camera::Symbol=:twodim)
+function GeoGrids.plot_geo(points::Point2; title="Point Position GEO Map", camera::Symbol=:twodim, kwargs_scatter=(;), kwargs_layout=(;))
 	# Markers for the points
 	# Take an array of SVector
 	points = scattergeo(
-		lat = map(x -> x[2], points_latlon),
-		lon = map(x -> x[1], points_latlon),
+		lat = map(x -> first(x.coords), points),
+		lon = map(x -> last(x.coords), points),
 		mode = "markers",
-		marker_size = 5
+		marker_size = 5,
+		kwargs_scatter...
 	)
 
 	if camera == :threedim
@@ -94,11 +95,40 @@ function GeoGrids.plot_geo(points_latlon; title="Point Position GEO Map", camera
 			)
 		),
 		title = title;
-		geo_projection_type = projection
+		geo_projection_type = projection,
+		kwargs_layout...
 	)
 	
 	# Plot([points],layout)
 	plotly_plot([points],layout)
 end
+
+GeoGrids.plot_geo(points::Union{Vector(StaticVector{2,Float64}), Vector{Tuple{Float64,Float64}}, Vector{LLA}}; kwargs...) = GeoGrids.plot_geo(_transform_point_plot(points); kwargs...)
+
+"""
+    _transform_point_plot(p::Union{StaticVector{2,Float64}, Tuple{Float64,Float64}, LLA})
+	_transform_point_plot(p::LLA)
+	_transform_point_plot(points::Union{Vector(StaticVector{2,Float64}), Vector{Tuple{Float64,Float64}}, Vector{LLA}})
+
+Transforms a point `p` of different types to a Point2gg.
+
+# Arguments
+- `p::Union{StaticVector{2,Float64}, Tuple{Float64,Float64}, LLA}`: A point in 2D space or a latitude-longitude-altitude (LLA) coordinate.
+
+# Returns
+- `Point2`: A 2D point with the first and last elements of `p` as its coordinates.
+"""
+function _transform_point_plot(p::Union{StaticVector{2,Float64}, Tuple{Float64,Float64}}) 
+	lat = to_radians(first(p))
+    lon = to_radians(last(p))
+
+    # Input validation
+    (lat < -π/2 || lat > π/2) && error("LAT provided as numbers must be expressed in radians and satisfy -π/2 ≤ x ≤ π/2. Consider using `°` from `Unitful` (Also re-exported by GeoGrids) if you want to pass numbers in degrees, by doing `x * °`.")
+    (lon < -π || lon > π) && error("LON provided as numbers must be expressed in radians and satisfy -π ≤ x ≤ π. Consider using `°` from `Unitful` (Also re-exported by GeoGrids) if you want to pass numbers in degrees, by doing `x * °`.")
+	
+	return Point2(first(p), last(p))
+end
+_transform_point_plot(p::LLA) = Point2(p.lat, p.lon)
+_transform_point_plot(points::Union{Vector(StaticVector{2,Float64}), Vector{Tuple{Float64,Float64}}, Vector{LLA}}) = map(x -> _transform_point_plot(x), points)
 
 end

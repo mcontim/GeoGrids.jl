@@ -43,14 +43,9 @@ using PlotlyBase
 
 @testset "Plots Plotly Base" begin
     @test plot_unitarysphere(icogrid(100; coord=:cart)) isa Plot
-    @test plot_geo(map(x -> rad2deg.(x), icogrid_geo(sepAng=deg2rad(4)))) isa Plot
-    @test plot_geo(map(x -> rad2deg.(x), icogrid_geo(sepAng=deg2rad(4)));camera=:threedim) isa Plot
-end
-
-using PlutoPlotly
-
-@testset "Plots Plotly Base" begin
-    @test GeoGrids.plot_unitarysphere(icogrid(100; coord=:cart)) isa PlutoPlot
-    @test GeoGrids.plot_geo(map(x -> rad2deg.(x), icogrid_geo(sepAng=deg2rad(4)))) isa PlutoPlot
-    @test GeoGrids.plot_geo(map(x -> rad2deg.(x), icogrid_geo(sepAng=deg2rad(4)));camera=:threedim) isa PlutoPlot
+    @test plot_geo(icogrid_geo(sepAng=deg2rad(5), type=:point)) isa Plot
+    @test plot_geo(icogrid_geo(sepAng=deg2rad(4), height=0.0)); camera=:threedim isa Plot
+    @test plot_geo(meshgrid_geo(xRes=deg2rad(5), type=:point)) isa Plot
+    @test plot_geo(meshgrid_geo(xRes=deg2rad(5), height=0.0)); camera=:threedim isa Plot
+    @test_throws "LAT provided as numbers must be expressed in radians and satisfy -π/2 ≤ x ≤ π/2. Consider using `°` from `Unitful` (Also re-exported by GeoGrids) if you want to pass numbers in degrees, by doing `x * °`." plot_geo(icogrid_geo(sepAng=deg2rad(5), type=:point, unit=:deg)) isa Plot
 end
