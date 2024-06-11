@@ -46,3 +46,12 @@ end
     @test plot_geo(meshgrid_geo(deg2rad(5); type=:point)) isa Plot
     @test plot_geo(meshgrid_geo(deg2rad(5); height=0.0); camera=:threedim) isa Plot
 end
+
+@testset "Filtering Functions" begin
+    ita = GeoRegion(;admin = "Italy")
+    eu = GeoRegion(;continent = "Europe")
+    points_ita = map(x -> SVector(x...), [(43.727878°,12.843441°), (43.714933°,10.399326°), (37.485829°,14.328285°), (39.330460°,8.430780°), (45.918388°,10.886654°)])
+    points_eu = map(x -> Point2(x...), [(52.218550°, 4.420621°), (41.353144°, 2.167639°), (42.670341°, 23.322592°)])
+    @test all(in_region(points_ita, ita))
+    @test all(in_region(points_eu, eu))
+end

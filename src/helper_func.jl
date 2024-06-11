@@ -1,5 +1,5 @@
 """
-    _check_point(p::Union{StaticVector{2,Float64}, Point2, Tuple{Float64,Float64}}) -> Point2(lon,lat)
+    _check_point(p::Union{AbstractVector, Point2, Tuple{Float64,Float64}}) -> Point2(lon,lat)
     _check_point(p::Point2) -> Point2(lon,lat)
     _check_point(p::LLA) -> Point2(lon,lat)
 
@@ -11,7 +11,8 @@ Checks the validity of the given point `p` in terms of latitude (LAT) and longit
 ## Returns
 - A `Point2` with the longitude (LON) in first position and latitude (LAT) value in second position, converted to radians.
 """
-function _check_point(p::Union{StaticVector{2,Float64}, Tuple{Float64,Float64}})
+function _check_point(p::Union{AbstractVector, Tuple{Float64,Float64}})
+    length(p) != 2 && error("The input must be a 2D point...")
     lat = to_radians(first(p))
     lon = to_radians(last(p))
 
@@ -19,10 +20,10 @@ function _check_point(p::Union{StaticVector{2,Float64}, Tuple{Float64,Float64}})
     (lat < -π/2 || lat > π/2) && error("LAT provided as numbers must be expressed in radians and satisfy -π/2 ≤ x ≤ π/2. Consider using `°` from `Unitful` (Also re-exported by GeoGrids) if you want to pass numbers in degrees, by doing `x * °`.")
     (lon < -π || lon > π) && error("LON provided as numbers must be expressed in radians and satisfy -π ≤ x ≤ π. Consider using `°` from `Unitful` (Also re-exported by GeoGrids) if you want to pass numbers in degrees, by doing `x * °`.")
 
-    return Point2(lon, lat)
+    return Point2(rad2deg(lon), rad2deg(lat)) # Countries borders is in degrees (for consistency also PolyArea points are stored in degrees)
 end
 _check_point(p::Point2) = _check_point(p.coords)
-_check_point(p::LLA) = Point2((p.lon, p.lat)) # The values are already in radians (checked in LLA() constructor)
+_check_point(p::LLA) = Point2((rad2deg(p.lon), rad2deg(p.lat))) # The values are in radians and checked in LLA() constructor.
 
 """
     CountriesBorders.extract_countries(r::GeoRegion)

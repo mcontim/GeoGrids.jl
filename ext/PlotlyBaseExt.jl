@@ -4,6 +4,7 @@ using PlotlyBase
 
 using GeoGrids
 using StaticArrays
+using TelecomUtils: ValidAngle, ValidDistance
 
 """
 	plot_unitarysphere(points_cart)
@@ -107,19 +108,19 @@ end
 GeoGrids.plot_geo(points; kwargs...) = GeoGrids.plot_geo(_transform_point_plot(points); kwargs...)
 
 """
-    _transform_point_plot(p::Union{StaticVector{2,Float64}, Tuple{Float64,Float64}, LLA})
+    _transform_point_plot(p::Union{AbstractVector, Tuple{Float64,Float64}, LLA})
 	_transform_point_plot(p::LLA)
-	_transform_point_plot(points::Union{Vector(StaticVector{2,Float64}), Vector{Tuple{Float64,Float64}}, Vector{LLA}})
+	_transform_point_plot(points::Union{Vector(AbstractVector), Vector{Tuple{Float64,Float64}}, Vector{LLA}})
 
 Transforms a point `p` of different types to a Point2gg.
 
 # Arguments
-- `p::Union{StaticVector{2,Float64}, Tuple{Float64,Float64}, LLA}`: A point in 2D space or a latitude-longitude-altitude (LLA) coordinate.
+- `p::Union{AbstractVector, Tuple{Float64,Float64}, LLA}`: A point in 2D space or a latitude-longitude-altitude (LLA) coordinate.
 
 # Returns
 - `Point2`: A 2D point with the first and last elements of `p` as its coordinates.
 """
-function _transform_point_plot(p::Union{StaticVector{2,Float64}, Tuple{Float64,Float64}}) 
+function _transform_point_plot(p::Union{AbstractVector, Tuple{Float64,Float64}}) 
 	lat = to_radians(first(p))
     lon = to_radians(last(p))
 
@@ -130,6 +131,6 @@ function _transform_point_plot(p::Union{StaticVector{2,Float64}, Tuple{Float64,F
 	return Point2(first(p), last(p))
 end
 _transform_point_plot(p::LLA) = Point2(p.lat, p.lon)
-_transform_point_plot(points::Array{<:Union{StaticVector{2,Float64},Tuple{Float64,Float64},LLA}}) = map(x -> _transform_point_plot(x), points)
+_transform_point_plot(points::Array{<:Union{AbstractVector,Tuple{Float64,Float64},LLA}}) = map(x -> _transform_point_plot(x), points)
 
 end
