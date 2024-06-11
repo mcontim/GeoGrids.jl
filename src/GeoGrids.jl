@@ -22,6 +22,7 @@ export icogrid_geo, icogrid, meshgrid_geo, meshgrid,
 extract_countries, in_region, filter_points
 
 export °, LLA,
-Point2
+Point2, PolyArea,
+SVector
 
 end # module GeoGrids

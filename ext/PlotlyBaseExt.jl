@@ -3,6 +3,7 @@ using PlotlyExtensionsHelper
 using PlotlyBase
 
 using GeoGrids
+using StaticArrays
 
 """
 	plot_unitarysphere(points_cart)
@@ -52,7 +53,7 @@ This function takes an AbstractVector of SVector{2, <:Real} of LAT-LON coordinat
 - `title::String`: (optional) Title for the plot, default is "Point Position 3D Map".
 - `camera::Symbol`: (optional) The camera projection to use, either :twodim (default) or :threedim. If :threedim, the map will be displayed as an orthographic projection, while :twodim shows the map with a natural earth projection.
 """
-function GeoGrids.plot_geo(points::Point2; title="Point Position GEO Map", camera::Symbol=:twodim, kwargs_scatter=(;), kwargs_layout=(;))
+function GeoGrids.plot_geo(points::Array{Point2}; title="Point Position GEO Map", camera::Symbol=:twodim, kwargs_scatter=(;), kwargs_layout=(;))
 	# Markers for the points
 	# Take an array of SVector
 	points = scattergeo(
@@ -103,7 +104,7 @@ function GeoGrids.plot_geo(points::Point2; title="Point Position GEO Map", camer
 	plotly_plot([points],layout)
 end
 
-GeoGrids.plot_geo(points::Union{Vector(StaticVector{2,Float64}), Vector{Tuple{Float64,Float64}}, Vector{LLA}}; kwargs...) = GeoGrids.plot_geo(_transform_point_plot(points); kwargs...)
+GeoGrids.plot_geo(points; kwargs...) = GeoGrids.plot_geo(_transform_point_plot(points); kwargs...)
 
 """
     _transform_point_plot(p::Union{StaticVector{2,Float64}, Tuple{Float64,Float64}, LLA})
@@ -129,6 +130,6 @@ function _transform_point_plot(p::Union{StaticVector{2,Float64}, Tuple{Float64,F
 	return Point2(first(p), last(p))
 end
 _transform_point_plot(p::LLA) = Point2(p.lat, p.lon)
-_transform_point_plot(points::Union{Vector(StaticVector{2,Float64}), Vector{Tuple{Float64,Float64}}, Vector{LLA}}) = map(x -> _transform_point_plot(x), points)
+_transform_point_plot(points::Array{<:Union{StaticVector{2,Float64},Tuple{Float64,Float64},LLA}}) = map(x -> _transform_point_plot(x), points)
 
 end

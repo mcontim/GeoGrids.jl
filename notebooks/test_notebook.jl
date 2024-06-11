@@ -88,6 +88,9 @@ s = "a"
 # ╔═╡ a41c17a6-b650-4b92-939e-d79cd820ad27
 isempty(s)
 
+# ╔═╡ 542e9a43-44c4-4c88-b511-a4ffc3adc0b6
+methods(StaticVector)
+
 # ╔═╡ 152ae683-dbad-4c2c-9c4a-5e14a31d2748
 md"""
 ## GeoRegion
@@ -635,6 +638,7 @@ version = "17.4.0+2"
 # ╠═3e0a9404-9ec5-40bc-9074-2dee6efccb43
 # ╠═f429fdbe-4464-4ca5-a4ba-b7830c12d49f
 # ╠═a41c17a6-b650-4b92-939e-d79cd820ad27
+# ╠═542e9a43-44c4-4c88-b511-a4ffc3adc0b6
 # ╟─152ae683-dbad-4c2c-9c4a-5e14a31d2748
 # ╠═40653a7f-bc4b-47f2-9006-6856bb89210e
 # ╠═9c977c07-ce0e-4c38-bcac-b2a83cfb3544
