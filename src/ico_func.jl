@@ -7,17 +7,17 @@ This function returns a vector `Nx2` of LAT, LON values for a `N` points grid bu
 - `N`: The number of points to generate.
 - `sepAng`: The separation angle for the grid of points to be generated [rad].
 - `unit`: `:rad` or `:deg`
+- `type`: `:lla` or `:point`. Output type either `LLA` or `Point2`
+- `height`: the point altitude in case of LLA type
 
 ## Output:
 - `out`: Matrix{Union{LLA,Point2}}, each element of the matrix is either a `LLA` or `Point2`. The order of the elements is LAT, LON.
 """
 function icogrid_geo(;N=nothing, sepAng=nothing, unit=:rad, height=nothing, type=:lla)	
-	if N isa Nothing && sepAng isa Nothing
-		error("Input one argument between N and sepAng...")
-	elseif sepAng isa Nothing
+	if isnothing(sepAng) && !isnothing(N)
 		vec = icogrid(N; coord=:sphe)
-	elseif N isa Nothing
-		N,sepAng = _points_required_for_separation_angle(sepAng)
+	elseif !isnothing(sepAng) && isnothing(N)
+		N,_ = _points_required_for_separation_angle(sepAng)
 		vec = icogrid(N; coord=:sphe)
 	else
 		error("Input one argument between N and sepAng...")
@@ -46,10 +46,6 @@ function icogrid_geo(;N=nothing, sepAng=nothing, unit=:rad, height=nothing, type
 
 	return out
 end
-
-
-# function meshgrid_geo(xRes::ValidAngle; yRes::ValidAngle=xRes, height=nothing, unit=:rad, type=:lla)
-
 
 """
 	icogrid(N::Int)
@@ -130,7 +126,7 @@ function _points_required_for_separation_angle(sepAng; spheRadius=1.0, pointsToC
 		thisTol = tolerance(Ns)
 	end
 	
-	return Ns[2],rad2deg(thisSep) # We return the higher end of the precision
+	return Ns[2], rad2deg(thisSep) # We return the higher end of the precision
 end
 
 """

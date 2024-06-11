@@ -5,9 +5,11 @@ This function call meshgrid with the specified resolution given as input and ret
 The meshgrid_geo cover all the globe with LAT=-90:90 and LON=-180:180
 
 ## Arguments
-- `gridRes`: resolution of the meshgrid_geo in `ValidAngle`. 
+- `xRes`: resolution of the x axis in meshgrid_geo in `ValidAngle`. 
+- `yRes`: resolution of the y axis in meshgrid_geo in `ValidAngle`. 
 - `unit`: `:rad` or `:deg`
 - `type`: `:lla` or `:point`. Output type either `LLA` or `Point2`
+- `height`: the point altitude in case of LLA type
 
 ## Output
 - `out`: Matrix{Union{LLA,Point2}}, each element of the matrix is either a `LLA` or `Point2`. The order of the elements is LAT, LON.
