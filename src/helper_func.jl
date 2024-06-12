@@ -42,8 +42,8 @@ function _check_point(p::Union{AbstractVector, Tuple})
     _check_angle(first(p); limit = π/2)
     _check_angle(last(p); limit = π)
     
-    lat = to_degrees(first(p)) 
-	lon = to_degrees(last(p)) 
+    lat = to_radians(first(p)) |> rad2deg
+	lon = to_radians(last(p)) |> rad2deg
 
     return Point2(lon, lat) # Countries borders is in degrees (for consistency also PolyArea points are stored in degrees)
 end
