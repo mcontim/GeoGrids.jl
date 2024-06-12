@@ -128,9 +128,9 @@ function _transform_point_plot(p::Union{AbstractVector, Tuple})
     (lat < -π/2 || lat > π/2) && error("LAT provided as numbers must be expressed in radians and satisfy -π/2 ≤ x ≤ π/2. Consider using `°` from `Unitful` (Also re-exported by GeoGrids) if you want to pass numbers in degrees, by doing `x * °`.")
     (lon < -π || lon > π) && error("LON provided as numbers must be expressed in radians and satisfy -π ≤ x ≤ π. Consider using `°` from `Unitful` (Also re-exported by GeoGrids) if you want to pass numbers in degrees, by doing `x * °`.")
 	
-	return Point2(first(p), last(p))
+    return Point2(rad2deg(lon), rad2deg(lat))
 end
-_transform_point_plot(p::LLA) = Point2(p.lat, p.lon)
+_transform_point_plot(p::LLA) = Point2(rad2deg(p.lat), rad2deg(p.lon))
 _transform_point_plot(points::Array{<:Union{AbstractVector,Tuple,LLA}}) = map(x -> _transform_point_plot(x), points)
 
 end

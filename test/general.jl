@@ -48,10 +48,42 @@ end
 end
 
 @testset "Filtering Functions" begin
+    sample_ita = [(43.727878°,12.843441°), (43.714933°,10.399326°), (37.485829°,14.328285°), (39.330460°,8.430780°), (45.918388°,10.886654°)]
+    sample_eu = [(52.218550°, 4.420621°), (41.353144°, 2.167639°), (42.670341°, 23.322592°)]
+    
     ita = GeoRegion(;admin = "Italy")
     eu = GeoRegion(;continent = "Europe")
-    points_ita = map(x -> SVector(x...), [(43.727878°,12.843441°), (43.714933°,10.399326°), (37.485829°,14.328285°), (39.330460°,8.430780°), (45.918388°,10.886654°)])
-    points_eu = map(x -> Point2(x...), [(52.218550°, 4.420621°), (41.353144°, 2.167639°), (42.670341°, 23.322592°)])
-    @test all(in_region(points_ita, ita))
-    @test all(in_region(points_eu, eu))
+    
+    sv_ita = map(x -> SVector(x...), sample_ita)
+    p_ita = map(x -> Point2(x...), sample_ita)
+    # tup_ita = map(x -> Tuple(x...), sample_ita)
+    lla_ita = map(x -> LLA(x..., 0.0), sample_ita)
+    @test all(in_region(sv_ita, ita))
+    @test all(in_region(p_ita, ita))
+    # @test all(in_region(tup_ita, ita))
+    @test all(in_region(lla_ita, ita))
+    
+    sv_eu = map(x -> SVector(x...), sample_eu)
+    p_eu = map(x -> Point2(x...), sample_eu)
+    # tup_eu = map(x -> Tuple(x...), sample_eu)
+    lla_eu = map(x -> LLA(x..., 0.0), sample_eu)
+    @test all(in_region(sv_eu, eu))
+    @test all(in_region(p_eu, eu))
+    # @test all(in_region(tup_eu, eu))
+    @test all(in_region(lla_eu, eu))
+
+    @test in_region((0.7631954460103929,0.22416033273563304), ita)
+    @test in_region((0.7631954460103929,0.22416033273563304), eu)
+    @test !in_region((0.7085271959818754, -0.2072522112608427), eu)
+    
+    @test_throws "LAT provided as numbers must be expressed in radians and satisfy -π/2 ≤ x ≤ π/2. Consider using `°` from `Unitful` (Also re-exported by GeoGrids) if you want to pass numbers in degrees, by doing `x * °`." in_region((93.727878,0.22416033273563304), eu)
+    @test_throws "LON provided as numbers must be expressed in radians and satisfy -π ≤ x ≤ π. Consider using `°` from `Unitful` (Also re-exported by GeoGrids) if you want to pass numbers in degrees, by doing `x * °`." in_region((0.7631954460103929,-91.843441), eu)
+
+    
+    # add test for PolyRegion
+end
+
+@testset "Helper Functions" begin
+    # Test all error messages and wrong input utilisation
+    # _check_point(p::Union{AbstractVector, Tuple}) 
 end
