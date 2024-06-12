@@ -17,8 +17,7 @@ The meshgrid_geo cover all the globe with LAT=-90:90 and LON=-180:180
 function meshgrid_geo(xRes::ValidAngle; yRes::ValidAngle=xRes, height=nothing, unit=:rad, type=:lla)
 	# Input Validation
 	_xRes = let
-		_check_angle(xRes; limit = π)
-		xRes > π && error("Resolution of x is too large, it must be smaller than π...") # A Unitful angle is considered as rad in comparisons or operations with other real values in genral.
+		_check_angle(xRes; limit = π, msg = "Resolution of x is too large, it must be smaller than π...")
 		if xRes < 0
 			@warn "Input xRes is negative, it will be converted to positive..."
 			to_radians(abs(xRes))
@@ -27,8 +26,7 @@ function meshgrid_geo(xRes::ValidAngle; yRes::ValidAngle=xRes, height=nothing, u
 		end	
 	end
 	_yRes = let
-		_check_angle(yRes; limit = π)
-		yRes > π && error("Resolution of y is too large, it must be smaller than π...")
+		_check_angle(yRes; limit = π, msg = "Resolution of y is too large, it must be smaller than π...")
 		if yRes < 0
 			@warn "Input yRes is negative, it will be converted to positive..."
 			to_radians(abs(yRes))

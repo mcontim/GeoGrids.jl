@@ -17,7 +17,17 @@ function icogrid_geo(;N=nothing, sepAng=nothing, unit=:rad, height=nothing, type
 	if isnothing(sepAng) && !isnothing(N)
 		vec = icogrid(N; coord=:sphe)
 	elseif !isnothing(sepAng) && isnothing(N)
-		N,_ = _points_required_for_separation_angle(sepAng)
+		# Input Validation, sepAng must be in radians
+		_sepAng = let
+			_check_angle(sepAng; limit = 2π)
+			if sepAng < 0
+				@warn "Input sepAng is negative, it will be converted to positive..."
+				to_radians(abs(sepAng); rounding=RoundToZero)
+			else
+				to_radians(sepAng; rounding=RoundToZero)
+			end	
+		end
+		N,_ = _points_required_for_separation_angle(_sepAng)
 		vec = icogrid(N; coord=:sphe)
 	else
 		error("Input one argument between N and sepAng...")
@@ -102,11 +112,11 @@ function _points_required_for_separation_angle(sepAng; spheRadius=1.0, pointsToC
 	
 	## Define Inner Functions ---------------------------------------------------------------------
 	# Find the separation angle for a given N
-	f(N) = _find_separation_angle(_fibonaccisphere_classic_partial(N; spheRadius=spheRadius, pointsToCheck=pointsToCheck))
+	f(N) = _find_separation_angle(_fibonaccisphere_classic_partial(N; spheRadius=spheRadius, pointsToCheck=pointsToCheck)) # radians
 	# Distance between the tested points
 	tolerance(v) = v[2] - v[1]
 	
-	# Compute the startin angles
+	# Compute the starting angles
 	angs = map(f, Ns)
 	sepAng > angs[1] && return Ns[1] # The lower is already sufficient
 	sepAng < angs[2] && error("$(maxPrec) points is not sufficient for the requested separation angle")
