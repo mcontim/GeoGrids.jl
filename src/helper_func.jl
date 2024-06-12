@@ -1,7 +1,24 @@
+"""
+    _check_angle_func(limit = π) 
+
+This function creates and returns another function which checks if the absolute value of `x` is less than or equal to the `limit`. The `limit` defaults to `π` if not provided. 
+    
+## Arguments:
+- `x::Uniion{Real, UnitfulAngle}`: A real number or UnitfulAngle quantity to be checked.
+
+## Returns:
+- `Bool` as result of the input check.
+"""
 function _check_angle_func(limit = π) 
 	f(x::Real) = abs(x) <= limit
 	f(x::UnitfulAngleQuantity) = abs(to_radians(x)) <= limit
 end
+
+"""
+    _check_angle(x; limit = π, msg::String)
+    
+This function checks if all elements in `x` satisfy the condition defined by `_check_angle_func(limit)`. If not, it throws an assertion error with the provided `msg`. The `limit` defaults to `π` and `msg` defaults to a string suggesting that angles should be expressed in radians and satisfy the condition `-$limit ≤ x ≤ $limit`. It also suggests using `°` from Unitful for passing numbers in degrees.
+"""
 function _check_angle(x; limit = π, msg::String = "Angles directly provided as numbers must be expressed in radians and satisfy -$limit ≤ x ≤ $limit
 Consider using `°` from Unitful (Also re-exported by TelecomUtils) if you want to pass numbers in degrees, by doing `x * °`." )  
 	@assert all(_check_angle_func(limit), x) msg
