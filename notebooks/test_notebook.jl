@@ -51,7 +51,13 @@ md"""
 methods(_check_angle)
 
 # ╔═╡ 77a2eac3-c24b-4ab9-bf01-43d741674120
-TelecomUtils._check_angle(93.2244°; limit=pi/2)
+abs(-93.2244°)
+
+# ╔═╡ a32a1633-134f-4363-96b0-65d511142ec0
+93.2244°<pi/2
+
+# ╔═╡ 02348c26-d666-4da3-9390-edbd6ca87027
+
 
 # ╔═╡ 278fbecd-f240-4693-b65d-083b02aae797
 www=meshgrid_geo(1;unit=:deg)
@@ -642,6 +648,8 @@ version = "17.4.0+2"
 # ╟─0e205c7f-43ea-4612-830c-d930e8e4522f
 # ╠═2fe84091-4831-40af-a564-f67b17062732
 # ╠═77a2eac3-c24b-4ab9-bf01-43d741674120
+# ╠═a32a1633-134f-4363-96b0-65d511142ec0
+# ╠═02348c26-d666-4da3-9390-edbd6ca87027
 # ╠═278fbecd-f240-4693-b65d-083b02aae797
 # ╠═658a8bf3-452a-4748-a24d-023200586516
 # ╠═ac5eb1ce-aa4b-4a3e-ad05-ed47852d1c00

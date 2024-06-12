@@ -17,7 +17,7 @@ end
 """
     _check_angle(x; limit = π, msg::String)
     
-This function checks if all elements in `x` satisfy the condition defined by `_check_angle_func(limit)`. If not, it throws an assertion error with the provided `msg`. The `limit` defaults to `π` and `msg` defaults to a string suggesting that angles should be expressed in radians and satisfy the condition `-$limit ≤ x ≤ $limit`. It also suggests using `°` from Unitful for passing numbers in degrees.
+This function checks if all elements in `x` satisfy the condition defined by `_check_angle_func(limit)`. If not, it throws an assertion error with the provided `msg`. The `limit` defaults to `π` and `msg` defaults to a string suggesting that angles should be expressed in radians and satisfy the condition `-limit ≤ x ≤ limit`. It also suggests using `°` from Unitful for passing numbers in degrees.
 """
 function _check_angle(x; limit = π, msg::String = "Angles directly provided as numbers must be expressed in radians and satisfy -$limit ≤ x ≤ $limit
 Consider using `°` from Unitful (Also re-exported by TelecomUtils) if you want to pass numbers in degrees, by doing `x * °`." )  
@@ -39,10 +39,13 @@ Checks the validity of the given point `p` in terms of latitude (LAT) and longit
 """
 function _check_point(p::Union{AbstractVector, Tuple})
     length(p) != 2 && error("The input must be a 2D point...")
-    lat = _check_angle(first(p); limit = π/2)
-    lon = _check_angle(last(p); limit = π)
+    _check_angle(first(p); limit = π/2)
+    _check_angle(last(p); limit = π)
+    
+    lat = to_degrees(first(p)) 
+	lon = to_degrees(last(p)) 
 
-    return Point2(rad2deg(lon), rad2deg(lat)) # Countries borders is in degrees (for consistency also PolyArea points are stored in degrees)
+    return Point2(lon, lat) # Countries borders is in degrees (for consistency also PolyArea points are stored in degrees)
 end
 _check_point(p::Point2) = _check_point(p.coords)
 _check_point(p::LLA) = Point2((rad2deg(p.lon), rad2deg(p.lat))) # The values are in radians and checked in LLA() constructor.

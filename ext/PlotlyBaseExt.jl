@@ -121,11 +121,15 @@ Transforms a point `p` of different types to a Point2gg.
 - `Point2`: A 2D point with the first and last elements of `p` as its coordinates.
 """
 function _transform_point_plot(p::Union{AbstractVector, Tuple}) 
+	# Input Validation
 	length(p) != 2 && error("The input must be a 2D point...")
-    lat = _check_angle(first(p); limit = π/2)
-    lon = _check_angle(last(p); limit = π)
+    _check_angle(first(p); limit = π/2)
+    _check_angle(last(p); limit = π)
 
-    return Point2(rad2deg(lat), rad2deg(lon))
+	lat = to_degrees(first(p)) 
+	lon = to_degrees(last(p)) 
+    
+	return Point2(lat, lon)
 end
 _transform_point_plot(p::LLA) = Point2(rad2deg(p.lat), rad2deg(p.lon))
 _transform_point_plot(points::Array{<:Union{AbstractVector,Tuple,LLA}}) = map(x -> _transform_point_plot(x), points)
