@@ -16,11 +16,28 @@ The meshgrid_geo cover all the globe with LAT=-90:90 and LON=-180:180
 """
 function meshgrid_geo(xRes::ValidAngle; yRes::ValidAngle=xRes, height=nothing, unit=:rad, type=:lla)
 	# Input Validation
-	_xRes = to_radians(xRes; rounding=RoundDown)
-	_xRes > π && error("Resolution of x is too large, it must be smaller than π...")
-	_yRes = to_radians(yRes; rounding=RoundDown)
-	_yRes > π && error("Resolution of y is too large, it must be smaller than π...")
-	
+	length(p) != 2 && error("The input must be a 2D point...")
+    _xRes = let
+		ang = _check_angle(xRes; limit = π)
+		ang > π && error("Resolution of x is too large, it must be smaller than π...")
+		if ang < 0
+			@warn "Input xRes is negative, it will be converted to positive..."
+			abs(ang)
+		else
+			ang
+		end	
+	end
+	_yRes = let
+		ang = _check_angle(yRes; limit = π)
+		ang > π && error("Resolution of y is too large, it must be smaller than π...")
+		if ang < 0
+			@warn "Input yRes is negative, it will be converted to positive..."
+			abs(ang)
+		else
+			ang
+		end
+	end
+
 	# Create meshgrid
 	mat = meshgrid(-π/2:_xRes:π/2, -π:_yRes:(π-_yRes+1e-10))
 	

@@ -121,14 +121,11 @@ Transforms a point `p` of different types to a Point2gg.
 - `Point2`: A 2D point with the first and last elements of `p` as its coordinates.
 """
 function _transform_point_plot(p::Union{AbstractVector, Tuple}) 
-	lat = to_radians(first(p))
-    lon = to_radians(last(p))
+	length(p) != 2 && error("The input must be a 2D point...")
+    lat = _check_angle(first(p); limit = π/2)
+    lon = _check_angle(last(p); limit = π)
 
-    # Input validation
-    (lat < -π/2 || lat > π/2) && error("LAT provided as numbers must be expressed in radians and satisfy -π/2 ≤ x ≤ π/2. Consider using `°` from `Unitful` (Also re-exported by GeoGrids) if you want to pass numbers in degrees, by doing `x * °`.")
-    (lon < -π || lon > π) && error("LON provided as numbers must be expressed in radians and satisfy -π ≤ x ≤ π. Consider using `°` from `Unitful` (Also re-exported by GeoGrids) if you want to pass numbers in degrees, by doing `x * °`.")
-	
-    return Point2(rad2deg(lon), rad2deg(lat))
+    return Point2(rad2deg(lat), rad2deg(lon))
 end
 _transform_point_plot(p::LLA) = Point2(rad2deg(p.lat), rad2deg(p.lon))
 _transform_point_plot(points::Array{<:Union{AbstractVector,Tuple,LLA}}) = map(x -> _transform_point_plot(x), points)
