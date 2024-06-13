@@ -46,7 +46,9 @@ end
 
 @testset "PolyRegion Test" begin
     
-    sample_in = [(43.727878°,12.843441°), (43.714933°,10.399326°), (37.485829°,14.328285°), (39.330460°,8.430780°), (45.918388°,10.886654°)]
+    sample_in = [(14°,1°), (26.9°,-4.9°), (10.1°,14.9°)]
+    sample_out = [(0°,0°), (10°,-5.2°), (27°,15.3°)]
+    sample_border = [(10°,-5°), (10°,10°), (27°,15°)]
     poly = PolyRegion(regionName="POLY", domain=[LLA(10°,-5°,0), LLA(10°,15°,0), LLA(27°,15°,0), LLA(27°,-5°,0), LLA(10°,-5°,0)])
 
     @test PolyRegion(domain=[LLA(10°,-5°,0), LLA(10°,15°,0), LLA(27°,15°,0), LLA(27°,-5°,0), LLA(10°,-5°,0)]) isa PolyRegion
@@ -61,16 +63,16 @@ end
     @test_throws "The input domain do not match the expected format..." PolyRegion(domain=Point2(0.0,0.0))
     @test_throws "Input the polygon domain..." PolyRegion()
     
-    
+    @test all(in_region(sample_in, poly))
+    @test all(in_region(sample_border, poly))
+    @test !all(in_region(sample_out, poly))
 
 
-    # eu = GeoRegion(;continent = "Europe")
     
     # sv_ita = map(x -> SVector(x...), sample_ita)
     # p_ita = map(x -> Point2(x...), sample_ita)
     # tup_ita = sample_ita
     # lla_ita = map(x -> LLA(x..., 0.0), sample_ita)
-    # @test all(in_region(sv_ita, ita))
     # @test all(in_region(p_ita, ita))
     # @test all(in_region(tup_ita, ita))
     # @test all(in_region(lla_ita, ita))

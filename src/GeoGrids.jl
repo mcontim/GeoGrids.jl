@@ -9,8 +9,8 @@ using StaticArrays
 using TelecomUtils
 using TelecomUtils: ValidAngle, ValidDistance
 
-include("typedef.jl")
 include("helper_func.jl")
+include("typedef.jl")
 include("filtering_func.jl")
 include("plot_func.jl")
 include("ico_func.jl")
