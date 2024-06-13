@@ -34,7 +34,7 @@ mutable struct PolyRegion
     
     # Inner Constructor for inputs sanity check.
     # No positional arguments allowed.
-    function PolyRegion(regionName::String="region_name", domain::Union{Vector{LLA}, Vector{SVector{2, Float64}}, Vector{Point2}, Vector{Tuple{Float64, Float64}}, PolyArea}=nothing)
+    function PolyRegion(regionName::String="region_name", domain::Union{Vector{LLA}, Vector{SVector{2, Float64}}, Vector{Point2}, Vector{Tuple}, PolyArea}=nothing)
         function _polyarea_from_vertex(domain)
             points = map(domain) do p
                 _check_geopoint(p)                
@@ -52,7 +52,7 @@ mutable struct PolyRegion
 
         _domain = if domain isa PolyArea
             domain
-        elseif (domain isa Vector{Tuple{Float64, Float64}}) || (domain isa Vector{SVector{2, Float64}})
+        elseif (domain isa Vector{Tuple}) || (domain isa Vector{SVector{2, Float64}})
             _polyarea_from_vertex(domain)
         elseif (domain isa Vector{Point2})
             points = map(x -> x.coords, domain)

@@ -56,25 +56,26 @@ end
     
     sv_ita = map(x -> SVector(x...), sample_ita)
     p_ita = map(x -> Point2(x...), sample_ita)
-    # tup_ita = map(x -> Tuple(x...), sample_ita)
+    tup_ita = sample_ita
     lla_ita = map(x -> LLA(x..., 0.0), sample_ita)
     @test all(in_region(sv_ita, ita))
     @test all(in_region(p_ita, ita))
-    # @test all(in_region(tup_ita, ita))
+    @test all(in_region(tup_ita, ita))
     @test all(in_region(lla_ita, ita))
     
     sv_eu = map(x -> SVector(x...), sample_eu)
     p_eu = map(x -> Point2(x...), sample_eu)
-    # tup_eu = map(x -> Tuple(x...), sample_eu)
+    tup_eu = sample_eu
     lla_eu = map(x -> LLA(x..., 0.0), sample_eu)
     @test all(in_region(sv_eu, eu))
     @test all(in_region(p_eu, eu))
-    # @test all(in_region(tup_eu, eu))
+    @test all(in_region(tup_eu, eu))
     @test all(in_region(lla_eu, eu))
 
     @test in_region((0.7631954460103929,0.22416033273563304), ita)
     @test in_region((0.7631954460103929,0.22416033273563304), eu)
     @test !in_region((0.7085271959818754, -0.2072522112608427), eu)
+    @test !in_region((52.218550°, 4.420621°), ita)
     
     @test_throws "LAT provided as numbers must be expressed in radians and satisfy -π/2 ≤ x ≤ π/2. Consider using `°` from `Unitful` (Also re-exported by GeoGrids) if you want to pass numbers in degrees, by doing `x * °`." in_region((93.727878,0.22416033273563304), eu)
     @test_throws "LON provided as numbers must be expressed in radians and satisfy -π ≤ x ≤ π. Consider using `°` from `Unitful` (Also re-exported by GeoGrids) if you want to pass numbers in degrees, by doing `x * °`." in_region((0.7631954460103929,-91.843441), eu)

@@ -1,6 +1,6 @@
 """
-    in_region(p::Union{LLA, Point2, AbstractVector, Tuple{Float64, Float64}}, domain::Union{GeometrySet, PolyArea}) -> Bool
-    in_region(p::Union{LLA, Point2, AbstractVector, Tuple{Float64, Float64}}, domain::Union{GeoRegion, PolyRegion}) -> Bool
+    in_region(p::Union{LLA, Point2, AbstractVector, Tuple}, domain::Union{GeometrySet, PolyArea}) -> Bool
+    in_region(p::Union{LLA, Point2, AbstractVector, Tuple}, domain::Union{GeoRegion, PolyRegion}) -> Bool
     in_region(points::Union{Vector{LLA}, Vector{Point2}, Vector{AbstractVector}, Vector{Tuple}}, domain::Union{GeometrySet, PolyArea}) -> Vector{Bool}
     in_region(points::Union{Vector{LLA}, Vector{Point2}, Vector{AbstractVector}, Vector{Tuple}}, domain::Union{GeoRegion, PolyRegion}) -> Vector{Bool}
 
@@ -16,7 +16,7 @@ The `Meshes.Domain` can be either a `GeometrySet` or a `PolyArea` object.
 ### Output
 The function returns a boolean value: `true` if the point represented by the input tuple falls inside the `Meshes.Domain` object and `false` otherwise. 
 """
-function in_region(p::Union{LLA, Point2, AbstractVector, Tuple{Float64, Float64}}, domain::Union{GeometrySet, PolyArea})
+function in_region(p::Union{LLA, Point2, AbstractVector, Tuple}, domain::Union{GeometrySet, PolyArea})
     # Prepare the input.
     _p = _check_geopoint(p)
     # Check if the point is inside the domain, using a Predicates from Meshes instead of an ExactPredicates.
@@ -25,7 +25,7 @@ function in_region(p::Union{LLA, Point2, AbstractVector, Tuple{Float64, Float64}
     # of error is acceptable.
 	_p in domain
 end
-in_region(p::Union{LLA, Point2, AbstractVector, Tuple{Float64, Float64}}, domain::Union{GeoRegion, PolyRegion}) = in_region(p, domain.domain)
+in_region(p::Union{LLA, Point2, AbstractVector, Tuple}, domain::Union{GeoRegion, PolyRegion}) = in_region(p, domain.domain)
 
 function in_region(points::Vector{<:Union{LLA, Point2, AbstractVector, Tuple}}, domain::Union{GeometrySet, PolyArea})
     mask = map(x -> in_region(x, domain), points) # Bool mask
