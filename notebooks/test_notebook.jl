@@ -47,6 +47,18 @@ md"""
 # Test
 """
 
+# ╔═╡ 4eae9a7e-2c76-477d-a08f-fedffb259300
+GeoRegion(;continent="Europe",domain=PolyArea(Point2(0.0,0.0), Point2(0.0,0.5), Point2(0.3,0.5), Point2(0.3,0.0), Point2(0.0,0.0)))
+
+# ╔═╡ 90fb35a5-51d3-4f1a-b140-c95eb0fbfa15
+PolyRegion(domain=[LLA(10°,-5°,0), LLA(10°,15°,0), LLA(27°,15°,0), LLA(27°,-5°,0), LLA(10°,-5°,0)])
+
+# ╔═╡ 575501f7-50ea-450c-94ac-a1e484963aaf
+PolyRegion(domain=[(10°,-5°), (10°,15°), (27°,15°), (27°,-5°), (10°,-5°)])
+
+# ╔═╡ 1732096c-d89d-4c07-97e6-60973a6bbc1c
+[(10°,-5°), (10°,15°), (27°,15°), (27°,-5°), (10°,-5°)] isa Vector{Tuple}
+
 # ╔═╡ 2fe84091-4831-40af-a564-f67b17062732
 methods(_check_angle)
 
@@ -646,6 +658,10 @@ version = "17.4.0+2"
 # ╠═282b928a-fc7d-4487-a056-6c2626cf7179
 # ╠═2f988a76-9c84-432b-b69f-dbe06f32ea35
 # ╟─0e205c7f-43ea-4612-830c-d930e8e4522f
+# ╠═4eae9a7e-2c76-477d-a08f-fedffb259300
+# ╠═90fb35a5-51d3-4f1a-b140-c95eb0fbfa15
+# ╠═575501f7-50ea-450c-94ac-a1e484963aaf
+# ╠═1732096c-d89d-4c07-97e6-60973a6bbc1c
 # ╠═2fe84091-4831-40af-a564-f67b17062732
 # ╠═77a2eac3-c24b-4ab9-bf01-43d741674120
 # ╠═a32a1633-134f-4363-96b0-65d511142ec0

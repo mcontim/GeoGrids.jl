@@ -10,15 +10,14 @@ mutable struct GeoRegion
     # Inner Constructor for inputs sanity check.
     # No positional arguments allowed.
     function GeoRegion(;regionName="region_name", continent="", subregion="", admin="", domain=nothing)
-        @something continent subregion admin error("Input at least one argument between continent, subregion and admin...")
+        all(isempty(v) for v in (continent, subregion, admin)) && error("Input at least one argument between continent, subregion and admin...")
     
         _domain = if isnothing(domain)
             nt = (;continent, subregion, admin)
             kwargs = (k=>v for (k,v) in pairs(nt) if !isempty(v))
             CountriesBorders.extract_countries(;kwargs...)
         else
-            @warn "GeoRegion domain is not automatically generated from the other arguments, check inputs consistency..."
-            domain
+            error("The domain must be computed from the other inputs...")
         end
 
         new(regionName, continent, subregion, admin, _domain)
@@ -34,13 +33,13 @@ mutable struct PolyRegion
     
     # Inner Constructor for inputs sanity check.
     # No positional arguments allowed.
-    function PolyRegion(regionName::String="region_name", domain::Union{Vector{LLA}, Vector{SVector{2, Float64}}, Vector{Point2}, Vector{Tuple}, PolyArea}=nothing)
-        function _polyarea_from_vertex(domain)
-            points = map(domain) do p
+    function PolyRegion(;regionName::String="region_name", domain=nothing)
+        function _polyarea_from_vertex(domainGen)
+            points = map(domainGen) do p
                 _check_geopoint(p)                
             end
             # Check if the first and last points are the same to create a valid polygon
-            if !(first(points[1])==first(points[end])) || !(last(points[1])==last(points[end]))
+            if first(points) != last(points)
                 @warn "First and last points are not the same, adding them to the end..."
                 push!(points, points[1])
             end
@@ -52,14 +51,14 @@ mutable struct PolyRegion
 
         _domain = if domain isa PolyArea
             domain
-        elseif (domain isa Vector{Tuple}) || (domain isa Vector{SVector{2, Float64}})
+        elseif (domain isa Vector{<:Tuple}) || (domain isa Vector{<:AbstractVector})
             _polyarea_from_vertex(domain)
         elseif (domain isa Vector{Point2})
             points = map(x -> x.coords, domain)
             _polyarea_from_vertex(points)
-        elseif typeof(domain) == Vector{Vector{LLA}}
+        elseif typeof(domain) == Vector{LLA}
             points = map(x -> (x.lon, x.lat), domain)
-            PolyArea(points) # Create a simple PolyArea with only the Outer Chain        
+            _polyarea_from_vertex(points)
         else
             error("The input domain do not match the expected format...")
         end
