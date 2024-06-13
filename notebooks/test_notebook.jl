@@ -54,10 +54,13 @@ grid=meshgrid_geo(deg2rad(.5))
 poly = PolyRegion(regionName="POLY", domain=[LLA(10°,-5°,0), LLA(10°,15°,0), LLA(27°,15°,0), LLA(27°,-5°,0), LLA(10°,-5°,0)])
 
 # ╔═╡ 2a77c856-6155-4759-bf50-aa3169d7494d
-filt = filter_points(grid[:],poly)
+filt = filter_points(grid,poly)
 
 # ╔═╡ 86362c31-7407-4c33-b24d-5e10a2a0858f
 plot_geo(filt)
+
+# ╔═╡ 75d1571e-2806-4613-b08f-13f8e069e26e
+in_region(grid,poly)
 
 # ╔═╡ 163dd79f-a999-4630-9cbb-b1fb06ea8aa6
 sample_border = [(10°,-5°), (10.1°,10°), (27°,15°)]
@@ -682,6 +685,7 @@ version = "17.4.0+2"
 # ╠═86362c31-7407-4c33-b24d-5e10a2a0858f
 # ╠═c9738f80-0297-46c4-b5ee-1a64ced99296
 # ╠═2a77c856-6155-4759-bf50-aa3169d7494d
+# ╠═75d1571e-2806-4613-b08f-13f8e069e26e
 # ╠═dcac9772-2c2c-431b-a568-ac91d483e470
 # ╠═163dd79f-a999-4630-9cbb-b1fb06ea8aa6
 # ╠═c58e75cb-3355-4c63-8eb9-1f364c6ec159
