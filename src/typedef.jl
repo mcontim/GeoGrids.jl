@@ -37,7 +37,7 @@ mutable struct PolyRegion
     function PolyRegion(regionName::String="region_name", domain::Union{Vector{LLA}, Vector{SVector{2, Float64}}, Vector{Point2}, Vector{Tuple{Float64, Float64}}, PolyArea}=nothing)
         function _polyarea_from_vertex(domain)
             points = map(domain) do p
-                _check_point(p)                
+                _check_geopoint(p)                
             end
             # Check if the first and last points are the same to create a valid polygon
             if !(first(points[1])==first(points[end])) || !(last(points[1])==last(points[end]))

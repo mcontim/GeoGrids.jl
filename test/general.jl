@@ -86,5 +86,5 @@ end
 
 # @testset "Helper Functions" begin
 #     # Test all error messages and wrong input utilisation
-#     # _check_point(p::Union{AbstractVector, Tuple}) 
+#     # _check_geopoint(p::Union{AbstractVector, Tuple}) 
 # end
