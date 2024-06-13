@@ -47,6 +47,24 @@ md"""
 # Test
 """
 
+# ╔═╡ c9738f80-0297-46c4-b5ee-1a64ced99296
+grid=meshgrid_geo(deg2rad(.5))
+
+# ╔═╡ dcac9772-2c2c-431b-a568-ac91d483e470
+poly = PolyRegion(regionName="POLY", domain=[LLA(10°,-5°,0), LLA(10°,15°,0), LLA(27°,15°,0), LLA(27°,-5°,0), LLA(10°,-5°,0)])
+
+# ╔═╡ 2a77c856-6155-4759-bf50-aa3169d7494d
+filt = filter_points(grid[:],poly)
+
+# ╔═╡ 86362c31-7407-4c33-b24d-5e10a2a0858f
+plot_geo(filt)
+
+# ╔═╡ 163dd79f-a999-4630-9cbb-b1fb06ea8aa6
+sample_border = [(10°,-5°), (10.1°,10°), (27°,15°)]
+
+# ╔═╡ c58e75cb-3355-4c63-8eb9-1f364c6ec159
+in_region(sample_border, poly)
+
 # ╔═╡ 4eae9a7e-2c76-477d-a08f-fedffb259300
 GeoRegion(;continent="Europe",domain=PolyArea(Point2(0.0,0.0), Point2(0.0,0.5), Point2(0.3,0.5), Point2(0.3,0.0), Point2(0.0,0.0)))
 
@@ -141,7 +159,10 @@ methods(PolyRegion)
 methods(in_region)
 
 # ╔═╡ 26ffbfb5-da79-45b1-bf77-ace20102699e
+# ╠═╡ disabled = true
+#=╠═╡
 poly = PolyArea((0.0,0.0),(1.0,0.0),(1.0,1.0),(0.0,1.0),(0.0,0.0))
+  ╠═╡ =#
 
 # ╔═╡ 20d397c3-9d37-4fd1-b62c-c93b931d5c97
 a = [(0.0,0.0),(1.0,0.0),(1.0,1.0),(0.0,1.0)]
@@ -658,6 +679,12 @@ version = "17.4.0+2"
 # ╠═282b928a-fc7d-4487-a056-6c2626cf7179
 # ╠═2f988a76-9c84-432b-b69f-dbe06f32ea35
 # ╟─0e205c7f-43ea-4612-830c-d930e8e4522f
+# ╠═86362c31-7407-4c33-b24d-5e10a2a0858f
+# ╠═c9738f80-0297-46c4-b5ee-1a64ced99296
+# ╠═2a77c856-6155-4759-bf50-aa3169d7494d
+# ╠═dcac9772-2c2c-431b-a568-ac91d483e470
+# ╠═163dd79f-a999-4630-9cbb-b1fb06ea8aa6
+# ╠═c58e75cb-3355-4c63-8eb9-1f364c6ec159
 # ╠═4eae9a7e-2c76-477d-a08f-fedffb259300
 # ╠═90fb35a5-51d3-4f1a-b140-c95eb0fbfa15
 # ╠═575501f7-50ea-450c-94ac-a1e484963aaf

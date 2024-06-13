@@ -870,7 +870,7 @@ version = "17.4.0+2"
 # ╟─e5ab7623-f708-489b-a130-8e33eb985aa6
 # ╟─d60e27a0-d518-475d-8a09-427fb42fd4c1
 # ╟─9cb4a573-a745-4314-a1ac-76ce01b9af55
-# ╟─ec3c88ba-972f-4b0f-ac25-75e779b1c33a
+# ╠═ec3c88ba-972f-4b0f-ac25-75e779b1c33a
 # ╟─f97a8555-086b-48f6-950e-fc583d0afa11
 # ╟─900cc195-8c5a-47c0-a48b-e04baa15fc61
 # ╟─d005be58-3be7-4b2a-a3f7-edf0fd095259
@@ -882,7 +882,7 @@ version = "17.4.0+2"
 # ╟─88704126-cdc6-486f-bd68-e8fee558eac4
 # ╟─9549fdb3-af94-4b3f-ba22-043c4e8be52e
 # ╠═f1d6ee2f-01d2-4b79-b326-cb202c58d74d
-# ╟─3eeeffc0-3ba5-427b-b75b-0bf5f6286c9b
+# ╠═3eeeffc0-3ba5-427b-b75b-0bf5f6286c9b
 # ╟─00055125-7c7e-459e-b79e-f22e3d74866d
 # ╟─9b8cf4cc-39ed-461c-8cea-7b2cdd92f0f3
 # ╟─45e2a04d-1414-4168-bca8-2ea557fb1cab

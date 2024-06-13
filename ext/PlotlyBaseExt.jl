@@ -57,9 +57,9 @@ This function takes an AbstractVector of SVector{2, <:Real} of LAT-LON coordinat
 function GeoGrids.plot_geo(points::Array{Point2}; title="Point Position GEO Map", camera::Symbol=:twodim, kwargs_scatter=(;), kwargs_layout=(;))
 	# Markers for the points
 	# Take an array of SVector
-	points = scattergeo(
-		lat = map(x -> first(x.coords), points),
-		lon = map(x -> last(x.coords), points),
+	scatterpoints = scattergeo(
+		lat = map(x -> first(x.coords), points[:]),
+		lon = map(x -> last(x.coords), points[:]),
 		mode = "markers",
 		marker_size = 5,
 		kwargs_scatter...
@@ -101,8 +101,7 @@ function GeoGrids.plot_geo(points::Array{Point2}; title="Point Position GEO Map"
 		kwargs_layout...
 	)
 	
-	# Plot([points],layout)
-	plotly_plot([points],layout)
+	plotly_plot([scatterpoints],layout)
 end
 
 GeoGrids.plot_geo(points; kwargs...) = GeoGrids.plot_geo(_transform_point_plot(points); kwargs...)

@@ -1,5 +1,5 @@
 """
-	meshgrid_geo(gridRes)
+	meshgrid_geo(xRes::ValidAngle; yRes::ValidAngle=xRes, height=nothing, unit=:rad, type=:lla)
 
 This function call meshgrid with the specified resolution given as input and return the LAT, LON meshgrid_geo (LAT=y, LON=x).
 The meshgrid_geo cover all the globe with LAT=-90:90 and LON=-180:180

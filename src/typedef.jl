@@ -57,7 +57,7 @@ mutable struct PolyRegion
             points = map(x -> x.coords, domain)
             _polyarea_from_vertex(points)
         elseif typeof(domain) == Vector{LLA}
-            points = map(x -> (x.lon, x.lat), domain)
+            points = map(x -> (x.lat, x.lon), domain)
             _polyarea_from_vertex(points)
         else
             error("The input domain do not match the expected format...")
@@ -65,33 +65,4 @@ mutable struct PolyRegion
 
         new(regionName, _domain)
     end
-end
-
-## Aux Functions
-"""
-    CountriesBorders.extract_countries(r::GeoRegion)
-
-Extracts the countries from a given region.
-
-It first gets the field names of the `GeoRegion` type, excluding the `:regionName`, then maps these field names to their corresponding values in the `GeoRegion` instance `r`, creating a collection of pairs. It filters out any pairs where the value is empty. It converts this collection of pairs into a `NamedTuple`, finally, it calls `CountriesBorders.extract_countries` with the `NamedTuple` as keyword arguments.
-
-This function is an overload of `CountriesBorders.extract_countries` that takes a `GeoRegion` object as input. It extracts the countries from the given region and returns them.
-
-## Arguments
-- `r::GeoRegion`: The region from which to extract the countries. It should be an instance of the `GeoRegion` type.
-
-## Returns
-- The function returns the result of `CountriesBorders.extract_countries(;kwargs...)`.
-"""
-function CountriesBorders.extract_countries(r::GeoRegion)
-    # Overload of CountriesBorders.extract_countries taking GeoRegion as input
-    names = setdiff(fieldnames(GeoRegion), (:regionName,:domain))
-
-    all_pairs = map(names) do n
-        n => getfield(r,n)
-    end 
-    
-    kwargs = NamedTuple(filter(x -> !isempty(x[2]), all_pairs))
-    @info kwargs
-    CountriesBorders.extract_countries(;kwargs...)
 end
