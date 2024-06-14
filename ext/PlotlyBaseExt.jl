@@ -46,7 +46,8 @@ function GeoGrids.plot_unitarysphere(points_cart)
 end
 
 """
-	plot_geo(points; title="Point Position 3D Map", camera::Symbol=:twodim)
+	plot_geo(points::Array{Point2}; title="Point Position GEO Map", camera::Symbol=:twodim, kwargs_scatter=(;), kwargs_layout=(;))
+	plot_geo(points; kwargs...)
 
 This function takes an AbstractVector of SVector{2, <:Real} of LAT-LON coordinates (deg) and generates a plot on a world map projection using the PlotlyJS package.
 

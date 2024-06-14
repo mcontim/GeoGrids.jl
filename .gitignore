@@ -31,7 +31,7 @@ SatConstellationVisual/notebooks/INPUT/*
 SatConstellationVisual/notebooks/OUTPUT/*
 
 # Other Files
-*.png
+# *.png
 *.fig
 *.mat
 *.jld2

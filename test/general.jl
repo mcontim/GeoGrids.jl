@@ -7,8 +7,8 @@ using GeoGrids
 end
 
 @testset "Icogrid Functions" begin
-    @test _icogrid(100; coord=:cart) isa Vector{SVector{3, Float64}}
-    @test _icogrid(100; coord=:sphe) isa Vector{SVector{2, Float64}}
+    @test GeoGrids._icogrid(100; coord=:cart) isa Vector{SVector{3, Float64}}
+    @test GeoGrids._icogrid(100; coord=:sphe) isa Vector{SVector{2, Float64}}
     
     @test icogrid(N=100, height=0.0) isa Vector{LLA}
     @test icogrid(N=100, type=:point) isa Vector{Point2}
@@ -40,7 +40,7 @@ end
 
 @testset "Plots Plotly Base" begin
     using PlotlyBase
-    @test plot_unitarysphere(_icogrid(100; coord=:cart)) isa Plot
+    @test plot_unitarysphere(GeoGrids._icogrid(100; coord=:cart)) isa Plot
     @test plot_geo(icogrid(sepAng=deg2rad(5), type=:point)) isa Plot
     @test plot_geo(icogrid(sepAng=deg2rad(4), height=0.0); camera=:threedim) isa Plot
     @test plot_geo(meshgrid(deg2rad(5); type=:point)) isa Plot

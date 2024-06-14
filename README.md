@@ -22,24 +22,44 @@ Of these near-optimal solutions, one of the most common simple methods is one ba
 
 This method of points distribution is **Area Preserving** but not distance preserving.
 
-As convention it has been considered: `LAT=x`, `LON=y` for the output. The output can be returned either in `:deg` or `:rad` units when the selected output type is `Point2`.
+When the selected output type is `Point2`, as convention it has been considered: `LAT=x`, `LON=y` and the output can be returned either in `:deg` or `:rad` units.
+
+<p align="center">
+  <img src="./docs/img/ico.png" alt="Icogrid"/>
+</p>
 
 ---
 
-	meshgrid(gridRes; unit = :rad)
+	meshgrid(xRes::ValidAngle; yRes::ValidAngle=xRes, height=nothing, unit=:rad, type=:lla)
 
-This function creates a 2D Global grid of coordinates with the specified resolution (`gridRes`) given as input and return the `LAT`, `LON` meshgrid similar to the namesake MATLAB function.
+This function returns a `Matrix` of `Point2` or `LLA` elements representing a 2D Global grid of coordinates with the specified resolutions `xRes` and `yRes` respectively for x and y axes. This function return the `LAT`, `LON` meshgrid similar to the namesake MATLAB function.
 
-As convention it has been considered: `LAT=y`, `LON=x`.
+When the selected output type is `Point2`, as convention it has been considered: `LAT=x`, `LON=y` and the output can be returned either in `:deg` or `:rad` units.
 
-The output is returned in the form of a vector of SVector{2}(lon,lat) (`vec`) and a tuple of two 2D grids (`grid`). The output can be returned either in `:deg` or `:rad` units.
+<p align="center">
+  <img src="./docs/img/mesh.png" alt="Meshgrid"/>
+</p>
+
+---
+
+in_region
+
+---
+
+filter_points
+
+---
+
+extract_countries
+
+---
 
 ## Useful Internal Functions
 
     _meshgrid(xin,yin)
 
 Create a 2D grid of coordinates using the input vectors `xin` and `yin`.
-The outputs in the form of `SVector(xout,yout)` and `grid=(xout,yout)` contain all possible combinations of the elements of `xin` and `yin`, with `xout` corresponding to the horizontal coordinates and `yout` corresponding to the vertical coordinates.
+The output, in the form of `SVector(xout,yout)`, contains all possible combinations of the elements of `xin` and `yin`, with `xout` corresponding to the horizontal coordinates and `yout` corresponding to the vertical coordinates.
 
 ---
 
@@ -51,10 +71,8 @@ The output can be returned as a `SVector` of either, spherical or cartesian coor
 
 ---
 
-icogrid, _icogrid, meshgrid, _meshgrid, 
-extract_countries, in_region, filter_points
+	plot_geo(points; title="Point Position GEO Map", camera::Symbol=:twodim, kwargs_scatter=(;), kwargs_layout=(;))
 
+This function takes an `Array` of `Union{Point2,LLA,AbstractVector,Tuple}` of LAT-LON coordinates and generates a plot on a world map projection using the PlotlyJS package.
 
-    plot_geo(points_latlon; title="Point Position 3D Map", camera::Symbol=:twodim)
-
-This function takes an AbstractVector of SVector{2, <:Real} of LAT-LON coordinates (deg) and generates a plot on a world map projection using the PlotlyJS package.
+The input is checked and the angles converted in deg if passed as `Unitful` and interpreted as rad if passed as `Real` values.

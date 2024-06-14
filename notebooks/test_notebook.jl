@@ -48,7 +48,10 @@ md"""
 """
 
 # ╔═╡ c9738f80-0297-46c4-b5ee-1a64ced99296
-grid=meshgrid(deg2rad(.5))
+grid=icogrid(sepAng=deg2rad(5))
+
+# ╔═╡ 992a4e72-4465-4cd4-9187-b4b6704c13a4
+plot_geo(grid; title="Icogrid")
 
 # ╔═╡ dcac9772-2c2c-431b-a568-ac91d483e470
 poly = PolyRegion(regionName="POLY", domain=[LLA(10°,-5°,0), LLA(10°,15°,0), LLA(27°,15°,0), LLA(27°,-5°,0), LLA(10°,-5°,0)])
@@ -683,6 +686,7 @@ version = "17.4.0+2"
 # ╠═2f988a76-9c84-432b-b69f-dbe06f32ea35
 # ╟─0e205c7f-43ea-4612-830c-d930e8e4522f
 # ╠═86362c31-7407-4c33-b24d-5e10a2a0858f
+# ╠═992a4e72-4465-4cd4-9187-b4b6704c13a4
 # ╠═c9738f80-0297-46c4-b5ee-1a64ced99296
 # ╠═2a77c856-6155-4759-bf50-aa3169d7494d
 # ╠═75d1571e-2806-4613-b08f-13f8e069e26e
