@@ -58,8 +58,8 @@ function GeoGrids.plot_geo(points::Array{Point2}; title="Point Position GEO Map"
 	# Markers for the points
 	# Take an array of SVector
 	scatterpoints = scattergeo(
-		lat = map(x -> first(x.coords), points[:]),
-		lon = map(x -> last(x.coords), points[:]),
+		lat = map(x -> first(x.coords), points[:]), # Vectorize such to be sure to avoid matrices.
+		lon = map(x -> last(x.coords), points[:]), # Vectorize such to be sure to avoid matrices.
 		mode = "markers",
 		marker_size = 5,
 		kwargs_scatter...
@@ -105,32 +105,3 @@ function GeoGrids.plot_geo(points::Array{Point2}; title="Point Position GEO Map"
 end
 
 GeoGrids.plot_geo(points; kwargs...) = GeoGrids.plot_geo(GeoGrids._check_geopoint(points); kwargs...)
-
-"""
-    _transform_point_plot(p::Union{AbstractVector, Tuple, LLA})
-	_transform_point_plot(p::LLA)
-	_transform_point_plot(points::Union{Vector(AbstractVector), Vector{Tuple}, Vector{LLA}})
-
-Transforms a point `p` of different types to a Point2gg.
-
-# Arguments
-- `p::Union{AbstractVector, Tuple, LLA}`: A point in 2D space or a latitude-longitude-altitude (LLA) coordinate.
-
-# Returns
-- `Point2`: A 2D point with the first and last elements of `p` as its coordinates.
-"""
-function _transform_point_plot(p::Union{AbstractVector, Tuple}) 
-	# Input Validation
-	length(p) != 2 && error("The input must be a 2D point...")
-    _check_angle(first(p); limit = π/2)
-    _check_angle(last(p); limit = π)
-
-	lat = to_radians(first(p)) |> rad2deg
-	lon = to_radians(last(p)) |> rad2deg
-    
-	return Point2(lat, lon)
-end
-_transform_point_plot(p::LLA) = Point2(rad2deg(p.lat), rad2deg(p.lon))
-_transform_point_plot(points::Array{<:Union{AbstractVector,Tuple,LLA}}) = map(x -> _transform_point_plot(x), points)
-
-end

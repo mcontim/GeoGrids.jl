@@ -26,8 +26,9 @@ end
 
 """
     _check_geopoint(p::Union{AbstractVector, Point2, Tuple}; rev=false) -> Point2
-    _check_geopoint(p::Point2; rev=false) -> Point2
-    _check_geopoint(p::LLA; rev=false) -> Point2
+    _check_geopoint(p::Point2; kwargs...) -> Point2
+    _check_geopoint(p::LLA; kwargs...) -> Point2
+    _check_geopoint(points::Array{<:Union{AbstractVector,Tuple,LLA}}; kwargs...) -> Array{Point2}
 
 Checks the validity of the given point `p` in terms of latitude (LAT) and longitude (LON) values. The function expects the input to be in radians and within the valid range for LAT and LON. If you want to pass numbers in degrees, consider using `°` from Unitful (Also re-exported by GeoGrids) by doing `x * °`.
 
@@ -49,6 +50,8 @@ function _check_geopoint(p::Union{AbstractVector, Tuple}; rev=false)
 end
 _check_geopoint(p::Point2; kwargs...) = _check_geopoint(p.coords; kwargs...)
 _check_geopoint(p::LLA; kwargs...) = _check_geopoint((p.lat, p.lon); kwargs...)
+_check_geopoint(points::Array{<:Union{AbstractVector,Tuple,LLA}}; kwargs...) = map(x -> _check_geopoint(x, kwargs...), points)
+
 
 ## Aux Functions
 """
