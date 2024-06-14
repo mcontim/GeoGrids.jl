@@ -57,7 +57,7 @@ end
     p2 = [Point2(10°,-5°), Point2(10°,15°), Point2(27°,15°), Point2(27°,-5°), Point2(10°,-5°)]
     p3 = [(10°,-5°), (10°,15°), (27°,15°), (27°,-5°), (10°,-5°)]
 
-    comp = map(x -> rad2deg.(x.coords), p2)
+    comp = map(x -> Point2(rad2deg.(x.coords)), p2)
 
     @test GeoGrids._check_geopoint(p1) == comp
     @test GeoGrids._check_geopoint(p3) == comp

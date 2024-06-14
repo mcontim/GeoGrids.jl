@@ -6,13 +6,13 @@
 [![Coverage](https://gitlab.esa.int/tec-esc-tools/GeoGrids.jl/badges/main/coverage.svg)](https://gitlab.esa.int/tec-esc-tools/GeoGrids.jl/commits/main)
 [![Aqua QA](https://raw.githubusercontent.com/JuliaTesting/Aqua.jl/master/badge.svg)](https://github.com/JuliaTesting/Aqua.jl)
 
-This is a package containing functions for Geographical Grids generation for example for terminals distribution for System Level Simulations.
+This is a package containing functions for Geographical Grids generation for example for terminals distribution for System Level Simulations. **In the next version support for Geo Surface tesselation for cell grid layout will be supported**.
 
 ## Exported Functions
 
-    icogrid_geo(; N = nothing, sepAng = nothing, unit = :rad)
+    icogrid_geo(;N=nothing, sepAng=nothing, unit=:rad, height=nothing, type=:lla)
 
-This function returns an Array of `SVector(lon,lat)`, as well as a `Tuple(x=lon,y=lat)`, of LAT, LON values for a `N` points Global grid built with the **Fibonacci Spiral** method.
+This function returns a `Vector` of `Point2` or `LLA` elements, for a `N` points Global grid built with the **Fibonacci Spiral** method.
 
 The grid can be generated starting fom the number of point requested on the grid (`N`) or by the minimum separation angle requested for the points (`sepAng`).
 
@@ -35,7 +35,6 @@ As convention it has been considered: `LAT=y`, `LON=x`.
 
 The output is returned in the form of a vector of SVector{2}(lon,lat) (`vec`) and a tuple of two 2D grids (`grid`). The output can be returned either in `:deg` or `:rad` units.
 
-## Useful Internal Functions
 
     meshgrid(xin,yin)
 
@@ -49,6 +48,11 @@ The outputs in the form of `SVector(xout,yout)` and `grid=(xout,yout)` contain a
 This function generates `N` uniformly distributed points on the surface of a unitary sphere using the classic Fibonacci Spiral
 
 ---
+
+icogrid_geo, icogrid, meshgrid_geo, meshgrid, 
+extract_countries, in_region, filter_points
+
+## Useful Internal Functions
 
     plot_geo(points_latlon; title="Point Position 3D Map", camera::Symbol=:twodim)
 

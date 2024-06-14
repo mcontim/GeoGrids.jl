@@ -1,5 +1,5 @@
 """
-	icogrid_geo(;N=nothing, sepAng=nothing)
+	icogrid_geo(;N=nothing, sepAng=nothing, unit=:rad, height=nothing, type=:lla)
 
 This function returns a vector `Nx2` of LAT, LON values for a `N` points grid built with the Fibonacci Spiral method.
 
