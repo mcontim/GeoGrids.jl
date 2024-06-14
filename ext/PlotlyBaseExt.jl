@@ -104,7 +104,7 @@ function GeoGrids.plot_geo(points::Array{Point2}; title="Point Position GEO Map"
 	plotly_plot([scatterpoints],layout)
 end
 
-GeoGrids.plot_geo(points; kwargs...) = GeoGrids.plot_geo(_transform_point_plot(points); kwargs...)
+GeoGrids.plot_geo(points; kwargs...) = GeoGrids.plot_geo(GeoGrids._check_geopoint(points); kwargs...)
 
 """
     _transform_point_plot(p::Union{AbstractVector, Tuple, LLA})

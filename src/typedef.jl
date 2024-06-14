@@ -36,7 +36,7 @@ mutable struct PolyRegion
     function PolyRegion(;regionName::String="region_name", domain=nothing)
         function _polyarea_from_vertex(domainGen)
             points = map(domainGen) do p
-                _check_geopoint(p)                
+                _check_geopoint(p; rev=true)                
             end
             # Check if the first and last points are the same to create a valid polygon
             if first(points) != last(points)

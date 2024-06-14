@@ -4,5 +4,5 @@ using Aqua
 
 # Aqua.test_all(GeoGrids; ambiguities = false) 
 # Aqua.test_ambiguities(GeoGrids)
-# @safetestset "General Tests" begin include("general.jl") end
-@safetestset "General Tests" begin include("filtering.jl") end
+@safetestset "General" begin include("general.jl") end
+# @safetestset "Filtering Functions" begin include("filtering.jl") end

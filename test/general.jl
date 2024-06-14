@@ -47,8 +47,9 @@ end
     @test plot_geo(meshgrid_geo(deg2rad(5); height=0.0); camera=:threedim) isa Plot
 end
 
-
-# @testset "Helper Functions" begin
-#     # Test all error messages and wrong input utilisation
-#     # _check_geopoint(p::Union{AbstractVector, Tuple}) 
-# end
+@testset "Helper Functions" begin
+    @test_throws "The input must be a 2D point..." _check_geopoint((0.0, 0.0, 0.0))
+    @test_throws "The input must be a 2D point..." _check_geopoint([0.0, 0.0, 0.0])
+    @test_throws "LAT provided as numbers must be expressed in radians and satisfy -π/2 ≤ x ≤ π/2. Consider using `°` from `Unitful` (Also re-exported by GeoGrids) if you want to pass numbers in degrees, by doing `x * °`." _check_geopoint([pi/2+0.01, 0.0]; rev=true)
+    @test_throws "LON provided as numbers must be expressed in radians and satisfy -π ≤ x ≤ π. Consider using `°` from `Unitful` (Also re-exported by GeoGrids) if you want to pass numbers in degrees, by doing `x * °`." _check_geopoint([0.0, pi+0.01])
+end

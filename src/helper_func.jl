@@ -25,9 +25,9 @@ Consider using `°` from Unitful (Also re-exported by TelecomUtils) if you want 
 end
 
 """
-    _check_geopoint(p::Union{AbstractVector, Point2, Tuple}) -> Point2(lon,lat)
-    _check_geopoint(p::Point2) -> Point2(lon,lat)
-    _check_geopoint(p::LLA) -> Point2(lon,lat)
+    _check_geopoint(p::Union{AbstractVector, Point2, Tuple}; rev=false) -> Point2
+    _check_geopoint(p::Point2; rev=false) -> Point2
+    _check_geopoint(p::LLA; rev=false) -> Point2
 
 Checks the validity of the given point `p` in terms of latitude (LAT) and longitude (LON) values. The function expects the input to be in radians and within the valid range for LAT and LON. If you want to pass numbers in degrees, consider using `°` from Unitful (Also re-exported by GeoGrids) by doing `x * °`.
 
@@ -37,7 +37,7 @@ Checks the validity of the given point `p` in terms of latitude (LAT) and longit
 ## Returns
 - A `Point2` with the longitude (LON) in first position and latitude (LAT) value in second position, converted to radians.
 """
-function _check_geopoint(p::Union{AbstractVector, Tuple})
+function _check_geopoint(p::Union{AbstractVector, Tuple}; rev=false)
     length(p) != 2 && error("The input must be a 2D point...")
     _check_angle(first(p); limit=π/2, msg="LAT provided as numbers must be expressed in radians and satisfy -π/2 ≤ x ≤ π/2. Consider using `°` from `Unitful` (Also re-exported by GeoGrids) if you want to pass numbers in degrees, by doing `x * °`.")
     _check_angle(last(p); limit=π, msg="LON provided as numbers must be expressed in radians and satisfy -π ≤ x ≤ π. Consider using `°` from `Unitful` (Also re-exported by GeoGrids) if you want to pass numbers in degrees, by doing `x * °`.")
@@ -45,10 +45,10 @@ function _check_geopoint(p::Union{AbstractVector, Tuple})
     lat = to_radians(first(p)) |> rad2deg
 	lon = to_radians(last(p)) |> rad2deg
 
-    return Point2(lon, lat) # Countries borders is in degrees (for consistency also PolyArea points are stored in degrees)
+    return rev ? Point2(lon, lat) : Point2(lat, lon) # Countries borders is in degrees (for consistency also PolyArea points are stored in degrees)
 end
-_check_geopoint(p::Point2) = _check_geopoint(p.coords)
-_check_geopoint(p::LLA) = Point2((rad2deg(p.lon), rad2deg(p.lat))) # The values are in radians and checked in LLA() constructor.
+_check_geopoint(p::Point2; kwargs...) = _check_geopoint(p.coords; kwargs...)
+_check_geopoint(p::LLA; kwargs...) = _check_geopoint((p.lat, p.lon); kwargs...)
 
 ## Aux Functions
 """

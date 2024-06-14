@@ -18,7 +18,7 @@ The function returns a boolean value: `true` if the point falls inside the `Mesh
 """
 function in_region(p::Union{LLA, Point2, AbstractVector, Tuple}, domain::Union{GeometrySet, PolyArea})
     # Prepare the input.
-    _p = _check_geopoint(p)
+    _p = _check_geopoint(p; rev=true)
     # Check if the point is inside the domain, using a Predicates from Meshes instead of an ExactPredicates.
     # There is a certain error margin for the point being exaclty inside, on the border or slightly outside. 
     # However, for the purpose of checking a point belonging to a certain geographical region, this margin 
