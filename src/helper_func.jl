@@ -34,9 +34,10 @@ Checks the validity of the given point `p` in terms of latitude (LAT) and longit
 
 ## Arguments
 - `p`: A tuple representing a point on the globe where the first element is the latitude (LAT) and the second element is the longitude (LON).
+- `rev`: If `true`, the function will return the point in the reverse order. Defaults to `false`.
 
 ## Returns
-- A `Point2` with the longitude (LON) in first position and latitude (LAT) value in second position, converted to radians.
+- A `Point2` converted to degrees.
 """
 function _check_geopoint(p::Union{AbstractVector, Tuple}; rev=false)
     length(p) != 2 && error("The input must be a 2D point...")
@@ -50,7 +51,7 @@ function _check_geopoint(p::Union{AbstractVector, Tuple}; rev=false)
 end
 _check_geopoint(p::Point2; kwargs...) = _check_geopoint(p.coords; kwargs...)
 _check_geopoint(p::LLA; kwargs...) = _check_geopoint((p.lat, p.lon); kwargs...)
-_check_geopoint(points::Array{<:Union{AbstractVector,Tuple,LLA}}; kwargs...) = map(x -> _check_geopoint(x, kwargs...), points)
+_check_geopoint(points::Array{<:Union{AbstractVector,Tuple,LLA,Point2}}; kwargs...) = map(x -> _check_geopoint(x, kwargs...), points)
 
 
 ## Aux Functions

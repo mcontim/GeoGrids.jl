@@ -48,8 +48,18 @@ end
 end
 
 @testset "Helper Functions" begin
-    @test_throws "The input must be a 2D point..." _check_geopoint((0.0, 0.0, 0.0))
-    @test_throws "The input must be a 2D point..." _check_geopoint([0.0, 0.0, 0.0])
-    @test_throws "LAT provided as numbers must be expressed in radians and satisfy -π/2 ≤ x ≤ π/2. Consider using `°` from `Unitful` (Also re-exported by GeoGrids) if you want to pass numbers in degrees, by doing `x * °`." _check_geopoint([pi/2+0.01, 0.0]; rev=true)
-    @test_throws "LON provided as numbers must be expressed in radians and satisfy -π ≤ x ≤ π. Consider using `°` from `Unitful` (Also re-exported by GeoGrids) if you want to pass numbers in degrees, by doing `x * °`." _check_geopoint([0.0, pi+0.01])
+    @test_throws "The input must be a 2D point..." GeoGrids._check_geopoint((0.0, 0.0, 0.0))
+    @test_throws "The input must be a 2D point..." GeoGrids._check_geopoint([0.0, 0.0, 0.0])
+    @test_throws "LAT provided as numbers must be expressed in radians and satisfy -π/2 ≤ x ≤ π/2. Consider using `°` from `Unitful` (Also re-exported by GeoGrids) if you want to pass numbers in degrees, by doing `x * °`." GeoGrids._check_geopoint([pi/2+0.01, 0.0]; rev=true)
+    @test_throws "LON provided as numbers must be expressed in radians and satisfy -π ≤ x ≤ π. Consider using `°` from `Unitful` (Also re-exported by GeoGrids) if you want to pass numbers in degrees, by doing `x * °`." GeoGrids._check_geopoint([0.0, pi+0.01])
+
+    p1 = [LLA(10°,-5°,0), LLA(10°,15°,0), LLA(27°,15°,0), LLA(27°,-5°,0), LLA(10°,-5°,0)]
+    p2 = [Point2(10°,-5°), Point2(10°,15°), Point2(27°,15°), Point2(27°,-5°), Point2(10°,-5°)]
+    p3 = [(10°,-5°), (10°,15°), (27°,15°), (27°,-5°), (10°,-5°)]
+
+    comp = map(x -> rad2deg.(x.coords), p2)
+
+    @test GeoGrids._check_geopoint(p1) == comp
+    @test GeoGrids._check_geopoint(p3) == comp
+    @test GeoGrids._check_geopoint(p2) == comp
 end

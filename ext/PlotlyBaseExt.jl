@@ -1,4 +1,5 @@
 module PlotlyBaseExt
+
 using PlotlyExtensionsHelper
 using PlotlyBase
 
@@ -105,3 +106,5 @@ function GeoGrids.plot_geo(points::Array{Point2}; title="Point Position GEO Map"
 end
 
 GeoGrids.plot_geo(points; kwargs...) = GeoGrids.plot_geo(GeoGrids._check_geopoint(points); kwargs...)
+
+end # module PlotlyBaseExt
