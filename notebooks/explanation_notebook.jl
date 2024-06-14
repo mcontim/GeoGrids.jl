@@ -70,7 +70,7 @@ md"""
 
 # ╔═╡ c63cac75-8eb1-47d2-88ef-7fbe418ae57b
 md"""
-The function ```icogrid()``` uses calssical implementation of the Fibonacci Sphere.
+The function ```_icogrid()``` uses calssical implementation of the Fibonacci Sphere.
 """
 
 # ╔═╡ d91d92b4-0e7c-40fc-97d3-4ae6f731d121
@@ -211,10 +211,10 @@ md"""
 """
 
 # ╔═╡ 32e67099-d63f-4319-8f74-95e8c74d6e89
-plot_geo(map(x -> rad2deg.(x), icogrid_geo(sepAng=deg2rad(fibRes))))
+plot_geo(map(x -> rad2deg.(x), icogrid(sepAng=deg2rad(fibRes))))
 
 # ╔═╡ 857cec97-06d8-4d48-b335-8f358b65b39c
-plot_geo(map(x -> rad2deg.(x), icogrid_geo(sepAng=deg2rad(fibRes)));camera=:threedim)
+plot_geo(map(x -> rad2deg.(x), icogrid(sepAng=deg2rad(fibRes)));camera=:threedim)
 
 # ╔═╡ 6191b1d1-2b46-410d-96a4-5c9e9835283a
 md"""
@@ -277,7 +277,7 @@ tableVal_bond = @bind tableVal StructBond(TABLE; description = "Grid Parameters"
 end
 
 # ╔═╡ 173eb8a1-c2bb-4c73-8345-6b9f0f5b7d90
-points1 = icogrid(tableVal.n; coord=:cart)
+points1 = _icogrid(tableVal.n; coord=:cart)
 
 # ╔═╡ 256e751b-d868-4b41-9f94-e54672a3f571
 # plot() is used to wrap the Plot() output for a proper visualization. PlutoPlotly or PlutoJS are required in the notebook
@@ -294,27 +294,27 @@ plot_unitarysphere(fibonaccisphere_optimization1(tableVal.n))
 plot_unitarysphere(fibonaccisphere_alternative1(tableVal.n))
 
 # ╔═╡ ec3c88ba-972f-4b0f-ac25-75e779b1c33a
-plot_geo(icogrid_geo(N=tableVal.n;unit=:deg))
+plot_geo(icogrid(N=tableVal.n;unit=:deg))
 
 # ╔═╡ f97a8555-086b-48f6-950e-fc583d0afa11
-plot_geo(icogrid_geo(N=tableVal.n;unit=:deg);camera=:threedim)
+plot_geo(icogrid(N=tableVal.n;unit=:deg);camera=:threedim)
 
 # ╔═╡ 900cc195-8c5a-47c0-a48b-e04baa15fc61
 # Check for the growing of points in Fibonacci spiral
-plot_geo(icogrid_geo(N=tableVal.n;unit=:deg)[1:50])
+plot_geo(icogrid(N=tableVal.n;unit=:deg)[1:50])
 
 # ╔═╡ d005be58-3be7-4b2a-a3f7-edf0fd095259
 # Check for the growing of points in Fibonacci spiral
-plot_geo(icogrid_geo(N=tableVal.n;unit=:deg)[1:50];camera=:threedim)
+plot_geo(icogrid(N=tableVal.n;unit=:deg)[1:50];camera=:threedim)
 
 # ╔═╡ 6b1c8079-bab5-4951-b564-500bba378781
-plot_geo(icogrid_geo(sepAng=deg2rad(tableVal.ang);unit=:deg))
+plot_geo(icogrid(sepAng=deg2rad(tableVal.ang);unit=:deg))
 
 # ╔═╡ 88704126-cdc6-486f-bd68-e8fee558eac4
-plot_geo(icogrid_geo(sepAng=deg2rad(tableVal.ang);unit=:deg);camera=:threedim)
+plot_geo(icogrid(sepAng=deg2rad(tableVal.ang);unit=:deg);camera=:threedim)
 
 # ╔═╡ f1d6ee2f-01d2-4b79-b326-cb202c58d74d
-meshGrid = meshgrid_geo(deg2rad(tableVal.ang); unit=:deg)
+meshGrid = meshgrid(deg2rad(tableVal.ang); unit=:deg)
 
 # ╔═╡ 3eeeffc0-3ba5-427b-b75b-0bf5f6286c9b
 plot_geo(vec(meshGrid))
@@ -323,10 +323,10 @@ plot_geo(vec(meshGrid))
 plot_geo(vec(meshGrid); camera=:threedim)
 
 # ╔═╡ 06a5260c-7d8c-42ad-895a-79f90df4040c
-icogrid_geo(N=tableVal.n, unit=:deg)
+icogrid(N=tableVal.n, unit=:deg)
 
 # ╔═╡ 4cb5958e-3d18-40ff-9100-42592e5ad1de
-meshgrid_geo(deg2rad(tableVal.ang); unit=:deg)
+meshgrid(deg2rad(tableVal.ang); unit=:deg)
 
 # ╔═╡ 8ed3bf0f-534e-4b12-a905-2b25b8c8e13a
 BondTable([

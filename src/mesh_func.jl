@@ -1,12 +1,12 @@
 """
-	meshgrid_geo(xRes::ValidAngle; yRes::ValidAngle=xRes, height=nothing, unit=:rad, type=:lla)
+	meshgrid(xRes::ValidAngle; yRes::ValidAngle=xRes, height=nothing, unit=:rad, type=:lla)
 
-This function call meshgrid with the specified resolution given as input and return the LAT, LON meshgrid_geo (LAT=y, LON=x).
-The meshgrid_geo cover all the globe with LAT=-90:90 and LON=-180:180
+This function call meshgrid with the specified resolution given as input and return the LAT, LON meshgrid (LAT=y, LON=x).
+The meshgrid cover all the globe with LAT=-90:90 and LON=-180:180
 
 ## Arguments
-- `xRes`: resolution of the x axis in meshgrid_geo in `ValidAngle`. 
-- `yRes`: resolution of the y axis in meshgrid_geo in `ValidAngle`. 
+- `xRes`: resolution of the x axis in meshgrid in `ValidAngle`. 
+- `yRes`: resolution of the y axis in meshgrid in `ValidAngle`. 
 - `unit`: `:rad` or `:deg`
 - `type`: `:lla` or `:point`. Output type either `LLA` or `Point2`
 - `height`: the point altitude in case of LLA type
@@ -14,7 +14,7 @@ The meshgrid_geo cover all the globe with LAT=-90:90 and LON=-180:180
 ## Output
 - `out`: Matrix{Union{LLA,Point2}}, each element of the matrix is either a `LLA` or `Point2`. The order of the elements is LAT, LON.
 """
-function meshgrid_geo(xRes::ValidAngle; yRes::ValidAngle=xRes, height=nothing, unit=:rad, type=:lla)
+function meshgrid(xRes::ValidAngle; yRes::ValidAngle=xRes, height=nothing, unit=:rad, type=:lla)
 	# Input Validation
 	_xRes = let
 		_check_angle(xRes; limit = π, msg = "Resolution of x is too large, it must be smaller than π...")
@@ -36,7 +36,7 @@ function meshgrid_geo(xRes::ValidAngle; yRes::ValidAngle=xRes, height=nothing, u
 	end
 
 	# Create meshgrid
-	mat = meshgrid(-π/2:_xRes:π/2, -π:_yRes:(π-_yRes+1e-10))
+	mat = _meshgrid(-π/2:_xRes:π/2, -π:_yRes:(π-_yRes+1e-10))
 	
 	# Unit Conversion
 	out = if type == :lla
@@ -63,7 +63,7 @@ function meshgrid_geo(xRes::ValidAngle; yRes::ValidAngle=xRes, height=nothing, u
 end
 
 """
-	meshgrid(xin::AbstractVector, yin::AbstractVector) -> Matrix{SVector{2,Float64}}
+	_meshgrid(xin::AbstractVector, yin::AbstractVector) -> Matrix{SVector{2,Float64}}
 
 Create a 2D grid of coordinates using the input vectors `xin` and `yin`.
 The outputs contain all possible combinations of the elements of `xin` and `yin`, with `xout` corresponding to the horizontal coordinates and `yout` corresponding to the vertical coordinates.
@@ -73,9 +73,9 @@ The outputs contain all possible combinations of the elements of `xin` and `yin`
 - `yin::AbstractVector`: 1D input array of vertical coordinates.
 
 ## Output
-- Matrix{SVector{2,Float64}}, each element of the matrix can be considered as (lat, lon) if used by `meshgrid_geo`.
+- Matrix{SVector{2,Float64}}, each element of the matrix can be considered as (lat, lon) if used by `meshgrid`.
 """
-function meshgrid(xin::AbstractVector, yin::AbstractVector)
+function _meshgrid(xin::AbstractVector, yin::AbstractVector)
 	# Compact writing using SA convenience constructor for StaticArrays and Comprehensions 
 	return [SA_F64[x,y] for x in xin, y in yin]
 	

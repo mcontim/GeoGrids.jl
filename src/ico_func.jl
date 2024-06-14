@@ -1,5 +1,5 @@
 """
-	icogrid_geo(;N=nothing, sepAng=nothing, unit=:rad, height=nothing, type=:lla)
+	icogrid(;N=nothing, sepAng=nothing, unit=:rad, height=nothing, type=:lla)
 
 This function returns a vector `Nx2` of LAT, LON values for a `N` points grid built with the Fibonacci Spiral method.
 
@@ -13,9 +13,9 @@ This function returns a vector `Nx2` of LAT, LON values for a `N` points grid bu
 ## Output:
 - `out`: Matrix{Union{LLA,Point2}}, each element of the matrix is either a `LLA` or `Point2`. The order of the elements is LAT, LON.
 """
-function icogrid_geo(;N=nothing, sepAng=nothing, unit=:rad, height=nothing, type=:lla)	
+function icogrid(;N=nothing, sepAng=nothing, unit=:rad, height=nothing, type=:lla)	
 	if isnothing(sepAng) && !isnothing(N)
-		vec = icogrid(N; coord=:sphe)
+		vec = _icogrid(N; coord=:sphe)
 	elseif !isnothing(sepAng) && isnothing(N)
 		# Input Validation, sepAng must be in radians
 		_sepAng = let
@@ -28,7 +28,7 @@ function icogrid_geo(;N=nothing, sepAng=nothing, unit=:rad, height=nothing, type
 			end	
 		end
 		N,_ = _points_required_for_separation_angle(_sepAng)
-		vec = icogrid(N; coord=:sphe)
+		vec = _icogrid(N; coord=:sphe)
 	else
 		error("Input one argument between N and sepAng...")
 	end
@@ -58,7 +58,7 @@ function icogrid_geo(;N=nothing, sepAng=nothing, unit=:rad, height=nothing, type
 end
 
 """
-	icogrid(N::Int)
+	_icogrid(N::Int)
 	
 This function generates `N` uniformly distributed points on the surface of a unitary sphere using the classic Fibonacci Spiral method as described in [1].
 Contrary to the Ichosahedral grid generation process, with the Fibonacci Spiral method it is possible to generate a grid of points uniformly distributed in the area for a generic `N` value. As a drawback, the structure of the points do not follow a "perfect simmetry" however, the density of points in the area is preserved quasi-constant.
@@ -74,15 +74,15 @@ Contrary to the Ichosahedral grid generation process, with the Fibonacci Spiral 
 ## References
 1. http://extremelearning.com.au/how-to-evenly-distribute-points-on-a-sphere-more-effectively-than-the-canonical-fibonacci-lattice/
 """
-function icogrid(N::Int; coord::Symbol=:sphe, spheRadius=1.0)
+function _icogrid(N::Int; coord::Symbol=:sphe, spheRadius=1.0)
 	pointsVec = if coord == :sphe # :sphe | :cart
 		map(0:N-1) do k
-			θ,ϕ = get_theta_phi(k, N)			
+			θ,ϕ = _get_theta_phi(k, N)			
 			SVector(π/2 - ϕ, rem2pi(θ, RoundNearest)) # wrap (lat,lon)
 		end
 	else
 		map(0:N-1) do k
-			θ,ϕ = get_theta_phi(k, N)
+			θ,ϕ = _get_theta_phi(k, N)
 			SVector(spheRadius.*sin(ϕ)*cos(θ), spheRadius.*sin(ϕ)*sin(θ), spheRadius.*cos(ϕ))
 		end
 	end
@@ -182,7 +182,7 @@ end
 """
 function _fibonaccisphere_classic_partial(N; spheRadius=1.0, pointsToCheck::Int=50)
 	points = map(0:min(pointsToCheck,N)-1) do k
-		θ,ϕ = get_theta_phi(k, N)
+		θ,ϕ = _get_theta_phi(k, N)
 		SVector(spheRadius.*sin(ϕ)*cos(θ), spheRadius.*sin(ϕ)*sin(θ), spheRadius.*cos(ϕ))
 	end
 
@@ -190,7 +190,7 @@ function _fibonaccisphere_classic_partial(N; spheRadius=1.0, pointsToCheck::Int=
 end
 
 # Helper Functions
-function get_theta_phi(k::Number, N::Number)
+function _get_theta_phi(k::Number, N::Number)
 	goldenRatio = (1 + sqrt(5))/2	
 	θ = 2π * k/goldenRatio # [0,2π] [LON]
 	ϕ = acos(1 - 2(k+0.5)/N) # [0,π] from North Pole [LAT]

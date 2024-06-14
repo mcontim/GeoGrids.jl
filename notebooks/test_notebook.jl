@@ -48,7 +48,7 @@ md"""
 """
 
 # ╔═╡ c9738f80-0297-46c4-b5ee-1a64ced99296
-grid=meshgrid_geo(deg2rad(.5))
+grid=meshgrid(deg2rad(.5))
 
 # ╔═╡ dcac9772-2c2c-431b-a568-ac91d483e470
 poly = PolyRegion(regionName="POLY", domain=[LLA(10°,-5°,0), LLA(10°,15°,0), LLA(27°,15°,0), LLA(27°,-5°,0), LLA(10°,-5°,0)])
@@ -93,7 +93,7 @@ abs(-93.2244°)
 
 
 # ╔═╡ 278fbecd-f240-4693-b65d-083b02aae797
-www=meshgrid_geo(1;unit=:deg)
+www=meshgrid(1;unit=:deg)
 
 # ╔═╡ 658a8bf3-452a-4748-a24d-023200586516
 a1=2.0
