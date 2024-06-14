@@ -47,7 +47,7 @@ md"""
 # Test
 """
 
-# ╔═╡ 6e3679c3-12fb-430c-b6c1-60a94019db6c
+# ╔═╡ dfbe0da8-da4f-49dd-8dea-45d4afde3a8a
 
 
 # ╔═╡ c9738f80-0297-46c4-b5ee-1a64ced99296
@@ -85,9 +85,6 @@ PolyRegion(domain=[(10°,-5°), (10°,15°), (27°,15°), (27°,-5°), (10°,-5�
 
 # ╔═╡ 1732096c-d89d-4c07-97e6-60973a6bbc1c
 [(10°,-5°), (10°,15°), (27°,15°), (27°,-5°), (10°,-5°)] isa Vector{Tuple}
-
-# ╔═╡ 2fe84091-4831-40af-a564-f67b17062732
-methods(_check_angle)
 
 # ╔═╡ 77a2eac3-c24b-4ab9-bf01-43d741674120
 abs(-93.2244°)
@@ -147,8 +144,8 @@ md"""
 ## GeoRegion
 """
 
-# ╔═╡ 40653a7f-bc4b-47f2-9006-6856bb89210e
-r = GeoRegion(;continent = "Europe", admin="Italy")
+# ╔═╡ 24dc6b9c-f2bc-4ea1-ad92-d3bf707caa1a
+extract_countries(r)==r.domain
 
 # ╔═╡ 9c977c07-ce0e-4c38-bcac-b2a83cfb3544
 GeoRegion(continent = "Europe", admin="Italy")
@@ -243,6 +240,15 @@ aaa.items[1].items[1].outer
 md"""
 # Packages
 """
+
+# ╔═╡ 924f327c-7fe0-4e2f-9122-cb8b1f3adda8
+r = GeoRegion(regionName="ITA", admin="Italy")
+
+# ╔═╡ 40653a7f-bc4b-47f2-9006-6856bb89210e
+# ╠═╡ disabled = true
+#=╠═╡
+r = GeoRegion(;continent = "Europe", admin="Italy")
+  ╠═╡ =#
 
 # ╔═╡ 00000000-0000-0000-0000-000000000001
 PLUTO_PROJECT_TOML_CONTENTS = """
@@ -688,7 +694,9 @@ version = "17.4.0+2"
 # ╠═282b928a-fc7d-4487-a056-6c2626cf7179
 # ╠═2f988a76-9c84-432b-b69f-dbe06f32ea35
 # ╟─0e205c7f-43ea-4612-830c-d930e8e4522f
-# ╠═6e3679c3-12fb-430c-b6c1-60a94019db6c
+# ╠═924f327c-7fe0-4e2f-9122-cb8b1f3adda8
+# ╠═24dc6b9c-f2bc-4ea1-ad92-d3bf707caa1a
+# ╠═dfbe0da8-da4f-49dd-8dea-45d4afde3a8a
 # ╠═86362c31-7407-4c33-b24d-5e10a2a0858f
 # ╠═992a4e72-4465-4cd4-9187-b4b6704c13a4
 # ╠═c9738f80-0297-46c4-b5ee-1a64ced99296
@@ -701,7 +709,6 @@ version = "17.4.0+2"
 # ╠═90fb35a5-51d3-4f1a-b140-c95eb0fbfa15
 # ╠═575501f7-50ea-450c-94ac-a1e484963aaf
 # ╠═1732096c-d89d-4c07-97e6-60973a6bbc1c
-# ╠═2fe84091-4831-40af-a564-f67b17062732
 # ╠═77a2eac3-c24b-4ab9-bf01-43d741674120
 # ╠═a32a1633-134f-4363-96b0-65d511142ec0
 # ╠═02348c26-d666-4da3-9390-edbd6ca87027

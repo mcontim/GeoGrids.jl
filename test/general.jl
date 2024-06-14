@@ -22,6 +22,8 @@ end
     @test_logs (:warn, "Height is ignored when type is set to :point...") icogrid(N=100, type=:point, height=0.0)
     @test_throws "The input type do not match the expected format, it must be :lla or :point..." icogrid(N=100, type=:testerr, height=0.0)
     @test_throws "Input one argument between N and sepAng..." icogrid(type=:testerr, height=0.0)
+    
+    @test_logs (:warn, "Input sepAng is negative, it will be converted to positive...") icogrid(sepAng=-deg2rad(5), height=0.0)
 end
 
 @testset "Mesh Grid Functions" begin
@@ -36,6 +38,9 @@ end
     @test_throws "The input type do not match the expected format, it must be :lla or :point..." meshgrid(deg2rad(5); type=:testerr)
     @test_throws "Resolution of x is too large, it must be smaller than π..." meshgrid(deg2rad(181); height=0.0)
     @test_throws "Resolution of y is too large, it must be smaller than π..." meshgrid(deg2rad(5); yRes=deg2rad(181), height=0.0)
+    
+    @test_logs (:warn, "Input xRes is negative, it will be converted to positive...") meshgrid(-deg2rad(5); yRes=deg2rad(3), type=:point)
+    @test_logs (:warn, "Input yRes is negative, it will be converted to positive...") meshgrid(deg2rad(5); yRes=-deg2rad(3), type=:point)
 end
 
 @testset "Plots Plotly Base" begin
@@ -66,4 +71,9 @@ end
     @test GeoGrids._check_geopoint(p3) == comp
     @test GeoGrids._check_geopoint(p4) == comp
     @test GeoGrids._check_geopoint(p5) == comp
+
+    r = GeoRegion(regionName="ITA", admin="Italy")
+    @test extract_countries(r) == r.domain
 end
+
+# add extract_countries test

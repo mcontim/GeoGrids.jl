@@ -7,7 +7,7 @@ using Meshes
 using PlotlyExtensionsHelper
 using StaticArrays
 using TelecomUtils
-using TelecomUtils: ValidAngle, ValidDistance
+using TelecomUtils: ValidAngle, ValidDistance, _check_angle
 
 include("typedef.jl")
 include("helper_func.jl")
