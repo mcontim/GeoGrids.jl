@@ -169,69 +169,6 @@ md"""
 ## Meshgrid
 """
 
-# ╔═╡ 9b8cf4cc-39ed-461c-8cea-7b2cdd92f0f3
-md"""
-# Test vs old MATLAB implementation
-"""
-
-# ╔═╡ 45e2a04d-1414-4168-bca8-2ea557fb1cab
-md"""
-It is possible to see that the two methods do not exactly correspond but the freedom of exact number of points selection given by the Fibonacci Spiral gives the edge to the latter.
-"""
-
-# ╔═╡ 85e83e10-849c-4d57-9343-7328393e30b0
-begin
-	MATLABgridRes = "4"
-	fibRes = 4
-end;
-
-# ╔═╡ 14178dd8-c96b-4db7-af7a-b89d08f1e060
-begin
-	file = matopen(joinpath("./assets/ico_grid", "ico_grid_$(MATLABgridRes).mat"))
-	ut_lat_unsorted = read(file, "lat") 
-	ut_lon_unsorted = read(file, "lon")
-	ut_alt_unsorted = ones(size(ut_lat_unsorted)) .* 10e3
-	close(file)
-
-	svecMAT = []
-	for ii=1:length(ut_lat_unsorted)
-		push!(svecMAT,SVector(ut_lon_unsorted[ii],ut_lat_unsorted[ii]))
-	end
-end;
-
-# ╔═╡ e3426da3-e213-49b2-917b-d58504eb1530
-length(svecMAT)
-
-# ╔═╡ d532c096-048d-49c5-ab95-b3d0520f85b9
-_points_required_for_separation_angle(deg2rad(fibRes))
-
-# ╔═╡ 59a8f573-9413-4ff6-b2b9-707a83c361de
-md"""
-### Fibonacci
-"""
-
-# ╔═╡ 32e67099-d63f-4319-8f74-95e8c74d6e89
-plot_geo(map(x -> rad2deg.(x), icogrid(sepAng=deg2rad(fibRes))))
-
-# ╔═╡ 857cec97-06d8-4d48-b335-8f358b65b39c
-plot_geo(map(x -> rad2deg.(x), icogrid(sepAng=deg2rad(fibRes)));camera=:threedim)
-
-# ╔═╡ 6191b1d1-2b46-410d-96a4-5c9e9835283a
-md"""
-### Icosahedron
-"""
-
-# ╔═╡ 136e0c87-9b04-4031-9bc7-8ec3acd0670f
-plot_geo(svecMAT)
-
-# ╔═╡ 320f235b-b7fa-4752-93e3-f34cfe82fdbb
-plot_geo(svecMAT;camera=:threedim)
-
-# ╔═╡ 8f4a39bf-cfdf-45ae-b7ca-357cc353a8bf
-md"""
-# Test LAT-LON :deg
-"""
-
 # ╔═╡ 446c2ef6-1983-47d0-a390-17d2357d0f92
 # ╠═╡ custom_attrs = ["toc-hidden"]
 md"""
@@ -321,12 +258,6 @@ plot_geo(vec(meshGrid))
 
 # ╔═╡ 00055125-7c7e-459e-b79e-f22e3d74866d
 plot_geo(vec(meshGrid); camera=:threedim)
-
-# ╔═╡ 06a5260c-7d8c-42ad-895a-79f90df4040c
-icogrid(N=tableVal.n, unit=:deg)
-
-# ╔═╡ 4cb5958e-3d18-40ff-9100-42592e5ad1de
-meshgrid(deg2rad(tableVal.ang); unit=:deg)
 
 # ╔═╡ 8ed3bf0f-534e-4b12-a905-2b25b8c8e13a
 BondTable([
@@ -884,21 +815,6 @@ version = "17.4.0+2"
 # ╠═f1d6ee2f-01d2-4b79-b326-cb202c58d74d
 # ╠═3eeeffc0-3ba5-427b-b75b-0bf5f6286c9b
 # ╟─00055125-7c7e-459e-b79e-f22e3d74866d
-# ╟─9b8cf4cc-39ed-461c-8cea-7b2cdd92f0f3
-# ╟─45e2a04d-1414-4168-bca8-2ea557fb1cab
-# ╠═85e83e10-849c-4d57-9343-7328393e30b0
-# ╠═14178dd8-c96b-4db7-af7a-b89d08f1e060
-# ╠═e3426da3-e213-49b2-917b-d58504eb1530
-# ╠═d532c096-048d-49c5-ab95-b3d0520f85b9
-# ╟─59a8f573-9413-4ff6-b2b9-707a83c361de
-# ╟─32e67099-d63f-4319-8f74-95e8c74d6e89
-# ╟─857cec97-06d8-4d48-b335-8f358b65b39c
-# ╟─6191b1d1-2b46-410d-96a4-5c9e9835283a
-# ╟─136e0c87-9b04-4031-9bc7-8ec3acd0670f
-# ╟─320f235b-b7fa-4752-93e3-f34cfe82fdbb
-# ╟─8f4a39bf-cfdf-45ae-b7ca-357cc353a8bf
-# ╠═06a5260c-7d8c-42ad-895a-79f90df4040c
-# ╠═4cb5958e-3d18-40ff-9100-42592e5ad1de
 # ╟─446c2ef6-1983-47d0-a390-17d2357d0f92
 # ╠═1aab6599-3b14-422d-acf6-3cbd953c555e
 # ╠═ca17905e-687a-4603-ab2f-d651123a12d1

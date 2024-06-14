@@ -10,6 +10,8 @@ This is a package containing functions for Geographical Grids generation for exa
 
 ## Exported Functions
 
+### Icogrid
+
     icogrid(;N=nothing, sepAng=nothing, unit=:rad, height=nothing, type=:lla)
 
 This function returns a `Vector` of `Point2` or `LLA` elements, for a `N` points Global grid built with the **Fibonacci Spiral** method.
@@ -30,6 +32,8 @@ When the selected output type is `Point2`, as convention it has been considered:
 
 ---
 
+### Meshgrid
+
 	meshgrid(xRes::ValidAngle; yRes::ValidAngle=xRes, height=nothing, unit=:rad, type=:lla)
 
 This function returns a `Matrix` of `Point2` or `LLA` elements representing a 2D Global grid of coordinates with the specified resolutions `xRes` and `yRes` respectively for x and y axes. This function return the `LAT`, `LON` meshgrid similar to the namesake MATLAB function.
@@ -42,11 +46,24 @@ When the selected output type is `Point2`, as convention it has been considered:
 
 ---
 
-in_region
+### Filtering
+
+    in_region(p::Union{LLA, Point2, AbstractVector, Tuple}, domain::Union{GeometrySet, PolyArea}) -> Bool
+    in_region(p::Union{LLA, Point2, AbstractVector, Tuple}, domain::Union{GeoRegion, PolyRegion}) -> Bool
+    in_region(points::Array{<:Union{LLA, Point2, AbstractVector, Tuple}}, domain::Union{GeometrySet, PolyArea}) -> Array{Bool}
+    in_region(points::Array{<:Union{LLA, Point2, AbstractVector, Tuple}}, domain::Union{GeoRegion, PolyRegion}) -> Array{Bool}
+
+This function determines if a given point belongs to a 2-dimensional `Meshes.Domain` object. The `Meshes.Domain` object represents a geometric domain, which is essentially a 2D region in space, specified by its bounds and discretization. 
+
+The function first converts the input tuple into a `Point` object, which is then checked if it falls inside the given `Meshes.Domain` object.
+The `Meshes.Domain` can be either a `GeometrySet` or a `PolyArea` object.
 
 ---
 
-filter_points
+    filter_points(points::Union{Vector{LLA}, Vector{AbstractVector}, Vector{Point2}, Vector{Tuple}}, domain::Union{GeometrySet, PolyArea}) -> Vector{Input Type}
+    filter_points(points::Union{Vector{LLA}, Vector{AbstractVector}, Vector{Point2}, Vector{Tuple}}, domain::Union{GeoRegion, PolyRegion}) -> Vector{Input Type}
+    
+Returns the list of of points based on whether they fall within a specified geographical domain.
 
 ---
 
