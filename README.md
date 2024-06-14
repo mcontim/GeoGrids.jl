@@ -6,16 +6,17 @@
 [![Coverage](https://gitlab.esa.int/tec-esc-tools/GeoGrids.jl/badges/main/coverage.svg)](https://gitlab.esa.int/tec-esc-tools/GeoGrids.jl/commits/main)
 [![Aqua QA](https://raw.githubusercontent.com/JuliaTesting/Aqua.jl/master/badge.svg)](https://github.com/JuliaTesting/Aqua.jl)
 
-This is a package containing functions for Geographical Grids generation for example for terminals distribution for System Level Simulations.
+This is a package containing functions for Geographical Grids generation for example for terminals distribution for System Level Simulations. **In the next version support for Geo Surface tesselation for cell grid layout will be supported**.
 
 ## Exported Functions
 
-    fibonaccigrid(; N = nothing, sepAng = nothing, unit = :rad)
+### Icogrid
 
-This function returns an Array of `SVector(lon,lat)`, as well as a `Tuple(x=lon,y=lat)`, of LAT, LON values for a `N` points Global grid built with the **Fibonacci Spiral** method.
+    icogrid(;N=nothing, sepAng=nothing, unit=:rad, height=nothing, type=:lla)
+
+This function returns a `Vector` of `Point2` or `LLA` elements, for a `N` points Global grid built with the **Fibonacci Spiral** method.
 
 The grid can be generated starting fom the number of point requested on the grid (`N`) or by the minimum separation angle requested for the points (`sepAng`).
-
 
 The problem of how to evenly distribute points on a sphere has a very long history. Unfortunately, except for a small handful of cases, it still has not been exactly solved. Therefore, in nearly all situations, we can merely hope to find near-optimal solutions to this problem.
 
@@ -23,33 +24,85 @@ Of these near-optimal solutions, one of the most common simple methods is one ba
 
 This method of points distribution is **Area Preserving** but not distance preserving.
 
-As convention it has been considered: `LAT=y`, `LON=x`. The output can be returned either in `:deg` or `:rad` units.
+When the selected output type is `Point2`, as convention it has been considered: `LAT=x`, `LON=y` and the output can be returned either in `:deg` or `:rad` units.
+
+<p align="center">
+  <img src="./docs/img/ico.png" alt="Icogrid"/>
+</p>
 
 ---
 
-	meshgrid(gridRes; unit = :rad)
+### Meshgrid
 
-This function creates a 2D Global grid of coordinates with the specified resolution (`gridRes`) given as input and return the `LAT`, `LON` meshgrid similar to the namesake MATLAB function.
+	meshgrid(xRes::ValidAngle; yRes::ValidAngle=xRes, height=nothing, unit=:rad, type=:lla)
 
-As convention it has been considered: `LAT=y`, `LON=x`.
+This function returns a `Matrix` of `Point2` or `LLA` elements representing a 2D Global grid of coordinates with the specified resolutions `xRes` and `yRes` respectively for x and y axes. This function return the `LAT`, `LON` meshgrid similar to the namesake MATLAB function.
 
-The output is returned in the form of a vector of SVector{2}(lon,lat) (`vec`) and a tuple of two 2D grids (`grid`). The output can be returned either in `:deg` or `:rad` units.
+When the selected output type is `Point2`, as convention it has been considered: `LAT=x`, `LON=y` and the output can be returned either in `:deg` or `:rad` units.
+
+<p align="center">
+  <img src="./docs/img/mesh.png" alt="Meshgrid"/>
+</p>
+
+---
+
+### Filtering
+
+    in_region(p::Union{LLA, Point2, AbstractVector, Tuple}, domain::Union{GeometrySet, PolyArea}) -> Bool
+    in_region(p::Union{LLA, Point2, AbstractVector, Tuple}, domain::Union{GeoRegion, PolyRegion}) -> Bool
+    in_region(points::Array{<:Union{LLA, Point2, AbstractVector, Tuple}}, domain::Union{GeometrySet, PolyArea}) -> Array{Bool}
+    in_region(points::Array{<:Union{LLA, Point2, AbstractVector, Tuple}}, domain::Union{GeoRegion, PolyRegion}) -> Array{Bool}
+
+This function determines if a given point belongs to a 2-dimensional `Meshes.Domain` object. The `Meshes.Domain` object represents a geometric domain, which is essentially a 2D region in space, specified by its bounds and discretization. 
+
+The function first converts the input tuple into a `Point` object, which is then checked if it falls inside the given `Meshes.Domain` object.
+The `Meshes.Domain` can be either a `GeometrySet` or a `PolyArea` object.
+
+---
+
+    filter_points(points::Union{Vector{LLA}, Vector{AbstractVector}, Vector{Point2}, Vector{Tuple}}, domain::Union{GeometrySet, PolyArea}) -> Vector{Input Type}
+    filter_points(points::Union{Vector{LLA}, Vector{AbstractVector}, Vector{Point2}, Vector{Tuple}}, domain::Union{GeoRegion, PolyRegion}) -> Vector{Input Type}
+    
+Returns the list of of points based on whether they fall within a specified geographical domain.
+
+<p align="center">
+  <img src="./docs/img/poly_filt.png" alt="Poly Filter"/>
+</p>
+<p align="center">
+  <img src="./docs/img/geo_filt.png" alt="Geo Filter"/>
+</p>
+
+---
+
+    extract_countries(r::GeoRegion)
+
+Extracts the countries from a given region. The output represents the field `domain` of `GeoRegion`.
+
+It first gets the field names of the `GeoRegion` type, excluding the `:regionName`, then maps these field names to their corresponding values in the `GeoRegion` instance `r`, creating a collection of pairs. It filters out any pairs where the value is empty. It converts this collection of pairs into a `NamedTuple`, finally, it calls `CountriesBorders.extract_countries` with the `NamedTuple` as keyword arguments.
+
+This function is an overload of `CountriesBorders.extract_countries` that takes a `GeoRegion` object as input. It extracts the countries from the given region and returns them.    
+
+---
 
 ## Useful Internal Functions
 
-    get_meshgrid(xin,yin)
+    _meshgrid(xin,yin)
 
 Create a 2D grid of coordinates using the input vectors `xin` and `yin`.
-The outputs in the form of `SVector(xout,yout)` and `grid=(xout,yout)` contain all possible combinations of the elements of `xin` and `yin`, with `xout` corresponding to the horizontal coordinates and `yout` corresponding to the vertical coordinates.
+The output, in the form of `SVector(xout,yout)`, contains all possible combinations of the elements of `xin` and `yin`, with `xout` corresponding to the horizontal coordinates and `yout` corresponding to the vertical coordinates.
 
 ---
 
-    fibonaccisphere_classic(N::Int)
-	
-This function generates `N` uniformly distributed points on the surface of a unitary sphere using the classic Fibonacci Spiral
+    _icogrid(N::Int; coord::Symbol=:sphe, spheRadius=1.0)	
+
+This is the base function used by `icogrid`. This function generates `N` uniformly distributed points on the surface of a unitary sphere using the classic Fibonacci Spiral.
+
+The output can be returned as a `SVector` of either, spherical or cartesian coordinates.
 
 ---
 
-    plot_geo(points_latlon; title="Point Position 3D Map", camera::Symbol=:twodim)
+	plot_geo(points; title="Point Position GEO Map", camera::Symbol=:twodim, kwargs_scatter=(;), kwargs_layout=(;))
 
-This function takes an AbstractVector of SVector{2, <:Real} of LAT-LON coordinates (deg) and generates a plot on a world map projection using the PlotlyJS package.
+This function takes an `Array` of `Union{Point2,LLA,AbstractVector,Tuple}` of LAT-LON coordinates and generates a plot on a world map projection using the PlotlyJS package.
+
+The input is checked and the angles converted in deg if passed as `Unitful` and interpreted as rad if passed as `Real` values.

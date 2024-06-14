@@ -31,7 +31,7 @@ SatConstellationVisual/notebooks/INPUT/*
 SatConstellationVisual/notebooks/OUTPUT/*
 
 # Other Files
-*.png
+# *.png
 *.fig
 *.mat
 *.jld2
@@ -48,6 +48,6 @@ SatConstellationVisual/notebooks/OUTPUT/*
 *.orb
 
 # Test notebooks
-/notebooks/
+# /notebooks/
+# /notebooks/assets/
 /testenv/
-/notebooks/assets/

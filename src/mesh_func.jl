@@ -1,43 +1,83 @@
 """
-	meshgrid(gridRes)
+	meshgrid(xRes::ValidAngle; yRes::ValidAngle=xRes, height=nothing, unit=:rad, type=:lla)
 
-This function call get_meshgrid with the specified resolution given as input and return the LAT, LON meshgrid (LAT=y, LON=x).
+This function call meshgrid with the specified resolution given as input and return the LAT, LON meshgrid (LAT=y, LON=x).
 The meshgrid cover all the globe with LAT=-90:90 and LON=-180:180
 
-### Arguments
-- `gridRes`: resolution of the meshgrid in rad
+## Arguments
+- `xRes`: resolution of the x axis in meshgrid in `ValidAngle`. 
+- `yRes`: resolution of the y axis in meshgrid in `ValidAngle`. 
 - `unit`: `:rad` or `:deg`
+- `type`: `:lla` or `:point`. Output type either `LLA` or `Point2`
+- `height`: the point altitude in case of LLA type
 
-### Output
-- `vec`: A vector of SVector{2}(lon,lat) objects of LAT-LON coordinates in rad (or deg) (LAT=y, LON=x).
+## Output
+- `out`: Matrix{Union{LLA,Point2}}, each element of the matrix is either a `LLA` or `Point2`. The order of the elements is LAT, LON.
 """
-function meshgrid(gridRes; unit=:rad)
-	vec = get_meshgrid(-π:gridRes:π-gridRes+1e-10,-π/2:gridRes:π/2)
-	
-	# Unit Conversion
-	if unit == :deg 
-		vec = map(x -> rad2deg.(x), vec)
+function meshgrid(xRes::ValidAngle; yRes::ValidAngle=xRes, height=nothing, unit=:rad, type=:lla)
+	# Input Validation
+	_xRes = let
+		_check_angle(xRes; limit = π, msg = "Resolution of x is too large, it must be smaller than π...")
+		if xRes < 0
+			@warn "Input xRes is negative, it will be converted to positive..."
+			to_radians(abs(xRes))
+		else
+			to_radians(xRes)
+		end	
+	end
+	_yRes = let
+		_check_angle(yRes; limit = π, msg = "Resolution of y is too large, it must be smaller than π...")
+		if yRes < 0
+			@warn "Input yRes is negative, it will be converted to positive..."
+			to_radians(abs(yRes))
+		else
+			to_radians(yRes)
+		end
 	end
 
-	return vec
+	# Create meshgrid
+	mat = _meshgrid(-π/2:_xRes:π/2, -π:_yRes:(π-_yRes+1e-10))
+	
+	# Unit Conversion
+	out = if type == :lla
+		_height = if isnothing(height)
+			@warn "Height is not provided, it will be set to 0 by default..." 
+			0.0 
+		else 
+			height
+		end
+		map(x -> LLA(x..., _height), mat)
+	elseif type == :point
+		!isnothing(height) && @warn "Height is ignored when type is set to :point..."
+		conv = if unit == :deg 
+			map(x -> rad2deg.(x), mat)
+		else
+			mat
+		end
+		map(x -> Point2(x...), conv) # lat-lon
+	else
+		error("The input type do not match the expected format, it must be :lla or :point...")
+	end
+
+	return out
 end
 
 """
-	get_meshgrid(xin, yin)
+	_meshgrid(xin::AbstractVector, yin::AbstractVector) -> Matrix{SVector{2,Float64}}
 
 Create a 2D grid of coordinates using the input vectors `xin` and `yin`.
 The outputs contain all possible combinations of the elements of `xin` and `yin`, with `xout` corresponding to the horizontal coordinates and `yout` corresponding to the vertical coordinates.
 
-### Arguments
+## Arguments
 - `xin::AbstractVector`: 1D input array of horizontal coordinates.
 - `yin::AbstractVector`: 1D input array of vertical coordinates.
 
-### Output
-- `mat`: A Matrix of SVector{2}(lon,lat) objects.
+## Output
+- Matrix{SVector{2,Float64}}, each element of the matrix can be considered as (lat, lon) if used by `meshgrid`.
 """
-function get_meshgrid(xin,yin)
+function _meshgrid(xin::AbstractVector, yin::AbstractVector)
 	# Compact writing using SA convenience constructor for StaticArrays and Comprehensions 
-	[SA_F64[x,y] for x in xin, y in yin]
+	return [SA_F64[x,y] for x in xin, y in yin]
 	
 	# # Equivalent nested for construction
 	# nx 	 = length(xin)

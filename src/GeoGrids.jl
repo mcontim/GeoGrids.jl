@@ -1,14 +1,28 @@
 module GeoGrids
 
-using LinearAlgebra
-using StaticArrays
 using AngleBetweenVectors
+using CountriesBorders
+using LinearAlgebra
+using Meshes
 using PlotlyExtensionsHelper
+using StaticArrays
+using TelecomUtils
+using TelecomUtils: ValidAngle, ValidDistance, _check_angle
 
+include("typedef.jl")
+include("helper_func.jl")
+include("filtering_func.jl")
 include("plot_func.jl")
-include("fibonacci_func.jl")
+include("ico_func.jl")
 include("mesh_func.jl")
 
-export fibonaccigrid, meshgrid
+export GeoRegion, PolyRegion
+
+export icogrid, meshgrid, 
+extract_countries, in_region, filter_points
+
+export °, LLA,
+Point2, PolyArea,
+SVector
 
 end # module GeoGrids

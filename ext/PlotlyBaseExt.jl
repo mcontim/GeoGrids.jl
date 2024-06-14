@@ -1,8 +1,11 @@
 module PlotlyBaseExt
 
-using GeoGrids
 using PlotlyExtensionsHelper
 using PlotlyBase
+
+using GeoGrids
+using StaticArrays
+using TelecomUtils: ValidAngle, ValidDistance
 
 """
 	plot_unitarysphere(points_cart)
@@ -10,9 +13,9 @@ using PlotlyBase
 This function takes an SVector{3} of Cartesian coordinates and plots the corresponding points on a unitary sphere. 
 The sphere is defined by a range of angles that are discretized into a grid of n_sphere points.
 
-### Arguments:
+## Arguments:
 - `points_cart`: an array of Cartesian coordinates of the points to be plotted on the unitary sphere.
-### Output:
+## Output:
 - Plot of the unitary sphere with the input points represented as markers.
 """
 function GeoGrids.plot_unitarysphere(points_cart)
@@ -43,23 +46,25 @@ function GeoGrids.plot_unitarysphere(points_cart)
 end
 
 """
-	plot_geo(points_latlon; title="Point Position 3D Map", camera::Symbol=:twodim)
+	plot_geo(points::Array{Point2}; title="Point Position GEO Map", camera::Symbol=:twodim, kwargs_scatter=(;), kwargs_layout=(;))
+	plot_geo(points; kwargs...)
 
 This function takes an AbstractVector of SVector{2, <:Real} of LAT-LON coordinates (deg) and generates a plot on a world map projection using the PlotlyJS package.
 
-### Arguments
-- `points_latlon::AbstractVector{SVector{2, <:Real}}:` List of 2-dimensional coordinates (lon,lat) in the form of an AbstractVector of SVector{2, <:Real} elements (LAT=y, LON=x).
+## Arguments
+- `points::AbstractVector{SVector{2, <:Real}}:` List of 2-dimensional coordinates (lon,lat) in the form of an AbstractVector of SVector{2, <:Real} elements (LAT=y, LON=x).
 - `title::String`: (optional) Title for the plot, default is "Point Position 3D Map".
 - `camera::Symbol`: (optional) The camera projection to use, either :twodim (default) or :threedim. If :threedim, the map will be displayed as an orthographic projection, while :twodim shows the map with a natural earth projection.
 """
-function GeoGrids.plot_geo(points_latlon; title="Point Position GEO Map", camera::Symbol=:twodim)
+function GeoGrids.plot_geo(points::Array{Point2}; title="Point Position GEO Map", camera::Symbol=:twodim, kwargs_scatter=(;), kwargs_layout=(;))
 	# Markers for the points
 	# Take an array of SVector
-	points = scattergeo(
-		lat = map(x -> x[2], points_latlon),
-		lon = map(x -> x[1], points_latlon),
+	scatterpoints = scattergeo(
+		lat = map(x -> first(x.coords), points[:]), # Vectorize such to be sure to avoid matrices.
+		lon = map(x -> last(x.coords), points[:]), # Vectorize such to be sure to avoid matrices.
 		mode = "markers",
-		marker_size = 5
+		marker_size = 5,
+		kwargs_scatter...
 	)
 
 	if camera == :threedim
@@ -94,11 +99,13 @@ function GeoGrids.plot_geo(points_latlon; title="Point Position GEO Map", camera
 			)
 		),
 		title = title;
-		geo_projection_type = projection
+		geo_projection_type = projection,
+		kwargs_layout...
 	)
 	
-	# Plot([points],layout)
-	plotly_plot([points],layout)
+	plotly_plot([scatterpoints],layout)
 end
 
-end
+GeoGrids.plot_geo(points; kwargs...) = GeoGrids.plot_geo(GeoGrids._check_geopoint(points); kwargs...)
+
+end # module PlotlyBaseExt
