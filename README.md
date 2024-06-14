@@ -65,9 +65,22 @@ The `Meshes.Domain` can be either a `GeometrySet` or a `PolyArea` object.
     
 Returns the list of of points based on whether they fall within a specified geographical domain.
 
+<p align="center">
+  <img src="./docs/img/poly_filt.png" alt="Poly Filter"/>
+</p>
+<p align="center">
+  <img src="./docs/img/geo_filt.png" alt="Geo Filter"/>
+</p>
+
 ---
 
-extract_countries
+    extract_countries(r::GeoRegion)
+
+Extracts the countries from a given region. The output represents the field `domain` of `GeoRegion`.
+
+It first gets the field names of the `GeoRegion` type, excluding the `:regionName`, then maps these field names to their corresponding values in the `GeoRegion` instance `r`, creating a collection of pairs. It filters out any pairs where the value is empty. It converts this collection of pairs into a `NamedTuple`, finally, it calls `CountriesBorders.extract_countries` with the `NamedTuple` as keyword arguments.
+
+This function is an overload of `CountriesBorders.extract_countries` that takes a `GeoRegion` object as input. It extracts the countries from the given region and returns them.    
 
 ---
 

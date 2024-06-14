@@ -30,7 +30,7 @@ _check_geopoint(points::Array{<:Union{AbstractVector,Tuple,LLA,Point2}}; kwargs.
 
 ## Aux Functions
 """
-    CountriesBorders.extract_countries(r::GeoRegion)
+    extract_countries(r::GeoRegion)
 
 Extracts the countries from a given region.
 
