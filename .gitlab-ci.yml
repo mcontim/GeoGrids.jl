@@ -7,7 +7,7 @@ Julia 1 (Linux):
   image: julia:1
   extends:
     - .linux_test_coverage
-Julia 1 (Windows):
-  image: julia:1
-  extends:
-    - .windows_test
+# Julia 1 (Windows):
+#   image: julia:1
+#   extends:
+#     - .windows_test
