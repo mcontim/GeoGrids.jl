@@ -4,11 +4,12 @@ using Documenter
 # This is used to skip the performance_page during the docs building locally (as it takes time)
 perf_page = get(ENV, "CI", "") === "true"
 
-makedocs(
+makedocs(;
     sitename = "GeoGrids",
     format = Documenter.HTML(),
     modules = [GeoGrids],
     warnonly = true,
+    authors="Matteo Conti <matteo.conti@ext.esa.int>",
     repo = Documenter.Remotes.GitLab("gitlab.esa.int","tec-esc-tools","GeoGrids.jl"),
     pagesonly = true, # This only build the source files listed in pages
     pages = [
