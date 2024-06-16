@@ -43,6 +43,19 @@ end
     @test_logs (:warn, "Input yRes is negative, it will be converted to positive...") meshgrid(deg2rad(5); yRes=-deg2rad(3), type=:point)
 end
 
+@testset "Vec Grid Functions" begin
+    @test vecgrid(deg2rad(5); height=0.0) isa Vector{LLA}
+    @test vecgrid(deg2rad(5); type=:point) isa Vector{Point2}
+    @test vecgrid(deg2rad(5); unit=:deg, type=:point) isa Vector{Point2}
+
+    @test_logs (:warn, "Height is not provided, it will be set to 0 by default...") vecgrid(deg2rad(5)) 
+    @test_logs (:warn, "Height is ignored when type is set to :point...") vecgrid(deg2rad(5); height=0.0, type=:point)
+    @test_throws "The input type do not match the expected format, it must be :lla or :point..." vecgrid(deg2rad(5); type=:testerr)
+    @test_throws "Resolution of grid is too large, it must be smaller than π/2..." vecgrid(deg2rad(91); height=0.0)
+    
+    @test_logs (:warn, "Input gridRes is negative, it will be converted to positive...") vecgrid(-deg2rad(5); type=:point)
+end
+
 @testset "Plots Plotly Base" begin
     using PlotlyBase
     @test plot_unitarysphere(GeoGrids._icogrid(100; coord=:cart)) isa Plot

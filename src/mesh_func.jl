@@ -104,8 +104,9 @@ function vecgrid(gridRes::ValidAngle; height=nothing, unit=:rad, type=:lla)
 		end	
 	end
 
-	# Create vecgrid
-	vec = collect(0:_gridRes:π/2) # LAT vector from 0 to π/2
+	# Create LAT vector
+	temp = collect(0:_gridRes:π/2) # LAT vector from 0 to π/2
+	vec = map(x -> SVector(x, 0.0), temp) # LAT vector from 0 to π/2
 	
 	# Unit Conversion
 	out = _grid_points_conversion(vec; height, type, unit)

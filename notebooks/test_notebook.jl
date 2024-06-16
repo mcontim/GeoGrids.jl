@@ -47,8 +47,11 @@ md"""
 # Test
 """
 
+# ╔═╡ 959913ca-99f0-45ef-9754-3da4daab3a9b
+vecgrid(deg2rad(5); height=0.0, type=:point, unit=:deg)
+
 # ╔═╡ a6a8271e-f6f9-4eab-8526-0af57a6ad684
-poly2 = PolyRegion(regionName="POLY", domain=[LLA(-90°,-181°,0), LLA(-60°,181°,0), LLA(60°,181°,0), LLA(60°,-181°,0), LLA(-60°,-181°,0)])
+poly2 = PolyRegion(regionName="POLY", domain=[LLA(-60°,-180°,0), LLA(-60°,180°,0), LLA(60°,180°,0), LLA(60°,-180°,0), LLA(-60°,-180°,0)])
 
 # ╔═╡ 8e22cfe1-6b66-4a1d-b7b0-f43f645a5b86
 poly2.domain.outer
@@ -56,20 +59,8 @@ poly2.domain.outer
 # ╔═╡ eef8c134-cb50-4f44-be4b-2572b9ba691e
 poly3 = PolyRegion(regionName="POLY", domain=[(-370°,-181°),(-60°,180°),(60°,180°),(60°,-180°), (-60°,-181°)])
 
-# ╔═╡ e7e4ca21-7a32-470f-a864-bf4a17443be2
-poly4 = PolyRegion(regionName="POLY", domain=[(pi/2,pi),(0.5,0.5),(pi/2,pi+0.1)])
-
 # ╔═╡ 464e2924-24b6-4f96-9200-627e497877db
 LatBeltRegion(regionName="aaa", latLim=[90°,-90°])
-
-# ╔═╡ 9d0dd502-7edc-4c5f-a7f2-67e32485fd18
-TelecomUtils._check_angle(90°; limit=pi/2)
-
-# ╔═╡ e267a108-5018-49ef-814a-0367a768457d
-abs(180°) <= pi/2
-
-# ╔═╡ 7e8cdfcf-8f6c-4186-b339-570780078ed8
-poly3.domain.outer
 
 # ╔═╡ c9738f80-0297-46c4-b5ee-1a64ced99296
 grid=meshgrid(deg2rad(5))
@@ -721,6 +712,7 @@ version = "17.4.0+2"
 # ╠═282b928a-fc7d-4487-a056-6c2626cf7179
 # ╠═2f988a76-9c84-432b-b69f-dbe06f32ea35
 # ╟─0e205c7f-43ea-4612-830c-d930e8e4522f
+# ╠═959913ca-99f0-45ef-9754-3da4daab3a9b
 # ╠═86362c31-7407-4c33-b24d-5e10a2a0858f
 # ╠═8228edb8-b393-4e60-b9a1-63df7a81d0e8
 # ╠═089c8f55-2beb-4eb1-b6bf-355c2818378d
@@ -728,11 +720,7 @@ version = "17.4.0+2"
 # ╠═8e22cfe1-6b66-4a1d-b7b0-f43f645a5b86
 # ╠═a6a8271e-f6f9-4eab-8526-0af57a6ad684
 # ╠═eef8c134-cb50-4f44-be4b-2572b9ba691e
-# ╠═e7e4ca21-7a32-470f-a864-bf4a17443be2
 # ╠═464e2924-24b6-4f96-9200-627e497877db
-# ╠═9d0dd502-7edc-4c5f-a7f2-67e32485fd18
-# ╠═e267a108-5018-49ef-814a-0367a768457d
-# ╠═7e8cdfcf-8f6c-4186-b339-570780078ed8
 # ╠═992a4e72-4465-4cd4-9187-b4b6704c13a4
 # ╠═c9738f80-0297-46c4-b5ee-1a64ced99296
 # ╠═dbda3eaf-fd96-4633-8603-368057a76ecd
