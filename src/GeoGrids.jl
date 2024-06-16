@@ -16,7 +16,7 @@ include("plot_func.jl")
 include("ico_func.jl")
 include("mesh_func.jl")
 
-export GeoRegion, PolyRegion
+export GeoRegion, PolyRegion, LatBeltRegion
 
 export icogrid, meshgrid, 
 extract_countries, in_region, filter_points

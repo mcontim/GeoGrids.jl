@@ -75,7 +75,7 @@ mutable struct LatBeltRegion <: AbstractRegion
     # No positional arguments allowed.
     function LatBeltRegion(;regionName::String="region_name", latLim=nothing)
         # Inputs check
-        isnothing(latLim) && error("Input the Latitude Bet limits...")
+        isnothing(latLim) && error("Input the Latitude Belt limits...")
         length(latLim) != 2 && error("The input must be a 2 elements vector...")
         
         for x in latLim _check_angle(x; limit=π/2, msg="LAT provided as numbers must be expressed in radians and satisfy -π/2 ≤ x ≤ π/2. Consider using `°` from `Unitful` (Also re-exported by GeoGrids) if you want to pass numbers in degrees, by doing `x * °`.") end

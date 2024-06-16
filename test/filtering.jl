@@ -74,3 +74,15 @@ end
 
     @test filter_points([(14°,1°), (0°,0°), (10°,-5.2°), (27°,15.3°), (26.9°,-4.9°), (10.1°,14.9°)], poly) == sample_in
 end
+
+@testset "LatBeltRegion Test" begin
+    @test LatBeltRegion(;regionName="region_name", latLim=[0°,π/2]) isa LatBeltRegion
+    @test LatBeltRegion(;regionName="region_name", latLim=[0°,π/2]).latLim == LatBeltRegion(;regionName="region_name", latLim=[0,π/2]).latLim
+    @test_throws "Input the Latitude Belt limits..." LatBeltRegion()
+    @test_throws "The first LAT limit must be lower than the second one..." LatBeltRegion(;regionName="region_name", latLim=[π/2,0])
+    @test_throws "The first LAT limit must be different than the second one..." LatBeltRegion(;regionName="region_name", latLim=[π/2,π/2])
+    @test_throws "The input must be a 2 elements vector..." LatBeltRegion(;regionName="region_name", latLim=[0°])
+    @test_throws "The input must be a 2 elements vector..." LatBeltRegion(;regionName="region_name", latLim=[0°,0°,0°])
+    @test_throws "LAT provided as numbers must be expressed in radians and satisfy -π/2 ≤ x ≤ π/2. Consider using `°` from `Unitful` (Also re-exported by GeoGrids) if you want to pass numbers in degrees, by doing `x * °`." LatBeltRegion(;regionName="region_name", latLim=[-π,π])
+    @test_throws "LAT provided as numbers must be expressed in radians and satisfy -π/2 ≤ x ≤ π/2. Consider using `°` from `Unitful` (Also re-exported by GeoGrids) if you want to pass numbers in degrees, by doing `x * °`." LatBeltRegion(;regionName="region_name", latLim=[-100°,100°])
+end
