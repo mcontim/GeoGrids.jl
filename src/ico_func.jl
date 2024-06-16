@@ -33,26 +33,8 @@ function icogrid(;N=nothing, sepAng=nothing, unit=:rad, height=nothing, type=:ll
 		error("Input one argument between N and sepAng...")
 	end
 
-	out = if type == :lla
-		_height = if isnothing(height)
-			@warn "Height is not provided, it will be set to 0 by default..." 
-			0.0 
-		else 
-			height
-		end
-		map(x -> LLA(x..., _height), vec)
-	elseif type == :point
-		!isnothing(height) && @warn "Height is ignored when type is set to :point..."
-		# Unit Conversion
-		conv = if unit == :deg 
-			map(x -> rad2deg.(x), vec)
-		else
-			vec
-		end
-		map(x -> Point2(x...), conv) # lat-lon
-	else
-		error("The input type do not match the expected format, it must be :lla or :point...")
-	end
+	# Unit Conversion	
+	out = _grid_points_conversion(vec; height, type, unit)
 
 	return out
 end
