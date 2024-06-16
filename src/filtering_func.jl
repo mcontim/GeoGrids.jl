@@ -28,18 +28,18 @@ end
 
 in_region(p::Union{LLA, Point2, AbstractVector, Tuple}, domain::Union{GeoRegion, PolyRegion}) = in_region(p, domain.domain)
 
-# function in_region(p::Union{LLA, Point2, AbstractVector, Tuple}, domain::LatBeltRegion)
-#     # Prepare the input.
-#     _p = _check_geopoint(p)
+function in_region(p::Union{LLA, Point2, AbstractVector, Tuple}, domain::LatBeltRegion)
+    # Prepare the input.
+    _p = _check_geopoint(p)
+    # Check if the LAT of the point is inside the Latitude Belt region.
+    domain.latLim[1] < first(_p) < domain.latLim[2] ? true : false 
+end
 
-#     firs(_p) < domain.latLim[2] && 
-#     _p in domain
-# end
-
-function in_region(points::Array{<:Union{LLA, Point2, AbstractVector, Tuple}}, domain::Union{GeometrySet, PolyArea})
+function in_region(points::Array{<:Union{LLA, Point2, AbstractVector, Tuple}}, domain::Union{GeometrySet, PolyArea, LatBeltRegion})
     mask = map(x -> in_region(x, domain), points) # Bool mask
     return mask
 end
+
 in_region(points::Array{<:Union{LLA, Point2, AbstractVector, Tuple}}, domain::Union{GeoRegion, PolyRegion}) = in_region(points, domain.domain)
 
 """
