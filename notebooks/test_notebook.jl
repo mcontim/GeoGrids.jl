@@ -48,16 +48,37 @@ md"""
 """
 
 # ╔═╡ c9738f80-0297-46c4-b5ee-1a64ced99296
-grid=meshgrid(deg2rad(3))
+grid=meshgrid(deg2rad(5))
+
+# ╔═╡ 089c8f55-2beb-4eb1-b6bf-355c2818378d
+grid
 
 # ╔═╡ 992a4e72-4465-4cd4-9187-b4b6704c13a4
-plot_geo(grid; title="Icogrid")
+plot_geo(grid; title="Icogrid", camera=:threedim)
 
 # ╔═╡ dcac9772-2c2c-431b-a568-ac91d483e470
 poly = PolyRegion(regionName="POLY", domain=[LLA(10°,-5°,0), LLA(10°,15°,0), LLA(27°,15°,0), LLA(27°,-5°,0), LLA(10°,-5°,0)])
 
 # ╔═╡ 75d1571e-2806-4613-b08f-13f8e069e26e
 in_region(grid,poly)
+
+# ╔═╡ a6a8271e-f6f9-4eab-8526-0af57a6ad684
+poly2 = PolyRegion(regionName="POLY", domain=[LLA(-60°,-180°,0), LLA(-60°,179°,0), LLA(60°,179°,0), LLA(60°,-180°,0), LLA(-60°,-180°,0)])
+
+# ╔═╡ 906292e8-e385-469f-92dd-8125fdcc78ac
+in_region(grid[:,1], poly2)
+
+# ╔═╡ 8e22cfe1-6b66-4a1d-b7b0-f43f645a5b86
+poly2.domain.outer
+
+# ╔═╡ 2a77c856-6155-4759-bf50-aa3169d7494d
+filt = filter_points(grid,poly2)
+
+# ╔═╡ 86362c31-7407-4c33-b24d-5e10a2a0858f
+plot_geo(filt, title="Filter by Geo Region", camera=:threedim)
+
+# ╔═╡ 8228edb8-b393-4e60-b9a1-63df7a81d0e8
+filt
 
 # ╔═╡ 163dd79f-a999-4630-9cbb-b1fb06ea8aa6
 sample_border = [(10°,-5°), (10.1°,10°), (27°,15°)]
@@ -134,12 +155,6 @@ methods(StaticVector)
 md"""
 ## GeoRegion
 """
-
-# ╔═╡ 2a77c856-6155-4759-bf50-aa3169d7494d
-filt = filter_points(grid,r)
-
-# ╔═╡ 86362c31-7407-4c33-b24d-5e10a2a0858f
-plot_geo(filt, title="Filter by Geo Region")
 
 # ╔═╡ 9c977c07-ce0e-4c38-bcac-b2a83cfb3544
 GeoRegion(continent = "Europe", admin="Italy")
@@ -689,12 +704,17 @@ version = "17.4.0+2"
 # ╠═2f988a76-9c84-432b-b69f-dbe06f32ea35
 # ╟─0e205c7f-43ea-4612-830c-d930e8e4522f
 # ╠═86362c31-7407-4c33-b24d-5e10a2a0858f
+# ╠═8228edb8-b393-4e60-b9a1-63df7a81d0e8
+# ╠═089c8f55-2beb-4eb1-b6bf-355c2818378d
+# ╠═906292e8-e385-469f-92dd-8125fdcc78ac
+# ╠═8e22cfe1-6b66-4a1d-b7b0-f43f645a5b86
 # ╠═992a4e72-4465-4cd4-9187-b4b6704c13a4
 # ╠═c9738f80-0297-46c4-b5ee-1a64ced99296
 # ╠═dbda3eaf-fd96-4633-8603-368057a76ecd
 # ╠═2a77c856-6155-4759-bf50-aa3169d7494d
 # ╠═75d1571e-2806-4613-b08f-13f8e069e26e
 # ╠═dcac9772-2c2c-431b-a568-ac91d483e470
+# ╠═a6a8271e-f6f9-4eab-8526-0af57a6ad684
 # ╠═163dd79f-a999-4630-9cbb-b1fb06ea8aa6
 # ╠═c58e75cb-3355-4c63-8eb9-1f364c6ec159
 # ╠═4eae9a7e-2c76-477d-a08f-fedffb259300
