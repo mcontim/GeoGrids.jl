@@ -47,8 +47,33 @@ md"""
 # Test
 """
 
+# ╔═╡ 75941301-a6e4-4e17-a99f-9f2f6c825fa3
+begin
+	sample_ita = [(43.727878°,12.843441°), (43.714933°,10.399326°), (37.485829°,14.328285°), (39.330460°,8.430780°), (45.918388°,10.886654°)]
+	ita = GeoRegion(regionName="ITA", admin="Italy")
+	sv_ita = map(x -> SVector(x...), sample_ita)
+end
+
+# ╔═╡ 04a6a3b3-029c-422c-bec4-8d0f0e6f2a90
+sample_ita isa Array
+
+# ╔═╡ 396e9574-82f7-4e70-a0bf-249932d60f48
+all(in_region(sv_ita, ita))
+
 # ╔═╡ 959913ca-99f0-45ef-9754-3da4daab3a9b
 vecgrid(deg2rad(5); height=0.0, type=:point, unit=:deg)
+
+# ╔═╡ 4c21a4c1-757d-4eca-984c-16e27df3a6fa
+ belt = LatBeltRegion(;regionName="test", latLim=[-60°, 60°])
+
+# ╔═╡ 38a176ff-bd7e-4ed3-a19b-a2e18ba330b8
+in_region(Point2(0.24434609527920614, 0.017453292519943295), belt)
+
+# ╔═╡ 46296600-2a42-455a-8557-32c3563845b6
+in_region(LLA(0,0,0), belt)
+
+# ╔═╡ 1a5dd28e-1ad2-4500-b711-bef0fd3aeff6
+methods(in_region)
 
 # ╔═╡ a6a8271e-f6f9-4eab-8526-0af57a6ad684
 poly2 = PolyRegion(regionName="POLY", domain=[LLA(-60°,-180°,0), LLA(-60°,180°,0), LLA(60°,180°,0), LLA(60°,-180°,0), LLA(-60°,-180°,0)])
@@ -66,7 +91,7 @@ LatBeltRegion(regionName="aaa", latLim=[90°,-90°])
 grid=meshgrid(deg2rad(5))
 
 # ╔═╡ 089c8f55-2beb-4eb1-b6bf-355c2818378d
-grid
+grid isa Array
 
 # ╔═╡ 906292e8-e385-469f-92dd-8125fdcc78ac
 in_region(grid[:,1], poly2)
@@ -211,6 +236,9 @@ Point2(b[1]) isa Point2
 
 # ╔═╡ 4e508a67-c8b6-47f8-a160-420b7f881769
 c = [Point(0.0,0.0),Point(1.0,0.0),Point(1.0,1.0),Point(0.0,1.0),Point(0.0,0.0)]
+
+# ╔═╡ aab386b8-485d-4206-b84d-863b4219720a
+c isa Array
 
 # ╔═╡ b496c282-4de8-442e-b96f-96158375b773
 first(c[2].coords)
@@ -712,7 +740,14 @@ version = "17.4.0+2"
 # ╠═282b928a-fc7d-4487-a056-6c2626cf7179
 # ╠═2f988a76-9c84-432b-b69f-dbe06f32ea35
 # ╟─0e205c7f-43ea-4612-830c-d930e8e4522f
+# ╠═75941301-a6e4-4e17-a99f-9f2f6c825fa3
+# ╠═04a6a3b3-029c-422c-bec4-8d0f0e6f2a90
+# ╠═396e9574-82f7-4e70-a0bf-249932d60f48
 # ╠═959913ca-99f0-45ef-9754-3da4daab3a9b
+# ╠═4c21a4c1-757d-4eca-984c-16e27df3a6fa
+# ╠═38a176ff-bd7e-4ed3-a19b-a2e18ba330b8
+# ╠═46296600-2a42-455a-8557-32c3563845b6
+# ╠═1a5dd28e-1ad2-4500-b711-bef0fd3aeff6
 # ╠═86362c31-7407-4c33-b24d-5e10a2a0858f
 # ╠═8228edb8-b393-4e60-b9a1-63df7a81d0e8
 # ╠═089c8f55-2beb-4eb1-b6bf-355c2818378d
@@ -761,6 +796,7 @@ version = "17.4.0+2"
 # ╠═20d397c3-9d37-4fd1-b62c-c93b931d5c97
 # ╠═47d9109b-b546-4279-b2e4-061746214d56
 # ╠═704c0699-4c32-4039-996f-24b314e1f34b
+# ╠═aab386b8-485d-4206-b84d-863b4219720a
 # ╠═f9cf5ae3-661d-42f6-b30b-fd7ef3fb2879
 # ╠═4e508a67-c8b6-47f8-a160-420b7f881769
 # ╠═b496c282-4de8-442e-b96f-96158375b773

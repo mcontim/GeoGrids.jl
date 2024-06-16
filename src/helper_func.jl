@@ -13,13 +13,18 @@ Checks the validity of the given point `p` in terms of latitude (LAT) and longit
 ## Returns
 - A `Point2` converted to degrees.
 """
-function _check_geopoint(p::Union{AbstractVector, Tuple}; rev=false)
+function _check_geopoint(p::Union{AbstractVector, Tuple}; rev=false, unit=:deg)
     length(p) != 2 && error("The input must be a 2D point...")
     _check_angle(first(p); limit=π/2, msg="LAT provided as numbers must be expressed in radians and satisfy -π/2 ≤ x ≤ π/2. Consider using `°` from `Unitful` (Also re-exported by GeoGrids) if you want to pass numbers in degrees, by doing `x * °`.")
     _check_angle(last(p); limit=π, msg="LON provided as numbers must be expressed in radians and satisfy -π ≤ x ≤ π. Consider using `°` from `Unitful` (Also re-exported by GeoGrids) if you want to pass numbers in degrees, by doing `x * °`.")
     
-    lat = to_radians(first(p)) |> rad2deg
-	lon = to_radians(last(p)) |> rad2deg
+    if unit == :rad
+        lat = to_radians(first(p))
+        lon = to_radians(last(p))
+    else
+        lat = to_radians(first(p)) |> rad2deg
+        lon = to_radians(last(p)) |> rad2deg
+    end
 
     return rev ? Point2(lon, lat) : Point2(lat, lon) # Countries borders is in degrees (for consistency also PolyArea points are stored in degrees)
 end

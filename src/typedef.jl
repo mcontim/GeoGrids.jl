@@ -69,7 +69,7 @@ end
 
 mutable struct LatBeltRegion <: AbstractRegion
     regionName::String
-    latLim::SVector{2, ValidAngle}
+    latLim::SVector{2, ValidAngle} # rad
     
     # Inner Constructor for inputs sanity check.
     # No positional arguments allowed.

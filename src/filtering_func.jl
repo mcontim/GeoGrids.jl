@@ -28,19 +28,24 @@ end
 
 in_region(p::Union{LLA, Point2, AbstractVector, Tuple}, domain::Union{GeoRegion, PolyRegion}) = in_region(p, domain.domain)
 
-function in_region(p::Union{LLA, Point2, AbstractVector, Tuple}, domain::LatBeltRegion)
-    # Prepare the input.
-    _p = _check_geopoint(p)
-    # Check if the LAT of the point is inside the Latitude Belt region.
-    domain.latLim[1] < first(_p) < domain.latLim[2] ? true : false 
-end
-
-function in_region(points::Array{<:Union{LLA, Point2, AbstractVector, Tuple}}, domain::Union{GeometrySet, PolyArea, LatBeltRegion})
+function in_region(points::Array{<:Union{LLA, Point2, AbstractVector, Tuple}}, domain::Union{GeometrySet, PolyArea})
     mask = map(x -> in_region(x, domain), points) # Bool mask
     return mask
 end
 
 in_region(points::Array{<:Union{LLA, Point2, AbstractVector, Tuple}}, domain::Union{GeoRegion, PolyRegion}) = in_region(points, domain.domain)
+
+function in_region(p::Union{LLA, Point2, AbstractVector, Tuple}, domain::LatBeltRegion)
+    # Prepare the input.
+    _p = _check_geopoint(p; unit=:rad)
+    # Check if the LAT of the point is inside the Latitude Belt region.
+    domain.latLim[1] < first(_p.coords) < domain.latLim[2] ? true : false 
+end
+
+function in_region(points::Array{<:Union{LLA, Point2, AbstractVector, Tuple}}, domain::LatBeltRegion)
+    mask = map(x -> in_region(x, domain), points) # Bool mask
+    return mask
+end
 
 """
     filter_points(points::Union{Vector{LLA}, Vector{AbstractVector}, Vector{Point2}, Vector{Tuple}}, domain::Union{GeometrySet, PolyArea}) -> Vector{Input Type}
@@ -55,7 +60,7 @@ Filters a list of points based on whether they fall within a specified geographi
 ## Returns
 - A vector of points that fall within the specified domain, subsection of the input vector.
 """
-function filter_points(points::Array{<:Union{LLA, AbstractVector, Point2, Tuple}}, domain::Union{GeometrySet, PolyArea})
+function filter_points(points::Array{<:Union{LLA, AbstractVector, Point2, Tuple}}, domain::Union{GeometrySet, PolyArea, LatBeltRegion})
     mask = in_region(points, domain)
     return points[mask]
 end

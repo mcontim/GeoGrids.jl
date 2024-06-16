@@ -88,5 +88,3 @@ end
     r = GeoRegion(regionName="ITA", admin="Italy")
     @test extract_countries(r) == r.domain
 end
-
-# add extract_countries test

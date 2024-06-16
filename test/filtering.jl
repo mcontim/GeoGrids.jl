@@ -76,6 +76,10 @@ end
 end
 
 @testset "LatBeltRegion Test" begin
+    belt = LatBeltRegion(;regionName="test", latLim=[-60°, 60°])
+    sample_in = [(14°,1°), (26.9°,-65°), (10.1°,70°)]
+    sample_out = [(90°,1°), (60.1°,1°), (-62°,-4.9°), (-60.1°,14.9°)]
+
     @test LatBeltRegion(;regionName="region_name", latLim=[0°,π/2]) isa LatBeltRegion
     @test LatBeltRegion(;regionName="region_name", latLim=[0°,π/2]).latLim == LatBeltRegion(;regionName="region_name", latLim=[0,π/2]).latLim
     @test_throws "Input the Latitude Belt limits..." LatBeltRegion()
@@ -85,4 +89,14 @@ end
     @test_throws "The input must be a 2 elements vector..." LatBeltRegion(;regionName="region_name", latLim=[0°,0°,0°])
     @test_throws "LAT provided as numbers must be expressed in radians and satisfy -π/2 ≤ x ≤ π/2. Consider using `°` from `Unitful` (Also re-exported by GeoGrids) if you want to pass numbers in degrees, by doing `x * °`." LatBeltRegion(;regionName="region_name", latLim=[-π,π])
     @test_throws "LAT provided as numbers must be expressed in radians and satisfy -π/2 ≤ x ≤ π/2. Consider using `°` from `Unitful` (Also re-exported by GeoGrids) if you want to pass numbers in degrees, by doing `x * °`." LatBeltRegion(;regionName="region_name", latLim=[-100°,100°])
+
+    @test all(in_region(sample_in, belt))
+    @test !all(in_region(sample_out, belt))
+
+    @test in_region((0.24434609527920614, 0.017453292519943295), belt)
+    @test in_region(SVector(0.24434609527920614, 0.017453292519943295), belt)
+    @test in_region(Point2(0.24434609527920614, 0.017453292519943295), belt)
+    @test in_region(LLA(0.24434609527920614, 0.017453292519943295, 0), belt)
+
+    @test filter_points([(14°,1°), (90°,1°), (60.1°,1°), (26.9°,-65°), (-62°,-4.9°), (-60.1°,14.9°), (10.1°,70°)], belt) == sample_in
 end
