@@ -2,6 +2,7 @@ module GeoGrids
 
 using AngleBetweenVectors
 using CountriesBorders
+using Dictionaries
 using LinearAlgebra
 using Meshes
 using PlotlyExtensionsHelper

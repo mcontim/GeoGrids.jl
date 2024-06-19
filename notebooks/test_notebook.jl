@@ -47,6 +47,15 @@ md"""
 # Test
 """
 
+# ╔═╡ 4a8f6103-fcfc-43a5-b46e-2958acbe7c60
+ts = ["ciao","dio","gesu","ciao"]
+
+# ╔═╡ 4789500b-b85c-45dd-ba62-5bc284807131
+unique(ts)
+
+# ╔═╡ f6e7bd04-9919-4819-a628-28ca5511b8a1
+[GeoRegion(regionName="ITA", admin="Italy"), LatBeltRegion(;regionName="test", latLim=[-60°, 60°]),PolyRegion(regionName="POLY", domain=[LLA(-60°,-180°,0), LLA(-60°,180°,0), LLA(60°,180°,0), LLA(60°,-180°,0), LLA(-60°,-180°,0)])]
+
 # ╔═╡ 75941301-a6e4-4e17-a99f-9f2f6c825fa3
 begin
 	sample_ita = [(43.727878°,12.843441°), (43.714933°,10.399326°), (37.485829°,14.328285°), (39.330460°,8.430780°), (45.918388°,10.886654°)]
@@ -740,6 +749,9 @@ version = "17.4.0+2"
 # ╠═282b928a-fc7d-4487-a056-6c2626cf7179
 # ╠═2f988a76-9c84-432b-b69f-dbe06f32ea35
 # ╟─0e205c7f-43ea-4612-830c-d930e8e4522f
+# ╠═4a8f6103-fcfc-43a5-b46e-2958acbe7c60
+# ╠═4789500b-b85c-45dd-ba62-5bc284807131
+# ╠═f6e7bd04-9919-4819-a628-28ca5511b8a1
 # ╠═75941301-a6e4-4e17-a99f-9f2f6c825fa3
 # ╠═04a6a3b3-029c-422c-bec4-8d0f0e6f2a90
 # ╠═396e9574-82f7-4e70-a0bf-249932d60f48

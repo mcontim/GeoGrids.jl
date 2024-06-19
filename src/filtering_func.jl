@@ -69,4 +69,43 @@ end
 
 filter_points(points::Array{<:Union{LLA, AbstractVector, Point2, Tuple}}, domain::Union{GeoRegion, PolyRegion}) = filter_points(points, domain.domain)
 
-# //TODO: Add group_by function(s)
+"""
+    group_by_domain(points::Array{<:Union{LLA, AbstractVector, Point2, Tuple}}, domains::Array; unique=true)
+
+Group points by regions defined in the `domains` array.
+
+## Arguments
+- `points`: An array of points. Points can be of type `LLA`, `AbstractVector`, `Point2`, or `Tuple`.
+- `domains`: An array of domains which can contain `GeoRegion`, `PolyRegion`, `LatBeltRegion` or a mix of the three. Each domain should have a `regionName` attribute.
+- `unique`: A boolean flag. If `true`, a point is assigned to the first region it belongs to and is not considered for subsequent regions. If `false`, a point can belong to multiple regions. Default is `true`.
+
+## Returns
+- A dictionary where keys are region names and values are arrays of points belonging to that region.
+
+## Errors
+- Throws an error if the region names in `domains` are not unique.
+
+## Notes
+- The order of the `domains` array is important when `unique=true`. Points are assigned to regions in the order they appear in the `domains` array.
+- The function uses the `in_region` function to determine if a point belongs to a region.
+"""
+function group_by_domain(points::Array{<:Union{LLA, AbstractVector, Point2, Tuple}}, domains::Array; unique=true)
+    # Check region names validity
+    names = map(x -> x.regionName, domains)
+    length(unique(names)) == length(names) || error("The region names passed to group_by must be unique...")
+    
+    groups = Dictionary{String,Any}()
+    maskAccum = fill(false, size(points))
+    for dom in domains
+        mask = in_region(points, dom)
+        if unique
+            set!(groups, dom.regionName, points[mask & .!maskAccum]) # The points that appear in previously analysed regions are not added again, so the order of daomains Array is important for the output.
+            groups = points[mask]
+        else
+            set!(groups, dom.regionName, points[mask]) # The same point could appear in multiple regions
+        end
+        maskAccum .= maskAccum | mask # Update the mask with the new points
+    end
+
+    return groups
+end
