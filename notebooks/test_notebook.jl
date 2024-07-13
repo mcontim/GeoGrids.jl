@@ -133,7 +133,7 @@ sample_border = [(10°,-5°), (10.1°,10°), (27°,15°)]
 in_region(sample_border, poly)
 
 # ╔═╡ 2e7afe18-213a-4c4a-addc-1e9a6ee8b52c
-dom = group_by_domain(grid, [GeoRegion(regionName="ITA", admin="Italy"), LatBeltRegion(;regionName="test", latLim=[-60°, 60°]),PolyRegion(regionName="POLY", domain=[LLA(-60°,-180°,0), LLA(-60°,180°,0), LLA(60°,180°,0), LLA(60°,-180°,0), LLA(-60°,-180°,0)])]; flagUnique=false)
+dom = group_by_domain(grid, [GeoRegion(regionName="ITA", admin="Italy"), LatBeltRegion(;regionName="test", latLim=[-60°, 60°]),PolyRegion(regionName="POLY", domain=[LLA(-60°,-180°,0), LLA(-60°,180°,0), LLA(60°,180°,0), LLA(60°,-180°,0), LLA(-60°,-180°,0)])]; flagUnique=true)
 
 # ╔═╡ 80616657-8d31-4da0-a372-214c389c2171
 dom["test"]
