@@ -132,6 +132,15 @@ sample_border = [(10°,-5°), (10.1°,10°), (27°,15°)]
 # ╔═╡ c58e75cb-3355-4c63-8eb9-1f364c6ec159
 in_region(sample_border, poly)
 
+# ╔═╡ 2e7afe18-213a-4c4a-addc-1e9a6ee8b52c
+dom = group_by_domain(grid, [GeoRegion(regionName="ITA", admin="Italy"), LatBeltRegion(;regionName="test", latLim=[-60°, 60°]),PolyRegion(regionName="POLY", domain=[LLA(-60°,-180°,0), LLA(-60°,180°,0), LLA(60°,180°,0), LLA(60°,-180°,0), LLA(-60°,-180°,0)])]; flagUnique=false)
+
+# ╔═╡ 80616657-8d31-4da0-a372-214c389c2171
+dom["test"]
+
+# ╔═╡ 6519abbd-801d-455e-87ca-efc0ea0f0705
+poly
+
 # ╔═╡ 4eae9a7e-2c76-477d-a08f-fedffb259300
 GeoRegion(;continent="Europe",domain=PolyArea(Point2(0.0,0.0), Point2(0.0,0.5), Point2(0.3,0.5), Point2(0.3,0.0), Point2(0.0,0.0)))
 
@@ -334,7 +343,7 @@ Unzip = "~0.2.0"
 PLUTO_MANIFEST_TOML_CONTENTS = """
 # This file is machine-generated - editing it directly is not advised
 
-julia_version = "1.10.3"
+julia_version = "1.10.4"
 manifest_format = "2.0"
 project_hash = "7bb0ff3e13f58e64aef4531a0caa51f3a83844d3"
 
@@ -776,6 +785,9 @@ version = "17.4.0+2"
 # ╠═dcac9772-2c2c-431b-a568-ac91d483e470
 # ╠═163dd79f-a999-4630-9cbb-b1fb06ea8aa6
 # ╠═c58e75cb-3355-4c63-8eb9-1f364c6ec159
+# ╠═2e7afe18-213a-4c4a-addc-1e9a6ee8b52c
+# ╠═80616657-8d31-4da0-a372-214c389c2171
+# ╠═6519abbd-801d-455e-87ca-efc0ea0f0705
 # ╠═4eae9a7e-2c76-477d-a08f-fedffb259300
 # ╠═90fb35a5-51d3-4f1a-b140-c95eb0fbfa15
 # ╠═575501f7-50ea-450c-94ac-a1e484963aaf

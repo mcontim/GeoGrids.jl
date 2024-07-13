@@ -63,8 +63,10 @@ Filters a list of points based on whether they fall within a specified geographi
 - A vector of points that fall within the specified domain, subsection of the input vector.
 """
 function filter_points(points::Array{<:Union{LLA, AbstractVector, Point2, Tuple}}, domain::Union{GeometrySet, PolyArea, LatBeltRegion})
-    mask = in_region(points, domain)
-    return points[mask]
+    # mask = in_region(points, domain)
+    # return points[mask]
+    filt = filter(x -> in_region(x, domain), points)
+    return filt
 end
 
 filter_points(points::Array{<:Union{LLA, AbstractVector, Point2, Tuple}}, domain::Union{GeoRegion, PolyRegion}) = filter_points(points, domain.domain)
@@ -89,22 +91,21 @@ Group points by regions defined in the `domains` array.
 - The order of the `domains` array is important when `unique=true`. Points are assigned to regions in the order they appear in the `domains` array.
 - The function uses the `in_region` function to determine if a point belongs to a region.
 """
-function group_by_domain(points::Array{<:Union{LLA, AbstractVector, Point2, Tuple}}, domains::Array; unique=true)
+function group_by_domain(points::Array{<:Union{LLA, AbstractVector, Point2, Tuple}}, domains::Array; flagUnique=true)
     # Check region names validity
     names = map(x -> x.regionName, domains)
     length(unique(names)) == length(names) || error("The region names passed to group_by must be unique...")
     
-    groups = Dictionary{String,Any}()
-    maskAccum = fill(false, size(points))
-    for dom in domains
-        mask = in_region(points, dom)
-        if unique
-            set!(groups, dom.regionName, points[mask & .!maskAccum]) # The points that appear in previously analysed regions are not added again, so the order of daomains Array is important for the output.
-            groups = points[mask]
-        else
-            set!(groups, dom.regionName, points[mask]) # The same point could appear in multiple regions
+    groups = Dictionary(map(x -> x.regionName, domains), map(_ -> eltype(points)[], domains))
+
+    for p in points
+        for dom in domains
+            vec = groups[dom.regionName]
+            if in_region(p, dom)
+                push!(vec, p)
+                flagUnique && break
+            end
         end
-        maskAccum .= maskAccum | mask # Update the mask with the new points
     end
 
     return groups
