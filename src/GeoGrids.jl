@@ -22,8 +22,6 @@ export GeoRegion, PolyRegion, LatBeltRegion
 export icogrid, meshgrid, vecgrid,
 extract_countries, in_region, filter_points
 
-export °, LLA,
-Point2, PolyArea,
-SVector
+export °, SimpleLatLon, PolyArea,
 
 end # module GeoGrids

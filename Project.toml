@@ -21,9 +21,9 @@ PlotlyBaseExt = "PlotlyBase"
 
 [compat]
 AngleBetweenVectors = "0.3"
-CountriesBorders = "0.2.1"
+CountriesBorders = "0.3.3"
 LinearAlgebra = "1"
-Meshes = "0.28.1"
+Meshes = "0.46"
 PlotlyBase = "0.8.19"
 PlotlyExtensionsHelper = "0.1"
 StaticArrays = "1"

@@ -1,10 +1,12 @@
 ### A Pluto.jl notebook ###
 # v0.19.41
 
+#> custom_attrs = ["hide-enabled"]
+
 using Markdown
 using InteractiveUtils
 
-# ╔═╡ cea38f6b-4eaf-4d4d-a882-81bf1e63e902
+# ╔═╡ 0e3793aa-13d2-4aeb-ad60-b98927932dc6
 begin
 	using PlutoUI
 	using PlutoExtras
@@ -14,7 +16,7 @@ begin
 	using PlotlyBase
 end
 
-# ╔═╡ 6c7d8bc0-47aa-499b-a0fc-895828c43ec6
+# ╔═╡ bf20cace-b64b-4155-90c1-1ec3644510d7
 @fromparent begin
 	import ^: * # to eport all functions from parent package
 	using >. AngleBetweenVectors
@@ -26,7 +28,7 @@ end
 	using >. Meshes
 end
 
-# ╔═╡ 9b06e2f7-cf71-4317-aecf-f44124ca9fde
+# ╔═╡ 1005c11c-1fef-4f3f-8cdf-d4b91d16fc60
 begin
 	using BenchmarkTools
 	using PlutoVSCodeDebugger
@@ -34,277 +36,15 @@ begin
 	using Unitful
 end
 
-# ╔═╡ 282b928a-fc7d-4487-a056-6c2626cf7179
+# ╔═╡ 069444e1-4e89-4f4f-ae2f-f5fb3131e398
 ExtendedTableOfContents()
 
-# ╔═╡ 0e205c7f-43ea-4612-830c-d930e8e4522f
+# ╔═╡ 8717aaad-3791-40ec-82a3-3957fb10a562
 md"""
 # Test
 """
 
-# ╔═╡ 4a8f6103-fcfc-43a5-b46e-2958acbe7c60
-ts = ["ciao","dio","gesu","ciao"]
-
-# ╔═╡ 4789500b-b85c-45dd-ba62-5bc284807131
-unique(ts)
-
-# ╔═╡ f6e7bd04-9919-4819-a628-28ca5511b8a1
-[GeoRegion(regionName="ITA", admin="Italy"), LatBeltRegion(;regionName="test", latLim=[-60°, 60°]),PolyRegion(regionName="POLY", domain=[LLA(-60°,-180°,0), LLA(-60°,180°,0), LLA(60°,180°,0), LLA(60°,-180°,0), LLA(-60°,-180°,0)])]
-
-# ╔═╡ 75941301-a6e4-4e17-a99f-9f2f6c825fa3
-begin
-	sample_ita = [(43.727878°,12.843441°), (43.714933°,10.399326°), (37.485829°,14.328285°), (39.330460°,8.430780°), (45.918388°,10.886654°)]
-	ita = GeoRegion(regionName="ITA", admin="Italy")
-	sv_ita = map(x -> SVector(x...), sample_ita)
-end
-
-# ╔═╡ 04a6a3b3-029c-422c-bec4-8d0f0e6f2a90
-sample_ita isa Array
-
-# ╔═╡ 396e9574-82f7-4e70-a0bf-249932d60f48
-all(in_region(sv_ita, ita))
-
-# ╔═╡ 959913ca-99f0-45ef-9754-3da4daab3a9b
-vecgrid(deg2rad(5); height=0.0, type=:point, unit=:deg)
-
-# ╔═╡ 4c21a4c1-757d-4eca-984c-16e27df3a6fa
- belt = LatBeltRegion(;regionName="test", latLim=[-60°, 60°])
-
-# ╔═╡ 38a176ff-bd7e-4ed3-a19b-a2e18ba330b8
-in_region(Point2(0.24434609527920614, 0.017453292519943295), belt)
-
-# ╔═╡ 46296600-2a42-455a-8557-32c3563845b6
-in_region(LLA(0,0,0), belt)
-
-# ╔═╡ 1a5dd28e-1ad2-4500-b711-bef0fd3aeff6
-methods(in_region)
-
-# ╔═╡ a6a8271e-f6f9-4eab-8526-0af57a6ad684
-poly2 = PolyRegion(regionName="POLY", domain=[LLA(-60°,-180°,0), LLA(-60°,180°,0), LLA(60°,180°,0), LLA(60°,-180°,0), LLA(-60°,-180°,0)])
-
-# ╔═╡ 8e22cfe1-6b66-4a1d-b7b0-f43f645a5b86
-poly2.domain.outer
-
-# ╔═╡ eef8c134-cb50-4f44-be4b-2572b9ba691e
-poly3 = PolyRegion(regionName="POLY", domain=[(-370°,-181°),(-60°,180°),(60°,180°),(60°,-180°), (-60°,-181°)])
-
-# ╔═╡ 464e2924-24b6-4f96-9200-627e497877db
-LatBeltRegion(regionName="aaa", latLim=[90°,-90°])
-
-# ╔═╡ c9738f80-0297-46c4-b5ee-1a64ced99296
-grid=meshgrid(deg2rad(5))
-
-# ╔═╡ 089c8f55-2beb-4eb1-b6bf-355c2818378d
-grid isa Array
-
-# ╔═╡ 906292e8-e385-469f-92dd-8125fdcc78ac
-in_region(grid[:,1], poly2)
-
-# ╔═╡ 992a4e72-4465-4cd4-9187-b4b6704c13a4
-plot_geo(grid; title="Icogrid", camera=:threedim)
-
-# ╔═╡ dbda3eaf-fd96-4633-8603-368057a76ecd
-r = GeoRegion(continent="Europe")
-
-# ╔═╡ 2a77c856-6155-4759-bf50-aa3169d7494d
-filt = filter_points(grid,poly2)
-
-# ╔═╡ 86362c31-7407-4c33-b24d-5e10a2a0858f
-plot_geo(filt, title="Filter by Geo Region", camera=:threedim)
-
-# ╔═╡ 8228edb8-b393-4e60-b9a1-63df7a81d0e8
-filt
-
-# ╔═╡ dcac9772-2c2c-431b-a568-ac91d483e470
-poly = PolyRegion(regionName="POLY", domain=[LLA(10°,-5°,0), LLA(10°,15°,0), LLA(27°,15°,0), LLA(27°,-5°,0), LLA(10°,-5°,0)])
-
-# ╔═╡ 75d1571e-2806-4613-b08f-13f8e069e26e
-in_region(grid,poly)
-
-# ╔═╡ 163dd79f-a999-4630-9cbb-b1fb06ea8aa6
-sample_border = [(10°,-5°), (10.1°,10°), (27°,15°)]
-
-# ╔═╡ c58e75cb-3355-4c63-8eb9-1f364c6ec159
-in_region(sample_border, poly)
-
-# ╔═╡ 2e7afe18-213a-4c4a-addc-1e9a6ee8b52c
-dom = group_by_domain(grid, [GeoRegion(regionName="ITA", admin="Italy"), LatBeltRegion(;regionName="test", latLim=[-60°, 60°]),PolyRegion(regionName="POLY", domain=[LLA(-60°,-180°,0), LLA(-60°,180°,0), LLA(60°,180°,0), LLA(60°,-180°,0), LLA(-60°,-180°,0)])]; flagUnique=true)
-
-# ╔═╡ 80616657-8d31-4da0-a372-214c389c2171
-dom["test"]
-
-# ╔═╡ 6519abbd-801d-455e-87ca-efc0ea0f0705
-poly
-
-# ╔═╡ 4eae9a7e-2c76-477d-a08f-fedffb259300
-GeoRegion(;continent="Europe",domain=PolyArea(Point2(0.0,0.0), Point2(0.0,0.5), Point2(0.3,0.5), Point2(0.3,0.0), Point2(0.0,0.0)))
-
-# ╔═╡ 90fb35a5-51d3-4f1a-b140-c95eb0fbfa15
-PolyRegion(domain=[LLA(10°,-5°,0), LLA(10°,15°,0), LLA(27°,15°,0), LLA(27°,-5°,0), LLA(10°,-5°,0)])
-
-# ╔═╡ 575501f7-50ea-450c-94ac-a1e484963aaf
-PolyRegion(domain=[(10°,-5°), (10°,15°), (27°,15°), (27°,-5°), (10°,-5°)])
-
-# ╔═╡ 1732096c-d89d-4c07-97e6-60973a6bbc1c
-[(10°,-5°), (10°,15°), (27°,15°), (27°,-5°), (10°,-5°)] isa Vector{Tuple}
-
-# ╔═╡ 77a2eac3-c24b-4ab9-bf01-43d741674120
-abs(-93.2244°)
-
-# ╔═╡ a32a1633-134f-4363-96b0-65d511142ec0
-93.2244°<pi/2
-
-# ╔═╡ 02348c26-d666-4da3-9390-edbd6ca87027
-
-
-# ╔═╡ 278fbecd-f240-4693-b65d-083b02aae797
-www=meshgrid(1;unit=:deg)
-
-# ╔═╡ 658a8bf3-452a-4748-a24d-023200586516
-a1=2.0
-
-# ╔═╡ ac5eb1ce-aa4b-4a3e-ad05-ed47852d1c00
-a3=5°
-
-# ╔═╡ 54ae0273-62ae-45f2-ac1c-870014a098ac
-typeof(ustrip(a3))
-
-# ╔═╡ 620108e4-ed0c-4955-9e04-1d3fe9683aeb
-a2=[1,3]
-
-# ╔═╡ 2fc51681-33db-48a1-8cd0-939615dab9d5
-reverse!(a2)
-
-# ╔═╡ 219b93b6-34a2-4422-a971-da417033effd
-a2
-
-# ╔═╡ 68e99520-e513-4355-8871-70177c936b10
-length((1,2))
-
-# ╔═╡ 925e889f-1a4a-449f-b5dd-b5581a0d169f
-typeof((1,2))
-
-# ╔═╡ 4a96aafa-1313-444b-a5cb-cb56a1c5189f
-SMatrix{3,3}([1 0 0;0 1 0;0 0 1])
-
-# ╔═╡ 3e0a9404-9ec5-40bc-9074-2dee6efccb43
-map(randn(3,3)) do v
-	v*2
-end
-
-# ╔═╡ f429fdbe-4464-4ca5-a4ba-b7830c12d49f
-s = "a"
-
-# ╔═╡ a41c17a6-b650-4b92-939e-d79cd820ad27
-isempty(s)
-
-# ╔═╡ 542e9a43-44c4-4c88-b511-a4ffc3adc0b6
-methods(StaticVector)
-
-# ╔═╡ 152ae683-dbad-4c2c-9c4a-5e14a31d2748
-md"""
-## GeoRegion
-"""
-
-# ╔═╡ 40653a7f-bc4b-47f2-9006-6856bb89210e
-# ╠═╡ disabled = true
-#=╠═╡
-r = GeoRegion(;continent = "Europe", admin="Italy")
-  ╠═╡ =#
-
-# ╔═╡ 9c977c07-ce0e-4c38-bcac-b2a83cfb3544
-GeoRegion(continent = "Europe", admin="Italy")
-
-# ╔═╡ 974a09cd-fffb-40c6-b277-8a27fd827f92
-methods(GeoRegion)
-
-# ╔═╡ 8f960ccd-a95d-403f-a6f8-0c8da617c009
-md"""
-## PolyRegion
-"""
-
-# ╔═╡ 16558f4f-0d6c-4f0f-90fe-6f43b023f33e
-methods(PolyRegion)
-
-# ╔═╡ 01ce8e56-201c-47a6-b925-a1d95f816b60
-methods(in_region)
-
-# ╔═╡ 26ffbfb5-da79-45b1-bf77-ace20102699e
-# ╠═╡ disabled = true
-#=╠═╡
-poly = PolyArea((0.0,0.0),(1.0,0.0),(1.0,1.0),(0.0,1.0),(0.0,0.0))
-  ╠═╡ =#
-
-# ╔═╡ 20d397c3-9d37-4fd1-b62c-c93b931d5c97
-a = [(0.0,0.0),(1.0,0.0),(1.0,1.0),(0.0,1.0)]
-
-# ╔═╡ 47d9109b-b546-4279-b2e4-061746214d56
-Point2(a[1])
-
-# ╔═╡ f9cf5ae3-661d-42f6-b30b-fd7ef3fb2879
-b = [SVector(0.0,0.0),SVector(1.0,0.0),SVector(1.0,1.0),SVector(0.0,1.0),SVector(0.0,0.0)]
-
-# ╔═╡ 704c0699-4c32-4039-996f-24b314e1f34b
-Point2(b[1]) isa Point2
-
-# ╔═╡ 4e508a67-c8b6-47f8-a160-420b7f881769
-c = [Point(0.0,0.0),Point(1.0,0.0),Point(1.0,1.0),Point(0.0,1.0),Point(0.0,0.0)]
-
-# ╔═╡ aab386b8-485d-4206-b84d-863b4219720a
-c isa Array
-
-# ╔═╡ b496c282-4de8-442e-b96f-96158375b773
-first(c[2].coords)
-
-# ╔═╡ 03251cdd-55e1-4392-aebd-4e8d8679cf62
-last(c[2].coords)
-
-# ╔═╡ 49a31491-a55f-4fb5-b8f7-d037a346837c
-typeof(c[1].coords)
-
-# ╔═╡ 2e1e519f-0d5e-48b8-800b-f1159a796dca
-c[1].coords isa Vec2
-
-# ╔═╡ 73aff794-81c0-4d1c-89cd-b965415ad8d9
-c[1].coords isa AbstractVector
-
-# ╔═╡ 24b3a8e0-5624-402c-afc4-8203691dc913
-c[1] isa Point2
-
-# ╔═╡ f3a6771f-2e7a-446f-ade5-6fee0091ccb4
-b[1] isa AbstractVector
-
-# ╔═╡ e15afc1f-ea55-48c9-8fed-8c98e3ed60e1
-a[1] isa Tuple
-
-# ╔═╡ 5ba44a38-e391-42dc-a566-ec4552329073
-length(a[1])
-
-# ╔═╡ 60f4905c-6f6f-405a-bcf0-05110f5e05e3
-AbstractVector{2}
-
-# ╔═╡ 3052ad94-14f6-42f9-bbf1-ff744138d8a1
-PolyRegion(domain=poly)
-
-# ╔═╡ ee9f61e3-dd7c-40a8-b7a8-41009b4a3518
-PolyRegion(domain=a)
-
-# ╔═╡ 850942e4-95f3-4f07-9493-9c3e709cb080
-PolyRegion(domain=b)
-
-# ╔═╡ c74bde8a-74d3-45e9-9857-330d0f9ff411
-PolyRegion(domain=c)
-
-# ╔═╡ c21f4e70-77f0-4ea8-bf96-450820f2912d
-nt=(continent="Europe", admin="")
-
-# ╔═╡ c058ccea-4945-416f-9bed-0d1063e398a0
-aaa=CountriesBorders.extract_countries(;nt...)
-
-# ╔═╡ 1da7de55-cc23-4a51-93e7-21bfc4fcadfa
-aaa.items[1].items[1].outer
-
-# ╔═╡ 6cca736e-7006-4887-83f0-d15f49533903
+# ╔═╡ b94c71b6-0601-4a4c-ac92-417f0c372334
 md"""
 # Packages
 """
@@ -325,8 +65,8 @@ Unzip = "41fe7b60-77ed-43a1-b4f0-825fd5a5650d"
 [compat]
 BenchmarkTools = "~1.5.0"
 PlotlyBase = "~0.8.19"
-PlutoDevMacros = "~0.7.4"
-PlutoExtras = "~0.7.12"
+PlutoDevMacros = "~0.9.0"
+PlutoExtras = "~0.7.13"
 PlutoPlotly = "~0.4.6"
 PlutoUI = "~0.7.59"
 PlutoVSCodeDebugger = "~0.2.0"
@@ -340,7 +80,7 @@ PLUTO_MANIFEST_TOML_CONTENTS = """
 
 julia_version = "1.10.4"
 manifest_format = "2.0"
-project_hash = "7bb0ff3e13f58e64aef4531a0caa51f3a83844d3"
+project_hash = "5bff041b11d85656c08714c8c15983d5d9622eff"
 
 [[deps.AbstractPlutoDingetjes]]
 deps = ["Pkg"]
@@ -368,6 +108,12 @@ deps = ["JSON", "Logging", "Printf", "Profile", "Statistics", "UUIDs"]
 git-tree-sha1 = "f1dff6729bc61f4d49e140da1af55dcd1ac97b2f"
 uuid = "6e4b80f9-dd63-53aa-95a3-0cdb28fa8baf"
 version = "1.5.0"
+
+[[deps.CodeTracking]]
+deps = ["InteractiveUtils", "UUIDs"]
+git-tree-sha1 = "c0216e792f518b39b22212127d4a84dc31e4e386"
+uuid = "da1fd8a2-8d9e-5ec2-8556-3022fb5608a2"
+version = "1.3.5"
 
 [[deps.ColorSchemes]]
 deps = ["ColorTypes", "ColorVectorSpace", "Colors", "FixedPointNumbers", "PrecompileTools", "Random"]
@@ -448,9 +194,9 @@ version = "0.9.5"
 
 [[deps.IOCapture]]
 deps = ["Logging", "Random"]
-git-tree-sha1 = "8b72179abc660bfab5e28472e019392b97d0985c"
+git-tree-sha1 = "b6d6bfdd7ce25b0f9b2f6b3dd56b2673a66c8770"
 uuid = "b5f81e59-6552-4d32-b1f0-c071b021bf89"
-version = "0.2.4"
+version = "0.2.5"
 
 [[deps.InteractiveUtils]]
 deps = ["Markdown"]
@@ -461,6 +207,12 @@ deps = ["Dates", "Mmap", "Parsers", "Unicode"]
 git-tree-sha1 = "31e996f0a15c7b280ba9f76636b3ff9e2ae58c9a"
 uuid = "682c06a0-de6a-54ab-a142-c8b1cf79cde6"
 version = "0.21.4"
+
+[[deps.JuliaInterpreter]]
+deps = ["CodeTracking", "InteractiveUtils", "Random", "UUIDs"]
+git-tree-sha1 = "a6adc2dcfe4187c40dc7c2c9d2128e326360e90a"
+uuid = "aa1ae85d-cabe-5617-a682-6adf51b2e16a"
+version = "0.9.32"
 
 [[deps.LaTeXStrings]]
 git-tree-sha1 = "50901ebc375ed41dbf8058da26f9de442febbbec"
@@ -566,16 +318,16 @@ uuid = "a03496cd-edff-5a9b-9e67-9cda94a718b5"
 version = "0.8.19"
 
 [[deps.PlutoDevMacros]]
-deps = ["AbstractPlutoDingetjes", "DocStringExtensions", "HypertextLiteral", "InteractiveUtils", "MacroTools", "Markdown", "Pkg", "Random", "TOML"]
-git-tree-sha1 = "c3839362a712e6d9c2845d179edafe74371cb77b"
+deps = ["JuliaInterpreter", "Logging", "MacroTools", "Pkg", "TOML"]
+git-tree-sha1 = "72f65885168722413c7b9a9debc504c7e7df7709"
 uuid = "a0499f29-c39b-4c5c-807c-88074221b949"
-version = "0.7.4"
+version = "0.9.0"
 
 [[deps.PlutoExtras]]
-deps = ["AbstractPlutoDingetjes", "HypertextLiteral", "InteractiveUtils", "Markdown", "PlutoDevMacros", "PlutoUI", "REPL"]
-git-tree-sha1 = "93d8c75734da9192d0639406fe6fb446be0fba4f"
+deps = ["AbstractPlutoDingetjes", "DocStringExtensions", "HypertextLiteral", "InteractiveUtils", "Markdown", "PlutoUI", "REPL", "Random"]
+git-tree-sha1 = "681f89bdd5c1da76b31a524af798efb5eb332ee9"
 uuid = "ed5d0301-4775-4676-b788-cf71e66ff8ed"
-version = "0.7.12"
+version = "0.7.13"
 
 [[deps.PlutoPlotly]]
 deps = ["AbstractPlutoDingetjes", "BaseDirs", "Colors", "Dates", "Downloads", "HypertextLiteral", "InteractiveUtils", "LaTeXStrings", "Markdown", "Pkg", "PlotlyBase", "Reexport", "TOML"]
@@ -750,93 +502,11 @@ version = "17.4.0+2"
 """
 
 # ╔═╡ Cell order:
-# ╠═282b928a-fc7d-4487-a056-6c2626cf7179
-# ╟─0e205c7f-43ea-4612-830c-d930e8e4522f
-# ╠═4a8f6103-fcfc-43a5-b46e-2958acbe7c60
-# ╠═4789500b-b85c-45dd-ba62-5bc284807131
-# ╠═f6e7bd04-9919-4819-a628-28ca5511b8a1
-# ╠═75941301-a6e4-4e17-a99f-9f2f6c825fa3
-# ╠═04a6a3b3-029c-422c-bec4-8d0f0e6f2a90
-# ╠═396e9574-82f7-4e70-a0bf-249932d60f48
-# ╠═959913ca-99f0-45ef-9754-3da4daab3a9b
-# ╠═4c21a4c1-757d-4eca-984c-16e27df3a6fa
-# ╠═38a176ff-bd7e-4ed3-a19b-a2e18ba330b8
-# ╠═46296600-2a42-455a-8557-32c3563845b6
-# ╠═1a5dd28e-1ad2-4500-b711-bef0fd3aeff6
-# ╠═86362c31-7407-4c33-b24d-5e10a2a0858f
-# ╠═8228edb8-b393-4e60-b9a1-63df7a81d0e8
-# ╠═089c8f55-2beb-4eb1-b6bf-355c2818378d
-# ╠═906292e8-e385-469f-92dd-8125fdcc78ac
-# ╠═8e22cfe1-6b66-4a1d-b7b0-f43f645a5b86
-# ╠═a6a8271e-f6f9-4eab-8526-0af57a6ad684
-# ╠═eef8c134-cb50-4f44-be4b-2572b9ba691e
-# ╠═464e2924-24b6-4f96-9200-627e497877db
-# ╠═992a4e72-4465-4cd4-9187-b4b6704c13a4
-# ╠═c9738f80-0297-46c4-b5ee-1a64ced99296
-# ╠═dbda3eaf-fd96-4633-8603-368057a76ecd
-# ╠═2a77c856-6155-4759-bf50-aa3169d7494d
-# ╠═75d1571e-2806-4613-b08f-13f8e069e26e
-# ╠═dcac9772-2c2c-431b-a568-ac91d483e470
-# ╠═163dd79f-a999-4630-9cbb-b1fb06ea8aa6
-# ╠═c58e75cb-3355-4c63-8eb9-1f364c6ec159
-# ╠═2e7afe18-213a-4c4a-addc-1e9a6ee8b52c
-# ╠═80616657-8d31-4da0-a372-214c389c2171
-# ╠═6519abbd-801d-455e-87ca-efc0ea0f0705
-# ╠═4eae9a7e-2c76-477d-a08f-fedffb259300
-# ╠═90fb35a5-51d3-4f1a-b140-c95eb0fbfa15
-# ╠═575501f7-50ea-450c-94ac-a1e484963aaf
-# ╠═1732096c-d89d-4c07-97e6-60973a6bbc1c
-# ╠═77a2eac3-c24b-4ab9-bf01-43d741674120
-# ╠═a32a1633-134f-4363-96b0-65d511142ec0
-# ╠═02348c26-d666-4da3-9390-edbd6ca87027
-# ╠═278fbecd-f240-4693-b65d-083b02aae797
-# ╠═658a8bf3-452a-4748-a24d-023200586516
-# ╠═ac5eb1ce-aa4b-4a3e-ad05-ed47852d1c00
-# ╠═54ae0273-62ae-45f2-ac1c-870014a098ac
-# ╠═620108e4-ed0c-4955-9e04-1d3fe9683aeb
-# ╠═2fc51681-33db-48a1-8cd0-939615dab9d5
-# ╠═219b93b6-34a2-4422-a971-da417033effd
-# ╠═68e99520-e513-4355-8871-70177c936b10
-# ╠═925e889f-1a4a-449f-b5dd-b5581a0d169f
-# ╠═4a96aafa-1313-444b-a5cb-cb56a1c5189f
-# ╠═3e0a9404-9ec5-40bc-9074-2dee6efccb43
-# ╠═f429fdbe-4464-4ca5-a4ba-b7830c12d49f
-# ╠═a41c17a6-b650-4b92-939e-d79cd820ad27
-# ╠═542e9a43-44c4-4c88-b511-a4ffc3adc0b6
-# ╟─152ae683-dbad-4c2c-9c4a-5e14a31d2748
-# ╠═40653a7f-bc4b-47f2-9006-6856bb89210e
-# ╠═9c977c07-ce0e-4c38-bcac-b2a83cfb3544
-# ╠═974a09cd-fffb-40c6-b277-8a27fd827f92
-# ╟─8f960ccd-a95d-403f-a6f8-0c8da617c009
-# ╠═16558f4f-0d6c-4f0f-90fe-6f43b023f33e
-# ╠═01ce8e56-201c-47a6-b925-a1d95f816b60
-# ╠═26ffbfb5-da79-45b1-bf77-ace20102699e
-# ╠═20d397c3-9d37-4fd1-b62c-c93b931d5c97
-# ╠═47d9109b-b546-4279-b2e4-061746214d56
-# ╠═704c0699-4c32-4039-996f-24b314e1f34b
-# ╠═aab386b8-485d-4206-b84d-863b4219720a
-# ╠═f9cf5ae3-661d-42f6-b30b-fd7ef3fb2879
-# ╠═4e508a67-c8b6-47f8-a160-420b7f881769
-# ╠═b496c282-4de8-442e-b96f-96158375b773
-# ╠═03251cdd-55e1-4392-aebd-4e8d8679cf62
-# ╠═49a31491-a55f-4fb5-b8f7-d037a346837c
-# ╠═2e1e519f-0d5e-48b8-800b-f1159a796dca
-# ╠═73aff794-81c0-4d1c-89cd-b965415ad8d9
-# ╠═24b3a8e0-5624-402c-afc4-8203691dc913
-# ╠═f3a6771f-2e7a-446f-ade5-6fee0091ccb4
-# ╠═e15afc1f-ea55-48c9-8fed-8c98e3ed60e1
-# ╠═5ba44a38-e391-42dc-a566-ec4552329073
-# ╠═60f4905c-6f6f-405a-bcf0-05110f5e05e3
-# ╠═3052ad94-14f6-42f9-bbf1-ff744138d8a1
-# ╠═ee9f61e3-dd7c-40a8-b7a8-41009b4a3518
-# ╠═850942e4-95f3-4f07-9493-9c3e709cb080
-# ╠═c74bde8a-74d3-45e9-9857-330d0f9ff411
-# ╠═c058ccea-4945-416f-9bed-0d1063e398a0
-# ╠═1da7de55-cc23-4a51-93e7-21bfc4fcadfa
-# ╠═c21f4e70-77f0-4ea8-bf96-450820f2912d
-# ╟─6cca736e-7006-4887-83f0-d15f49533903
-# ╠═6c7d8bc0-47aa-499b-a0fc-895828c43ec6
-# ╠═cea38f6b-4eaf-4d4d-a882-81bf1e63e902
-# ╠═9b06e2f7-cf71-4317-aecf-f44124ca9fde
+# ╠═069444e1-4e89-4f4f-ae2f-f5fb3131e398
+# ╟─8717aaad-3791-40ec-82a3-3957fb10a562
+# ╟─b94c71b6-0601-4a4c-ac92-417f0c372334
+# ╠═bf20cace-b64b-4155-90c1-1ec3644510d7
+# ╠═0e3793aa-13d2-4aeb-ad60-b98927932dc6
+# ╠═1005c11c-1fef-4f3f-8cdf-d4b91d16fc60
 # ╟─00000000-0000-0000-0000-000000000001
 # ╟─00000000-0000-0000-0000-000000000002
