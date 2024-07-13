@@ -47,11 +47,78 @@ md"""
 # Test
 """
 
+# ╔═╡ 4a8f6103-fcfc-43a5-b46e-2958acbe7c60
+ts = ["ciao","dio","gesu","ciao"]
+
+# ╔═╡ 4789500b-b85c-45dd-ba62-5bc284807131
+unique(ts)
+
+# ╔═╡ f6e7bd04-9919-4819-a628-28ca5511b8a1
+[GeoRegion(regionName="ITA", admin="Italy"), LatBeltRegion(;regionName="test", latLim=[-60°, 60°]),PolyRegion(regionName="POLY", domain=[LLA(-60°,-180°,0), LLA(-60°,180°,0), LLA(60°,180°,0), LLA(60°,-180°,0), LLA(-60°,-180°,0)])]
+
+# ╔═╡ 75941301-a6e4-4e17-a99f-9f2f6c825fa3
+begin
+	sample_ita = [(43.727878°,12.843441°), (43.714933°,10.399326°), (37.485829°,14.328285°), (39.330460°,8.430780°), (45.918388°,10.886654°)]
+	ita = GeoRegion(regionName="ITA", admin="Italy")
+	sv_ita = map(x -> SVector(x...), sample_ita)
+end
+
+# ╔═╡ 04a6a3b3-029c-422c-bec4-8d0f0e6f2a90
+sample_ita isa Array
+
+# ╔═╡ 396e9574-82f7-4e70-a0bf-249932d60f48
+all(in_region(sv_ita, ita))
+
+# ╔═╡ 959913ca-99f0-45ef-9754-3da4daab3a9b
+vecgrid(deg2rad(5); height=0.0, type=:point, unit=:deg)
+
+# ╔═╡ 4c21a4c1-757d-4eca-984c-16e27df3a6fa
+ belt = LatBeltRegion(;regionName="test", latLim=[-60°, 60°])
+
+# ╔═╡ 38a176ff-bd7e-4ed3-a19b-a2e18ba330b8
+in_region(Point2(0.24434609527920614, 0.017453292519943295), belt)
+
+# ╔═╡ 46296600-2a42-455a-8557-32c3563845b6
+in_region(LLA(0,0,0), belt)
+
+# ╔═╡ 1a5dd28e-1ad2-4500-b711-bef0fd3aeff6
+methods(in_region)
+
+# ╔═╡ a6a8271e-f6f9-4eab-8526-0af57a6ad684
+poly2 = PolyRegion(regionName="POLY", domain=[LLA(-60°,-180°,0), LLA(-60°,180°,0), LLA(60°,180°,0), LLA(60°,-180°,0), LLA(-60°,-180°,0)])
+
+# ╔═╡ 8e22cfe1-6b66-4a1d-b7b0-f43f645a5b86
+poly2.domain.outer
+
+# ╔═╡ eef8c134-cb50-4f44-be4b-2572b9ba691e
+poly3 = PolyRegion(regionName="POLY", domain=[(-370°,-181°),(-60°,180°),(60°,180°),(60°,-180°), (-60°,-181°)])
+
+# ╔═╡ 464e2924-24b6-4f96-9200-627e497877db
+LatBeltRegion(regionName="aaa", latLim=[90°,-90°])
+
 # ╔═╡ c9738f80-0297-46c4-b5ee-1a64ced99296
-grid=meshgrid(deg2rad(3))
+grid=meshgrid(deg2rad(5))
+
+# ╔═╡ 089c8f55-2beb-4eb1-b6bf-355c2818378d
+grid isa Array
+
+# ╔═╡ 906292e8-e385-469f-92dd-8125fdcc78ac
+in_region(grid[:,1], poly2)
 
 # ╔═╡ 992a4e72-4465-4cd4-9187-b4b6704c13a4
-plot_geo(grid; title="Icogrid")
+plot_geo(grid; title="Icogrid", camera=:threedim)
+
+# ╔═╡ dbda3eaf-fd96-4633-8603-368057a76ecd
+r = GeoRegion(continent="Europe")
+
+# ╔═╡ 2a77c856-6155-4759-bf50-aa3169d7494d
+filt = filter_points(grid,poly2)
+
+# ╔═╡ 86362c31-7407-4c33-b24d-5e10a2a0858f
+plot_geo(filt, title="Filter by Geo Region", camera=:threedim)
+
+# ╔═╡ 8228edb8-b393-4e60-b9a1-63df7a81d0e8
+filt
 
 # ╔═╡ dcac9772-2c2c-431b-a568-ac91d483e470
 poly = PolyRegion(regionName="POLY", domain=[LLA(10°,-5°,0), LLA(10°,15°,0), LLA(27°,15°,0), LLA(27°,-5°,0), LLA(10°,-5°,0)])
@@ -64,6 +131,15 @@ sample_border = [(10°,-5°), (10.1°,10°), (27°,15°)]
 
 # ╔═╡ c58e75cb-3355-4c63-8eb9-1f364c6ec159
 in_region(sample_border, poly)
+
+# ╔═╡ 2e7afe18-213a-4c4a-addc-1e9a6ee8b52c
+dom = group_by_domain(grid, [GeoRegion(regionName="ITA", admin="Italy"), LatBeltRegion(;regionName="test", latLim=[-60°, 60°]),PolyRegion(regionName="POLY", domain=[LLA(-60°,-180°,0), LLA(-60°,180°,0), LLA(60°,180°,0), LLA(60°,-180°,0), LLA(-60°,-180°,0)])]; flagUnique=true)
+
+# ╔═╡ 80616657-8d31-4da0-a372-214c389c2171
+dom["test"]
+
+# ╔═╡ 6519abbd-801d-455e-87ca-efc0ea0f0705
+poly
 
 # ╔═╡ 4eae9a7e-2c76-477d-a08f-fedffb259300
 GeoRegion(;continent="Europe",domain=PolyArea(Point2(0.0,0.0), Point2(0.0,0.5), Point2(0.3,0.5), Point2(0.3,0.0), Point2(0.0,0.0)))
@@ -135,11 +211,11 @@ md"""
 ## GeoRegion
 """
 
-# ╔═╡ 2a77c856-6155-4759-bf50-aa3169d7494d
-filt = filter_points(grid,r)
-
-# ╔═╡ 86362c31-7407-4c33-b24d-5e10a2a0858f
-plot_geo(filt, title="Filter by Geo Region")
+# ╔═╡ 40653a7f-bc4b-47f2-9006-6856bb89210e
+# ╠═╡ disabled = true
+#=╠═╡
+r = GeoRegion(;continent = "Europe", admin="Italy")
+  ╠═╡ =#
 
 # ╔═╡ 9c977c07-ce0e-4c38-bcac-b2a83cfb3544
 GeoRegion(continent = "Europe", admin="Italy")
@@ -178,6 +254,9 @@ Point2(b[1]) isa Point2
 
 # ╔═╡ 4e508a67-c8b6-47f8-a160-420b7f881769
 c = [Point(0.0,0.0),Point(1.0,0.0),Point(1.0,1.0),Point(0.0,1.0),Point(0.0,0.0)]
+
+# ╔═╡ aab386b8-485d-4206-b84d-863b4219720a
+c isa Array
 
 # ╔═╡ b496c282-4de8-442e-b96f-96158375b773
 first(c[2].coords)
@@ -235,15 +314,6 @@ md"""
 # Packages
 """
 
-# ╔═╡ dbda3eaf-fd96-4633-8603-368057a76ecd
-r = GeoRegion(continent="Europe")
-
-# ╔═╡ 40653a7f-bc4b-47f2-9006-6856bb89210e
-# ╠═╡ disabled = true
-#=╠═╡
-r = GeoRegion(;continent = "Europe", admin="Italy")
-  ╠═╡ =#
-
 # ╔═╡ 00000000-0000-0000-0000-000000000001
 PLUTO_PROJECT_TOML_CONTENTS = """
 [deps]
@@ -273,7 +343,7 @@ Unzip = "~0.2.0"
 PLUTO_MANIFEST_TOML_CONTENTS = """
 # This file is machine-generated - editing it directly is not advised
 
-julia_version = "1.10.3"
+julia_version = "1.10.4"
 manifest_format = "2.0"
 project_hash = "7bb0ff3e13f58e64aef4531a0caa51f3a83844d3"
 
@@ -688,7 +758,25 @@ version = "17.4.0+2"
 # ╠═282b928a-fc7d-4487-a056-6c2626cf7179
 # ╠═2f988a76-9c84-432b-b69f-dbe06f32ea35
 # ╟─0e205c7f-43ea-4612-830c-d930e8e4522f
+# ╠═4a8f6103-fcfc-43a5-b46e-2958acbe7c60
+# ╠═4789500b-b85c-45dd-ba62-5bc284807131
+# ╠═f6e7bd04-9919-4819-a628-28ca5511b8a1
+# ╠═75941301-a6e4-4e17-a99f-9f2f6c825fa3
+# ╠═04a6a3b3-029c-422c-bec4-8d0f0e6f2a90
+# ╠═396e9574-82f7-4e70-a0bf-249932d60f48
+# ╠═959913ca-99f0-45ef-9754-3da4daab3a9b
+# ╠═4c21a4c1-757d-4eca-984c-16e27df3a6fa
+# ╠═38a176ff-bd7e-4ed3-a19b-a2e18ba330b8
+# ╠═46296600-2a42-455a-8557-32c3563845b6
+# ╠═1a5dd28e-1ad2-4500-b711-bef0fd3aeff6
 # ╠═86362c31-7407-4c33-b24d-5e10a2a0858f
+# ╠═8228edb8-b393-4e60-b9a1-63df7a81d0e8
+# ╠═089c8f55-2beb-4eb1-b6bf-355c2818378d
+# ╠═906292e8-e385-469f-92dd-8125fdcc78ac
+# ╠═8e22cfe1-6b66-4a1d-b7b0-f43f645a5b86
+# ╠═a6a8271e-f6f9-4eab-8526-0af57a6ad684
+# ╠═eef8c134-cb50-4f44-be4b-2572b9ba691e
+# ╠═464e2924-24b6-4f96-9200-627e497877db
 # ╠═992a4e72-4465-4cd4-9187-b4b6704c13a4
 # ╠═c9738f80-0297-46c4-b5ee-1a64ced99296
 # ╠═dbda3eaf-fd96-4633-8603-368057a76ecd
@@ -697,6 +785,9 @@ version = "17.4.0+2"
 # ╠═dcac9772-2c2c-431b-a568-ac91d483e470
 # ╠═163dd79f-a999-4630-9cbb-b1fb06ea8aa6
 # ╠═c58e75cb-3355-4c63-8eb9-1f364c6ec159
+# ╠═2e7afe18-213a-4c4a-addc-1e9a6ee8b52c
+# ╠═80616657-8d31-4da0-a372-214c389c2171
+# ╠═6519abbd-801d-455e-87ca-efc0ea0f0705
 # ╠═4eae9a7e-2c76-477d-a08f-fedffb259300
 # ╠═90fb35a5-51d3-4f1a-b140-c95eb0fbfa15
 # ╠═575501f7-50ea-450c-94ac-a1e484963aaf
@@ -729,6 +820,7 @@ version = "17.4.0+2"
 # ╠═20d397c3-9d37-4fd1-b62c-c93b931d5c97
 # ╠═47d9109b-b546-4279-b2e4-061746214d56
 # ╠═704c0699-4c32-4039-996f-24b314e1f34b
+# ╠═aab386b8-485d-4206-b84d-863b4219720a
 # ╠═f9cf5ae3-661d-42f6-b30b-fd7ef3fb2879
 # ╠═4e508a67-c8b6-47f8-a160-420b7f881769
 # ╠═b496c282-4de8-442e-b96f-96158375b773

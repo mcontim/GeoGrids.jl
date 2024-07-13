@@ -2,6 +2,7 @@ module GeoGrids
 
 using AngleBetweenVectors
 using CountriesBorders
+using Dictionaries
 using LinearAlgebra
 using Meshes
 using PlotlyExtensionsHelper
@@ -16,9 +17,9 @@ include("plot_func.jl")
 include("ico_func.jl")
 include("mesh_func.jl")
 
-export GeoRegion, PolyRegion
+export GeoRegion, PolyRegion, LatBeltRegion
 
-export icogrid, meshgrid, 
+export icogrid, meshgrid, vecgrid,
 extract_countries, in_region, filter_points
 
 export °, LLA,
