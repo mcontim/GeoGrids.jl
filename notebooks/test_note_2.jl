@@ -1,5 +1,5 @@
 ### A Pluto.jl notebook ###
-# v0.19.41
+# v0.19.42
 
 #> custom_attrs = ["hide-enabled"]
 
@@ -28,14 +28,6 @@ end
 	using >. Meshes
 end
 
-# ╔═╡ 1005c11c-1fef-4f3f-8cdf-d4b91d16fc60
-begin
-	using BenchmarkTools
-	using PlutoVSCodeDebugger
-	using Unzip
-	using Unitful
-end
-
 # ╔═╡ 069444e1-4e89-4f4f-ae2f-f5fb3131e398
 ExtendedTableOfContents()
 
@@ -49,29 +41,29 @@ md"""
 # Packages
 """
 
+# ╔═╡ 1005c11c-1fef-4f3f-8cdf-d4b91d16fc60
+# begin
+# 	using BenchmarkTools
+# 	using PlutoVSCodeDebugger
+# 	using Unzip
+# 	using Unitful
+# end
+
 # ╔═╡ 00000000-0000-0000-0000-000000000001
 PLUTO_PROJECT_TOML_CONTENTS = """
 [deps]
-BenchmarkTools = "6e4b80f9-dd63-53aa-95a3-0cdb28fa8baf"
 PlotlyBase = "a03496cd-edff-5a9b-9e67-9cda94a718b5"
 PlutoDevMacros = "a0499f29-c39b-4c5c-807c-88074221b949"
 PlutoExtras = "ed5d0301-4775-4676-b788-cf71e66ff8ed"
 PlutoPlotly = "8e989ff0-3d88-8e9f-f020-2b208a939ff0"
 PlutoUI = "7f904dfe-b85e-4ff6-b463-dae2292396a8"
-PlutoVSCodeDebugger = "560812a8-17ff-4261-aab5-f8f600b273e2"
-Unitful = "1986cc42-f94f-5a68-af5c-568840ba703d"
-Unzip = "41fe7b60-77ed-43a1-b4f0-825fd5a5650d"
 
 [compat]
-BenchmarkTools = "~1.5.0"
 PlotlyBase = "~0.8.19"
 PlutoDevMacros = "~0.9.0"
 PlutoExtras = "~0.7.13"
 PlutoPlotly = "~0.4.6"
 PlutoUI = "~0.7.59"
-PlutoVSCodeDebugger = "~0.2.0"
-Unitful = "~1.20.0"
-Unzip = "~0.2.0"
 """
 
 # ╔═╡ 00000000-0000-0000-0000-000000000002
@@ -80,7 +72,7 @@ PLUTO_MANIFEST_TOML_CONTENTS = """
 
 julia_version = "1.10.4"
 manifest_format = "2.0"
-project_hash = "5bff041b11d85656c08714c8c15983d5d9622eff"
+project_hash = "94387de7a043c1bded01cc93904ca43c63fa39be"
 
 [[deps.AbstractPlutoDingetjes]]
 deps = ["Pkg"]
@@ -102,12 +94,6 @@ uuid = "2a0f44e3-6c83-55bd-87e4-b1978d98bd5f"
 git-tree-sha1 = "cb25e4b105cc927052c2314f8291854ea59bf70a"
 uuid = "18cc8868-cbac-4acf-b575-c8ff214dc66f"
 version = "1.2.4"
-
-[[deps.BenchmarkTools]]
-deps = ["JSON", "Logging", "Printf", "Profile", "Statistics", "UUIDs"]
-git-tree-sha1 = "f1dff6729bc61f4d49e140da1af55dcd1ac97b2f"
-uuid = "6e4b80f9-dd63-53aa-95a3-0cdb28fa8baf"
-version = "1.5.0"
 
 [[deps.CodeTracking]]
 deps = ["InteractiveUtils", "UUIDs"]
@@ -319,9 +305,9 @@ version = "0.8.19"
 
 [[deps.PlutoDevMacros]]
 deps = ["JuliaInterpreter", "Logging", "MacroTools", "Pkg", "TOML"]
-git-tree-sha1 = "72f65885168722413c7b9a9debc504c7e7df7709"
+git-tree-sha1 = "9e1d5cbbfba0c9f2d776831bd5efb1bb38802794"
 uuid = "a0499f29-c39b-4c5c-807c-88074221b949"
-version = "0.9.0"
+version = "0.9.0-DEV"
 
 [[deps.PlutoExtras]]
 deps = ["AbstractPlutoDingetjes", "DocStringExtensions", "HypertextLiteral", "InteractiveUtils", "Markdown", "PlutoUI", "REPL", "Random"]
@@ -349,12 +335,6 @@ git-tree-sha1 = "ab55ee1510ad2af0ff674dbcced5e94921f867a9"
 uuid = "7f904dfe-b85e-4ff6-b463-dae2292396a8"
 version = "0.7.59"
 
-[[deps.PlutoVSCodeDebugger]]
-deps = ["AbstractPlutoDingetjes", "InteractiveUtils", "Markdown", "REPL"]
-git-tree-sha1 = "888128e4c890f15b1a0eb847bfd54cf987a6bc77"
-uuid = "560812a8-17ff-4261-aab5-f8f600b273e2"
-version = "0.2.0"
-
 [[deps.PrecompileTools]]
 deps = ["Preferences"]
 git-tree-sha1 = "5aa36f7049a63a1528fe8f7c3f2113413ffd4e1f"
@@ -370,10 +350,6 @@ version = "1.4.3"
 [[deps.Printf]]
 deps = ["Unicode"]
 uuid = "de0858da-6303-5e67-8744-51eddeeeb8d7"
-
-[[deps.Profile]]
-deps = ["Printf"]
-uuid = "9abbd945-dff8-562f-b5e8-e1ebf5ef1b79"
 
 [[deps.REPL]]
 deps = ["InteractiveUtils", "Markdown", "Sockets", "Unicode"]
@@ -460,25 +436,6 @@ version = "1.0.2"
 
 [[deps.Unicode]]
 uuid = "4ec0a83e-493e-50e2-b9ac-8f72acf5a8f5"
-
-[[deps.Unitful]]
-deps = ["Dates", "LinearAlgebra", "Random"]
-git-tree-sha1 = "dd260903fdabea27d9b6021689b3cd5401a57748"
-uuid = "1986cc42-f94f-5a68-af5c-568840ba703d"
-version = "1.20.0"
-
-    [deps.Unitful.extensions]
-    ConstructionBaseUnitfulExt = "ConstructionBase"
-    InverseFunctionsUnitfulExt = "InverseFunctions"
-
-    [deps.Unitful.weakdeps]
-    ConstructionBase = "187b0558-2788-49d3-abe0-74a17ed4e7c9"
-    InverseFunctions = "3587e190-3f89-42d0-90ee-14403ec27112"
-
-[[deps.Unzip]]
-git-tree-sha1 = "ca0969166a028236229f63514992fc073799bb78"
-uuid = "41fe7b60-77ed-43a1-b4f0-825fd5a5650d"
-version = "0.2.0"
 
 [[deps.Zlib_jll]]
 deps = ["Libdl"]

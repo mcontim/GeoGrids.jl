@@ -49,6 +49,12 @@ function in_region(points::Array{<:Union{LLA, Point2, AbstractVector, Tuple}}, d
     return mask
 end
 
+######################
+Base.in(point::SimpleLatLon, domain::Union{GeoRegion, PolyRegion}) = Base.in(point, domain.domain)
+Base.in(point::SimpleLatLon, domain::LatBeltRegion) = domain.latLim[1] < first(point) < domain.latLim[2] # Check if the LAT of the point is inside the Latitude Belt region.
+######################
+
+
 """
     filter_points(points::Union{Vector{LLA}, Vector{AbstractVector}, Vector{Point2}, Vector{Tuple}}, domain::Union{GeometrySet, PolyArea, LatBeltRegion}) -> Vector{Input Type}
     filter_points(points::Union{Vector{LLA}, Vector{AbstractVector}, Vector{Point2}, Vector{Tuple}}, domain::Union{GeoRegion, PolyRegion}) -> Vector{Input Type}

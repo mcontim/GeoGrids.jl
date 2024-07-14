@@ -1,36 +1,36 @@
-"""
-    _check_geopoint(p::Union{AbstractVector, Point2, Tuple}; rev=false) -> Point2
-    _check_geopoint(p::Point2; kwargs...) -> Point2
-    _check_geopoint(p::LLA; kwargs...) -> Point2
-    _check_geopoint(points::Array{<:Union{AbstractVector,Tuple,LLA}}; kwargs...) -> Array{Point2}
+# """
+#     _check_geopoint(p::Union{AbstractVector, Point2, Tuple}; rev=false) -> Point2
+#     _check_geopoint(p::Point2; kwargs...) -> Point2
+#     _check_geopoint(p::LLA; kwargs...) -> Point2
+#     _check_geopoint(points::Array{<:Union{AbstractVector,Tuple,LLA}}; kwargs...) -> Array{Point2}
 
-Checks the validity of the given point `p` in terms of latitude (LAT) and longitude (LON) values. The function expects the input to be in radians and within the valid range for LAT and LON. If you want to pass numbers in degrees, consider using `°` from Unitful (Also re-exported by GeoGrids) by doing `x * °`.
+# Checks the validity of the given point `p` in terms of latitude (LAT) and longitude (LON) values. The function expects the input to be in radians and within the valid range for LAT and LON. If you want to pass numbers in degrees, consider using `°` from Unitful (Also re-exported by GeoGrids) by doing `x * °`.
 
-## Arguments
-- `p`: A tuple representing a point on the globe where the first element is the latitude (LAT) and the second element is the longitude (LON).
-- `rev`: If `true`, the function will return the point in the reverse order. Defaults to `false`.
+# ## Arguments
+# - `p`: A tuple representing a point on the globe where the first element is the latitude (LAT) and the second element is the longitude (LON).
+# - `rev`: If `true`, the function will return the point in the reverse order. Defaults to `false`.
 
-## Returns
-- A `Point2` converted to degrees.
-"""
-function _check_geopoint(p::Union{AbstractVector, Tuple}; rev=false, unit=:deg)
-    length(p) != 2 && error("The input must be a 2D point...")
-    _check_angle(first(p); limit=π/2, msg="LAT provided as numbers must be expressed in radians and satisfy -π/2 ≤ x ≤ π/2. Consider using `°` from `Unitful` (Also re-exported by GeoGrids) if you want to pass numbers in degrees, by doing `x * °`.")
-    _check_angle(last(p); limit=π, msg="LON provided as numbers must be expressed in radians and satisfy -π ≤ x ≤ π. Consider using `°` from `Unitful` (Also re-exported by GeoGrids) if you want to pass numbers in degrees, by doing `x * °`.")
+# ## Returns
+# - A `Point2` converted to degrees.
+# """
+# function _check_geopoint(p::Union{AbstractVector, Tuple}; rev=false, unit=:deg)
+#     length(p) != 2 && error("The input must be a 2D point...")
+#     _check_angle(first(p); limit=π/2, msg="LAT provided as numbers must be expressed in radians and satisfy -π/2 ≤ x ≤ π/2. Consider using `°` from `Unitful` (Also re-exported by GeoGrids) if you want to pass numbers in degrees, by doing `x * °`.")
+#     _check_angle(last(p); limit=π, msg="LON provided as numbers must be expressed in radians and satisfy -π ≤ x ≤ π. Consider using `°` from `Unitful` (Also re-exported by GeoGrids) if you want to pass numbers in degrees, by doing `x * °`.")
     
-    if unit == :rad
-        lat = to_radians(first(p))
-        lon = to_radians(last(p))
-    else
-        lat = to_radians(first(p)) |> rad2deg
-        lon = to_radians(last(p)) |> rad2deg
-    end
+#     if unit == :rad
+#         lat = to_radians(first(p))
+#         lon = to_radians(last(p))
+#     else
+#         lat = to_radians(first(p)) |> rad2deg
+#         lon = to_radians(last(p)) |> rad2deg
+#     end
 
-    return rev ? Point2(lon, lat) : Point2(lat, lon) # Countries borders is in degrees (for consistency also PolyArea points are stored in degrees)
-end
-_check_geopoint(p::Point2; kwargs...) = _check_geopoint(p.coords; kwargs...)
-_check_geopoint(p::LLA; kwargs...) = _check_geopoint((p.lat, p.lon); kwargs...)
-_check_geopoint(points::Array{<:Union{AbstractVector,Tuple,LLA,Point2}}; kwargs...) = map(x -> _check_geopoint(x, kwargs...), points)
+#     return rev ? Point2(lon, lat) : Point2(lat, lon) # Countries borders is in degrees (for consistency also PolyArea points are stored in degrees)
+# end
+# _check_geopoint(p::Point2; kwargs...) = _check_geopoint(p.coords; kwargs...)
+# _check_geopoint(p::LLA; kwargs...) = _check_geopoint((p.lat, p.lon); kwargs...)
+# _check_geopoint(points::Array{<:Union{AbstractVector,Tuple,LLA,Point2}}; kwargs...) = map(x -> _check_geopoint(x, kwargs...), points)
 
 
 ## Aux Functions
