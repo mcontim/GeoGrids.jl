@@ -11,7 +11,7 @@ using TelecomUtils
 using TelecomUtils: ValidAngle, ValidDistance, _check_angle
 
 include("typedef.jl")
-# include("helper_func.jl")
+include("helper_func.jl")
 # include("filtering_func.jl")
 # include("plot_func.jl")
 # include("ico_func.jl")
@@ -22,6 +22,6 @@ export GeoRegion, PolyRegion, LatBeltRegion
 export icogrid, meshgrid, vecgrid,
 extract_countries, in_region, filter_points
 
-export °, SimpleLatLon, PolyArea,
+export °, SimpleLatLon, PolyArea
 
 end # module GeoGrids

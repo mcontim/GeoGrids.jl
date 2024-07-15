@@ -45,7 +45,6 @@ using GeoGrids
 end
 
 @testset "PolyRegion Test" begin
-    
     sample_in = [(14°,1°), (26.9°,-4.9°), (10.1°,14.9°)]
     sample_out = [(0°,0°), (10°,-5.2°), (27°,15.3°)]
     sample_border = [(10°,-5°), (10.1°,10°), (27°,15°)] # Due to the Predicates of Meshes the countour is not exact (acceptable)

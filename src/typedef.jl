@@ -7,21 +7,15 @@ mutable struct GeoRegion{D} <: AbstractRegion
     admin::String
     domain::D
     
-    # Inner Constructor for inputs sanity check.
-    # No positional arguments allowed.
-    function GeoRegion(;regionName="region_name", continent="", subregion="", admin="", domain=nothing)
-        all(isempty(v) for v in (continent, subregion, admin)) && error("Input at least one argument between continent, subregion and admin...")
-    
-        _domain = if isnothing(domain)
-            nt = (;continent, subregion, admin)
-            kwargs = (k=>v for (k,v) in pairs(nt) if !isempty(v))
-            CountriesBorders.extract_countries(;kwargs...)
-        else
-            error("The domain must be computed from the other inputs...")
-        end
+end
+function GeoRegion(;regionName="region_name", continent="", subregion="", admin="")
+    all(isempty(v) for v in (continent, subregion, admin)) && error("Input at least one argument between continent, subregion and admin...")
 
-        new(regionName, continent, subregion, admin, _domain)
-    end
+    nt = (;continent, subregion, admin)
+    kwargs = (k=>v for (k,v) in pairs(nt) if !isempty(v))
+    domain = CountriesBorders.extract_countries(;kwargs...)
+
+    GeoRegion(regionName, continent, subregion, admin, domain)
 end
 
 """
@@ -36,22 +30,19 @@ PolyRegion(;regionName::String="region_name", domain) = PolyRegion(regionName, d
 
 mutable struct LatBeltRegion <: AbstractRegion
     regionName::String
-    latLim::SVector{2, ValidAngle} # rad
+    latLim::SVector{2, ValidAngle} # [rad] 
+end
+function LatBeltRegion(;regionName::String="region_name", latLim=nothing)
+    # Inputs check
+    isnothing(latLim) && error("Input the Latitude Belt limits...")
+    length(latLim) != 2 && error("The input must be a 2 elements vector...")
     
-    # Inner Constructor for inputs sanity check.
-    # No positional arguments allowed.
-    function LatBeltRegion(;regionName::String="region_name", latLim=nothing)
-        # Inputs check
-        isnothing(latLim) && error("Input the Latitude Belt limits...")
-        length(latLim) != 2 && error("The input must be a 2 elements vector...")
-        
-        for x in latLim _check_angle(x; limit=π/2, msg="LAT provided as numbers must be expressed in radians and satisfy -π/2 ≤ x ≤ π/2. Consider using `°` from `Unitful` (Also re-exported by GeoGrids) if you want to pass numbers in degrees, by doing `x * °`.") end
-        
-        latLim[1] > latLim[2] && error("The first LAT limit must be lower than the second one...")
-        latLim[1] == latLim[2] && error("The first LAT limit must be different than the second one...")
-        
-        _latLim = map(x -> to_radians(x), latLim)
+    for x in latLim _check_angle(x; limit=π/2, msg="LAT provided as numbers must be expressed in radians and satisfy -π/2 ≤ x ≤ π/2. Consider using `°` from `Unitful` (Also re-exported by GeoGrids) if you want to pass numbers in degrees, by doing `x * °`.") end
+    
+    latLim[1] > latLim[2] && error("The first LAT limit must be lower than the second one...")
+    latLim[1] == latLim[2] && error("The first LAT limit must be different than the second one...")
+    
+    _latLim = map(x -> to_radians(x), latLim)
 
-        new(regionName, _latLim)
-    end
+    LatBeltRegion(regionName, _latLim)
 end
