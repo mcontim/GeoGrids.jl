@@ -1,37 +1,29 @@
-# """
-#     _check_geopoint(p::Union{AbstractVector, Point2, Tuple}; rev=false) -> Point2
-#     _check_geopoint(p::Point2; kwargs...) -> Point2
-#     _check_geopoint(p::LLA; kwargs...) -> Point2
-#     _check_geopoint(points::Array{<:Union{AbstractVector,Tuple,LLA}}; kwargs...) -> Array{Point2}
+"""
+    _cast_geopoint(p::Union{AbstractVector, Tuple})
+    _cast_geopoint(p::LLA)
+    _cast_geopoint(p::SimpleLatLon)
 
-# Checks the validity of the given point `p` in terms of latitude (LAT) and longitude (LON) values. The function expects the input to be in radians and within the valid range for LAT and LON. If you want to pass numbers in degrees, consider using `°` from Unitful (Also re-exported by GeoGrids) by doing `x * °`.
+Convert various types of input representations into a `SimpleLatLon` object.
+This method assumes that the input coordinates are in degrees. It converts the latitude and longitude from degrees to radians before creating a `SimpleLatLon` object.
 
-# ## Arguments
-# - `p`: A tuple representing a point on the globe where the first element is the latitude (LAT) and the second element is the longitude (LON).
-# - `rev`: If `true`, the function will return the point in the reverse order. Defaults to `false`.
+## Arguments
+- `p::Union{AbstractVector, Tuple}`: A 2D point where the first element is the latitude and the second element is the longitude, both in degrees.
 
-# ## Returns
-# - A `Point2` converted to degrees.
-# """
-# function _check_geopoint(p::Union{AbstractVector, Tuple}; rev=false, unit=:deg)
-#     length(p) != 2 && error("The input must be a 2D point...")
-#     _check_angle(first(p); limit=π/2, msg="LAT provided as numbers must be expressed in radians and satisfy -π/2 ≤ x ≤ π/2. Consider using `°` from `Unitful` (Also re-exported by GeoGrids) if you want to pass numbers in degrees, by doing `x * °`.")
-#     _check_angle(last(p); limit=π, msg="LON provided as numbers must be expressed in radians and satisfy -π ≤ x ≤ π. Consider using `°` from `Unitful` (Also re-exported by GeoGrids) if you want to pass numbers in degrees, by doing `x * °`.")
-    
-#     if unit == :rad
-#         lat = to_radians(first(p))
-#         lon = to_radians(last(p))
-#     else
-#         lat = to_radians(first(p)) |> rad2deg
-#         lon = to_radians(last(p)) |> rad2deg
-#     end
+## Returns
+- `SimpleLatLon`: An object representing the geographical point with latitude and longitude converted to radians.
 
-#     return rev ? Point2(lon, lat) : Point2(lat, lon) # Countries borders is in degrees (for consistency also PolyArea points are stored in degrees)
-# end
-# _check_geopoint(p::Point2; kwargs...) = _check_geopoint(p.coords; kwargs...)
-# _check_geopoint(p::LLA; kwargs...) = _check_geopoint((p.lat, p.lon); kwargs...)
-# _check_geopoint(points::Array{<:Union{AbstractVector,Tuple,LLA,Point2}}; kwargs...) = map(x -> _check_geopoint(x, kwargs...), points)
-
+## Errors
+- Throws an `ArgumentError` if the input `p` does not have exactly two elements.
+"""
+function _cast_geopoint(p::Union{AbstractVector, Tuple})
+    length(p) != 2 && error("The input must be a 2D point...")
+    lat = first(p)
+    lon = last(p)
+    # Inputs are considered in degrees
+    return SimpleLatLon(lat*°, lon*°)
+end
+_cast_geopoint(p::LLA) = SimpleLatLon(p)
+_cast_geopoint(p::SimpleLatLon) = p
 
 ## Aux Functions
 """
@@ -74,7 +66,7 @@ end
 # - `type::Symbol`: The type of the output. It can be `:lla` (default) for latitude-longitude-altitude or `:point` for 2D point.
 
 # ## Returns
-# - `out`: The converted grid points. If `type` is `:lla`, each element of the grid is an `LLA` object with latitude, longitude, and altitude. If `type` is `:point`, each element of the grid is a `Point2` object with latitude and longitude.
+# - `out`: The converted grid points. If `type` is `:lla`, each element of the grid is an `LLA` object with latitude, longitude, and altitude. If `type` is `:point`, each element of the grid is a `Point` object with latitude and longitude.
 # """
 # function _grid_points_conversion(gridPoints; height=nothing, unit=:rad, type=:lla)
 #     out = if type == :lla
@@ -93,7 +85,7 @@ end
 # 		else
 # 			gridPoints
 # 		end
-# 		map(x -> Point2(x...), conv) # lat-lon
+# 		map(x -> Point(x...), conv) # lat-lon
 # 	else
 # 		error("The input type do not match the expected format, it must be :lla or :point...")
 # 	end

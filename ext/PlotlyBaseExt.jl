@@ -46,22 +46,22 @@ function GeoGrids.plot_unitarysphere(points_cart)
 end
 
 """
-	plot_geo(points::Array{Point2}; title="Point Position GEO Map", camera::Symbol=:twodim, kwargs_scatter=(;), kwargs_layout=(;))
+	plot_geo(points::Array{<:Union{LLA, SimpleLatLon, AbstractVector, Tuple}}; title="Point Position GEO Map", camera::Symbol=:twodim, kwargs_scatter=(;), kwargs_layout=(;))
 	plot_geo(points; kwargs...)
 
-This function takes an AbstractVector of SVector{2, <:Real} of LAT-LON coordinates (deg) and generates a plot on a world map projection using the PlotlyJS package.
+This function takes an Array of LAT-LON coordinates and generates a plot on a world map projection using the PlotlyJS package.
 
 ## Arguments
 - `points::AbstractVector{SVector{2, <:Real}}:` List of 2-dimensional coordinates (lon,lat) in the form of an AbstractVector of SVector{2, <:Real} elements (LAT=y, LON=x).
 - `title::String`: (optional) Title for the plot, default is "Point Position 3D Map".
 - `camera::Symbol`: (optional) The camera projection to use, either :twodim (default) or :threedim. If :threedim, the map will be displayed as an orthographic projection, while :twodim shows the map with a natural earth projection.
 """
-function GeoGrids.plot_geo(points::Array{Point2}; title="Point Position GEO Map", camera::Symbol=:twodim, kwargs_scatter=(;), kwargs_layout=(;))
+function GeoGrids.plot_geo(points::Array{<:Union{LLA, SimpleLatLon, AbstractVector, Tuple}}; title="Point Position GEO Map", camera::Symbol=:twodim, kwargs_scatter=(;), kwargs_layout=(;))
 	# Markers for the points
-	# Take an array of SVector
+	vec_p = map(x -> _cast_geopoint(x), points[:]) # Convert in a vector of SimpleLatLon
 	scatterpoints = scattergeo(
-		lat = map(x -> first(x.coords), points[:]), # Vectorize such to be sure to avoid matrices.
-		lon = map(x -> last(x.coords), points[:]), # Vectorize such to be sure to avoid matrices.
+		lat = map(x -> x.lat, vec_p), # Vectorize such to be sure to avoid matrices.
+		lon = map(x -> x.lon, vec_p), # Vectorize such to be sure to avoid matrices.
 		mode = "markers",
 		marker_size = 5,
 		kwargs_scatter...
@@ -105,7 +105,5 @@ function GeoGrids.plot_geo(points::Array{Point2}; title="Point Position GEO Map"
 	
 	plotly_plot([scatterpoints],layout)
 end
-
-GeoGrids.plot_geo(points; kwargs...) = GeoGrids.plot_geo(GeoGrids._check_geopoint(points); kwargs...)
 
 end # module PlotlyBaseExt
