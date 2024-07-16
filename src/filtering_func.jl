@@ -18,40 +18,41 @@ The `Meshes.Domain` can be either a `GeometrySet` or a `PolyArea` object.
 ### Output
 The function returns a boolean value: `true` if the point falls inside the `Meshes.Domain` object and `false` otherwise. The output has the same shape of the input.
 """
-function in_region(p::Union{LLA, Point2, AbstractVector, Tuple}, domain::Union{GeometrySet, PolyArea})
-    # Prepare the input.
-    _p = _check_geopoint(p; rev=true)
-    # Check if the point is inside the domain, using a Predicates from Meshes instead of an ExactPredicates.
-    # There is a certain error margin for the point being exaclty inside, on the border or slightly outside. 
-    # However, for the purpose of checking a point belonging to a certain geographical region, this margin 
-    # of error is acceptable.
-	_p in domain
-end
+# function in_region(p::Union{LLA, Point2, AbstractVector, Tuple}, domain::Union{GeometrySet, PolyArea})
+#     # Prepare the input.
+#     _p = _check_geopoint(p; rev=true)
+#     # Check if the point is inside the domain, using a Predicates from Meshes instead of an ExactPredicates.
+#     # There is a certain error margin for the point being exaclty inside, on the border or slightly outside. 
+#     # However, for the purpose of checking a point belonging to a certain geographical region, this margin 
+#     # of error is acceptable.
+# 	_p in domain
+# end
 
-in_region(p::Union{LLA, Point2, AbstractVector, Tuple}, domain::Union{GeoRegion, PolyRegion}) = in_region(p, domain.domain)
+# in_region(p::Union{LLA, Point2, AbstractVector, Tuple}, domain::Union{GeoRegion, PolyRegion}) = in_region(p, domain.domain)
 
-function in_region(points::Array{<:Union{LLA, Point2, AbstractVector, Tuple}}, domain::Union{GeometrySet, PolyArea})
-    mask = map(x -> in_region(x, domain), points) # Bool mask
-    return mask
-end
+# function in_region(points::Array{<:Union{LLA, Point2, AbstractVector, Tuple}}, domain::Union{GeometrySet, PolyArea})
+#     mask = map(x -> in_region(x, domain), points) # Bool mask
+#     return mask
+# end
 
-in_region(points::Array{<:Union{LLA, Point2, AbstractVector, Tuple}}, domain::Union{GeoRegion, PolyRegion}) = in_region(points, domain.domain)
+# in_region(points::Array{<:Union{LLA, Point2, AbstractVector, Tuple}}, domain::Union{GeoRegion, PolyRegion}) = in_region(points, domain.domain)
 
-function in_region(p::Union{LLA, Point2, AbstractVector, Tuple}, domain::LatBeltRegion)
-    # Prepare the input.
-    _p = _check_geopoint(p; unit=:rad)
-    # Check if the LAT of the point is inside the Latitude Belt region.
-    domain.latLim[1] < first(_p.coords) < domain.latLim[2] ? true : false 
-end
+# function in_region(p::Union{LLA, Point2, AbstractVector, Tuple}, domain::LatBeltRegion)
+#     # Prepare the input.
+#     _p = _check_geopoint(p; unit=:rad)
+#     # Check if the LAT of the point is inside the Latitude Belt region.
+#     domain.latLim[1] < first(_p.coords) < domain.latLim[2] ? true : false 
+# end
 
-function in_region(points::Array{<:Union{LLA, Point2, AbstractVector, Tuple}}, domain::LatBeltRegion)
-    mask = map(x -> in_region(x, domain), points) # Bool mask
-    return mask
-end
+# function in_region(points::Array{<:Union{LLA, Point2, AbstractVector, Tuple}}, domain::LatBeltRegion)
+#     mask = map(x -> in_region(x, domain), points) # Bool mask
+#     return mask
+# end
 
 ######################
 Base.in(point::SimpleLatLon, domain::Union{GeoRegion, PolyRegion}) = Base.in(point, domain.domain)
-Base.in(point::SimpleLatLon, domain::LatBeltRegion) = domain.latLim[1] < first(point) < domain.latLim[2] # Check if the LAT of the point is inside the Latitude Belt region.
+Base.in(point::SimpleLatLon, domain::LatBeltRegion) = domain.latLim[1] < point.lat < domain.latLim[2]
+Base.in(point::SimpleLatLon, domain::Array{<:AbstractRegion}) = error("The domain should be a single element of type <:AbstractRegion")
 ######################
 
 
@@ -68,14 +69,19 @@ Filters a list of points based on whether they fall within a specified geographi
 ## Returns
 - A vector of points that fall within the specified domain, subsection of the input vector.
 """
-function filter_points(points::Array{<:Union{LLA, AbstractVector, Point2, Tuple}}, domain::Union{GeometrySet, PolyArea, LatBeltRegion})
-    # mask = in_region(points, domain)
-    # return points[mask]
-    filt = filter(x -> in_region(x, domain), points)
+# function filter_points(points::Array{<:Union{LLA, AbstractVector, Point2, Tuple}}, domain::Union{GeometrySet, PolyArea, LatBeltRegion})
+#     # mask = in_region(points, domain)
+#     # return points[mask]
+#     filt = filter(x -> in_region(x, domain), points)
+#     return filt
+# end
+# filter_points(points::Array{<:Union{LLA, AbstractVector, Point2, Tuple}}, domain::Union{GeoRegion, PolyRegion}) = filter_points(points, domain.domain)
+
+function filter_points(points::Array{<:SimpleLatLon}, domain::Union{GeoRegion, PolyRegion, LatBeltRegion})
+    filt = filter(x -> in(x, domain), points)
     return filt
 end
 
-filter_points(points::Array{<:Union{LLA, AbstractVector, Point2, Tuple}}, domain::Union{GeoRegion, PolyRegion}) = filter_points(points, domain.domain)
 
 """
     group_by_domain(points::Array{<:Union{LLA, AbstractVector, Point2, Tuple}}, domains::Array; unique=true)
@@ -97,7 +103,26 @@ Group points by regions defined in the `domains` array.
 - The order of the `domains` array is important when `unique=true`. Points are assigned to regions in the order they appear in the `domains` array.
 - The function uses the `in_region` function to determine if a point belongs to a region.
 """
-function group_by_domain(points::Array{<:Union{LLA, AbstractVector, Point2, Tuple}}, domains::Array; flagUnique=true)
+# function group_by_domain(points::Array{<:Union{LLA, AbstractVector, Point2, Tuple}}, domains::Array; flagUnique=true)
+#     # Check region names validity
+#     names = map(x -> x.regionName, domains)
+#     length(unique(names)) == length(names) || error("The region names passed to group_by must be unique...")
+    
+#     groups = Dictionary(map(x -> x.regionName, domains), map(_ -> eltype(points)[], domains))
+
+#     for p in points
+#         for dom in domains
+#             vec = groups[dom.regionName]
+#             if in_region(p, dom)
+#                 push!(vec, p)
+#                 flagUnique && break
+#             end
+#         end
+#     end
+
+#     return groups
+# end
+function group_by_domain(points::Array{<:SimpleLatLon}, domains::Array; flagUnique=true)
     # Check region names validity
     names = map(x -> x.regionName, domains)
     length(unique(names)) == length(names) || error("The region names passed to group_by must be unique...")
@@ -107,7 +132,7 @@ function group_by_domain(points::Array{<:Union{LLA, AbstractVector, Point2, Tupl
     for p in points
         for dom in domains
             vec = groups[dom.regionName]
-            if in_region(p, dom)
+            if p in dom
                 push!(vec, p)
                 flagUnique && break
             end

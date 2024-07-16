@@ -39,11 +39,38 @@ end
 r = [
 	GeoRegion(regionName="ITA", admin="Italy"), 
 	PolyRegion(regionName="POLY", domain=[SimpleLatLon(-60°,-180°), SimpleLatLon(-60°,180°), SimpleLatLon(60°,180°), SimpleLatLon(60°,-180°)]),
-	LatBeltRegion(regionName="test", latLim=[-60°, 60°])
+	LatBeltRegion(regionName="test", latLim=[50°, 60°])
 ]
 
-# ╔═╡ c728bc83-8af6-4fb9-b96e-63c883a7919b
-SimpleLatLon(60°,180°)
+# ╔═╡ aed8268b-3432-434c-a764-03bfc49b6333
+typeof(r)
+
+# ╔═╡ 3a7b7e4e-8555-488f-be49-c82cac515376
+SimpleLatLon(43.997568°, 11.647423°) in r[2]
+
+# ╔═╡ 56cef4fa-7aea-40c8-83da-e6431ff9a915
+SimpleLatLon(-70°, 11.647423°) in r
+
+# ╔═╡ d2c92cda-1d17-49c0-82af-40da55db9ccd
+methods(filter_points)
+
+# ╔═╡ e05e7a8c-3957-4329-950c-7cc41383662f
+points = [SimpleLatLon(43.997568°, 11.647423°), SimpleLatLon(-70°, 11.647423°)]
+
+# ╔═╡ af171b47-c943-4d70-93cc-e55f1ef9d2c2
+filter_points(points, r[1])
+
+# ╔═╡ 8eb93dcd-118a-4988-a4bc-a59db70053ea
+gr = group_by_domain(points, r; flagUnique=true)
+
+# ╔═╡ 18a8cc75-79ae-49c2-8c7b-3ea6c318f383
+isempty(gr["ITA"])
+
+# ╔═╡ b6dda362-d709-4628-aa45-a42ca377ee70
+typeof(points)
+
+# ╔═╡ 28aa42db-f470-4170-8f91-4b2897389fd5
+SimpleLatLon(60°,180°).lat 
 
 # ╔═╡ f33655ca-5da5-45af-9608-341bcb609477
 aaa=extract_countries(GeoRegion(regionName="ITA", continent="Europe"))
@@ -383,7 +410,16 @@ version = "17.4.0+2"
 # ╠═069444e1-4e89-4f4f-ae2f-f5fb3131e398
 # ╟─8717aaad-3791-40ec-82a3-3957fb10a562
 # ╠═cd0f6997-c95c-4fd7-9be8-88d8dbcf760a
-# ╠═c728bc83-8af6-4fb9-b96e-63c883a7919b
+# ╠═3a7b7e4e-8555-488f-be49-c82cac515376
+# ╠═56cef4fa-7aea-40c8-83da-e6431ff9a915
+# ╠═af171b47-c943-4d70-93cc-e55f1ef9d2c2
+# ╠═8eb93dcd-118a-4988-a4bc-a59db70053ea
+# ╠═18a8cc75-79ae-49c2-8c7b-3ea6c318f383
+# ╠═b6dda362-d709-4628-aa45-a42ca377ee70
+# ╠═d2c92cda-1d17-49c0-82af-40da55db9ccd
+# ╠═e05e7a8c-3957-4329-950c-7cc41383662f
+# ╠═aed8268b-3432-434c-a764-03bfc49b6333
+# ╠═28aa42db-f470-4170-8f91-4b2897389fd5
 # ╠═f33655ca-5da5-45af-9608-341bcb609477
 # ╠═d9334bde-6ae5-4da4-b8ed-b16bd9678785
 # ╠═5a60a99f-ff3b-4867-86ba-03813a817430
