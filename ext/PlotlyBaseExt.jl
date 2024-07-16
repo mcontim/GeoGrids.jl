@@ -4,8 +4,7 @@ using PlotlyExtensionsHelper
 using PlotlyBase
 
 using GeoGrids
-using StaticArrays
-using TelecomUtils: ValidAngle, ValidDistance
+using TelecomUtils
 
 """
 	plot_unitarysphere(points_cart)
@@ -18,7 +17,7 @@ The sphere is defined by a range of angles that are discretized into a grid of n
 ## Output:
 - Plot of the unitary sphere with the input points represented as markers.
 """
-function GeoGrids.plot_unitarysphere(points_cart)
+function GeoGrids.plot_unitarysphere(points_cart; kwargs_scatter=(;), kwargs_layout=(;))
 	# Reference Sphere
 	n_sphere = 100
 	u = range(-π, π; length = n_sphere)
@@ -27,19 +26,40 @@ function GeoGrids.plot_unitarysphere(points_cart)
 	y_sphere = sin.(u) * sin.(v)'
 	z_sphere = ones(n_sphere) * cos.(v)'
 	color = ones(size(z_sphere))
-	sphere = surface(z=z_sphere, x=x_sphere, y=y_sphere, surfacecolor = color, colorbar=false)
+	sphere = surface(
+		z = z_sphere,
+		x = x_sphere,
+		y = y_sphere,
+		colorscale = [[0,"rgb(2,204,150)"], [1,"rgb(2,204,150)"]],
+		showscale = false
+	)
 	
 	# Take an array of SVector
-	markers = scatter3d(
+	markers = scatter3d(;
 		x = map(x -> x[1], points_cart),
 		y = map(x -> x[2], points_cart),
 		z = map(x -> x[3], points_cart),
 		mode = "markers",
 		marker_size = 4,
 		marker_color = "rgb(0,0,0)",
-		)
+		kwargs_scatter...
+	)
 
-	layout = Layout(title = "Point on Unitary Sphere")
+	layout = Layout(;
+		scene = attr(
+			xaxis = attr(
+				visible = false,
+			),
+			yaxis = attr(
+				visible = false,
+			),
+			zaxis = attr(
+				visible = false,
+			),
+		),
+		width = 700,
+		kwargs_layout...
+	)
 	
 	# Plot([sphere,markers],layout)
 	plotly_plot([sphere,markers],layout)
@@ -58,7 +78,7 @@ This function takes an Array of LAT-LON coordinates and generates a plot on a wo
 """
 function GeoGrids.plot_geo(points::Array{<:Union{LLA, SimpleLatLon, AbstractVector, Tuple}}; title="Point Position GEO Map", camera::Symbol=:twodim, kwargs_scatter=(;), kwargs_layout=(;))
 	# Markers for the points
-	vec_p = map(x -> _cast_geopoint(x), points[:]) # Convert in a vector of SimpleLatLon
+	vec_p = map(x -> GeoGrids._cast_geopoint(x), points[:]) # Convert in a vector of SimpleLatLon
 	scatterpoints = scattergeo(
 		lat = map(x -> x.lat, vec_p), # Vectorize such to be sure to avoid matrices.
 		lon = map(x -> x.lon, vec_p), # Vectorize such to be sure to avoid matrices.

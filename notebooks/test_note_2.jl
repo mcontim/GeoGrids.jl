@@ -81,59 +81,11 @@ aaa
 # ╔═╡ d9334bde-6ae5-4da4-b8ed-b16bd9678785
 extract_countries(GeoRegion(regionName="ITA", continent="Europe"))
 
-# ╔═╡ 4c330e93-b575-448c-81df-d7ea7d849d0c
-function plot_geosu(points; title="Point Position GEO Map", camera::Symbol=:twodim, kwargs_scatter=(;), kwargs_layout=(;))
-	# Markers for the points
-	# Take an array of SVector
-	scatterpoints = scattergeo(
-		lat = map(x -> first(x.lat), points[:]), # Vectorize such to be sure to avoid matrices.
-		lon = map(x -> last(x.lon), points[:]), # Vectorize such to be sure to avoid matrices.
-		mode = "markers",
-		marker_size = 5,
-		kwargs_scatter...
-	)
+# ╔═╡ 4ff0540b-c3ba-408f-894e-5fda86c0769d
+plot_geo([SimpleLatLon(-70°, 11°),SimpleLatLon(-0°, 12°)])
 
-	if camera == :threedim
-		projection = "orthographic"
-	else
-		projection = "natural earth"
-	end
-	
-	# Create the geo layout
-	layout = Layout(
-		geo =  attr(
-			projection =  attr(
-			type =  "robinson",
-			),
-			showocean =  true,
-			# oceancolor =  "rgb(0, 255, 255)",
-			oceancolor =  "rgb(255, 255, 255)",
-			showland =  true,
-			# landcolor =  "rgb(230, 145, 56)",
-			landcolor =  "rgb(217, 217, 217)",
-			showlakes =  true,
-			# lakecolor =  "rgb(0, 255, 255)",
-			lakecolor =  "rgb(255, 255, 255)",
-			showcountries =  true,
-			lonaxis =  attr(
-				showgrid =  true,
-				gridcolor =  "rgb(102, 102, 102)"
-			),
-			lataxis =  attr(
-				showgrid =  true,
-				gridcolor =  "rgb(102, 102, 102)"
-			)
-		),
-		title = title;
-		geo_projection_type = projection,
-		kwargs_layout...
-	)
-	
-	plotly_plot([scatterpoints],layout)
-end
-
-# ╔═╡ a6cafa6e-3f5d-4228-85f1-78d8a8cf58f8
-plot_geosu([SimpleLatLon(-70°, 11°),SimpleLatLon(-0°, 12°)])
+# ╔═╡ 4bec169d-5243-439f-92e0-b623aaa1c31c
+plot_unitarysphere([[1.0,1.0,1.0],[1.0,1.0,2.0]])
 
 # ╔═╡ 1005c11c-1fef-4f3f-8cdf-d4b91d16fc60
 # begin
@@ -569,8 +521,8 @@ version = "17.4.0+2"
 # ╠═f33655ca-5da5-45af-9608-341bcb609477
 # ╠═d9334bde-6ae5-4da4-b8ed-b16bd9678785
 # ╠═5a60a99f-ff3b-4867-86ba-03813a817430
-# ╠═a6cafa6e-3f5d-4228-85f1-78d8a8cf58f8
-# ╠═4c330e93-b575-448c-81df-d7ea7d849d0c
+# ╠═4ff0540b-c3ba-408f-894e-5fda86c0769d
+# ╠═4bec169d-5243-439f-92e0-b623aaa1c31c
 # ╟─b94c71b6-0601-4a4c-ac92-417f0c372334
 # ╠═bf20cace-b64b-4155-90c1-1ec3644510d7
 # ╠═0e3793aa-13d2-4aeb-ad60-b98927932dc6
