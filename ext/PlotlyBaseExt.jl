@@ -65,7 +65,7 @@ function GeoGrids.plot_unitarysphere(points_cart; kwargs_scatter=(;), kwargs_lay
 end
 
 """
-	plot_geo(points::Array{<:Union{LLA, SimpleLatLon, AbstractVector, Tuple}}; title="Point Position GEO Map", camera::Symbol=:twodim, kwargs_scatter=(;), kwargs_layout=(;))
+	plot_geo(points::Array{<:Union{SimpleLatLon, AbstractVector, Tuple}}; title="Point Position GEO Map", camera::Symbol=:twodim, kwargs_scatter=(;), kwargs_layout=(;))
 	plot_geo(points; kwargs...)
 
 This function takes an Array of LAT-LON coordinates and generates a plot on a world map projection using the PlotlyJS package.
@@ -75,7 +75,7 @@ This function takes an Array of LAT-LON coordinates and generates a plot on a wo
 - `title::String`: (optional) Title for the plot, default is "Point Position 3D Map".
 - `camera::Symbol`: (optional) The camera projection to use, either :twodim (default) or :threedim. If :threedim, the map will be displayed as an orthographic projection, while :twodim shows the map with a natural earth projection.
 """
-function GeoGrids.plot_geo(points::Array{<:Union{LLA, SimpleLatLon, AbstractVector, Tuple}}; title="Point Position GEO Map", camera::Symbol=:twodim, kwargs_scatter=(;), kwargs_layout=(;))
+function GeoGrids.plot_geo(points::Array{<:Union{SimpleLatLon, AbstractVector, Tuple}}; title="Point Position GEO Map", camera::Symbol=:twodim, kwargs_scatter=(;), kwargs_layout=(;))
 	# Markers for the points
 	vec_p = map(x -> GeoGrids._cast_geopoint(x), points[:]) # Convert in a vector of SimpleLatLon
 	scatterpoints = scattergeo(

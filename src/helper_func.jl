@@ -21,7 +21,6 @@ function _cast_geopoint(p::Union{AbstractVector, Tuple})
     # Inputs are considered in degrees
     return SimpleLatLon(lat*°, lon*°)
 end
-# _cast_geopoint(p::LLA) = SimpleLatLon(p) # //FIX: to be removed
 _cast_geopoint(p::SimpleLatLon) = p
 
 ## Aux Functions
@@ -62,6 +61,7 @@ function CountriesBorders.extract_countries(r::GeoRegion)
     CountriesBorders.extract_countries(;kwargs...)
 end
 
+# //FIX: DELETE
 # """
 #     _grid_points_conversion(gridPoints; height=nothing, unit=:rad, type=:lla)
 
