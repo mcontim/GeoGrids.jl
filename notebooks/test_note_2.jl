@@ -51,6 +51,12 @@ SimpleLatLon(43.997568°, 11.647423°) in r[2]
 # ╔═╡ 56cef4fa-7aea-40c8-83da-e6431ff9a915
 SimpleLatLon(-70°, 11.647423°) in r
 
+# ╔═╡ b21c6e34-f9c0-4b1b-b467-c25db60fd9e1
+_cast_geopoint(LLA(-70°, 11.647423°,10))
+
+# ╔═╡ f3084b73-e66a-406e-bd4e-c0233ab876a9
+SimpleLatLon(LLA(-70°, 11.647423°,10))
+
 # ╔═╡ d2c92cda-1d17-49c0-82af-40da55db9ccd
 methods(filter_points)
 
@@ -510,6 +516,8 @@ version = "17.4.0+2"
 # ╠═cd0f6997-c95c-4fd7-9be8-88d8dbcf760a
 # ╠═3a7b7e4e-8555-488f-be49-c82cac515376
 # ╠═56cef4fa-7aea-40c8-83da-e6431ff9a915
+# ╠═b21c6e34-f9c0-4b1b-b467-c25db60fd9e1
+# ╠═f3084b73-e66a-406e-bd4e-c0233ab876a9
 # ╠═af171b47-c943-4d70-93cc-e55f1ef9d2c2
 # ╠═8eb93dcd-118a-4988-a4bc-a59db70053ea
 # ╠═18a8cc75-79ae-49c2-8c7b-3ea6c318f383

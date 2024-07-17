@@ -1,60 +1,20 @@
 """
-    in_region(p::Union{LLA, Point2, AbstractVector, Tuple}, domain::Union{GeometrySet, PolyArea}) -> Bool
-    in_region(p::Union{LLA, Point2, AbstractVector, Tuple}, domain::Union{GeoRegion, PolyRegion}) -> Bool
-    in_region(p::Union{LLA, Point2, AbstractVector, Tuple}, domain::LatBeltRegion) -> Bool
-    in_region(points::Array{<:Union{LLA, Point2, AbstractVector, Tuple}}, domain::Union{GeometrySet, PolyArea}) -> Array{Bool}
-    in_region(points::Array{<:Union{LLA, Point2, AbstractVector, Tuple}}, domain::Union{GeoRegion, PolyRegion}) -> Array{Bool}
-    in_region(points::Array{<:Union{LLA, Point2, AbstractVector, Tuple}}, domain::LatBeltRegion) -> Array{Bool}
+    Base.in(point::SimpleLatLon, domain::Union{GeoRegion, PolyRegion})
+    Base.in(point::SimpleLatLon, domain::LatBeltRegion)
+    Base.in(point::SimpleLatLon, domain::Array{<:AbstractRegion})
 
-This function determines if a given point belongs to a 2-dimensional `Meshes.Domain` object. The `Meshes.Domain` object represents a geometric domain, which is essentially a 2D region in space, specified by its bounds and discretization. 
-
-The function first converts the input tuple into a `Point` object, which is then checked if it falls inside the given `Meshes.Domain` object.
-The `Meshes.Domain` can be either a `GeometrySet` or a `PolyArea` object.
+Check if a geographical point is within a specified region.
 
 ## Arguments
-* `p`: A point, or a vector of points in 2D space. 
-* `domain::Union{GeometrySet,PolyArea}`: A `Meshes.Domain` object representing a 2D space. 
+- `point::SimpleLatLon`: The geographical point to be checked.
+- `domain::Union{GeoRegion, PolyRegion}`: The region in which the point is to be checked. The region is represented by the `domain` attribute.
 
-### Output
-The function returns a boolean value: `true` if the point falls inside the `Meshes.Domain` object and `false` otherwise. The output has the same shape of the input.
+## Returns
+- `Bool`: Returns `true` if the point is within the region, `false` otherwise.
 """
-# function in_region(p::Union{LLA, Point2, AbstractVector, Tuple}, domain::Union{GeometrySet, PolyArea})
-#     # Prepare the input.
-#     _p = _check_geopoint(p; rev=true)
-#     # Check if the point is inside the domain, using a Predicates from Meshes instead of an ExactPredicates.
-#     # There is a certain error margin for the point being exaclty inside, on the border or slightly outside. 
-#     # However, for the purpose of checking a point belonging to a certain geographical region, this margin 
-#     # of error is acceptable.
-# 	_p in domain
-# end
-
-# in_region(p::Union{LLA, Point2, AbstractVector, Tuple}, domain::Union{GeoRegion, PolyRegion}) = in_region(p, domain.domain)
-
-# function in_region(points::Array{<:Union{LLA, Point2, AbstractVector, Tuple}}, domain::Union{GeometrySet, PolyArea})
-#     mask = map(x -> in_region(x, domain), points) # Bool mask
-#     return mask
-# end
-
-# in_region(points::Array{<:Union{LLA, Point2, AbstractVector, Tuple}}, domain::Union{GeoRegion, PolyRegion}) = in_region(points, domain.domain)
-
-# function in_region(p::Union{LLA, Point2, AbstractVector, Tuple}, domain::LatBeltRegion)
-#     # Prepare the input.
-#     _p = _check_geopoint(p; unit=:rad)
-#     # Check if the LAT of the point is inside the Latitude Belt region.
-#     domain.latLim[1] < first(_p.coords) < domain.latLim[2] ? true : false 
-# end
-
-# function in_region(points::Array{<:Union{LLA, Point2, AbstractVector, Tuple}}, domain::LatBeltRegion)
-#     mask = map(x -> in_region(x, domain), points) # Bool mask
-#     return mask
-# end
-
-######################
 Base.in(point::SimpleLatLon, domain::Union{GeoRegion, PolyRegion}) = Base.in(point, domain.domain)
 Base.in(point::SimpleLatLon, domain::LatBeltRegion) = domain.latLim[1] < point.lat < domain.latLim[2]
 Base.in(point::SimpleLatLon, domain::Array{<:AbstractRegion}) = error("The domain should be a single element of type <:AbstractRegion")
-######################
-
 
 """
     filter_points(points::Union{Vector{LLA}, Vector{AbstractVector}, Vector{Point2}, Vector{Tuple}}, domain::Union{GeometrySet, PolyArea, LatBeltRegion}) -> Vector{Input Type}
