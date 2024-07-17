@@ -12,8 +12,8 @@ begin
 	using PlutoExtras
 	using PlutoExtras.StructBondModule
 	using PlutoDevMacros
-	using PlutoPlotly
-	using PlotlyBase
+	# using PlutoPlotly
+	# using PlotlyBase
 end
 
 # ╔═╡ 069444e1-4e89-4f4f-ae2f-f5fb3131e398
@@ -23,6 +23,12 @@ ExtendedTableOfContents()
 md"""
 # Test
 """
+
+# ╔═╡ d2c92cda-1d17-49c0-82af-40da55db9ccd
+methods(filter_points)
+
+# ╔═╡ 4bec169d-5243-439f-92e0-b623aaa1c31c
+plot_unitarysphere([[1.0,1.0,1.0],[1.0,1.0,2.0]])
 
 # ╔═╡ b94c71b6-0601-4a4c-ac92-417f0c372334
 md"""
@@ -39,11 +45,19 @@ end
 r = [
 	GeoRegion(regionName="ITA", admin="Italy"), 
 	PolyRegion(regionName="POLY", domain=[SimpleLatLon(-60°,-180°), SimpleLatLon(-60°,180°), SimpleLatLon(60°,180°), SimpleLatLon(60°,-180°)]),
-	LatBeltRegion(regionName="test", latLim=[50°, 60°])
+	LatBeltRegion(regionName="test", latLim=(50°, 60°)),
+	LatBeltRegion(regionName="test", latLim=(45, 60)),
+	LatBeltRegion(regionName="test", latLim=((pi/4)rad, (pi/2)rad))
 ]
 
 # ╔═╡ aed8268b-3432-434c-a764-03bfc49b6333
 typeof(r)
+
+# ╔═╡ 7b017402-a293-4759-90ac-b41459ce1a37
+r[5].latLim[1] ≈ (pi/4)rad
+
+# ╔═╡ 604a6dad-aa56-41f7-acf2-a3597aff2eae
+r[4].latLim[1] ≈ 45°
 
 # ╔═╡ 3a7b7e4e-8555-488f-be49-c82cac515376
 SimpleLatLon(43.997568°, 11.647423°) in r[2]
@@ -57,9 +71,6 @@ _cast_geopoint(LLA(-70°, 11.647423°,10))
 # ╔═╡ f3084b73-e66a-406e-bd4e-c0233ab876a9
 SimpleLatLon(LLA(-70°, 11.647423°,10))
 
-# ╔═╡ d2c92cda-1d17-49c0-82af-40da55db9ccd
-methods(filter_points)
-
 # ╔═╡ e05e7a8c-3957-4329-950c-7cc41383662f
 points = [SimpleLatLon(43.997568°, 11.647423°), SimpleLatLon(-70°, 11.647423°)]
 
@@ -67,10 +78,16 @@ points = [SimpleLatLon(43.997568°, 11.647423°), SimpleLatLon(-70°, 11.647423�
 filter_points(points, r[1])
 
 # ╔═╡ 8eb93dcd-118a-4988-a4bc-a59db70053ea
-gr = group_by_domain(points, r; flagUnique=true)
+gr = group_by_domain(points, r; flagUnique=false)
 
 # ╔═╡ 18a8cc75-79ae-49c2-8c7b-3ea6c318f383
-isempty(gr["ITA"])
+gr["ITA"]
+
+# ╔═╡ b638c73e-72d8-4140-aa7a-97d6293794a4
+gr["POLY"]
+
+# ╔═╡ f9a83ad1-ae48-429d-825f-a2db78c27d83
+gr["test"]
 
 # ╔═╡ b6dda362-d709-4628-aa45-a42ca377ee70
 typeof(points)
@@ -90,9 +107,6 @@ extract_countries(GeoRegion(regionName="ITA", continent="Europe"))
 # ╔═╡ 4ff0540b-c3ba-408f-894e-5fda86c0769d
 plot_geo([SimpleLatLon(-70°, 11°),SimpleLatLon(-0°, 12°)])
 
-# ╔═╡ 4bec169d-5243-439f-92e0-b623aaa1c31c
-plot_unitarysphere([[1.0,1.0,1.0],[1.0,1.0,2.0]])
-
 # ╔═╡ 1005c11c-1fef-4f3f-8cdf-d4b91d16fc60
 # begin
 # 	using BenchmarkTools
@@ -104,17 +118,13 @@ plot_unitarysphere([[1.0,1.0,1.0],[1.0,1.0,2.0]])
 # ╔═╡ 00000000-0000-0000-0000-000000000001
 PLUTO_PROJECT_TOML_CONTENTS = """
 [deps]
-PlotlyBase = "a03496cd-edff-5a9b-9e67-9cda94a718b5"
 PlutoDevMacros = "a0499f29-c39b-4c5c-807c-88074221b949"
 PlutoExtras = "ed5d0301-4775-4676-b788-cf71e66ff8ed"
-PlutoPlotly = "8e989ff0-3d88-8e9f-f020-2b208a939ff0"
 PlutoUI = "7f904dfe-b85e-4ff6-b463-dae2292396a8"
 
 [compat]
-PlotlyBase = "~0.8.19"
 PlutoDevMacros = "~0.9.0"
 PlutoExtras = "~0.7.13"
-PlutoPlotly = "~0.4.6"
 PlutoUI = "~0.7.59"
 """
 
@@ -124,7 +134,7 @@ PLUTO_MANIFEST_TOML_CONTENTS = """
 
 julia_version = "1.10.4"
 manifest_format = "2.0"
-project_hash = "94387de7a043c1bded01cc93904ca43c63fa39be"
+project_hash = "0ad2c6a718035d9963440914613285d2844ed2cc"
 
 [[deps.AbstractPlutoDingetjes]]
 deps = ["Pkg"]
@@ -142,46 +152,17 @@ uuid = "56f22d72-fd6d-98f1-02f0-08ddc0907c33"
 [[deps.Base64]]
 uuid = "2a0f44e3-6c83-55bd-87e4-b1978d98bd5f"
 
-[[deps.BaseDirs]]
-git-tree-sha1 = "cb25e4b105cc927052c2314f8291854ea59bf70a"
-uuid = "18cc8868-cbac-4acf-b575-c8ff214dc66f"
-version = "1.2.4"
-
 [[deps.CodeTracking]]
 deps = ["InteractiveUtils", "UUIDs"]
 git-tree-sha1 = "c0216e792f518b39b22212127d4a84dc31e4e386"
 uuid = "da1fd8a2-8d9e-5ec2-8556-3022fb5608a2"
 version = "1.3.5"
 
-[[deps.ColorSchemes]]
-deps = ["ColorTypes", "ColorVectorSpace", "Colors", "FixedPointNumbers", "PrecompileTools", "Random"]
-git-tree-sha1 = "4b270d6465eb21ae89b732182c20dc165f8bf9f2"
-uuid = "35d6a980-a343-548e-a6ea-1d62b119f2f4"
-version = "3.25.0"
-
 [[deps.ColorTypes]]
 deps = ["FixedPointNumbers", "Random"]
 git-tree-sha1 = "b10d0b65641d57b8b4d5e234446582de5047050d"
 uuid = "3da002f7-5984-5a60-b8a6-cbb66c0b333f"
 version = "0.11.5"
-
-[[deps.ColorVectorSpace]]
-deps = ["ColorTypes", "FixedPointNumbers", "LinearAlgebra", "Requires", "Statistics", "TensorCore"]
-git-tree-sha1 = "a1f44953f2382ebb937d60dafbe2deea4bd23249"
-uuid = "c3611d14-8923-5661-9e6a-0046d554d3a4"
-version = "0.10.0"
-
-    [deps.ColorVectorSpace.extensions]
-    SpecialFunctionsExt = "SpecialFunctions"
-
-    [deps.ColorVectorSpace.weakdeps]
-    SpecialFunctions = "276daf66-3868-5448-9aa4-cd146d93841b"
-
-[[deps.Colors]]
-deps = ["ColorTypes", "FixedPointNumbers", "Reexport"]
-git-tree-sha1 = "362a287c3aa50601b0bc359053d5c2468f0e7ce0"
-uuid = "5ae59095-9a9b-59fe-a467-6f913c188581"
-version = "0.12.11"
 
 [[deps.CompilerSupportLibraries_jll]]
 deps = ["Artifacts", "Libdl"]
@@ -191,12 +172,6 @@ version = "1.1.1+0"
 [[deps.Dates]]
 deps = ["Printf"]
 uuid = "ade2ca70-3891-5945-98fb-dc099432e06a"
-
-[[deps.DelimitedFiles]]
-deps = ["Mmap"]
-git-tree-sha1 = "9e2f36d3c96a820c678f2f1f1782582fcf685bae"
-uuid = "8bb1440f-4735-579b-a4ab-409b98df4dab"
-version = "1.9.1"
 
 [[deps.DocStringExtensions]]
 deps = ["LibGit2"]
@@ -251,11 +226,6 @@ deps = ["CodeTracking", "InteractiveUtils", "Random", "UUIDs"]
 git-tree-sha1 = "a6adc2dcfe4187c40dc7c2c9d2128e326360e90a"
 uuid = "aa1ae85d-cabe-5617-a682-6adf51b2e16a"
 version = "0.9.32"
-
-[[deps.LaTeXStrings]]
-git-tree-sha1 = "50901ebc375ed41dbf8058da26f9de442febbbec"
-uuid = "b964fa9f-0449-5b57-a5c2-d3ea65f4040f"
-version = "1.3.1"
 
 [[deps.LibCURL]]
 deps = ["LibCURL_jll", "MozillaCACerts_jll"]
@@ -327,17 +297,6 @@ deps = ["Artifacts", "CompilerSupportLibraries_jll", "Libdl"]
 uuid = "4536629a-c528-5b80-bd46-f80d51c5b363"
 version = "0.3.23+4"
 
-[[deps.OrderedCollections]]
-git-tree-sha1 = "dfdf5519f235516220579f949664f1bf44e741c5"
-uuid = "bac558e1-5e72-5ebc-8fee-abe8a469f55d"
-version = "1.6.3"
-
-[[deps.Parameters]]
-deps = ["OrderedCollections", "UnPack"]
-git-tree-sha1 = "34c0e9ad262e5f7fc75b10a9952ca7692cfc5fbe"
-uuid = "d96e819e-fc66-5662-9728-84c9c7592b0a"
-version = "0.12.3"
-
 [[deps.Parsers]]
 deps = ["Dates", "PrecompileTools", "UUIDs"]
 git-tree-sha1 = "8489905bcdbcfac64d1daa51ca07c0d8f0283821"
@@ -348,12 +307,6 @@ version = "2.8.1"
 deps = ["Artifacts", "Dates", "Downloads", "FileWatching", "LibGit2", "Libdl", "Logging", "Markdown", "Printf", "REPL", "Random", "SHA", "Serialization", "TOML", "Tar", "UUIDs", "p7zip_jll"]
 uuid = "44cfe95a-1eb2-52ea-b672-e2afdf69b78f"
 version = "1.10.0"
-
-[[deps.PlotlyBase]]
-deps = ["ColorSchemes", "Dates", "DelimitedFiles", "DocStringExtensions", "JSON", "LaTeXStrings", "Logging", "Parameters", "Pkg", "REPL", "Requires", "Statistics", "UUIDs"]
-git-tree-sha1 = "56baf69781fc5e61607c3e46227ab17f7040ffa2"
-uuid = "a03496cd-edff-5a9b-9e67-9cda94a718b5"
-version = "0.8.19"
 
 [[deps.PlutoDevMacros]]
 deps = ["JuliaInterpreter", "Logging", "MacroTools", "Pkg", "TOML"]
@@ -366,20 +319,6 @@ deps = ["AbstractPlutoDingetjes", "DocStringExtensions", "HypertextLiteral", "In
 git-tree-sha1 = "681f89bdd5c1da76b31a524af798efb5eb332ee9"
 uuid = "ed5d0301-4775-4676-b788-cf71e66ff8ed"
 version = "0.7.13"
-
-[[deps.PlutoPlotly]]
-deps = ["AbstractPlutoDingetjes", "BaseDirs", "Colors", "Dates", "Downloads", "HypertextLiteral", "InteractiveUtils", "LaTeXStrings", "Markdown", "Pkg", "PlotlyBase", "Reexport", "TOML"]
-git-tree-sha1 = "1ae939782a5ce9a004484eab5416411c7190d3ce"
-uuid = "8e989ff0-3d88-8e9f-f020-2b208a939ff0"
-version = "0.4.6"
-
-    [deps.PlutoPlotly.extensions]
-    PlotlyKaleidoExt = "PlotlyKaleido"
-    UnitfulExt = "Unitful"
-
-    [deps.PlutoPlotly.weakdeps]
-    PlotlyKaleido = "f2990250-8cf9-495f-b13a-cce12b45703c"
-    Unitful = "1986cc42-f94f-5a68-af5c-568840ba703d"
 
 [[deps.PlutoUI]]
 deps = ["AbstractPlutoDingetjes", "Base64", "ColorTypes", "Dates", "FixedPointNumbers", "Hyperscript", "HypertextLiteral", "IOCapture", "InteractiveUtils", "JSON", "Logging", "MIMEs", "Markdown", "Random", "Reexport", "URIs", "UUIDs"]
@@ -416,12 +355,6 @@ git-tree-sha1 = "45e428421666073eab6f2da5c9d310d99bb12f9b"
 uuid = "189a3867-3050-52da-a836-e630ba90ab69"
 version = "1.2.2"
 
-[[deps.Requires]]
-deps = ["UUIDs"]
-git-tree-sha1 = "838a3a4188e2ded87a4f9f184b4b0d78a1e91cb7"
-uuid = "ae029012-a4dd-5104-9daa-d747884805df"
-version = "1.3.0"
-
 [[deps.SHA]]
 uuid = "ea8e919c-243c-51af-8825-aaa63cd721ce"
 version = "0.7.0"
@@ -457,12 +390,6 @@ deps = ["ArgTools", "SHA"]
 uuid = "a4e569a6-e804-4fa4-b0f3-eef7a1d5b13e"
 version = "1.10.0"
 
-[[deps.TensorCore]]
-deps = ["LinearAlgebra"]
-git-tree-sha1 = "1feb45f88d133a655e001435632f019a9a1bcdb6"
-uuid = "62fd8b95-f654-4bbd-a8a5-9c27f68ccd50"
-version = "0.1.1"
-
 [[deps.Test]]
 deps = ["InteractiveUtils", "Logging", "Random", "Serialization"]
 uuid = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
@@ -480,11 +407,6 @@ version = "1.5.1"
 [[deps.UUIDs]]
 deps = ["Random", "SHA"]
 uuid = "cf7118a7-6976-5b1a-9a39-7adc72f591a4"
-
-[[deps.UnPack]]
-git-tree-sha1 = "387c1f73762231e86e0c9c5443ce3b4a0a9a0c2b"
-uuid = "3a884ed6-31ef-47d7-9d2a-63182c4928ed"
-version = "1.0.2"
 
 [[deps.Unicode]]
 uuid = "4ec0a83e-493e-50e2-b9ac-8f72acf5a8f5"
@@ -514,6 +436,8 @@ version = "17.4.0+2"
 # ╠═069444e1-4e89-4f4f-ae2f-f5fb3131e398
 # ╟─8717aaad-3791-40ec-82a3-3957fb10a562
 # ╠═cd0f6997-c95c-4fd7-9be8-88d8dbcf760a
+# ╠═7b017402-a293-4759-90ac-b41459ce1a37
+# ╠═604a6dad-aa56-41f7-acf2-a3597aff2eae
 # ╠═3a7b7e4e-8555-488f-be49-c82cac515376
 # ╠═56cef4fa-7aea-40c8-83da-e6431ff9a915
 # ╠═b21c6e34-f9c0-4b1b-b467-c25db60fd9e1
@@ -521,6 +445,8 @@ version = "17.4.0+2"
 # ╠═af171b47-c943-4d70-93cc-e55f1ef9d2c2
 # ╠═8eb93dcd-118a-4988-a4bc-a59db70053ea
 # ╠═18a8cc75-79ae-49c2-8c7b-3ea6c318f383
+# ╠═b638c73e-72d8-4140-aa7a-97d6293794a4
+# ╠═f9a83ad1-ae48-429d-825f-a2db78c27d83
 # ╠═b6dda362-d709-4628-aa45-a42ca377ee70
 # ╠═d2c92cda-1d17-49c0-82af-40da55db9ccd
 # ╠═e05e7a8c-3957-4329-950c-7cc41383662f

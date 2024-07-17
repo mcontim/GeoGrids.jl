@@ -1,6 +1,5 @@
 """
     _cast_geopoint(p::Union{AbstractVector, Tuple})
-    _cast_geopoint(p::LLA)
     _cast_geopoint(p::SimpleLatLon)
 
 Convert various types of input representations into a `SimpleLatLon` object.
@@ -22,7 +21,7 @@ function _cast_geopoint(p::Union{AbstractVector, Tuple})
     # Inputs are considered in degrees
     return SimpleLatLon(lat*°, lon*°)
 end
-_cast_geopoint(p::LLA) = SimpleLatLon(p)
+# _cast_geopoint(p::LLA) = SimpleLatLon(p) # //FIX: to be removed
 _cast_geopoint(p::SimpleLatLon) = p
 
 ## Aux Functions
@@ -31,15 +30,24 @@ _cast_geopoint(p::SimpleLatLon) = p
 
 Extracts the countries from a given region.
 
-It first gets the field names of the `GeoRegion` type, excluding the `:regionName`, then maps these field names to their corresponding values in the `GeoRegion` instance `r`, creating a collection of pairs. It filters out any pairs where the value is empty. It converts this collection of pairs into a `NamedTuple`, finally, it calls `CountriesBorders.extract_countries` with the `NamedTuple` as keyword arguments.
+It first gets the field names of the `GeoRegion` type, excluding the
+`:regionName`, then maps these field names to their corresponding values in the
+`GeoRegion` instance `r`, creating a collection of pairs. It filters out any
+pairs where the value is empty. It converts this collection of pairs into a
+`NamedTuple`, finally, it calls `CountriesBorders.extract_countries` with the
+`NamedTuple` as keyword arguments.
 
-This function is an overload of `CountriesBorders.extract_countries` that takes a `GeoRegion` object as input. It extracts the countries from the given region and returns them.
+This function is an overload of `CountriesBorders.extract_countries` that takes
+a `GeoRegion` object as input. It extracts the countries from the given region
+and returns them.
 
 ## Arguments
-- `r::GeoRegion`: The region from which to extract the countries. It should be an instance of the `GeoRegion` type.
+- `r::GeoRegion`: The region from which to extract the countries. It should be \
+an instance of the `GeoRegion` type.
 
 ## Returns
-- The function returns the result of `CountriesBorders.extract_countries(;kwargs...)`.
+- The function returns the result of \
+`CountriesBorders.extract_countries(;kwargs...)`.
 """
 function CountriesBorders.extract_countries(r::GeoRegion)
     # Overload of CountriesBorders.extract_countries taking GeoRegion as input
@@ -92,3 +100,11 @@ end
 
 # 	return out
 # end
+
+function _check_angle_func(limit = π) 
+	f(x::Union{Real, UnitfulAngleQuantity}) = abs(x) <= limit
+end
+function _check_angle(x; limit = π, msg::String = "Angles directly provided as numbers must be expressed in radians and satisfy -$limit ≤ x ≤ $limit
+Consider using `°` from Unitful (Also re-exported by TelecomUtils) if you want to pass numbers in degrees, by doing `x * °`." )  
+	@assert all(_check_angle_func(limit), x) msg
+end

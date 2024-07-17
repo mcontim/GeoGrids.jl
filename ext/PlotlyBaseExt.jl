@@ -4,7 +4,6 @@ using PlotlyExtensionsHelper
 using PlotlyBase
 
 using GeoGrids
-using TelecomUtils
 
 """
 	plot_unitarysphere(points_cart)
