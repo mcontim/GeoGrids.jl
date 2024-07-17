@@ -13,7 +13,7 @@ This function returns a vector `Nx2` of LAT, LON values for a `N` points grid bu
 ## Output:
 - `out`: Matrix{Union{LLA,Point2}}, each element of the matrix is either a `LLA` or `Point2`. The order of the elements is LAT, LON.
 """
-function icogrid(;N=nothing, sepAng=nothing)	
+function icogrid(;N::Int=nothing, sepAng::ValidAngle=nothing)	# //FIX: to make it compliant with ValidAngle
 	if isnothing(sepAng) && !isnothing(N)
 		vec = _icogrid(N; coord=:sphe)
 	elseif !isnothing(sepAng) && isnothing(N)
@@ -88,13 +88,13 @@ Instead of checking all the possible pairs of the N points generated with the Fi
 ## Output:
 - `Ns[2]`: an integer representing the minimum number of points required on the surface of the sphere to achieve the desired separation angle.
 """
-function _points_required_for_separation_angle(sepAng; spheRadius=1.0, pointsToCheck::Int=50, maxPrec=10^7, tol=10)
+function _points_required_for_separation_angle(sepAng::ValidAngle; spheRadius=1.0, pointsToCheck::Int=50, maxPrec=10^7, tol=10)
 	# Bisection
 	Ns = [2, maxPrec]
 	
 	## Define Inner Functions ---------------------------------------------------------------------
 	# Find the separation angle for a given N
-	f(N) = _find_separation_angle(_fibonaccisphere_classic_partial(N; spheRadius=spheRadius, pointsToCheck=pointsToCheck)) # radians
+	f(N) = _find_min_separation_angle(_fibonaccisphere_classic_partial(N; spheRadius=spheRadius, pointsToCheck=pointsToCheck)) # radians
 	# Distance between the tested points
 	tolerance(v) = v[2] - v[1]
 	
@@ -122,7 +122,7 @@ function _points_required_for_separation_angle(sepAng; spheRadius=1.0, pointsToC
 end
 
 """
-	_find_separation_angle(points)
+	_find_min_separation_angle(points)
 
 This function takes an array of 3D Cartesian points as input and computes the smallest angle between any two points in the array. It does this by iterating over all unique pairs of points in the array and computing the angle between them using the `angle`` function. The smallest angle encountered during the iteration is stored in the variable `sep` and returned as the output of the function.
 
@@ -130,9 +130,9 @@ This function takes an array of 3D Cartesian points as input and computes the sm
 - `points``: an array of 3D points in the Cartesian plane represented as Tuples, Arrays, SVectors.
 
 ## Output:
-- `sep`: the smallest angle between any two points in the input array, measured in radians.
+- `sep`: the smallest angle between any two points in the input array, returned as Uniful.Quantity in radians.
 """
-function _find_separation_angle(points)
+function _find_min_separation_angle(points)
 	sep = Inf
 	L = length(points)
 
@@ -143,12 +143,12 @@ function _find_separation_angle(points)
 	@inbounds for i in 1:L-1
 		for j in i+1:L # Check triang sup (avoid repeating pairs of points, order is not important)
 			# acos(dot(points[i],points[j]) / norm(points[i])*norm(points[j]))
-			temp = angle(points[i],points[j]) # avoid errors with float approximations (<-1, >1)
+			temp = angle(points[i],points[j]) # avoid errors with float approximations (<-1, >1) using AngleBetweenVectors.jl
 			sep = temp < sep ? temp : sep
 		end
 	end
 	
-	return sep
+	return sep*rad
 end
 
 """

@@ -36,11 +36,8 @@ mutable struct LatBeltRegion <: AbstractRegion
     regionName::String
     latLim::Tuple{ValidAngle,ValidAngle} # [rad] 
 
-    function LatBeltRegion(regionName::String="region_name", latLim=nothing)
-        # Inputs validation
-        isnothing(latLim) && error("Input the Latitude Belt limits...")
-        length(latLim) != 2 && error("The input must be a 2 elements vector...")
-        
+    function LatBeltRegion(regionName::String, latLim::Tuple{ValidAngle,ValidAngle})
+        # Inputs validation    
         _latLim = map(latLim) do l
             l isa Real ? l * ° : l
         end
@@ -59,4 +56,4 @@ Consider using `°` (or `rad`) from `Unitful` if you want to pass numbers in deg
         new(regionName, _latLim)
     end
 end
-LatBeltRegion(; regionName::String="region_name", latLim=nothing) = LatBeltRegion(regionName, latLim)
+LatBeltRegion(; regionName::String="region_name", latLim) = LatBeltRegion(regionName, latLim)
