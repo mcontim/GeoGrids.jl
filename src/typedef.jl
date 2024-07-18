@@ -41,7 +41,7 @@ mutable struct LatBeltRegion <: AbstractRegion
         _latLim = map(latLim) do l
             l isa Real ? l * ° : l
         end
-        
+
         for x in _latLim
             abs(x) ≤ 90° || error(
 #! format: off

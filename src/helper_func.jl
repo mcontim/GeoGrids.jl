@@ -3,23 +3,27 @@
     _cast_geopoint(p::SimpleLatLon)
 
 Convert various types of input representations into a `SimpleLatLon` object.
-This method assumes that the input coordinates are in degrees. It converts the latitude and longitude from degrees to radians before creating a `SimpleLatLon` object.
+This method assumes that the input coordinates are in degrees. It converts the
+latitude and longitude from degrees to radians before creating a `SimpleLatLon`
+object.
 
 ## Arguments
-- `p::Union{AbstractVector, Tuple}`: A 2D point where the first element is the latitude and the second element is the longitude, both in degrees.
+- `p::Union{AbstractVector, Tuple}`: A 2D point where the first element is the \
+latitude and the second element is the longitude, both in degrees.
 
 ## Returns
-- `SimpleLatLon`: An object representing the geographical point with latitude and longitude converted to radians.
+- `SimpleLatLon`: An object representing the geographical point with latitude \
+and longitude converted to radians.
 
 ## Errors
 - Throws an `ArgumentError` if the input `p` does not have exactly two elements.
 """
-function _cast_geopoint(p::Union{AbstractVector, Tuple})
+function _cast_geopoint(p::Union{AbstractVector,Tuple})
     length(p) != 2 && error("The input must be a 2D point...")
     lat = first(p)
     lon = last(p)
     # Inputs are considered in degrees
-    return SimpleLatLon(lat*°, lon*°)
+    return SimpleLatLon(lat * °, lon * °)
 end
 _cast_geopoint(p::SimpleLatLon) = p
 
@@ -50,15 +54,15 @@ an instance of the `GeoRegion` type.
 """
 function CountriesBorders.extract_countries(r::GeoRegion)
     # Overload of CountriesBorders.extract_countries taking GeoRegion as input
-    names = setdiff(fieldnames(GeoRegion), (:regionName,:domain))
+    names = setdiff(fieldnames(GeoRegion), (:regionName, :domain))
 
     all_pairs = map(names) do n
-        n => getfield(r,n)
-    end 
-    
+        n => getfield(r, n)
+    end
+
     kwargs = NamedTuple(filter(x -> !isempty(x[2]), all_pairs))
     @info kwargs
-    CountriesBorders.extract_countries(;kwargs...)
+    CountriesBorders.extract_countries(; kwargs...)
 end
 
 # //FIX: DELETE
@@ -101,10 +105,10 @@ end
 # 	return out
 # end
 
-function _check_angle_func(limit = π) 
-	f(x::Union{Real, UnitfulAngleQuantity}) = abs(x) <= limit
+function _check_angle_func(limit=π)
+    f(x::Union{Real,UnitfulAngleQuantity}) = abs(x) <= limit
 end
-function _check_angle(x; limit = π, msg::String = "Angles directly provided as numbers must be expressed in radians and satisfy -$limit ≤ x ≤ $limit
-Consider using `°` from Unitful (Also re-exported by TelecomUtils) if you want to pass numbers in degrees, by doing `x * °`." )  
-	@assert all(_check_angle_func(limit), x) msg
+function _check_angle(x; limit=π, msg::String="Angles directly provided as numbers must be expressed in radians and satisfy -$limit ≤ x ≤ $limit
+Consider using `°` from Unitful (Also re-exported by TelecomUtils) if you want to pass numbers in degrees, by doing `x * °`.")
+    @assert all(_check_angle_func(limit), x) msg
 end

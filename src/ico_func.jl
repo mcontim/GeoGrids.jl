@@ -13,7 +13,7 @@ This function returns a vector `Nx2` of LAT, LON values for a `N` points grid bu
 ## Output:
 - `out`: Matrix{Union{LLA,Point2}}, each element of the matrix is either a `LLA` or `Point2`. The order of the elements is LAT, LON.
 """
-function icogrid(;N::Int=nothing, sepAng::ValidAngle=nothing)	# //FIX: to make it compliant with ValidAngle
+function icogrid(;N::Union{Int,Nothing}=nothing, sepAng::Union{ValidAngle,Nothing}=nothing)	# //FIX: to make it compliant with ValidAngle
 	if isnothing(sepAng) && !isnothing(N)
 		vec = _icogrid(N; coord=:sphe)
 	elseif !isnothing(sepAng) && isnothing(N)
