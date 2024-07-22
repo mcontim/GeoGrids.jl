@@ -1,5 +1,5 @@
 """
-	meshgrid(xRes::ValidAngle; yRes::ValidAngle=xRes, height=nothing, unit=:rad, type=:lla)
+	rectgrid(xRes::ValidAngle; yRes::ValidAngle=xRes, height=nothing, unit=:rad, type=:lla)
 
 This function call meshgrid with the specified resolution given as input and return the LAT, LON meshgrid (LAT=y, LON=x).
 The meshgrid cover all the globe with LAT=-90:90 and LON=-180:180
@@ -14,68 +14,34 @@ The meshgrid cover all the globe with LAT=-90:90 and LON=-180:180
 ## Output
 - `out`: Matrix{Union{LLA,Point2}}, each element of the matrix is either a `LLA` or `Point2`. The order of the elements is LAT, LON.
 """
-function meshgrid(xRes::ValidAngle; yRes::ValidAngle=xRes, height=nothing, unit=:rad, type=:lla)
-	# Input Validation
+function rectgrid(xRes::ValidAngle; yRes::ValidAngle=xRes, height=nothing, unit=:rad, type=:lla)
+	# Input Validation   
 	_xRes = let
-		_check_angle(xRes; limit = π, msg = "Resolution of x is too large, it must be smaller than π...")
-		if xRes < 0
+		x = xRes isa Real ? xRes * ° : l # Convert to Uniful
+		abs(x) ≤ 180° || error("Resolution of x is too large, it must be smaller than π...")
+		if x < 0
 			@warn "Input xRes is negative, it will be converted to positive..."
-			to_radians(abs(xRes))
+			abs(x)
 		else
-			to_radians(xRes)
-		end	
-	end
-	_yRes = let
-		_check_angle(yRes; limit = π, msg = "Resolution of y is too large, it must be smaller than π...")
-		if yRes < 0
-			@warn "Input yRes is negative, it will be converted to positive..."
-			to_radians(abs(yRes))
-		else
-			to_radians(yRes)
+			x
 		end
 	end
 
-	# Create meshgrid
-	mat = _meshgrid(-π/2:_xRes:π/2, -π:_yRes:(π-_yRes+1e-10))
-	
-	# Unit Conversion
-	out = _grid_points_conversion(mat; height, type, unit)
+	_yRes = let
+		x = yRes isa Real ? yRes * ° : l # Convert to Uniful
+		abs(x) ≤ 180° || error("Resolution of x is too large, it must be smaller than π...")
+		if x < 0
+			@warn "Input yRes is negative, it will be converted to positive..."
+			abs(x)
+		else
+			x
+		end
+	end
+
+	# Create the rectangular grid of elements SimpleLatLon
+	out = [SimpleLatLon(x,y) for x in -90°:_xRes:90°, y in -180°:_yRes:(180°-_yRes+1e-10*°)]
 
 	return out
-end
-
-"""
-	_meshgrid(xin::AbstractVector, yin::AbstractVector) -> Matrix{SVector{2,Float64}}
-
-Create a 2D grid of coordinates using the input vectors `xin` and `yin`.
-The outputs contain all possible combinations of the elements of `xin` and `yin`, with `xout` corresponding to the horizontal coordinates and `yout` corresponding to the vertical coordinates.
-
-## Arguments
-- `xin::AbstractVector`: 1D input array of horizontal coordinates.
-- `yin::AbstractVector`: 1D input array of vertical coordinates.
-
-## Output
-- Matrix{SVector{2,Float64}}, each element of the matrix can be considered as (lat, lon) if used by `meshgrid`.
-"""
-function _meshgrid(xin::AbstractVector, yin::AbstractVector)
-	# Compact writing using SA convenience constructor for StaticArrays and Comprehensions 
-	return [SA_F64[x,y] for x in xin, y in yin]
-	
-	# # Equivalent nested for construction
-	# nx 	 = length(xin)
-	# ny 	 = length(yin)
-	# xout = zeros(ny,nx)
-	# yout = zeros(ny,nx)
-	# mat  = Array{SVector{2,Float64}}(undef,length(yin),length(xin)) # Output matrix of SVectors
-	
-    # for jx = 1:nx
-	#     for ix = 1:ny
-	#         xout[ix,jx] = xin[jx]
-	#         yout[ix,jx] = yin[ix]
-	# 		mat[ix,jx] = SVector(xin[jx],yin[ix])
-	#     end
-	# end
-    # return mat
 end
 
 """

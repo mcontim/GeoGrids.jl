@@ -27,20 +27,20 @@ end
 end
 
 @testitem "Mesh Grid Functions" tags=[:general] begin
-    @test meshgrid(deg2rad(5); height=0.0) isa Matrix{LLA}
-    @test meshgrid(deg2rad(5); yRes=deg2rad(3), height=0.0) isa Matrix{LLA}
-    @test meshgrid(deg2rad(5); type=:point) isa Matrix{Point2}
-    @test meshgrid(deg2rad(5); unit=:deg, type=:point) isa Matrix{Point2}
-    @test meshgrid(deg2rad(5); yRes=deg2rad(3), type=:point) isa Matrix{Point2}
+    @test rectgrid(deg2rad(5); height=0.0) isa Matrix{LLA}
+    @test rectgrid(deg2rad(5); yRes=deg2rad(3), height=0.0) isa Matrix{LLA}
+    @test rectgrid(deg2rad(5); type=:point) isa Matrix{Point2}
+    @test rectgrid(deg2rad(5); unit=:deg, type=:point) isa Matrix{Point2}
+    @test rectgrid(deg2rad(5); yRes=deg2rad(3), type=:point) isa Matrix{Point2}
 
-    @test_logs (:warn, "Height is not provided, it will be set to 0 by default...") meshgrid(deg2rad(5)) 
-    @test_logs (:warn, "Height is ignored when type is set to :point...") meshgrid(deg2rad(5); height=0.0, type=:point)
-    @test_throws "The input type do not match the expected format, it must be :lla or :point..." meshgrid(deg2rad(5); type=:testerr)
-    @test_throws "Resolution of x is too large, it must be smaller than π..." meshgrid(deg2rad(181); height=0.0)
-    @test_throws "Resolution of y is too large, it must be smaller than π..." meshgrid(deg2rad(5); yRes=deg2rad(181), height=0.0)
+    @test_logs (:warn, "Height is not provided, it will be set to 0 by default...") rectgrid(deg2rad(5)) 
+    @test_logs (:warn, "Height is ignored when type is set to :point...") rectgrid(deg2rad(5); height=0.0, type=:point)
+    @test_throws "The input type do not match the expected format, it must be :lla or :point..." rectgrid(deg2rad(5); type=:testerr)
+    @test_throws "Resolution of x is too large, it must be smaller than π..." rectgrid(deg2rad(181); height=0.0)
+    @test_throws "Resolution of y is too large, it must be smaller than π..." rectgrid(deg2rad(5); yRes=deg2rad(181), height=0.0)
     
-    @test_logs (:warn, "Input xRes is negative, it will be converted to positive...") meshgrid(-deg2rad(5); yRes=deg2rad(3), type=:point)
-    @test_logs (:warn, "Input yRes is negative, it will be converted to positive...") meshgrid(deg2rad(5); yRes=-deg2rad(3), type=:point)
+    @test_logs (:warn, "Input xRes is negative, it will be converted to positive...") rectgrid(-deg2rad(5); yRes=deg2rad(3), type=:point)
+    @test_logs (:warn, "Input yRes is negative, it will be converted to positive...") rectgrid(deg2rad(5); yRes=-deg2rad(3), type=:point)
 end
 
 @testitem "Vec Grid Functions" tags=[:general] begin
@@ -61,8 +61,8 @@ end
     @test plot_unitarysphere(GeoGrids._icogrid(100; coord=:cart)) isa Plot
     @test plot_geo(icogrid(sepAng=deg2rad(5), type=:point)) isa Plot
     @test plot_geo(icogrid(sepAng=deg2rad(4), height=0.0); camera=:threedim) isa Plot
-    @test plot_geo(meshgrid(deg2rad(5); type=:point)) isa Plot
-    @test plot_geo(meshgrid(deg2rad(5); height=0.0); camera=:threedim) isa Plot
+    @test plot_geo(rectgrid(deg2rad(5); type=:point)) isa Plot
+    @test plot_geo(rectgrid(deg2rad(5); height=0.0); camera=:threedim) isa Plot
 end
 
 @testitem "Helper Functions" tags=[:general] begin

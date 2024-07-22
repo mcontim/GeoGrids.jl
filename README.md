@@ -34,7 +34,7 @@ When the selected output type is `Point2`, as convention it has been considered:
 
 ### Meshgrid
 
-	meshgrid(xRes::ValidAngle; yRes::ValidAngle=xRes, height=nothing, unit=:rad, type=:lla)
+	rectgrid(xRes::ValidAngle; yRes::ValidAngle=xRes, height=nothing, unit=:rad, type=:lla)
 
 This function returns a `Matrix` of `Point2` or `LLA` elements representing a 2D Global grid of coordinates with the specified resolutions `xRes` and `yRes` respectively for x and y axes. This function return the `LAT`, `LON` meshgrid similar to the namesake MATLAB function.
 

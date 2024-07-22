@@ -11,18 +11,15 @@ built with the Fibonacci Spiral method.
 - `type`: `:lla` or `:point`. Output type either `LLA` or `Point2`
 
 ## Output:
-- `out`: Matrix{Union{LLA,Point2}}, each element of the matrix is either a `LLA` \
-or `Point2`. The order of the elements is LAT, LON.
+- `out`: an Array{SimpleLatLon} of points in the icosahedral grid.
 """
 function icogrid(; N::Union{Int,Nothing}=nothing, sepAng::Union{ValidAngle,Nothing}=nothing)
     if isnothing(sepAng) && !isnothing(N)
         vec = _icogrid(N; coord=:sphe)
     elseif !isnothing(sepAng) && isnothing(N)
-
         # Inputs validation (sepAng must be positive Uniful value)    
         _sepAng = let
             x = sepAng isa Real ? sepAng * ° : l # Convert to Uniful
-
             abs(x) ≤ 360° || error(
 #! format: off
 "The sepAng provided as numbers must be expressed in radians and satisfy -360 ≤ x ≤ 360. 
@@ -36,7 +33,6 @@ Consider using `°` (or `rad`) from `Unitful` if you want to pass numbers in deg
                 x
             end
         end
-
         N, _ = _points_required_for_separation_angle(_sepAng)
         vec = _icogrid(N; coord=:sphe)
     else
@@ -169,7 +165,7 @@ iteration is stored in the variable `sep` and returned as the output of the
 function.
 
 ## Arguments:
-- `points``: an array of 3D points in the Cartesian plane represented as Tuples, \
+- `points`: an array of 3D points in the Cartesian plane represented as Tuples, \
 Arrays, SVectors.
 
 ## Output:
@@ -323,7 +319,7 @@ corresponds to a point on the surface of the sphere, and the columns \
 correspond to the x, y, and z coordinates of the point.
 """
 function fibonaccisphere_alternative1(N::Int)
-    # //FIX: to be further tested 
+    # //FIX: to be further tested (only used in the example notebook, not an actual function important for the module)
     points = zeros(N, 3)
     goldenSphere = π * (3.0 - sqrt(5.0))
     off = 2.0 / N
