@@ -19,7 +19,7 @@ function icogrid(; N::Union{Int,Nothing}=nothing, sepAng::Union{ValidAngle,Nothi
     elseif !isnothing(sepAng) && isnothing(N)
         # Inputs validation (sepAng must be positive Uniful value)    
         _sepAng = let
-            x = sepAng isa Real ? sepAng * ° : l # Convert to Uniful
+            x = sepAng isa Real ? sepAng * ° : sepAng # Convert to Uniful
             abs(x) ≤ 360° || error(
 #! format: off
 "The sepAng provided as numbers must be expressed in radians and satisfy -360 ≤ x ≤ 360. 
@@ -40,7 +40,7 @@ Consider using `°` (or `rad`) from `Unitful` if you want to pass numbers in deg
     end
 
     # Unit Conversion	
-    out = map(x -> SimpleLatLon(x...), vec)
+	out = map(x -> SimpleLatLon(rad2deg.(x)...), vec)
 
     return out
 end
@@ -62,10 +62,10 @@ preserved quasi-constant.
 - `radius`: the sphere radius in meters (unitary as default)
 
 ## Output:
-- `pointsVec``: `N x 1` array containing the SVector of the generated points. \
+- `pointsVec`: `N x 1` array containing the SVector of the generated points. \
 Each element corresponds to a point on the surface of the sphere, the SVector \
 contains either the x, y, and z (:cart) or lat, lon (:sphe) (LAT=x, LON=y) \
-in Unitful.° coordinates of the point.
+in rad coordinates of the point.
 
 ## References
 1. http://extremelearning.com.au/how-to-evenly-distribute-points-on-a-sphere-more-effectively-than-the-canonical-fibonacci-lattice/
@@ -74,7 +74,7 @@ function _icogrid(N::Int; coord::Symbol=:sphe, spheRadius=1.0)
     pointsVec = if coord == :sphe # :sphe | :cart
         map(0:N-1) do k
             θ, ϕ = _get_theta_phi(k, N)
-            SVector((π / 2 - ϕ)°, rem(θ, 360°, RoundNearest)) # wrap (lat,lon), use Uniful.°
+            SVector(π / 2 - ϕ, rem(θ, 2π, RoundNearest)) # wrap (lat,lon)
         end
     else
         map(0:N-1) do k
@@ -188,7 +188,7 @@ function _find_min_separation_angle(points)
         end
     end
 
-    return sep * ° # return as ValidAngle (in deg)
+    return rad2deg(sep) * ° # return as ValidAngle (in deg)
 end
 
 """
@@ -218,7 +218,7 @@ end
 
 # Helper Functions
 """
-    _get_theta_phi(k::Number, N::Number) -> Tuple{Unitful.°, Unitful.°}
+    _get_theta_phi(k::Number, N::Number) -> Tuple{Number, Number}
 
 Calculate the spherical coordinates θ (theta) and ϕ (phi) for a given index `k`
 and total number of points `N` using the Golden Ratio method.
@@ -231,16 +231,16 @@ are to be calculated.
 
 ## Returns
 - A tuple `(θ, ϕ)` where:
-    - `θ::Uniful.°`: The longitude angle in degrees, ranging from `[0, 360]`.
-    - `ϕ::Uniful.°`: The latitude angle in degrees, ranging from `[0, 180]` from \
+    - `θ::Number`: The longitude angle in rad, ranging from `[0, 360]`.
+    - `ϕ::Number`: The latitude angle in rad, ranging from `[0, 180]` from \
 the North Pole.
 """
 function _get_theta_phi(k::Number, N::Number)
     goldenRatio = (1 + sqrt(5)) / 2
-    θ = rad2deg(2π * k / goldenRatio)*° # [0,2π] [LON]
-    ϕ = acosd(1 - 2(k + 0.5) / N)*° # [0,π] from North Pole [LAT]
+    θ = 2π * k / goldenRatio # [0,2π] [LON]
+    ϕ = acos(1 - 2(k + 0.5) / N) # [0,π] from North Pole [LAT]
 
-    return (θ, ϕ) # Return values as Unitful.°
+    return (θ, ϕ) # Return values as rad
 end
 
 ## Alternative implementations ------------------------------------------------------------------------------
@@ -319,7 +319,7 @@ corresponds to a point on the surface of the sphere, and the columns \
 correspond to the x, y, and z coordinates of the point.
 """
 function fibonaccisphere_alternative1(N::Int)
-    # //FIX: to be further tested (only used in the example notebook, not an actual function important for the module)
+    # //FIX: to be further tested
     points = zeros(N, 3)
     goldenSphere = π * (3.0 - sqrt(5.0))
     off = 2.0 / N

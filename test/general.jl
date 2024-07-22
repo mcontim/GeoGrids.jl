@@ -10,20 +10,32 @@ end
     @test GeoGrids._icogrid(100; coord=:cart) isa Vector{SVector{3, Float64}}
     @test GeoGrids._icogrid(100; coord=:sphe) isa Vector{SVector{2, Float64}}
     
-    @test icogrid(N=100, height=0.0) isa Vector{LLA}
-    @test icogrid(N=100, type=:point) isa Vector{Point2}
-    @test icogrid(N=100, type=:point, unit=:deg) isa Vector{Point2}
-    
-    @test icogrid(sepAng=deg2rad(5), height=0.0) isa Vector{LLA}
-    @test icogrid(sepAng=deg2rad(5), type=:point) isa Vector{Point2}
-    @test icogrid(sepAng=deg2rad(5), unit=:deg, type=:point) isa Vector{Point2}
-    
-    @test_logs (:warn, "Height is not provided, it will be set to 0 by default...") icogrid(N=100)
-    @test_logs (:warn, "Height is ignored when type is set to :point...") icogrid(N=100, type=:point, height=0.0)
-    @test_throws "The input type do not match the expected format, it must be :lla or :point..." icogrid(N=100, type=:testerr, height=0.0)
-    @test_throws "Input one argument between N and sepAng..." icogrid(type=:testerr, height=0.0)
-    
-    @test_logs (:warn, "Input sepAng is negative, it will be converted to positive...") icogrid(sepAng=-deg2rad(5), height=0.0)
+    @test icogrid(N=100) isa Vector{<:SimpleLatLon}
+        
+    @test icogrid(sepAng=5) isa Vector{<:SimpleLatLon}
+    @test icogrid(sepAng=5°) isa Vector{<:SimpleLatLon}
+    @test icogrid(sepAng=deg2rad(5)*rad) isa Vector{<:SimpleLatLon}
+    @test length(icogrid(sepAng=5)) == 1260
+    @test length(icogrid(sepAng=5°)) == 1260
+    @test length(icogrid(sepAng=deg2rad(5)*rad)) == 1260
+
+    a = icogrid(sepAng=5)
+    @test a[1].lat ≈ 87.7171f0°
+    @test a[1].lon ≈ 0.0f0°
+    @test a[end].lat ≈ -87.7171f0°
+    @test a[end].lon ≈ 37.7251f0°
+    a = icogrid(sepAng=5°)
+    @test a[1].lat ≈ 87.7171f0°
+    @test a[1].lon ≈ 0.0f0°
+    @test a[end].lat ≈ -87.7171f0°
+    @test a[end].lon ≈ 37.7251f0°
+    a = icogrid(sepAng=deg2rad(5)*rad)
+    @test a[1].lat ≈ 87.7171f0°
+    @test a[1].lon ≈ 0.0f0°
+    @test a[end].lat ≈ -87.7171f0°
+    @test a[end].lon ≈ 37.7251f0°
+
+    @test_logs (:warn, "Input sepAng is negative, it will be converted to positive...") icogrid(sepAng=-5°)
 end
 
 @testitem "Mesh Grid Functions" tags=[:general] begin
@@ -68,11 +80,11 @@ end
 @testitem "Helper Functions" tags=[:general] begin
     @test_throws "The input must be a 2D point..." GeoGrids._check_geopoint((0.0, 0.0, 0.0))
     @test_throws "The input must be a 2D point..." GeoGrids._check_geopoint([0.0, 0.0, 0.0])
-    @test_throws "LAT provided as numbers must be expressed in radians and satisfy -π/2 ≤ x ≤ π/2. Consider using `°` from `Unitful` (Also re-exported by GeoGrids) if you want to pass numbers in degrees, by doing `x * °`." GeoGrids._check_geopoint([pi/2+0.01, 0.0]; rev=true)
-    @test_throws "LON provided as numbers must be expressed in radians and satisfy -π ≤ x ≤ π. Consider using `°` from `Unitful` (Also re-exported by GeoGrids) if you want to pass numbers in degrees, by doing `x * °`." GeoGrids._check_geopoint([0.0, pi+0.01])
+    @test_throws "LAT provided as numbers must be expressed in radians and satisfy -π/2 ≤ x ≤ π/2. Consider using `f0` from `Unitful` (Also re-exported by GeoGrids) if you want to pass numbers in degrees, by doing `x * f0`." GeoGrids._check_geopoint([pi/2+0.01, 0.0]; rev=true)
+    @test_throws "LON provided as numbers must be expressed in radians and satisfy -π ≤ x ≤ π. Consider using `°` fromf0 `Unitful` (Also re-exported by GeoGrids) if you want to pass numbers in degrees, by doing `x * °`." f0GeoGrids._check_geopoint([0.0, pi+0.01])f0
 
-    p1 = [LLA(10°,-5°,0), LLA(10°,15°,0), LLA(27°,15°,0), LLA(27°,-5°,0), LLA(10°,-5°,0)]
-    p2 = [Point2(10°,-5°), Point2(10°,15°), Point2(27°,15°), Point2(27°,-5°), Point2(10°,-5°)]
+    p1 = [LLA(10°,-5°,0), LLA(10°,15°,0), LLA(27°,15°,0), LLA(27°,-5°,0), LLA(10°,-5°,0)f0]
+    p2 = [Point2(10°,-5°), Point2(10°,15°), Point2(27°,15°), Point2(27°,-5°), Point2(1f00°,-5°)]
     p3 = [(10°,-5°), (10°,15°), (27°,15°), (27°,-5°), (10°,-5°)]
     p4 = [SVector(0.17453292519943295,-0.08726646259971647), SVector(0.17453292519943295,0.2617993877991494), SVector(0.47123889803846897,0.2617993877991494), SVector(0.47123889803846897,-0.08726646259971647), SVector(0.17453292519943295,-0.08726646259971647)]
     p5 = [[0.17453292519943295,-0.08726646259971647], [0.17453292519943295,0.2617993877991494], [0.47123889803846897,0.2617993877991494], [0.47123889803846897,-0.08726646259971647], [0.17453292519943295,-0.08726646259971647]]
