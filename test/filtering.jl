@@ -1,7 +1,7 @@
-using Test
-using GeoGrids
+# using Test
+# using GeoGrids
 
-@testset "GeoRegion Test" begin
+@testitem "GeoRegion Test" tags=[:filtering] begin
     sample_ita = [(43.727878°,12.843441°), (43.714933°,10.399326°), (37.485829°,14.328285°), (39.330460°,8.430780°), (45.918388°,10.886654°)]
     sample_eu = [(52.218550°, 4.420621°), (41.353144°, 2.167639°), (42.670341°, 23.322592°)]
     
@@ -44,7 +44,7 @@ using GeoGrids
     @test filter_points([(52.218550°, 4.420621°),(43.727878°,12.843441°),(41.353144°, 2.167639°),(43.714933°,10.399326°)], ita) == [(43.727878°,12.843441°), (43.714933°,10.399326°)]
 end
 
-@testset "PolyRegion Test" begin
+@testitem "PolyRegion Test" tags=[:filtering] begin
     sample_in = [(14°,1°), (26.9°,-4.9°), (10.1°,14.9°)]
     sample_out = [(0°,0°), (10°,-5.2°), (27°,15.3°)]
     sample_border = [(10°,-5°), (10.1°,10°), (27°,15°)] # Due to the Predicates of Meshes the countour is not exact (acceptable)
@@ -74,7 +74,7 @@ end
     @test filter_points([(14°,1°), (0°,0°), (10°,-5.2°), (27°,15.3°), (26.9°,-4.9°), (10.1°,14.9°)], poly) == sample_in
 end
 
-@testset "LatBeltRegion Test" begin
+@testitem "LatBeltRegion Test" tags=[:filtering] begin
     belt = LatBeltRegion(;regionName="test", latLim=[-60°, 60°])
     sample_in = [(14°,1°), (26.9°,-65°), (10.1°,70°)]
     sample_out = [(90°,1°), (60.1°,1°), (-62°,-4.9°), (-60.1°,14.9°)]

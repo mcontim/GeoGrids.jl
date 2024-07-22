@@ -1,12 +1,12 @@
-using Test
-using GeoGrids
+# using Test
+# using GeoGrids
 
-@testset "Theory Notebook Functions" begin
+@testitem "Theory Notebook Functions" tags=[:general] begin
     @test GeoGrids.fibonaccisphere_optimization1(100) isa Vector{SVector{3, Float64}}
     @test GeoGrids.fibonaccisphere_alternative1(100) isa Vector{SVector{3, Float64}}
 end
 
-@testset "Icogrid Functions" begin
+@testitem "Icogrid Functions" tags=[:general] begin
     @test GeoGrids._icogrid(100; coord=:cart) isa Vector{SVector{3, Float64}}
     @test GeoGrids._icogrid(100; coord=:sphe) isa Vector{SVector{2, Float64}}
     
@@ -26,7 +26,7 @@ end
     @test_logs (:warn, "Input sepAng is negative, it will be converted to positive...") icogrid(sepAng=-deg2rad(5), height=0.0)
 end
 
-@testset "Mesh Grid Functions" begin
+@testitem "Mesh Grid Functions" tags=[:general] begin
     @test meshgrid(deg2rad(5); height=0.0) isa Matrix{LLA}
     @test meshgrid(deg2rad(5); yRes=deg2rad(3), height=0.0) isa Matrix{LLA}
     @test meshgrid(deg2rad(5); type=:point) isa Matrix{Point2}
@@ -43,7 +43,7 @@ end
     @test_logs (:warn, "Input yRes is negative, it will be converted to positive...") meshgrid(deg2rad(5); yRes=-deg2rad(3), type=:point)
 end
 
-@testset "Vec Grid Functions" begin
+@testitem "Vec Grid Functions" tags=[:general] begin
     @test vecgrid(deg2rad(5); height=0.0) isa Vector{LLA}
     @test vecgrid(deg2rad(5); type=:point) isa Vector{Point2}
     @test vecgrid(deg2rad(5); unit=:deg, type=:point) isa Vector{Point2}
@@ -56,7 +56,7 @@ end
     @test_logs (:warn, "Input gridRes is negative, it will be converted to positive...") vecgrid(-deg2rad(5); type=:point)
 end
 
-@testset "Plots Plotly Base" begin
+@testitem "Plots Plotly Base" tags=[:general] begin
     using PlotlyBase
     @test plot_unitarysphere(GeoGrids._icogrid(100; coord=:cart)) isa Plot
     @test plot_geo(icogrid(sepAng=deg2rad(5), type=:point)) isa Plot
@@ -65,7 +65,7 @@ end
     @test plot_geo(meshgrid(deg2rad(5); height=0.0); camera=:threedim) isa Plot
 end
 
-@testset "Helper Functions" begin
+@testitem "Helper Functions" tags=[:general] begin
     @test_throws "The input must be a 2D point..." GeoGrids._check_geopoint((0.0, 0.0, 0.0))
     @test_throws "The input must be a 2D point..." GeoGrids._check_geopoint([0.0, 0.0, 0.0])
     @test_throws "LAT provided as numbers must be expressed in radians and satisfy -π/2 ≤ x ≤ π/2. Consider using `°` from `Unitful` (Also re-exported by GeoGrids) if you want to pass numbers in degrees, by doing `x * °`." GeoGrids._check_geopoint([pi/2+0.01, 0.0]; rev=true)
