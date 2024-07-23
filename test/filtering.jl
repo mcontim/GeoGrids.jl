@@ -2,8 +2,8 @@
 # using GeoGrids
 
 @testitem "GeoRegion Test" tags=[:filtering] begin
-    sample_ita = [(43.727878°,12.843441°), (43.714933°,10.399326°), (37.485829°,14.328285°), (39.330460°,8.430780°), (45.918388°,10.886654°)]
-    sample_eu = [(52.218550°, 4.420621°), (41.353144°, 2.167639°), (42.670341°, 23.322592°)]
+    sample_ita = [SimpleLatLon(43.727878°,12.843441°), SimpleLatLon(43.714933°,10.399326°), SimpleLatLon(37.485829°,14.328285°), SimpleLatLon(39.330460°,8.430780°), SimpleLatLon(45.918388°,10.886654°)]
+    sample_eu = [SimpleLatLon(52.218550°, 4.420621°), SimpleLatLon(41.353144°, 2.167639°), SimpleLatLon(42.670341°, 23.322592°)]
     
     ita = GeoRegion(regionName="ITA", admin="Italy")
     eu = GeoRegion(;continent="Europe")
