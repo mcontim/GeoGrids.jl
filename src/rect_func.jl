@@ -22,7 +22,7 @@ longitude points.
 function rectgrid(xRes::ValidAngle; yRes::ValidAngle=xRes)
     # Input Validation   
     _xRes = let
-        x = xRes isa Real ? xRes * ° : xRes # Convert to Uniful
+        x = xRes isa Real ? xRes * ° : xRes |> u"°" # Convert to Uniful °
         abs(x) ≤ 180° || error("Resolution of x is too large, it must be smaller than 180°...")
         if x < 0
             @warn "Input xRes is negative, it will be converted to positive..."
@@ -33,7 +33,7 @@ function rectgrid(xRes::ValidAngle; yRes::ValidAngle=xRes)
     end
 
     _yRes = let
-        x = yRes isa Real ? yRes * ° : yRes # Convert to Uniful
+        x = yRes isa Real ? yRes * ° : yRes |> u"°" # Convert to Uniful °
         abs(x) ≤ 180° || error("Resolution of y is too large, it must be smaller than 180°...")
         if x < 0
             @warn "Input yRes is negative, it will be converted to positive..."
@@ -71,7 +71,7 @@ equator (0°) to the North Pole (90°) with the specified resolution.
 function vecgrid(gridRes::ValidAngle)
     # Input Validation
     _gridRes = let
-        x = gridRes isa Real ? gridRes * ° : gridRes # Convert to Uniful
+        x = gridRes isa Real ? gridRes * ° : gridRes |> u"°" # Convert to Uniful °
         abs(x) ≤ 90° || error("Resolution of grid is too large, it must be smaller than 90°...")
         if x < 0
             @warn "Input gridRes is negative, it will be converted to positive..."
@@ -80,10 +80,8 @@ function vecgrid(gridRes::ValidAngle)
             x
         end
     end
-
     # Create LAT vector
-    temp = collect(0°:_gridRes:90°)
-    vec = map(x -> SimpleLatLon(x, 0°), temp) # LAT vector from 0° to 90°
+    vec = map(x -> SimpleLatLon(x, 0°), 0°:_gridRes:90°) # LAT vector from 0° to 90°
 
     return vec
 end

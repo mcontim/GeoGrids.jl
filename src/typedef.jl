@@ -39,7 +39,7 @@ mutable struct LatBeltRegion <: AbstractRegion
     function LatBeltRegion(regionName::String, latLim::Tuple{ValidAngle,ValidAngle})
         # Inputs validation    
         _latLim = map(latLim) do l
-            l isa Real ? l * ° : l
+            l isa Real ? l * ° : l |> u"°" # Convert to Uniful °
         end
 
         for x in _latLim

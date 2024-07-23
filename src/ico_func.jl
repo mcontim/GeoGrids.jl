@@ -19,7 +19,7 @@ function icogrid(; N::Union{Int,Nothing}=nothing, sepAng::Union{ValidAngle,Nothi
     elseif !isnothing(sepAng) && isnothing(N)
         # Inputs validation (sepAng must be positive Uniful value)    
         _sepAng = let
-            x = sepAng isa Real ? sepAng * ° : sepAng # Convert to Uniful
+            x = sepAng isa Real ? sepAng * ° : sepAng |> u"°" # Convert to Uniful °
             abs(x) ≤ 360° || error(
 #! format: off
 "The sepAng provided as numbers must be expressed in radians and satisfy -360° ≤ x ≤ 360°. 
@@ -121,7 +121,7 @@ between two adjacent points on the surface of the sphere.
 """
 function _points_required_for_separation_angle(sepAng::ValidAngle; spheRadius=1.0, pointsToCheck::Int=50, maxPrec=10^7, tol=10)
     # Input validation (make it deg)
-    _sepAng = sepAng isa Real ? sepAng * ° : sepAng
+    _sepAng = sepAng isa Real ? sepAng * ° : sepAng |> u"°" # Convert to Uniful °
     # Bisection
     Ns = [2, maxPrec]
 

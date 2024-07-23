@@ -7,7 +7,7 @@ using LinearAlgebra
 using Meshes
 using PlotlyExtensionsHelper
 using StaticArrays
-using Unitful: °, rad, Quantity
+using Unitful: °, rad, Quantity, @u_str
 
 include("typedef.jl")
 include("helper_func.jl")

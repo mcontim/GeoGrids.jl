@@ -55,17 +55,37 @@ end
     @test_logs (:warn, "Input xRes is negative, it will be converted to positive...") rectgrid(-5°; yRes=3°)
     @test_logs (:warn, "Input yRes is negative, it will be converted to positive...") rectgrid(5°; yRes=-3°)
 
-    grid = rectgrid(5°)
-    @test length(grid) == 2664
+    a = rectgrid(5)
+    b = rectgrid(5°)
+    c = rectgrid(deg2rad(5)*rad)
+    @test length(a) == 2664
+    @test length(b) == 2664
+    @test length(c) == 2664
 
-    @test grid[1,1].lat ≈ -90°
-    @test grid[1,1].lon ≈ -180°
-    @test grid[end,end].lat ≈ 90°
-    @test grid[end,end].lon ≈ 175°
-    @test abs(grid[1,2].lon-grid[1,1].lon) ≈ 5°
-    @test abs(grid[1,2].lat-grid[1,1].lat) ≈ 0°
-    @test abs(grid[2,1].lon-grid[1,1].lon) ≈ 0°
-    @test abs(grid[2,1].lat-grid[1,1].lat) ≈ 5°
+    @test a[1,1].lat ≈ -90°
+    @test a[1,1].lon ≈ -180°
+    @test a[end,end].lat ≈ 90°
+    @test a[end,end].lon ≈ 175°
+    @test abs(a[1,2].lon-a[1,1].lon) ≈ 5°
+    @test abs(a[1,2].lat-a[1,1].lat) ≈ 0°
+    @test abs(a[2,1].lon-a[1,1].lon) ≈ 0°
+    @test abs(a[2,1].lat-a[1,1].lat) ≈ 5°
+    @test b[1,1].lat ≈ -90°
+    @test b[1,1].lon ≈ -180°
+    @test b[end,end].lat ≈ 90°
+    @test b[end,end].lon ≈ 175°
+    @test abs(b[1,2].lon-b[1,1].lon) ≈ 5°
+    @test abs(b[1,2].lat-b[1,1].lat) ≈ 0°
+    @test abs(b[2,1].lon-b[1,1].lon) ≈ 0°
+    @test abs(b[2,1].lat-b[1,1].lat) ≈ 5°
+    @test c[1,1].lat ≈ -90°
+    @test c[1,1].lon ≈ -180°
+    @test c[end,end].lat ≈ 90°
+    @test c[end,end].lon ≈ 175°
+    @test abs(c[1,2].lon-c[1,1].lon) ≈ 5°
+    @test abs(c[1,2].lat-c[1,1].lat) ≈ 0°
+    @test abs(c[2,1].lon-c[1,1].lon) ≈ 0°
+    @test abs(c[2,1].lat-c[1,1].lat) ≈ 5°
 end
 
 @testitem "Vec Grid Functions" tags=[:general] begin
