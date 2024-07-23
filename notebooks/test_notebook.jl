@@ -39,9 +39,6 @@ end
 # ╔═╡ 282b928a-fc7d-4487-a056-6c2626cf7179
 ExtendedTableOfContents()
 
-# ╔═╡ 2f988a76-9c84-432b-b69f-dbe06f32ea35
-
-
 # ╔═╡ 0e205c7f-43ea-4612-830c-d930e8e4522f
 md"""
 # Test
@@ -97,7 +94,7 @@ poly3 = PolyRegion(regionName="POLY", domain=[(-370°,-181°),(-60°,180°),(60�
 LatBeltRegion(regionName="aaa", latLim=[90°,-90°])
 
 # ╔═╡ c9738f80-0297-46c4-b5ee-1a64ced99296
-grid=meshgrid(deg2rad(5))
+grid=rectgrid(deg2rad(5))
 
 # ╔═╡ 089c8f55-2beb-4eb1-b6bf-355c2818378d
 grid isa Array
@@ -163,7 +160,7 @@ abs(-93.2244°)
 
 
 # ╔═╡ 278fbecd-f240-4693-b65d-083b02aae797
-www=meshgrid(1;unit=:deg)
+www=rectgrid(1;unit=:deg)
 
 # ╔═╡ 658a8bf3-452a-4748-a24d-023200586516
 a1=2.0
@@ -756,7 +753,6 @@ version = "17.4.0+2"
 
 # ╔═╡ Cell order:
 # ╠═282b928a-fc7d-4487-a056-6c2626cf7179
-# ╠═2f988a76-9c84-432b-b69f-dbe06f32ea35
 # ╟─0e205c7f-43ea-4612-830c-d930e8e4522f
 # ╠═4a8f6103-fcfc-43a5-b46e-2958acbe7c60
 # ╠═4789500b-b85c-45dd-ba62-5bc284807131

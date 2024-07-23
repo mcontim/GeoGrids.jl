@@ -251,7 +251,7 @@ plot_geo(icogrid(sepAng=deg2rad(tableVal.ang);unit=:deg))
 plot_geo(icogrid(sepAng=deg2rad(tableVal.ang);unit=:deg);camera=:threedim)
 
 # ╔═╡ f1d6ee2f-01d2-4b79-b326-cb202c58d74d
-meshGrid = meshgrid(deg2rad(tableVal.ang); unit=:deg)
+meshGrid = rectgrid(deg2rad(tableVal.ang); unit=:deg)
 
 # ╔═╡ 3eeeffc0-3ba5-427b-b75b-0bf5f6286c9b
 plot_geo(vec(meshGrid))

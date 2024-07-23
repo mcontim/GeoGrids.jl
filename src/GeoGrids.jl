@@ -7,23 +7,20 @@ using LinearAlgebra
 using Meshes
 using PlotlyExtensionsHelper
 using StaticArrays
-using TelecomUtils
-using TelecomUtils: ValidAngle, ValidDistance, _check_angle
+using Unitful: °, rad, Quantity, @u_str
 
 include("typedef.jl")
 include("helper_func.jl")
 include("filtering_func.jl")
 include("plot_func.jl")
 include("ico_func.jl")
-include("mesh_func.jl")
+include("rect_func.jl")
 
-export GeoRegion, PolyRegion, LatBeltRegion
+export AbstractRegion, GeoRegion, PolyRegion, LatBeltRegion
 
-export icogrid, meshgrid, vecgrid,
-extract_countries, in_region, filter_points
+export icogrid, rectgrid, vecgrid,
+extract_countries, in, filter_points, group_by_domain
 
-export °, LLA,
-Point2, PolyArea,
-SVector
+export °, rad, SimpleLatLon, PolyArea, SVector
 
 end # module GeoGrids

@@ -1,102 +1,83 @@
-using Test
-using GeoGrids
+@testitem "GeoRegion Test" tags = [:filtering] begin
+    sample_ita = [SimpleLatLon(43.727878°, 12.843441°), SimpleLatLon(43.714933°, 10.399326°), SimpleLatLon(37.485829°, 14.328285°), SimpleLatLon(39.330460°, 8.430780°), SimpleLatLon(45.918388°, 10.886654°)]
+    sample_eu = [SimpleLatLon(52.218550°, 4.420621°), SimpleLatLon(41.353144°, 2.167639°), SimpleLatLon(42.670341°, 23.322592°)]
 
-@testset "GeoRegion Test" begin
-    sample_ita = [(43.727878°,12.843441°), (43.714933°,10.399326°), (37.485829°,14.328285°), (39.330460°,8.430780°), (45.918388°,10.886654°)]
-    sample_eu = [(52.218550°, 4.420621°), (41.353144°, 2.167639°), (42.670341°, 23.322592°)]
-    
     ita = GeoRegion(regionName="ITA", admin="Italy")
-    eu = GeoRegion(;continent="Europe")
-    
-    sv_ita = map(x -> SVector(x...), sample_ita)
-    p_ita = map(x -> Point2(x...), sample_ita)
-    tup_ita = sample_ita
-    lla_ita = map(x -> LLA(x..., 0.0), sample_ita)
-    @test all(in_region(sv_ita, ita))
-    @test all(in_region(p_ita, ita))
-    @test all(in_region(tup_ita, ita))
-    @test all(in_region(lla_ita, ita))
-    
-    sv_eu = map(x -> SVector(x...), sample_eu)
-    p_eu = map(x -> Point2(x...), sample_eu)
-    tup_eu = sample_eu
-    lla_eu = map(x -> LLA(x..., 0.0), sample_eu)
-    @test all(in_region(sv_eu, eu))
-    @test all(in_region(p_eu, eu))
-    @test all(in_region(tup_eu, eu))
-    @test all(in_region(lla_eu, eu))
+    eu = GeoRegion(; continent="Europe")
 
-    @test in_region((0.7631954460103929,0.22416033273563304), ita)
-    @test in_region((0.7631954460103929,0.22416033273563304), eu)
-    @test !in_region((0.7085271959818754, -0.2072522112608427), eu)
-    @test !in_region((52.218550°, 4.420621°), ita)
+    @test ita isa GeoRegion
+    @test eu isa GeoRegion
+    @test ita isa AbstractRegion
+    @test eu isa AbstractRegion
+
+    @test all(map(x -> in(x, ita), sample_ita))
+    @test all(map(x -> in(x, eu), sample_eu))
     
-    @test_throws "LAT provided as numbers must be expressed in radians and satisfy -π/2 ≤ x ≤ π/2. Consider using `°` from `Unitful` (Also re-exported by GeoGrids) if you want to pass numbers in degrees, by doing `x * °`." in_region((93.727878,0.22416033273563304), eu)
-    @test_throws "LON provided as numbers must be expressed in radians and satisfy -π ≤ x ≤ π. Consider using `°` from `Unitful` (Also re-exported by GeoGrids) if you want to pass numbers in degrees, by doing `x * °`." in_region((0.7631954460103929,-91.843441), eu)
+    @test in(SimpleLatLon(0.7631954460103929rad, 0.22416033273563304rad), ita)
+    @test in(SimpleLatLon(0.7631954460103929rad, 0.22416033273563304rad), eu)
+    @test !in(SimpleLatLon(0.7085271959818754rad, -0.2072522112608427rad), eu)
+    @test !in(SimpleLatLon(52.218550°, 4.420621°), ita)
+    
     @test_throws "Input at least one argument between continent, subregion and admin..." GeoRegion()
 
-    @test_throws "The domain must be computed from the other inputs..." GeoRegion(;continent="Europe",domain=PolyArea(Point2(0.0,0.0), Point2(0.0,0.5), Point2(0.3,0.5), Point2(0.3,0.0), Point2(0.0,0.0)))
-
     @test filter_points(sample_ita, ita) == sample_ita
-    @test filter_points(lla_ita, ita) == lla_ita
-    @test filter_points(sv_eu, eu) == sv_eu
-    @test filter_points(p_eu, eu) == p_eu
-    @test filter_points([(52.218550°, 4.420621°),(43.727878°,12.843441°),(41.353144°, 2.167639°),(43.714933°,10.399326°)], ita) == [(43.727878°,12.843441°), (43.714933°,10.399326°)]
+    @test filter_points(sample_eu, eu) == sample_eu
+    @test filter_points([SimpleLatLon(52.218550°, 4.420621°), SimpleLatLon(43.727878°, 12.843441°), SimpleLatLon(41.353144°, 2.167639°), SimpleLatLon(43.714933°, 10.399326°)], ita) == [SimpleLatLon(43.727878°, 12.843441°), SimpleLatLon(43.714933°, 10.399326°)]
 end
 
-@testset "PolyRegion Test" begin
-    
-    sample_in = [(14°,1°), (26.9°,-4.9°), (10.1°,14.9°)]
-    sample_out = [(0°,0°), (10°,-5.2°), (27°,15.3°)]
-    sample_border = [(10°,-5°), (10.1°,10°), (27°,15°)] # Due to the Predicates of Meshes the countour is not exact (acceptable)
-    poly = PolyRegion(regionName="POLY", domain=[LLA(10°,-5°,0), LLA(10°,15°,0), LLA(27°,15°,0), LLA(27°,-5°,0), LLA(10°,-5°,0)])
+@testitem "PolyRegion Test" tags = [:filtering] begin
+    sample_in = [SimpleLatLon(14°, 1°), SimpleLatLon(26.9°, -4.9°), SimpleLatLon(10.1°, 14.9°)]
+    sample_out = [SimpleLatLon(0°, 0°), SimpleLatLon(10°, -5.2°), SimpleLatLon(27°, 15.3°)]
+    sample_border = [SimpleLatLon(10°, -5°), SimpleLatLon(10.1°, 10°), SimpleLatLon(27°, 15°)] # Due to the Predicates of Meshes the countour is not exact (acceptable)
+    poly = PolyRegion("POLY", [SimpleLatLon(10°, -5°), SimpleLatLon(10°, 15°), SimpleLatLon(27°, 15°), SimpleLatLon(27°, -5°)])
+    vertex = [SimpleLatLon(10°, -5°), SimpleLatLon(10°, 15°), SimpleLatLon(27°, 15°), SimpleLatLon(27°, -5°)]
 
-    @test PolyRegion(domain=[LLA(10°,-5°,0), LLA(10°,15°,0), LLA(27°,15°,0), LLA(27°,-5°,0), LLA(10°,-5°,0)]) isa PolyRegion
-    @test PolyRegion(domain=[Point2(10°,-5°), Point2(10°,15°), Point2(27°,15°), Point2(27°,-5°), Point2(10°,-5°)]) isa PolyRegion
-    @test PolyRegion(domain=[(10°,-5°), (10°,15°), (27°,15°), (27°,-5°), (10°,-5°)]) isa PolyRegion
-    @test PolyRegion(domain=[SVector(10°,-5°), SVector(10°,15°), SVector(27°,15°), SVector(27°,-5°), SVector(10°,-5°)]) isa PolyRegion
-    @test PolyRegion(domain=[(0.0,0.0), (0.0,0.5), (0.3,0.5), (0.3,0.0), (0.0,0.0)]) isa PolyRegion
-    @test PolyRegion(domain=[SVector(0.0,0.0), SVector(0.0,0.5), SVector(0.3,0.5), SVector(0.3,0.0), SVector(0.0,0.0)]) isa PolyRegion
-    @test PolyRegion(domain=[Point2(0.0,0.0), Point2(0.0,0.5), Point2(0.3,0.5), Point2(0.3,0.0), Point2(0.0,0.0)]) isa PolyRegion
+    @test poly isa PolyRegion
+    @test PolyRegion(;domain=vertex) isa PolyRegion
+    @test PolyRegion(;regionName="Test",domain=vertex) isa PolyRegion
+    @test PolyRegion("Test", vertex) isa PolyRegion
+    @test_throws "UndefKeywordError: keyword argument `domain` not assigned" PolyRegion()
     
-    @test_logs (:warn, "First and last points are not the same, adding them to the end...") PolyRegion(domain=[LLA(10°,-5°,0), LLA(10°,15°,0), LLA(27°,15°,0), LLA(27°,-5°,0)])
-    @test_throws "The input domain do not match the expected format..." PolyRegion(domain=Point2(0.0,0.0))
-    @test_throws "Input the polygon domain..." PolyRegion()
+    @test all(map(x -> in(x, poly),sample_in))
+    @test all(map(x -> in(x, poly),sample_border))
+    @test !all(map(x -> in(x, poly),sample_out))
+
+    @test in(SimpleLatLon(0.24434609527920614rad, 0.017453292519943295rad), poly)
     
-    @test all(in_region(sample_in, poly))
-    @test all(in_region(sample_border, poly))
-    @test !all(in_region(sample_out, poly))
-
-    @test in_region((0.24434609527920614, 0.017453292519943295), poly)
-    @test in_region(SVector(0.24434609527920614, 0.017453292519943295), poly)
-    @test in_region(Point2(0.24434609527920614, 0.017453292519943295), poly)
-    @test in_region(LLA(0.24434609527920614, 0.017453292519943295, 0), poly)
-
-    @test filter_points([(14°,1°), (0°,0°), (10°,-5.2°), (27°,15.3°), (26.9°,-4.9°), (10.1°,14.9°)], poly) == sample_in
+    @test filter_points(vcat(sample_in, sample_out), poly) == sample_in
 end
 
-@testset "LatBeltRegion Test" begin
-    belt = LatBeltRegion(;regionName="test", latLim=[-60°, 60°])
-    sample_in = [(14°,1°), (26.9°,-65°), (10.1°,70°)]
-    sample_out = [(90°,1°), (60.1°,1°), (-62°,-4.9°), (-60.1°,14.9°)]
+@testitem "LatBeltRegion Test" tags = [:filtering] begin
+    belt = LatBeltRegion(; regionName="test", latLim=(-60°, 60°))
+    sample_in = [SimpleLatLon(14°, 1°), SimpleLatLon(26.9°, -65°), SimpleLatLon(10.1°, 70°)]
+    sample_out = [SimpleLatLon(90°, 1°), SimpleLatLon(60.1°, 1°), SimpleLatLon(-62°, -4.9°), SimpleLatLon(-60.1°, 14.9°)]
 
-    @test LatBeltRegion(;regionName="region_name", latLim=[0°,π/2]) isa LatBeltRegion
-    @test LatBeltRegion(;regionName="region_name", latLim=[0°,π/2]).latLim == LatBeltRegion(;regionName="region_name", latLim=[0,π/2]).latLim
-    @test_throws "Input the Latitude Belt limits..." LatBeltRegion()
-    @test_throws "The first LAT limit must be lower than the second one..." LatBeltRegion(;regionName="region_name", latLim=[π/2,0])
-    @test_throws "The first LAT limit must be different than the second one..." LatBeltRegion(;regionName="region_name", latLim=[π/2,π/2])
-    @test_throws "The input must be a 2 elements vector..." LatBeltRegion(;regionName="region_name", latLim=[0°])
-    @test_throws "The input must be a 2 elements vector..." LatBeltRegion(;regionName="region_name", latLim=[0°,0°,0°])
-    @test_throws "LAT provided as numbers must be expressed in radians and satisfy -π/2 ≤ x ≤ π/2. Consider using `°` from `Unitful` (Also re-exported by GeoGrids) if you want to pass numbers in degrees, by doing `x * °`." LatBeltRegion(;regionName="region_name", latLim=[-π,π])
-    @test_throws "LAT provided as numbers must be expressed in radians and satisfy -π/2 ≤ x ≤ π/2. Consider using `°` from `Unitful` (Also re-exported by GeoGrids) if you want to pass numbers in degrees, by doing `x * °`." LatBeltRegion(;regionName="region_name", latLim=[-100°,100°])
+    @test belt isa LatBeltRegion
+    @test LatBeltRegion(; regionName="test", latLim=(0°,90°)) isa LatBeltRegion
+    @test LatBeltRegion(; latLim=(0°,90°)) isa LatBeltRegion
+    @test LatBeltRegion("test", (0°,90°)) isa LatBeltRegion
+    
+    a = LatBeltRegion("test", (0°,90°))
+    b = LatBeltRegion("test", (0,90))
+    c = LatBeltRegion("test", (0rad, (π/2)rad))
+    @test a isa LatBeltRegion
+    @test b isa LatBeltRegion
+    @test c isa LatBeltRegion
+    @test a.latLim == b.latLim == c.latLim == (0°,90°)
 
-    @test all(in_region(sample_in, belt))
-    @test !all(in_region(sample_out, belt))
-
-    @test in_region((0.24434609527920614, 0.017453292519943295), belt)
-    @test in_region(SVector(0.24434609527920614, 0.017453292519943295), belt)
-    @test in_region(Point2(0.24434609527920614, 0.017453292519943295), belt)
-    @test in_region(LLA(0.24434609527920614, 0.017453292519943295, 0), belt)
-
-    @test filter_points([(14°,1°), (90°,1°), (60.1°,1°), (26.9°,-65°), (-62°,-4.9°), (-60.1°,14.9°), (10.1°,70°)], belt) == sample_in
+    @test_throws "UndefKeywordError: keyword argument `latLim` not assigned" LatBeltRegion()
+    @test_throws "LAT provided as numbers must be expressed in radians and satisfy -90 ≤ x ≤ 90. 
+Consider using `°` (or `rad`) from `Unitful` if you want to pass numbers in degrees (or rad), by doing `x * °` (or `x * rad`)." LatBeltRegion("test", (0°,91°))
+    @test_throws "LAT provided as numbers must be expressed in radians and satisfy -90 ≤ x ≤ 90. 
+Consider using `°` (or `rad`) from `Unitful` if you want to pass numbers in degrees (or rad), by doing `x * °` (or `x * rad`)." LatBeltRegion("test", (-91°,91°))
+    @test_throws "LAT provided as numbers must be expressed in radians and satisfy -90 ≤ x ≤ 90. 
+Consider using `°` (or `rad`) from `Unitful` if you want to pass numbers in degrees (or rad), by doing `x * °` (or `x * rad`)." LatBeltRegion("test", (-91°,0°))
+    @test_throws "The first LAT limit must be lower than the second one..." LatBeltRegion(; latLim=((π/2)rad, 0rad))
+    @test_throws "The first LAT limit must be different than the second one..." LatBeltRegion(; latLim=(90, 90))
+    
+    @test all(map(x -> in(x, belt), sample_in))
+    @test !all(map(x -> in(x, belt), sample_out))
+    @test in(SimpleLatLon(0.24434609527920614, 0.017453292519943295), belt)
+    
+    @test filter_points([SimpleLatLon(14°, 1°), SimpleLatLon(90°, 1°), SimpleLatLon(60.1°, 1°), SimpleLatLon(26.9°, -65°), SimpleLatLon(-62°, -4.9°), SimpleLatLon(-60.1°, 14.9°), SimpleLatLon(10.1°, 70°)], belt) == sample_in
 end
