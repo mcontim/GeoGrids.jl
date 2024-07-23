@@ -5,6 +5,7 @@
 [![Build Status](https://gitlab.esa.int/tec-esc-tools/GeoGrids.jl/badges/main/pipeline.svg)](https://gitlab.esa.int/tec-esc-tools/GeoGrids.jl/pipelines)
 [![Coverage](https://gitlab.esa.int/tec-esc-tools/GeoGrids.jl/badges/main/coverage.svg)](https://gitlab.esa.int/tec-esc-tools/GeoGrids.jl/commits/main)
 [![Aqua QA](https://raw.githubusercontent.com/JuliaTesting/Aqua.jl/master/badge.svg)](https://github.com/JuliaTesting/Aqua.jl)
+[![](https://img.shields.io/badge/%F0%9F%9B%A9%EF%B8%8F_tested_with-JET.jl-233f9a)](https://github.com/aviatesk/JET.jl)
 
 This is a package containing functions for Geographical Grids generation for example for terminals distribution for System Level Simulations. **In the next version support for Geo Surface tesselation for cell grid layout will be supported**.
 
