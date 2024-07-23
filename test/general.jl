@@ -12,58 +12,68 @@ end
     
     @test icogrid(N=100) isa Vector{<:SimpleLatLon}
         
-    @test icogrid(sepAng=5) isa Vector{<:SimpleLatLon}
-    @test icogrid(sepAng=5°) isa Vector{<:SimpleLatLon}
-    @test icogrid(sepAng=deg2rad(5)*rad) isa Vector{<:SimpleLatLon}
-    @test length(icogrid(sepAng=5)) == 1260
-    @test length(icogrid(sepAng=5°)) == 1260
-    @test length(icogrid(sepAng=deg2rad(5)*rad)) == 1260
-
     a = icogrid(sepAng=5)
+    b = icogrid(sepAng=5°)
+    c = icogrid(sepAng=deg2rad(5)*rad)
+
+    @test a isa Vector{<:SimpleLatLon}
+    @test b isa Vector{<:SimpleLatLon}
+    @test c isa Vector{<:SimpleLatLon}
+    @test length(a) == 1260
+    @test length(b) == 1260
+    @test length(c) == 1260
+
     @test a[1].lat ≈ 87.7171f0°
     @test a[1].lon ≈ 0.0f0°
     @test a[end].lat ≈ -87.7171f0°
     @test a[end].lon ≈ 37.7251f0°
-    a = icogrid(sepAng=5°)
-    @test a[1].lat ≈ 87.7171f0°
-    @test a[1].lon ≈ 0.0f0°
-    @test a[end].lat ≈ -87.7171f0°
-    @test a[end].lon ≈ 37.7251f0°
-    a = icogrid(sepAng=deg2rad(5)*rad)
-    @test a[1].lat ≈ 87.7171f0°
-    @test a[1].lon ≈ 0.0f0°
-    @test a[end].lat ≈ -87.7171f0°
-    @test a[end].lon ≈ 37.7251f0°
+    @test b[1].lat ≈ 87.7171f0°
+    @test b[1].lon ≈ 0.0f0°
+    @test b[end].lat ≈ -87.7171f0°
+    @test b[end].lon ≈ 37.7251f0°
+    @test c[1].lat ≈ 87.7171f0°
+    @test c[1].lon ≈ 0.0f0°
+    @test c[end].lat ≈ -87.7171f0°
+    @test c[end].lon ≈ 37.7251f0°
 
     @test_logs (:warn, "Input sepAng is negative, it will be converted to positive...") icogrid(sepAng=-5°)
+    @test_throws "The sepAng provided as numbers must be expressed in radians and satisfy -360° ≤ x ≤ 360°. 
+Consider using `°` (or `rad`) from `Unitful` if you want to pass numbers in degrees (or rad), by doing `x * °` (or `x * rad`)." icogrid(sepAng=361°)
 end
 
 @testitem "Mesh Grid Functions" tags=[:general] begin
-    @test rectgrid(deg2rad(5); height=0.0) isa Matrix{LLA}
-    @test rectgrid(deg2rad(5); yRes=deg2rad(3), height=0.0) isa Matrix{LLA}
-    @test rectgrid(deg2rad(5); type=:point) isa Matrix{Point2}
-    @test rectgrid(deg2rad(5); unit=:deg, type=:point) isa Matrix{Point2}
-    @test rectgrid(deg2rad(5); yRes=deg2rad(3), type=:point) isa Matrix{Point2}
+    @test rectgrid(5) isa Matrix{<:SimpleLatLon}
+    @test rectgrid(5°) isa Matrix{<:SimpleLatLon}
+    @test rectgrid(deg2rad(5)*rad) isa Matrix{<:SimpleLatLon}
+    @test rectgrid(5; yRes=3) isa Matrix{<:SimpleLatLon}
+    @test rectgrid(5°; yRes=3°) isa Matrix{<:SimpleLatLon}
+    @test rectgrid(deg2rad(5)*rad; yRes=deg2rad(3)*rad) isa Matrix{<:SimpleLatLon}
 
-    @test_logs (:warn, "Height is not provided, it will be set to 0 by default...") rectgrid(deg2rad(5)) 
-    @test_logs (:warn, "Height is ignored when type is set to :point...") rectgrid(deg2rad(5); height=0.0, type=:point)
-    @test_throws "The input type do not match the expected format, it must be :lla or :point..." rectgrid(deg2rad(5); type=:testerr)
-    @test_throws "Resolution of x is too large, it must be smaller than π..." rectgrid(deg2rad(181); height=0.0)
-    @test_throws "Resolution of y is too large, it must be smaller than π..." rectgrid(deg2rad(5); yRes=deg2rad(181), height=0.0)
+    @test_throws "Resolution of x is too large, it must be smaller than 180°..." rectgrid(181°)
+    @test_throws "Resolution of y is too large, it must be smaller than 180°..." rectgrid(5°; yRes=181°)
     
-    @test_logs (:warn, "Input xRes is negative, it will be converted to positive...") rectgrid(-deg2rad(5); yRes=deg2rad(3), type=:point)
-    @test_logs (:warn, "Input yRes is negative, it will be converted to positive...") rectgrid(deg2rad(5); yRes=-deg2rad(3), type=:point)
+    @test_logs (:warn, "Input xRes is negative, it will be converted to positive...") rectgrid(-5°; yRes=3°)
+    @test_logs (:warn, "Input yRes is negative, it will be converted to positive...") rectgrid(5°; yRes=-3°)
+
+    grid = rectgrid(5°)
+    @test length(grid) == 2664
+
+    @test grid[1,1].lat ≈ -90°
+    @test grid[1,1].lon ≈ -180°
+    @test grid[end,end].lat ≈ 90°
+    @test grid[end,end].lon ≈ 175°
+    @test abs(grid[1,2].lon-grid[1,1].lon) ≈ 5°
+    @test abs(grid[1,2].lat-grid[1,1].lat) ≈ 0°
+    @test abs(grid[2,1].lon-grid[1,1].lon) ≈ 0°
+    @test abs(grid[2,1].lat-grid[1,1].lat) ≈ 5°
 end
 
 @testitem "Vec Grid Functions" tags=[:general] begin
-    @test vecgrid(deg2rad(5); height=0.0) isa Vector{LLA}
-    @test vecgrid(deg2rad(5); type=:point) isa Vector{Point2}
-    @test vecgrid(deg2rad(5); unit=:deg, type=:point) isa Vector{Point2}
+    @test vecgrid(5) isa Vector{<:SimpleLatLon}
+    @test vecgrid(5°) isa Vector{<:SimpleLatLon}
+    @test vecgrid(deg2rad(5)*rad) isa Vector{<:SimpleLatLon}
 
-    @test_logs (:warn, "Height is not provided, it will be set to 0 by default...") vecgrid(deg2rad(5)) 
-    @test_logs (:warn, "Height is ignored when type is set to :point...") vecgrid(deg2rad(5); height=0.0, type=:point)
-    @test_throws "The input type do not match the expected format, it must be :lla or :point..." vecgrid(deg2rad(5); type=:testerr)
-    @test_throws "Resolution of grid is too large, it must be smaller than π/2..." vecgrid(deg2rad(91); height=0.0)
+    @test_throws "Resolution of grid is too large, it must be smaller than 90°..." vecgrid(deg2rad(91); height=0.0)
     
     @test_logs (:warn, "Input gridRes is negative, it will be converted to positive...") vecgrid(-deg2rad(5); type=:point)
 end

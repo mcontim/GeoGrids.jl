@@ -22,7 +22,7 @@ function icogrid(; N::Union{Int,Nothing}=nothing, sepAng::Union{ValidAngle,Nothi
             x = sepAng isa Real ? sepAng * ° : sepAng # Convert to Uniful
             abs(x) ≤ 360° || error(
 #! format: off
-"The sepAng provided as numbers must be expressed in radians and satisfy -360 ≤ x ≤ 360. 
+"The sepAng provided as numbers must be expressed in radians and satisfy -360° ≤ x ≤ 360°. 
 Consider using `°` (or `rad`) from `Unitful` if you want to pass numbers in degrees (or rad), by doing `x * °` (or `x * rad`)."
 #! format: on   
             )
@@ -133,7 +133,7 @@ function _points_required_for_separation_angle(sepAng::ValidAngle; spheRadius=1.
 
     # Compute the starting angles
     angs = map(f, Ns)
-    _sepAng > angs[1] && return Ns[1] # The lower is already sufficient
+    _sepAng > angs[1] && return Ns[1], f(Ns[1]) # The lower is already sufficient
     _sepAng < angs[2] && error("$(maxPrec) points is not sufficient for the requested separation angle")
     thisSep = Inf
     thisTol = tolerance(Ns)
