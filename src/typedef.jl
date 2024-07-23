@@ -28,7 +28,7 @@ mutable struct PolyRegion <: AbstractRegion
     regionName::String
     domain::PolyArea
 end
-PolyRegion(name, domain::Vector{<:SimpleLatLon}) = PolyRegion(name, PolyArea(map(Point, domain)))
+PolyRegion(regionName, domain::Vector{<:SimpleLatLon}) = PolyRegion(regionName, PolyArea(map(Point, domain)))
 PolyRegion(; regionName::String="region_name", domain) = PolyRegion(regionName, domain)
 
 "Type of region representinga a latitude belt region."

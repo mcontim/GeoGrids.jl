@@ -15,7 +15,6 @@ checked. The region is represented by the `domain` attribute.
 """
 Base.in(point::SimpleLatLon, domain::Union{GeoRegion,PolyRegion}) = Base.in(point, domain.domain)
 Base.in(point::SimpleLatLon, domain::LatBeltRegion) = domain.latLim[1] < point.lat < domain.latLim[2]
-Base.in(point::SimpleLatLon, domain::Array{<:AbstractRegion}) = error("The domain should be a single element of type <:AbstractRegion")
 
 """
     filter_points(points::Array{<:SimpleLatLon}, domain::Union{GeoRegion, PolyRegion, LatBeltRegion}) -> Vector{Input Type}
