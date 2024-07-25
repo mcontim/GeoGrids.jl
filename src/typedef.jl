@@ -6,7 +6,10 @@ const ValidAngle = Union{UnitfulAngleQuantity,Real}
 ## Define Region Types
 abstract type AbstractRegion end
 
-"Type of Geographical region based on CountriesBorders."
+"Type of global region."
+struct GlobalRegion <: AbstractRegion end
+
+"Type of geographical region based on CountriesBorders."
 mutable struct GeoRegion{D} <: AbstractRegion
     regionName::String
     continent::String
@@ -66,16 +69,15 @@ mutable struct TilingInit
     "Tessellation type (:ICO | :HEX | :H3)"
     type::Symbol 
     "Region to be tessellated"
-    region::Union{AbstractRegion, Nothing}
+    region::AbstractRegion
 
-    function TilingInit(radius, type=:ICO, region=nothing)
+    function TilingInit(radius, type=:ICO, region=GlobalRegion())
         # Input validation
         type in (:ICO, :HEX, :H3) || error("Tessellation type must be :ICO, :HEX or :H3")
-        region isa AbstractRegion || region === nothing || error("Region must be of type AbstractRegion or Nothing to set it global")
-        region === nothing && @warn "Tessellation region is defined as global..."
-        (region === nothing && type in (:ICO, :H3)) || error("Tessellation of type :ICO and :H3 cannot be used with global region...")
+        region isa AbstractRegion || error("Region must be of type AbstractRegion...")
+        (region isa GlobalRegion && type in (:ICO, :H3)) || error("Tessellation of type :HEX cannot be used with global region...")
 
         new(radius, type, region)
     end
 end
-TilingInit(; radius, type=:ICO, region=nothing) = TilingInit(radius, type, region)
+TilingInit(; radius, type=:ICO, region=GlobalRegion()) = TilingInit(radius, type, region)

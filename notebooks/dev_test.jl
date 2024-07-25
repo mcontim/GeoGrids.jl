@@ -24,6 +24,11 @@ md"""
 # Test
 """
 
+# ╔═╡ 222fb774-1693-4b3c-b2ef-5fd38eca773c
+md"""
+# Test Tessellation
+"""
+
 # ╔═╡ b94c71b6-0601-4a4c-ac92-417f0c372334
 md"""
 # Packages
@@ -94,6 +99,15 @@ plot_geo([SimpleLatLon(-70°, 11°),SimpleLatLon(-0°, 12°)])
 
 # ╔═╡ 4bec169d-5243-439f-92e0-b623aaa1c31c
 plot_unitarysphere([[1.0,1.0,1.0],[1.0,1.0,2.0]])
+
+# ╔═╡ 404988a4-599e-42c7-a3c6-636dd40ad797
+TilingInit(10.0)
+
+# ╔═╡ 318449bb-6e70-46d0-adbb-ce5f3522d1fe
+TilingInit(12, :ICO, GlobalRegion())
+
+# ╔═╡ aa980a61-139b-4a46-a04c-4ce8552a2766
+TilingInit(radius=12, type=:ICO)
 
 # ╔═╡ 1005c11c-1fef-4f3f-8cdf-d4b91d16fc60
 # begin
@@ -533,6 +547,10 @@ version = "17.4.0+2"
 # ╠═5a60a99f-ff3b-4867-86ba-03813a817430
 # ╠═4ff0540b-c3ba-408f-894e-5fda86c0769d
 # ╠═4bec169d-5243-439f-92e0-b623aaa1c31c
+# ╟─222fb774-1693-4b3c-b2ef-5fd38eca773c
+# ╠═404988a4-599e-42c7-a3c6-636dd40ad797
+# ╠═318449bb-6e70-46d0-adbb-ce5f3522d1fe
+# ╠═aa980a61-139b-4a46-a04c-4ce8552a2766
 # ╟─b94c71b6-0601-4a4c-ac92-417f0c372334
 # ╠═bf20cace-b64b-4155-90c1-1ec3644510d7
 # ╠═0e3793aa-13d2-4aeb-ad60-b98927932dc6
