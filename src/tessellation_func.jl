@@ -1,25 +1,4 @@
-# @kwdef mutable struct CellsInit
-#     "The cell sizing is driven by a specific satellite altitude [m]"
-#     satAlt::Float64 = 0.0  
-#     "The cell sizing is driven by a minimum elevation [deg]" # //TODO: evaluate the possibility of using the scan too
-#     minEl::Float64 = 0.0  
-#     "Inclination for the orbital plane of the reference satellite [deg]"
-#     satIncl::Float64 = 0.0  
-#     "Reference for the satellite antenna beamwidth@boresight [deg]" # //TODO: evaluate if using AntennaSat type for this
-#     bwBoresightSat::Float64 = 0.0  
-#     "Maximum latitude to be covered with cells [deg]"
-#     maxLatCovered::Float64 = 999  
-#     "The type of grid to generate the cells can be an icosahedral or grown by latitude [:ico | :leg]"
-#     gridType::Symbol  = :ico 
-#     "Scan angle for the sizing (related to minEl) [Updated in make_cells] [deg]"
-#     satScanAng::Float64 = 0.0  
-#     "Antenna BW at the sizing scan angle [Updated in make_cells] [deg]"
-#     satAntBW::Float64 = 0.0  
-#     "Cell Earth center angle [Updated in make_cells] [deg]"
-#     cellEarthAng::Float64 = 0.0  
-#     "Flags list to apply cell filtering rules"
-#     filterCell::filterCellFlags
-# end
+
 
 # satAlt, minEl
 # function make_cells!(cellsInit; em::EllipsoidModel)    

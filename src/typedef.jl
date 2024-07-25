@@ -1,8 +1,9 @@
-# Angle Types
+## Angle Types
 const UnitfulAngleType = Union{typeof(°),typeof(rad)}
 const UnitfulAngleQuantity = Quantity{<:Real,<:Any,<:UnitfulAngleType}
 const ValidAngle = Union{UnitfulAngleQuantity,Real}
 
+## Define Region Types
 abstract type AbstractRegion end
 
 "Type of Geographical region based on CountriesBorders."
@@ -57,3 +58,24 @@ Consider using `°` (or `rad`) from `Unitful` if you want to pass numbers in deg
     end
 end
 LatBeltRegion(; regionName::String="region_name", latLim) = LatBeltRegion(regionName, latLim)
+
+## Define Tessellation Types
+mutable struct TilingInit
+    "Radius of the single element (cell)"
+    radius::Number  
+    "Tessellation type (:ICO | :HEX | :H3)"
+    type::Symbol 
+    "Region to be tessellated"
+    region::Union{AbstractRegion, Nothing}
+
+    function TilingInit(radius, type=:ICO, region=nothing)
+        # Input validation
+        type in (:ICO, :HEX, :H3) || error("Tessellation type must be :ICO, :HEX or :H3")
+        region isa AbstractRegion || region === nothing || error("Region must be of type AbstractRegion or Nothing to set it global")
+        region === nothing && @warn "Tessellation region is defined as global..."
+        (region === nothing && type in (:ICO, :H3)) || error("Tessellation of type :ICO and :H3 cannot be used with global region...")
+
+        new(radius, type, region)
+    end
+end
+TilingInit(; radius, type=:ICO, region=nothing) = TilingInit(radius, type, region)
