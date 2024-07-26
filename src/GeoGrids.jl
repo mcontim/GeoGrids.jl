@@ -15,6 +15,7 @@ include("filtering_func.jl")
 include("plot_func.jl")
 include("ico_func.jl")
 include("rect_func.jl")
+include("tessellation_func.jl")
 
 export AbstractRegion, GeoRegion, PolyRegion, LatBeltRegion
 

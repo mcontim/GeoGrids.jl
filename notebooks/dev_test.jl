@@ -29,6 +29,26 @@ md"""
 # Test Tessellation
 """
 
+# ╔═╡ 2f6c6420-ffb5-4bb6-b757-1ce852c35e78
+md"""
+## Local grid on Earth
+"""
+
+# ╔═╡ 833103c3-9d4c-4c78-b83f-49e0c6b16104
+md"""
+- We use sphere a pproximation for the tasselltion which is a fair assumption for local grid.
+- To increase precision we will also implement H3, however, it won't allow us full flexibility in terms of lattice spacing definition (as we have here with HEX grid).
+"""
+
+# ╔═╡ ea40cb99-2bf1-4225-84fe-e8aee4f7863a
+begin
+	# 1. Find lattice spacing as angular distance related to cell size
+	Re = 6371e3 # Earth radius
+	Rc = 10e3 # 10 km cell radius (circumscribed circle to hex cell)
+	linSpacing = Rc*√3 # linear spacing between lattice points (considering a pointy topped formation to ease the toughts)
+	θ = 2linSpacing/Re # equivalent angular spacing [rad]
+end
+
 # ╔═╡ b94c71b6-0601-4a4c-ac92-417f0c372334
 md"""
 # Packages
@@ -108,6 +128,12 @@ TilingInit(12, :ICO, GlobalRegion())
 
 # ╔═╡ aa980a61-139b-4a46-a04c-4ce8552a2766
 TilingInit(radius=12, type=:ICO)
+
+# ╔═╡ 69ff22ae-93ac-466d-ba16-5a2521e1729e
+begin
+	# 2. Define the lattice
+	aaaa = _generate_hex_lattice(1)
+end
 
 # ╔═╡ 1005c11c-1fef-4f3f-8cdf-d4b91d16fc60
 # begin
@@ -551,6 +577,10 @@ version = "17.4.0+2"
 # ╠═404988a4-599e-42c7-a3c6-636dd40ad797
 # ╠═318449bb-6e70-46d0-adbb-ce5f3522d1fe
 # ╠═aa980a61-139b-4a46-a04c-4ce8552a2766
+# ╟─2f6c6420-ffb5-4bb6-b757-1ce852c35e78
+# ╟─833103c3-9d4c-4c78-b83f-49e0c6b16104
+# ╠═ea40cb99-2bf1-4225-84fe-e8aee4f7863a
+# ╠═69ff22ae-93ac-466d-ba16-5a2521e1729e
 # ╟─b94c71b6-0601-4a4c-ac92-417f0c372334
 # ╠═bf20cace-b64b-4155-90c1-1ec3644510d7
 # ╠═0e3793aa-13d2-4aeb-ad60-b98927932dc6

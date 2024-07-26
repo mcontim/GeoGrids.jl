@@ -1,3 +1,52 @@
+# Basic generator for regular lattice
+function _generate_regular_lattice(dx::T, dy, ds; x0=zero(T), y0=zero(T), M::Int=70, N::Int=M) where {T}
+    # Function to generate x position as function of row,column number m,n
+    x(m, n) = m * dx + n * ds + x0
+    # Function to generate y position as function of row,column number m,n
+    y(n) = n * dy + y0
+    # Generate the elements. For each row, shift the columns to always have the search domain around x=0
+    gen = [SVector(x(m - round(Int, n * ds / dx), n), y(n)) for n in -N:N, m in -M:M]
+
+    return gen
+end
+
+# Hex Lattice
+"""
+	_generate_hex_lattice(spacing, direction = :pointy; kwargs...)
+Generate a hexagonal lattice of points with equal distance `spacing` between neighboring points.
+
+The generated hexagonal lattice will have distance between points on the same
+row/column that will depend on the second argument `direction`:
+
+If `direction = :pointy`, neighboring points on the same row (points which
+have the same `y` coordinate) will be at a distance `spacing` from one another, while
+points on the same column (sharing the `x` coordinate) will have a distance
+equivalent to `√3 * spacing`.
+
+If `direction = :flat`, the distance will be reversed, so points on the same
+column will have a distance equivalent to `spacing` while points on the same row
+will have a distance equivalent to `√3 * spacing`.
+
+## Arguments
+- `spacing`: spacing between neighboring points
+- `direction`: specifies the direction of minimum distance between neighboring\
+points. Defaults to `:pointy`.
+"""
+function _generate_hex_lattice(spacing, direction=:pointy)
+    coeffs = if direction === :pointy # Hexagon orientation with the pointy side up
+        1.0, √3 / 2, 0.5
+    elseif direction === :flat # Hexagon orientation with the flat side up
+        √3, 0.5, √3 / 2
+    else
+        error("Invalid value for `direction`, it must be either `:pointy` or `:flat`")
+    end
+
+    dx, dy, ds = spacing .* coeffs
+
+    return _generate_regular_lattice(dx, dy, ds)
+end
+
+
 
 
 # satAlt, minEl
@@ -33,7 +82,7 @@
 #     else
 #         geoCoord = sort(vec(fibonaccigrid(;N=Ncells)), by = x -> x[2]) # Sort cells positions by LAT  
 #     end
-    
+
 #     cells = map(geoCoord) do p
 #         cell_lla = LLA(reverse(p)...) # Default altitude 0.0
 #         cell_ecef = get_ecef(cell_lla; ellipsoid) 
@@ -58,7 +107,7 @@
 #     # d_theta and d_phi are basically the diameter of each cell, represented as the Earth central angle
 #     d_theta = π/M_Theta # represent 2*theta of the spherical cap
 #     d_phi = a/d_theta # ? it's equal to d_theta
-    
+
 #     cellCoord = []
 #     for i = 0:M_Theta-1 # from 90 to -90 LAT
 #         Theta_ThisTheta = π*(i+0.5)/M_Theta # center of the m-th tier (theta angle from Earth center - spherical cap like) of circles (steps of LAT), you need to normalize on the total number of circle from 90:-90 (M_Theta)
@@ -108,7 +157,7 @@
 # 	else
 # 		projection = "natural earth"
 # 	end
-	
+
 # 	# Create the geo layout
 # 	layout = Layout(
 # 		geo =  attr(
@@ -137,6 +186,6 @@
 # 		title = title;
 # 		geo_projection_type = projection
 # 	)
-	
+
 # 	plotly_plot([markers...],layout)
 # end
