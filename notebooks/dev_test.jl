@@ -44,9 +44,31 @@ md"""
 begin
 	# 1. Find lattice spacing as angular distance related to cell size
 	Re = 6371e3 # Earth radius
-	Rc = 10e3 # 10 km cell radius (circumscribed circle to hex cell)
-	linSpacing = Rc*√3 # linear spacing between lattice points (considering a pointy topped formation to ease the toughts)
-	θ = 2linSpacing/Re # equivalent angular spacing [rad]
+	Rc = 30e3 # 30 km cell radius (circumscribed circle to hex cell)
+	linearSpacing = Rc*√3 # linear spacing between lattice points (considering a pointy topped formation to ease the toughts)
+	θ = linearSpacing/Re # equivalent angular spacing [rad]
+end
+
+# ╔═╡ 0edec1e6-cf88-4b7c-a586-43507a2cbd7c
+function _hexagon_vertices(cx, cy, r)
+    # vertices = [(cx + r * cos(2 * π * i / 6), cy + r * sin(2 * π * i / 6)) for i in 0:5]
+    vertices = [(cx + r * sin(2 * π * i / 6), cy + r * cos(2 * π * i / 6)) for i in 0:6]
+    return vcat(vertices, (NaN,NaN))
+end
+
+# ╔═╡ c5471612-989e-41ce-afb3-afe302da83d4
+let
+	# Example usage:
+	center = (0.0, 0.0)
+	radius = 1.0
+	vertices = _hexagon_vertices(center[1], center[2], radius)
+
+	plot(
+		scatter(;
+			x=map(x->first(x),vertices),
+			y=map(x->last(x),vertices)
+		)
+	)
 end
 
 # ╔═╡ b94c71b6-0601-4a4c-ac92-417f0c372334
@@ -131,9 +153,69 @@ TilingInit(radius=12, type=:ICO)
 
 # ╔═╡ 69ff22ae-93ac-466d-ba16-5a2521e1729e
 begin
-	# 2. Define the lattice
-	aaaa = _generate_hex_lattice(1)
+	# 2. Define the lattice in u,v (linear)
+	# Now that we have the theta wrt a source in the center of the sphere, we retrieve u,v coord then the linear distance in uv which will be the actual spacing of our lattice.
+	# Since we can consider a generic ϕ, we'll use ϕ=0 such that we end up with the only u component, which will also corresponds to the spacing.
+	sp = sin(θ)
+	lat = _generate_hex_lattice(sp;M=3)
 end
+
+# ╔═╡ 59578774-09dc-456b-bbf3-fb3ef7a35072
+sp
+
+# ╔═╡ a6e2e847-9ce9-4080-8965-f128ca84c1ad
+let
+	plot(
+		scatter(;
+			x=map(x->first(x), lat[:]),
+			y=map(x->last(x), lat[:]),
+			mode="markers",
+		)
+	)
+end
+
+# ╔═╡ 2ef96156-c392-4b32-9d75-30c740700e4c
+let
+	x = []
+	y = []
+	for c in lat
+		hex = _hexagon_vertices(first(c), last(c), Rc/Re)
+		push!(x, first.(hex)...)
+		push!(y, last.(hex)...)
+	end
+	
+	plot(
+		scatter(;
+			x=x,
+			y=y,
+		 	mode="lines",
+        )
+	)	
+end
+
+# ╔═╡ b95d1de2-9cdc-4d01-b105-2d59e1643864
+let
+	x = []
+	y = []
+	for c in lat
+		hex = _generate_hex_vertices(first(c), last(c), Rc/Re, :pointy)
+		push!(x, first.(hex)...)
+		push!(x, NaN)
+		push!(y, last.(hex)...)
+		push!(y, NaN)
+	end
+	
+	plot(
+		scatter(;
+			x=x,
+			y=y,
+		 	mode="lines",
+        )
+	)	
+end
+
+# ╔═╡ a867a0e2-f77d-4599-b9e4-93875d25f8e5
+_generate_hex_vertices
 
 # ╔═╡ 1005c11c-1fef-4f3f-8cdf-d4b91d16fc60
 # begin
@@ -581,6 +663,13 @@ version = "17.4.0+2"
 # ╟─833103c3-9d4c-4c78-b83f-49e0c6b16104
 # ╠═ea40cb99-2bf1-4225-84fe-e8aee4f7863a
 # ╠═69ff22ae-93ac-466d-ba16-5a2521e1729e
+# ╠═59578774-09dc-456b-bbf3-fb3ef7a35072
+# ╠═a6e2e847-9ce9-4080-8965-f128ca84c1ad
+# ╠═2ef96156-c392-4b32-9d75-30c740700e4c
+# ╠═b95d1de2-9cdc-4d01-b105-2d59e1643864
+# ╠═a867a0e2-f77d-4599-b9e4-93875d25f8e5
+# ╠═0edec1e6-cf88-4b7c-a586-43507a2cbd7c
+# ╠═c5471612-989e-41ce-afb3-afe302da83d4
 # ╟─b94c71b6-0601-4a4c-ac92-417f0c372334
 # ╠═bf20cace-b64b-4155-90c1-1ec3644510d7
 # ╠═0e3793aa-13d2-4aeb-ad60-b98927932dc6

@@ -32,7 +32,7 @@ will have a distance equivalent to `√3 * spacing`.
 - `direction`: specifies the direction of minimum distance between neighboring\
 points. Defaults to `:pointy`.
 """
-function _generate_hex_lattice(spacing, direction=:pointy)
+function _generate_hex_lattice(spacing, direction=:pointy; kwargs...)
     coeffs = if direction === :pointy # Hexagon orientation with the pointy side up
         1.0, √3 / 2, 0.5
     elseif direction === :flat # Hexagon orientation with the flat side up
@@ -43,7 +43,17 @@ function _generate_hex_lattice(spacing, direction=:pointy)
 
     dx, dy, ds = spacing .* coeffs
 
-    return _generate_regular_lattice(dx, dy, ds)
+    return _generate_regular_lattice(dx, dy, ds; kwargs...)
+end
+
+function _generate_hex_vertices(cx, cy, r, direction=:pointy)
+    vertices = if direction === :pointy
+        [(cx + r*sin(2π*i/6), cy + r*cos(2π*i/6)) for i in 0:6]
+    else
+        [(cx + r*cos(2π*i/6), cy + r*sin(2π*i/6)) for i in 0:6]
+    end
+
+    return vertices
 end
 
 
