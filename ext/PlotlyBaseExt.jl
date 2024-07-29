@@ -66,9 +66,23 @@ function GeoGrids.plot_unitarysphere(points_cart; kwargs_scatter=(;), kwargs_lay
     plotly_plot([sphere, markers], layout)
 end
 
+function _get_scatter_points(points::Array{<:Union{SimpleLatLon,AbstractVector,Tuple}}; kwargs...)
+    # Markers for the points
+    vec_p = map(x -> GeoGrids._cast_geopoint(x), points[:]) # Convert in a vector of SimpleLatLon
+    scatterpoints = scattergeo(
+        lat=map(x -> x.lat, vec_p), # Vectorize such to be sure to avoid matrices.
+        lon=map(x -> x.lon, vec_p), # Vectorize such to be sure to avoid matrices.
+        mode="markers",
+        marker_size=5,
+        kwargs...
+    )
+
+    return scatterpoints
+end
+
 """
-    plot_geo(points::Array{<:Union{SimpleLatLon, AbstractVector, Tuple}}; title="Point Position GEO Map", camera::Symbol=:twodim, kwargs_scatter=(;), kwargs_layout=(;))
-    plot_geo(points; kwargs...)
+    plot_geo_points(points::Array{<:Union{SimpleLatLon, AbstractVector, Tuple}}; title="Point Position GEO Map", camera::Symbol=:twodim, kwargs_scatter=(;), kwargs_layout=(;))
+    plot_geo_points(points; kwargs...)
 
 This function takes an Array of LAT-LON coordinates and generates a plot on a
 world map projection using the PlotlyJS package.
@@ -84,7 +98,69 @@ Map".
 orthographic projection, while :twodim shows the map with a natural earth \
 projection.
 """
-function GeoGrids.plot_geo(points::Array{<:Union{SimpleLatLon,AbstractVector,Tuple}}; title="Point Position GEO Map", camera::Symbol=:twodim, kwargs_scatter=(;), kwargs_layout=(;))
+function GeoGrids.plot_geo_points(points::Array{<:Union{SimpleLatLon,AbstractVector,Tuple}}; title="Point Position GEO Map", camera::Symbol=:twodim, kwargs_scatter=(;), kwargs_layout=(;))
+    # Markers for the points
+    scatterpoints = _get_scatter_points(points; kwargs_scatter...)
+
+    if camera == :threedim
+        projection = "orthographic"
+    else
+        projection = "natural earth"
+    end
+
+    # Create the geo layout
+    layout = Layout(
+        geo=attr(
+            projection=attr(
+                type="robinson",
+            ),
+            showocean=true,
+            # oceancolor =  "rgb(0, 255, 255)",
+            oceancolor="rgb(255, 255, 255)",
+            showland=true,
+            # landcolor =  "rgb(230, 145, 56)",
+            landcolor="rgb(217, 217, 217)",
+            showlakes=true,
+            # lakecolor =  "rgb(0, 255, 255)",
+            lakecolor="rgb(255, 255, 255)",
+            showcountries=true,
+            lonaxis=attr(
+                showgrid=true,
+                gridcolor="rgb(102, 102, 102)"
+            ),
+            lataxis=attr(
+                showgrid=true,
+                gridcolor="rgb(102, 102, 102)"
+            )
+        ),
+        title=title;
+        geo_projection_type=projection,
+        kwargs_layout...
+    )
+
+    plotly_plot([scatterpoints], layout)
+end
+
+function _get_scatter_cells(cellCenter::Array{<:Union{SimpleLatLon,AbstractVector,Tuple}}, radius::Number, type::Symbol=:hex; kwargs...)
+    # Radius in Km
+    x = []
+	y = []
+	for c in cellCenter
+		hex = _generate_hex_vertices(first(c), last(c), Rc/Re, :pointy)
+		push!(x, [first.(hex)..., NaN]...)
+		push!(y, [last.(hex)..., NaN]...)
+	end
+	
+	plot(
+		scatter(;
+			x=x,
+			y=y,
+		 	mode="lines",
+        )
+	)	
+
+
+
     # Markers for the points
     vec_p = map(x -> GeoGrids._cast_geopoint(x), points[:]) # Convert in a vector of SimpleLatLon
     scatterpoints = scattergeo(
@@ -92,8 +168,16 @@ function GeoGrids.plot_geo(points::Array{<:Union{SimpleLatLon,AbstractVector,Tup
         lon=map(x -> x.lon, vec_p), # Vectorize such to be sure to avoid matrices.
         mode="markers",
         marker_size=5,
-        kwargs_scatter...
+        kwargs...
     )
+
+    return scatterpoints
+end
+
+
+function GeoGrids.plot_geo_cells(cellCenter::Array{<:Union{SimpleLatLon,AbstractVector,Tuple}}, type::Symbol=:hex; title="Cell Layout GEO Map", camera::Symbol=:twodim, kwargs_scatter=(;), kwargs_layout=(;))
+    # Markers for the points
+    scatterpoints = _get_scatter_cells(cellCenter, type; kwargs_scatter...)
 
     if camera == :threedim
         projection = "orthographic"

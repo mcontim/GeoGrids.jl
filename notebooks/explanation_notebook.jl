@@ -231,33 +231,33 @@ plot_unitarysphere(fibonaccisphere_optimization1(tableVal.n))
 plot_unitarysphere(fibonaccisphere_alternative1(tableVal.n))
 
 # ╔═╡ ec3c88ba-972f-4b0f-ac25-75e779b1c33a
-plot_geo(icogrid(N=tableVal.n;unit=:deg))
+plot_geo_points(icogrid(N=tableVal.n;unit=:deg))
 
 # ╔═╡ f97a8555-086b-48f6-950e-fc583d0afa11
-plot_geo(icogrid(N=tableVal.n;unit=:deg);camera=:threedim)
+plot_geo_points(icogrid(N=tableVal.n;unit=:deg);camera=:threedim)
 
 # ╔═╡ 900cc195-8c5a-47c0-a48b-e04baa15fc61
 # Check for the growing of points in Fibonacci spiral
-plot_geo(icogrid(N=tableVal.n;unit=:deg)[1:50])
+plot_geo_points(icogrid(N=tableVal.n;unit=:deg)[1:50])
 
 # ╔═╡ d005be58-3be7-4b2a-a3f7-edf0fd095259
 # Check for the growing of points in Fibonacci spiral
-plot_geo(icogrid(N=tableVal.n;unit=:deg)[1:50];camera=:threedim)
+plot_geo_points(icogrid(N=tableVal.n;unit=:deg)[1:50];camera=:threedim)
 
 # ╔═╡ 6b1c8079-bab5-4951-b564-500bba378781
-plot_geo(icogrid(sepAng=deg2rad(tableVal.ang);unit=:deg))
+plot_geo_points(icogrid(sepAng=deg2rad(tableVal.ang);unit=:deg))
 
 # ╔═╡ 88704126-cdc6-486f-bd68-e8fee558eac4
-plot_geo(icogrid(sepAng=deg2rad(tableVal.ang);unit=:deg);camera=:threedim)
+plot_geo_points(icogrid(sepAng=deg2rad(tableVal.ang);unit=:deg);camera=:threedim)
 
 # ╔═╡ f1d6ee2f-01d2-4b79-b326-cb202c58d74d
 meshGrid = rectgrid(deg2rad(tableVal.ang); unit=:deg)
 
 # ╔═╡ 3eeeffc0-3ba5-427b-b75b-0bf5f6286c9b
-plot_geo(vec(meshGrid))
+plot_geo_points(vec(meshGrid))
 
 # ╔═╡ 00055125-7c7e-459e-b79e-f22e3d74866d
-plot_geo(vec(meshGrid); camera=:threedim)
+plot_geo_points(vec(meshGrid); camera=:threedim)
 
 # ╔═╡ 8ed3bf0f-534e-4b12-a905-2b25b8c8e13a
 BondTable([

@@ -81,3 +81,7 @@ mutable struct TilingInit
     end
 end
 TilingInit(; radius, type=:ICO, region=GlobalRegion()) = TilingInit(radius, type, region)
+
+const constants = (
+    Re_mean = 6371e3, # Mean Earth Radius [m]
+)

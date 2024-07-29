@@ -46,11 +46,34 @@ function _generate_hex_lattice(spacing, direction=:pointy; kwargs...)
     return _generate_regular_lattice(dx, dy, ds; kwargs...)
 end
 
-function _generate_hex_vertices(cx, cy, r, direction=:pointy)
+"""
+    _generate_hex_vertices(cx::Number, cy::Number, r::Number, direction::Symbol=:pointy) -> Vector{Number}
+
+The `_generate_hex_vertices` function generates the vertices of a hexagon
+centered at a given point `(cx, cy)` with a specified radius `r`. The function
+allows for two orientations of the hexagon: "pointy" (vertex pointing upwards)
+or "flat" (edge pointing upwards).
+
+## Arguments
+- `cx::Number`: The x-coordinate of the center of the hexagon.
+- `cy::Number`: The y-coordinate of the center of the hexagon.
+- `r::Number`: The radius of the hexagon, which is the distance from the center \
+to any vertex.
+- `direction::Symbol`: The orientation of the hexagon. It can be either \
+`:pointy` for a hexagon with a vertex pointing upwards or `:flat` for a \
+hexagon with an edge pointing upwards. The default value is `:pointy`.
+
+## Returns
+- `vertices::Vector{Tuple{Number, Number}}`: A vector of tuples, where each \
+tuple represents the `(x, y)` coordinates of a vertex of the hexagon. The \
+vector contains 7 tuples, with the last vertex being the same as the first to \
+close the hexagon.
+"""
+function _generate_hex_vertices(cx::Number, cy::Number, r::Number, direction::Symbol=:pointy)
     vertices = if direction === :pointy
-        [(cx + r*sin(2π*i/6), cy + r*cos(2π*i/6)) for i in 0:6]
+        [(cx + r * sin(2π * i / 6), cy + r * cos(2π * i / 6)) for i in 0:6]
     else
-        [(cx + r*cos(2π*i/6), cy + r*sin(2π*i/6)) for i in 0:6]
+        [(cx + r * cos(2π * i / 6), cy + r * sin(2π * i / 6)) for i in 0:6]
     end
 
     return vertices
