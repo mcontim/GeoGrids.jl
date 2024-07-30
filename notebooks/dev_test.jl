@@ -32,6 +32,9 @@ md"""
 # Test
 """
 
+# ╔═╡ 75264458-e8a8-4186-809b-0fd97a22b9d2
+
+
 # ╔═╡ 222fb774-1693-4b3c-b2ef-5fd38eca773c
 md"""
 # Test Tessellation
@@ -76,6 +79,9 @@ r = [
 	# LatBeltRegion(regionName="test", latLim=(45, 60)),
 	# LatBeltRegion(regionName="test", latLim=((pi/4)rad, (pi/2)rad))
 ]
+
+# ╔═╡ 8f85708a-bd84-4eaa-8673-8c8adafad858
+centroid(r[2].domain)
 
 # ╔═╡ aed8268b-3432-434c-a764-03bfc49b6333
 typeof(r)
@@ -127,6 +133,12 @@ plot_geo_points([SimpleLatLon(-70°, 11°),SimpleLatLon(-0°, 12°)])
 
 # ╔═╡ 4bec169d-5243-439f-92e0-b623aaa1c31c
 plot_unitarysphere([[1.0,1.0,1.0],[1.0,1.0,2.0]])
+
+# ╔═╡ 5c75483b-9e9b-4188-91f4-4d7464d11843
+SimpleLatLon(-70°, 11°).lat
+
+# ╔═╡ d529382c-3174-45b5-9eda-dfe114108b98
+typeof(ustrip(deg2rad(SimpleLatLon(deg2rad(-70)*rad, deg2rad(11)*rad).lat)))
 
 # ╔═╡ 404988a4-599e-42c7-a3c6-636dd40ad797
 TilingInit(10.0)
@@ -602,6 +614,7 @@ version = "17.4.0+2"
 # ╔═╡ Cell order:
 # ╠═069444e1-4e89-4f4f-ae2f-f5fb3131e398
 # ╟─8717aaad-3791-40ec-82a3-3957fb10a562
+# ╠═8f85708a-bd84-4eaa-8673-8c8adafad858
 # ╠═cd0f6997-c95c-4fd7-9be8-88d8dbcf760a
 # ╠═3a7b7e4e-8555-488f-be49-c82cac515376
 # ╠═56cef4fa-7aea-40c8-83da-e6431ff9a915
@@ -620,6 +633,9 @@ version = "17.4.0+2"
 # ╠═5a60a99f-ff3b-4867-86ba-03813a817430
 # ╠═4ff0540b-c3ba-408f-894e-5fda86c0769d
 # ╠═4bec169d-5243-439f-92e0-b623aaa1c31c
+# ╠═5c75483b-9e9b-4188-91f4-4d7464d11843
+# ╠═75264458-e8a8-4186-809b-0fd97a22b9d2
+# ╠═d529382c-3174-45b5-9eda-dfe114108b98
 # ╟─222fb774-1693-4b3c-b2ef-5fd38eca773c
 # ╠═404988a4-599e-42c7-a3c6-636dd40ad797
 # ╠═318449bb-6e70-46d0-adbb-ce5f3522d1fe

@@ -81,6 +81,42 @@ end
 
 
 
+# - Add multiple dispatch for different types of grid ICO, HEX, H3
+# - Add multiple dispatch for different types of Regions
+function generate_cell_layout(initLayout::TilingInit; hex_direction=:pointy)
+    (; radius, type, region) = initLayout
+    # Una volta capito lon=x lat=y e’ ok alla fine
+    centre = if region isa GeoRegion
+        dmn = extract_countries(region)[1] # The indicization is used to extract directly the Multi or PolyArea from the view
+        c = if dmn isa Multi
+            idxMain = findmax(x -> length(vertices(x)), dmn.geoms)[2] # Find the PolyArea with the most vertices. It is assumed also to be the largest one so the main area of that country to be considered for the centroid computation.
+            centroid(dmn.geoms[idxMain]) # Find the centroid of the main PolyArea to be used as grid layout seed.
+        elseif dmn isa PolyArea
+            centroid(dmn)
+        else
+            error("Unrecognised type of GeoRegion domain")
+        end
+    elseif region isa PolyRegion
+        centroid(region.domain)
+    elseif region isa GlobalRegion
+    end    
+
+    d = first(dmn)
+    c = centroid(d)
+    
+    # Create grid layout
+    if initLayout.type == :HEX
+        return _generate_hex_lattice(initLayout.radius, hex_direction)
+    elseif initLayout.type == :ICO
+
+    else
+        error("H3 tassellation is not yet implemented...")
+    end
+
+end
+
+
+
 
 # satAlt, minEl
 # function make_cells!(cellsInit; em::EllipsoidModel)    
