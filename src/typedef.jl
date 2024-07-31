@@ -65,27 +65,10 @@ LatBeltRegion(; regionName::String="region_name", latLim) = LatBeltRegion(region
 ## Define Tessellation Types
 abstract type AbstractTiling end
 struct ICO <: AbstractTiling end
-struct HEX <: AbstractTiling end
-struct H3 <: AbstractTiling end
-
-mutable struct TilingInit
-    "Radius of the single element (cell), to be considered in m."
-    radius::Number  
-    "Tessellation type (:ICO | :HEX | :H3)"
-    type::Symbol 
-    "Region to be tessellated"
-    region::AbstractRegion
-
-    function TilingInit(radius, type=:ICO, region=GlobalRegion())
-        # Input validation
-        type in (:ICO, :HEX, :H3) || error("Tessellation type must be :ICO, :HEX or :H3")
-        region isa AbstractRegion || error("Region must be of type AbstractRegion...")
-        (region isa GlobalRegion && type in (:ICO, :H3)) || error("Tessellation of type :HEX cannot be used with global region...")
-
-        new(radius, type, region)
-    end
+@kwdef struct HEX <: AbstractTiling 
+    direction::Symbol = :pointy
 end
-TilingInit(; radius, type=:ICO, region=GlobalRegion()) = TilingInit(radius, type, region)
+struct H3 <: AbstractTiling end
 
 const constants = (
     Re_mean = 6371e3, # Mean Earth Radius [m]

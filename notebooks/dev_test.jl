@@ -140,7 +140,7 @@ typeof(ustrip(deg2rad(SimpleLatLon(deg2rad(-70)*rad, deg2rad(11)*rad).lat)))
 # ╔═╡ d05078cc-f277-492e-85a6-aab35f38f2f4
 let 
 	reg = GeoRegion(; regionName="Tassellation", admin="Switzerland")
-	dd = _gen_cell_layout(reg, 20000, HEX())
+	dd = gen_cell_layout(reg, 20000, HEX())
 	plot_geo_points(dd)
 end
 
@@ -150,7 +150,7 @@ _gen_hex_vertices(SimpleLatLon(0,0), 1000)
 # ╔═╡ e0b2c99d-c689-48fb-91d5-6a3b4ee4d044
 let 
 	reg = GeoRegion(; regionName="Tassellation", admin="Switzerland")
-	dd = _gen_cell_layout(reg, 20000, HEX())
+	dd = gen_cell_layout(reg, 20000, HEX())
 	    
 	plot_geo_cells(dd, 20000)
 end

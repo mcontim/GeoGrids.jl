@@ -50,6 +50,7 @@ end
 
 """
     _gen_hex_vertices(cx::Number, cy::Number, r::Number, direction::Symbol=:pointy) -> Vector{Number}
+    _gen_hex_vertices(center::SimpleLatLon, r::Number, direction::Symbol=:pointy) -> Vector{Number}
 
 The `_gen_hex_vertices` function generates the vertices of a hexagon
 centered at a given point `(cx, cy)` with a specified radius `r`. The function
@@ -59,17 +60,20 @@ or "flat" (edge pointing upwards).
 ## Arguments
 - `cx::Number`: The x-coordinate of the center of the hexagon.
 - `cy::Number`: The y-coordinate of the center of the hexagon.
+- `center::SimpleLatLon`: The center of the hexagon as a `SimpleLatLon` object.
 - `r::Number`: The radius of the hexagon, which is the distance from the center \
 to any vertex.
 - `direction::Symbol`: The orientation of the hexagon. It can be either \
 `:pointy` for a hexagon with a vertex pointing upwards or `:flat` for a \
 hexagon with an edge pointing upwards. The default value is `:pointy`.
+- f::Function: A function to apply to the vertices before returning them.
 
 ## Returns
 - `vertices::Vector{Tuple{Number, Number}}`: A vector of tuples, where each \
 tuple represents the `(x, y)` coordinates of a vertex of the hexagon. The \
 vector contains 7 tuples, with the last vertex being the same as the first to \
-close the hexagon.
+close the hexagon. When `SimpleLatLon` is given as input the output vector \
+contains `Number` representing lon=x and lat=y in deg (useful for geoscatter plotting). 
 """
 function _gen_hex_vertices(cx::Number, cy::Number, r::Number, direction::Symbol=:pointy, f::Function=identity)
     vertices = if direction === :pointy
@@ -97,58 +101,24 @@ function _gen_hex_vertices(center::SimpleLatLon, r::Number, direction::Symbol=:p
     return map(x -> rad2deg.(x), vertices)
 end
 
-# - Add multiple dispatch for different types of grid ICO, HEX, H3
-# - Add multiple dispatch for different types of Regions
-function gen_cell_layout(initLayout::TilingInit; hex_direction::Symbol=:pointy)
-    (; radius, type, region) = initLayout
-    # For SimpleLatLon consider that lon=x and lat=y (it's importand for the operations with 2D points/vec)
-    centre = if region isa GeoRegion
-        dmn = extract_countries(region)[1] # The indicization is used to extract directly the Multi or PolyArea from the view
-        c = if dmn isa Multi
-            idxMain = findmax(x -> length(vertices(x)), dmn.geoms)[2] # Find the PolyArea with the most vertices. It is assumed also to be the largest one so the main area of that country to be considered for the centroid computation.
-            centroid(dmn.geoms[idxMain]) # Find the centroid of the main PolyArea to be used as grid layout seed.
-        elseif dmn isa PolyArea
-            centroid(dmn)
-        else
-            error("Unrecognised type of GeoRegion domain...")
-        end
-    elseif region isa PolyRegion
-        centroid(region.domain)
-    elseif region isa GlobalRegion
 
-    end    
-
-    d = first(dmn)
-    c = centroid(d)
-    
-    # Create grid layout
-    if initLayout.type == :HEX
-        return gen_hex_lattice(initLayout.radius, hex_direction)
-    elseif initLayout.type == :ICO
-
-    else
-        error("H3 tassellation is not yet implemented...")
-    end
+function gen_cell_layout(region::GlobalRegion, radius::Number, type::ICO)
 
 end
 
-function _gen_cell_layout(region::GlobalRegion, radius::Number, type::ICO)
-
-end
-
-function _gen_cell_layout(region::GlobalRegion, radius::Number, type::H3)
+function gen_cell_layout(region::GlobalRegion, radius::Number, type::H3)
     error("H3 tassellation is not yet implemented in this version...")
 end
 
-function _gen_cell_layout(region::LatBeltRegion, radius::Number, type::ICO)
+function gen_cell_layout(region::LatBeltRegion, radius::Number, type::ICO)
 
 end
 
-function _gen_cell_layout(region::LatBeltRegion, radius::Number, type::H3)
+function gen_cell_layout(region::LatBeltRegion, radius::Number, type::H3)
     error("H3 tassellation is not yet implemented in this version...")
 end
 
-function _gen_cell_layout(region::GeoRegion, radius::Number, type::HEX; hex_direction::Symbol=:pointy, kwargs_lattice...)
+function gen_cell_layout(region::GeoRegion, radius::Number, type::HEX; hex_direction::Symbol=:pointy, kwargs_lattice...)
     ## Find the domain center as seed for the cell grid layout.
     domain = extract_countries(region)[1]; # The indicization is used to extract directly the Multi or PolyArea from the view
     centre = let
@@ -178,25 +148,27 @@ function _gen_cell_layout(region::GeoRegion, radius::Number, type::HEX; hex_dire
     return filter_points(new_lattice, region)
 end
 
-function _gen_cell_layout(region::GeoRegion, radius::Number, type::ICO)
-    # Define the separation angle for the icosahedral grid in a similar way as for the hexagonal grid.
-    sepAng = radius*√3/constants.Re_mean # spacing (angular in rad) between lattice points, considering a sphere of radius equivalent to the Earth mean radius.
+function gen_cell_layout(region::GeoRegion, radius::Number, type::ICO)
+    sepAng = radius*√3/constants.Re_mean |> rad2deg # Define the separation angle for the icosahedral grid in a similar way as for the hexagonal grid.
 
+    grid = icogrid(;sepAng)
+
+    return filter_points(grid, region)
 end
 
-function _gen_cell_layout(region::GeoRegion, radius::Number, type::H3)
+function gen_cell_layout(region::GeoRegion, radius::Number, type::H3)
     error("H3 tassellation is not yet implemented in this version...")
 end
 
-function _gen_cell_layout(region::PolyRegion, radius::Number, type::HEX)
+function gen_cell_layout(region::PolyRegion, radius::Number, type::HEX)
 
 end
 
-function _gen_cell_layout(region::PolyRegion, radius::Number, type::ICO)
+function gen_cell_layout(region::PolyRegion, radius::Number, type::ICO)
 
 end
 
-function _gen_cell_layout(region::PolyRegion, radius::Number, type::H3)
+function gen_cell_layout(region::PolyRegion, radius::Number, type::H3)
     error("H3 tassellation is not yet implemented in this version...")
 end
 
