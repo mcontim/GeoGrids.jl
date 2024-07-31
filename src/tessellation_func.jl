@@ -12,7 +12,7 @@ end
 
 # Hex Lattice
 """
-	_gen_hex_lattice(spacing, direction = :pointy; kwargs...)
+	gen_hex_lattice(spacing, direction = :pointy; kwargs...)
 Generate a hexagonal lattice of points with equal distance `spacing` between neighboring points.
 
 The generated hexagonal lattice will have distance between points on the same
@@ -32,7 +32,7 @@ will have a distance equivalent to `√3 * spacing`.
 - `direction`: specifies the direction of minimum distance between neighboring\
 points. Defaults to `:pointy`.
 """
-function _gen_hex_lattice(spacing, direction=:pointy; kwargs...)
+function gen_hex_lattice(spacing, direction=:pointy, f::Function=identity; kwargs...)
     coeffs = if direction === :pointy # Hexagon orientation with the pointy side up
         1.0, √3 / 2, 0.5
     elseif direction === :flat # Hexagon orientation with the flat side up
@@ -43,7 +43,9 @@ function _gen_hex_lattice(spacing, direction=:pointy; kwargs...)
 
     dx, dy, ds = spacing .* coeffs
 
-    return _gen_regular_lattice(dx, dy, ds; kwargs...)
+    lat = _gen_regular_lattice(dx, dy, ds; kwargs...)
+
+    return map(x -> f.(x), lat)
 end
 
 """
@@ -69,21 +71,21 @@ tuple represents the `(x, y)` coordinates of a vertex of the hexagon. The \
 vector contains 7 tuples, with the last vertex being the same as the first to \
 close the hexagon.
 """
-function _gen_hex_vertices(cx::Number, cy::Number, r::Number, direction::Symbol=:pointy)
+function _gen_hex_vertices(cx::Number, cy::Number, r::Number, direction::Symbol=:pointy, f::Function=identity)
     vertices = if direction === :pointy
         [(cx + r * sin(2π * i / 6), cy + r * cos(2π * i / 6)) for i in 0:6]
     else
         [(cx + r * cos(2π * i / 6), cy + r * sin(2π * i / 6)) for i in 0:6]
     end
 
-    return vertices
+    return map(x -> f.(x), vertices)
 end
 
 
 
 # - Add multiple dispatch for different types of grid ICO, HEX, H3
 # - Add multiple dispatch for different types of Regions
-function gen_cell_layout(initLayout::TilingInit; hex_direction=:pointy)
+function gen_cell_layout(initLayout::TilingInit; hex_direction::Symbol=:pointy)
     (; radius, type, region) = initLayout
     # For SimpleLatLon consider that lon=x and lat=y (it's importand for the operations with 2D points/vec)
     centre = if region isa GeoRegion
@@ -107,7 +109,7 @@ function gen_cell_layout(initLayout::TilingInit; hex_direction=:pointy)
     
     # Create grid layout
     if initLayout.type == :HEX
-        return _gen_hex_lattice(initLayout.radius, hex_direction)
+        return gen_hex_lattice(initLayout.radius, hex_direction)
     elseif initLayout.type == :ICO
 
     else
@@ -116,15 +118,97 @@ function gen_cell_layout(initLayout::TilingInit; hex_direction=:pointy)
 
 end
 
-function _gen_cell_layout(region::GlobalRegion; hex_direction=:pointy)
-
+function _gen_cell_layout(region::GlobalRegion, radius::Number, type::ICO)
 
 end
 
-    GlobalRegion
-    GeoRegion
-    PolyRegion
-    LatBeltRegion
+function _gen_cell_layout(region::GlobalRegion, radius::Number, type::H3)
+    error("H3 tassellation is not yet implemented in this version...")
+end
+
+function _gen_cell_layout(region::LatBeltRegion, radius::Number, type::ICO)
+
+end
+
+function _gen_cell_layout(region::LatBeltRegion, radius::Number, type::H3)
+    error("H3 tassellation is not yet implemented in this version...")
+end
+
+function _gen_cell_layout(region::GeoRegion, radius::Number, type::HEX; hex_direction::Symbol=:pointy, kwargs_lattice...)
+    ## Find the domain center as seed for the cell grid layout.
+    domain = extract_countries(region)[1]; # The indicization is used to extract directly the Multi or PolyArea from the view
+    centre = let
+        c = if domain isa Multi
+            idxMain = findmax(x -> length(vertices(x)), domain.geoms)[2] # Find the PolyArea with the most vertices. It is assumed also to be the largest one so the main area of that country to be considered for the centroid computation.
+            c = centroid(domain.geoms[idxMain]) # Find the centroid of the main PolyArea to be used as grid layout seed.
+        elseif domain isa PolyArea
+            centroid(domain)
+        else
+            error("Unrecognised type of GeoRegion domain...")
+        end
+        (;x,y) = c.coords
+        SVector(x |> ustrip, y |> ustrip) # SVector of lon-lat in deg
+    end
+    
+    ## Generate the lattice centered in 0,0.
+    spacing = radius*√3/constants.Re_mean # spacing (angular in rad) between lattice points, considering a sphere of radius equivalent to the Earth mean radius.
+    lattice = gen_hex_lattice(spacing, hex_direction, rad2deg; kwargs_lattice...)
+
+    ## Re-center the lattice around the seed point.
+    new_lattice = map(lattice) do point
+        new = point + centre # This SVector is still in the order lon-lat
+        lat,lon = _wrap_latlon(new[2], new[1])
+        SimpleLatLon(lat,lon)
+    end
+
+    return filter_points(new_lattice, region)
+end
+
+function _gen_cell_layout(region::GeoRegion, radius::Number, type::ICO)
+
+end
+
+function _gen_cell_layout(region::GeoRegion, radius::Number, type::H3)
+    error("H3 tassellation is not yet implemented in this version...")
+end
+
+function _gen_cell_layout(region::PolyRegion, radius::Number, type::HEX)
+
+end
+
+function _gen_cell_layout(region::PolyRegion, radius::Number, type::ICO)
+
+end
+
+function _gen_cell_layout(region::PolyRegion, radius::Number, type::H3)
+    error("H3 tassellation is not yet implemented in this version...")
+end
+
+function _wrap_latlon(lat, lon)
+    # Normalize lat to the range [-180, 180)
+    lat = rem(lat, 360, RoundNearest)
+    lon = rem(lon, 360, RoundNearest)
+    
+    # Wrap to the range [-90, 90] and make the longitude "jump"
+    if lat > 90
+        lat = 180 - lat
+        lon = lon + 180
+        lon = rem(lon, 360, RoundNearest)
+    elseif lat < -90
+        lat = -180 - lat
+        lon = lon + 180
+        lon = rem(lon, 360, RoundNearest)
+    end
+
+    return lat, lon
+end
+
+
+
+
+
+
+
 
 
 

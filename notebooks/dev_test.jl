@@ -60,47 +60,6 @@ begin
 	θ = linearSpacing/Re # equivalent angular spacing [rad]
 end
 
-# ╔═╡ 69ff22ae-93ac-466d-ba16-5a2521e1729e
-begin
-	# 2. Define the lattice in u,v (linear)
-	# Now that we have the theta wrt a source in the center of the sphere, we retrieve u,v coord then the linear distance in uv which will be the actual spacing of our lattice.
-	# Since we can consider a generic ϕ, we'll use ϕ=0 such that we end up with the only u component, which will also corresponds to the spacing.
-	sp = sin(θ)
-	lat = _gen_hex_lattice(sp;M=3)
-end
-
-# ╔═╡ a6e2e847-9ce9-4080-8965-f128ca84c1ad
-let
-	plot(
-		scatter(;
-			x=map(x->first(x), lat[:]),
-			y=map(x->last(x), lat[:]),
-			mode="markers",
-		)
-	)
-end
-
-# ╔═╡ b95d1de2-9cdc-4d01-b105-2d59e1643864
-let
-	x = []
-	y = []
-	for c in lat
-		hex = _gen_hex_vertices(first(c), last(c), Rc/Re, :pointy)
-		push!(x, first.(hex)...)
-		push!(x, NaN)
-		push!(y, last.(hex)...)
-		push!(y, NaN)
-	end
-	
-	plot(
-		scatter(;
-			x=x,
-			y=y,
-		 	mode="lines",
-        )
-	)	
-end
-
 # ╔═╡ b94c71b6-0601-4a4c-ac92-417f0c372334
 md"""
 # Packages
@@ -120,9 +79,6 @@ r = [
 	# LatBeltRegion(regionName="test", latLim=(45, 60)),
 	# LatBeltRegion(regionName="test", latLim=((pi/4)rad, (pi/2)rad))
 ]
-
-# ╔═╡ 8f85708a-bd84-4eaa-8673-8c8adafad858
-centroid(r[2].domain)
 
 # ╔═╡ aed8268b-3432-434c-a764-03bfc49b6333
 typeof(r)
@@ -181,14 +137,70 @@ SimpleLatLon(-70°, 11°).lat
 # ╔═╡ d529382c-3174-45b5-9eda-dfe114108b98
 typeof(ustrip(deg2rad(SimpleLatLon(deg2rad(-70)*rad, deg2rad(11)*rad).lat)))
 
-# ╔═╡ 404988a4-599e-42c7-a3c6-636dd40ad797
-TilingInit(10.0)
+# ╔═╡ d05078cc-f277-492e-85a6-aab35f38f2f4
+let 
+	reg = GeoRegion(; regionName="Tassellation", admin="Spain")
+	dd = _gen_cell_layout(reg, 100000, HEX())
+	plot_geo_points(dd)
+end
 
-# ╔═╡ 318449bb-6e70-46d0-adbb-ce5f3522d1fe
-TilingInit(12, :ICO, GlobalRegion())
+# ╔═╡ d83ce3fa-1a72-429a-a5af-30d22261ad1f
+SimpleLatLon(1,2).lat
 
-# ╔═╡ aa980a61-139b-4a46-a04c-4ce8552a2766
-TilingInit(radius=12, type=:ICO)
+# ╔═╡ e0b2c99d-c689-48fb-91d5-6a3b4ee4d044
+let 
+	reg = GeoRegion(; regionName="Tassellation", admin="Spain")
+	dd = _gen_cell_layout(reg, 100000, HEX())
+	
+	plot_geo_cells(dd, 100000)
+end
+
+# ╔═╡ 69ff22ae-93ac-466d-ba16-5a2521e1729e
+begin
+	# 2. Define the lattice in u,v (linear)
+	# Now that we have the theta wrt a source in the center of the sphere, we retrieve u,v coord then the linear distance in uv which will be the actual spacing of our lattice.
+	# Since we can consider a generic ϕ, we'll use ϕ=0 such that we end up with the only u component, which will also corresponds to the spacing.
+	sp = sin(θ)
+	lat = gen_hex_lattice(sp, :flat; M=3)
+end
+
+# ╔═╡ a6e2e847-9ce9-4080-8965-f128ca84c1ad
+let
+	plot(
+		scatter(;
+			x=map(x->first(x), lat[:]),
+			y=map(x->last(x), lat[:]),
+			mode="markers",
+		)
+	)
+end
+
+# ╔═╡ 0f807392-647c-4063-9d1d-0f3b1e0751c2
+SVector(1,1) + SVector(2,2)
+
+# ╔═╡ b95d1de2-9cdc-4d01-b105-2d59e1643864
+let
+	x = []
+	y = []
+	for c in lat
+		hex = _gen_hex_vertices(first(c), last(c), Rc/Re, :flat)
+		push!(x, first.(hex)...)
+		push!(x, NaN)
+		push!(y, last.(hex)...)
+		push!(y, NaN)
+	end
+	
+	plot(
+		scatter(;
+			x=x,
+			y=y,
+		 	mode="lines",
+        )
+	)	
+end
+
+# ╔═╡ 2671fc8c-d53b-4682-a912-7c213defe7e0
+Meshes |> pkgversion
 
 # ╔═╡ 00000000-0000-0000-0000-000000000001
 PLUTO_PROJECT_TOML_CONTENTS = """
@@ -614,7 +626,6 @@ version = "17.4.0+2"
 # ╔═╡ Cell order:
 # ╠═069444e1-4e89-4f4f-ae2f-f5fb3131e398
 # ╟─8717aaad-3791-40ec-82a3-3957fb10a562
-# ╠═8f85708a-bd84-4eaa-8673-8c8adafad858
 # ╠═cd0f6997-c95c-4fd7-9be8-88d8dbcf760a
 # ╠═3a7b7e4e-8555-488f-be49-c82cac515376
 # ╠═56cef4fa-7aea-40c8-83da-e6431ff9a915
@@ -637,15 +648,17 @@ version = "17.4.0+2"
 # ╠═75264458-e8a8-4186-809b-0fd97a22b9d2
 # ╠═d529382c-3174-45b5-9eda-dfe114108b98
 # ╟─222fb774-1693-4b3c-b2ef-5fd38eca773c
-# ╠═404988a4-599e-42c7-a3c6-636dd40ad797
-# ╠═318449bb-6e70-46d0-adbb-ce5f3522d1fe
-# ╠═aa980a61-139b-4a46-a04c-4ce8552a2766
+# ╠═d05078cc-f277-492e-85a6-aab35f38f2f4
+# ╠═d83ce3fa-1a72-429a-a5af-30d22261ad1f
+# ╠═e0b2c99d-c689-48fb-91d5-6a3b4ee4d044
 # ╟─2f6c6420-ffb5-4bb6-b757-1ce852c35e78
 # ╟─833103c3-9d4c-4c78-b83f-49e0c6b16104
 # ╠═ea40cb99-2bf1-4225-84fe-e8aee4f7863a
 # ╠═69ff22ae-93ac-466d-ba16-5a2521e1729e
+# ╠═0f807392-647c-4063-9d1d-0f3b1e0751c2
 # ╠═a6e2e847-9ce9-4080-8965-f128ca84c1ad
 # ╠═b95d1de2-9cdc-4d01-b105-2d59e1643864
+# ╠═2671fc8c-d53b-4682-a912-7c213defe7e0
 # ╟─b94c71b6-0601-4a4c-ac92-417f0c372334
 # ╠═bf20cace-b64b-4155-90c1-1ec3644510d7
 # ╠═0e3793aa-13d2-4aeb-ad60-b98927932dc6

@@ -69,7 +69,7 @@ struct HEX <: AbstractTiling end
 struct H3 <: AbstractTiling end
 
 mutable struct TilingInit
-    "Radius of the single element (cell)"
+    "Radius of the single element (cell), to be considered in m."
     radius::Number  
     "Tessellation type (:ICO | :HEX | :H3)"
     type::Symbol 

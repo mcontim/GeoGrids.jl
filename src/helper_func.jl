@@ -61,6 +61,6 @@ function CountriesBorders.extract_countries(r::GeoRegion)
     end
 
     kwargs = NamedTuple(filter(x -> !isempty(x[2]), all_pairs))
-    @info kwargs
-    CountriesBorders.extract_countries(; kwargs...)
+
+    return CountriesBorders.extract_countries(; kwargs...)
 end

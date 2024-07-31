@@ -141,43 +141,35 @@ function GeoGrids.plot_geo_points(points::Array{<:Union{SimpleLatLon,AbstractVec
     plotly_plot([scatterpoints], layout)
 end
 
-function _get_scatter_cells(cellCenter::Array{<:Union{SimpleLatLon,AbstractVector,Tuple}}, radius::Number, type::Symbol=:hex; kwargs...)
-    # Radius in Km
-    x = []
-	y = []
+function _get_scatter_cells(cellCenter::Array{<:Union{SimpleLatLon,AbstractVector,Tuple}}, radius::Number, type::Symbol=:hex; hex_direction::Symbol=:pointy, kwargs...)
+    cellCenter = map(x -> GeoGrids._cast_geopoint(x), cellCenter[:]) # Convert in a vector of SimpleLatLon
+
+    x_plot = [] # deg
+	y_plot = [] # deg
 	for c in cellCenter
-		hex = _gen_hex_vertices(first(c), last(c), Rc/Re, :pointy)
-		push!(x, [first.(hex)..., NaN]...)
-		push!(y, [last.(hex)..., NaN]...)
+        x = c.lon |> ustrip |> deg2rad
+        y = c.lat |> ustrip |> deg2rad
+		hex = _gen_hex_vertices(x, y, radius/constants.Re_mean, hex_direction, rad2deg)
+		push!(x_plot, [first.(hex)..., NaN]...)
+		push!(y_plot, [last.(hex)..., NaN]...)
 	end
 	
-	plot(
-		scatter(;
-			x=x,
-			y=y,
-		 	mode="lines",
-        )
-	)	
-
-
-
     # Markers for the points
     vec_p = map(x -> GeoGrids._cast_geopoint(x), points[:]) # Convert in a vector of SimpleLatLon
     scatterpoints = scattergeo(
-        lat=map(x -> x.lat, vec_p), # Vectorize such to be sure to avoid matrices.
-        lon=map(x -> x.lon, vec_p), # Vectorize such to be sure to avoid matrices.
-        mode="markers",
-        marker_size=5,
+        lat = y_plot, # Vectorize such to be sure to avoid matrices.
+        lon = x_plot, # Vectorize such to be sure to avoid matrices.
+        mode = "lines",
+        marker_size = 5,
         kwargs...
     )
 
     return scatterpoints
 end
 
-
-function GeoGrids.plot_geo_cells(cellCenter::Array{<:Union{SimpleLatLon,AbstractVector,Tuple}}, type::Symbol=:hex; title="Cell Layout GEO Map", camera::Symbol=:twodim, kwargs_scatter=(;), kwargs_layout=(;))
+function GeoGrids.plot_geo_cells(cellCenter::Array{<:Union{SimpleLatLon,AbstractVector,Tuple}}, radius, type::Symbol=:hex; hex_direction=:pointy, title="Cell Layout GEO Map", camera::Symbol=:twodim, kwargs_scatter=(;), kwargs_layout=(;))
     # Markers for the points
-    scatterpoints = _get_scatter_cells(cellCenter, type; kwargs_scatter...)
+    scatterpoints = _get_scatter_cells(cellCenter, radius, type; hex_direction, kwargs_scatter...)
 
     if camera == :threedim
         projection = "orthographic"
