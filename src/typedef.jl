@@ -64,7 +64,9 @@ LatBeltRegion(; regionName::String="region_name", latLim) = LatBeltRegion(region
 
 ## Define Tessellation Types
 abstract type AbstractTiling end
-struct ICO <: AbstractTiling end
+@kwdef struct ICO <: AbstractTiling 
+    correction::Number = 6/5 # Default correction factor for the icosahedral cell grid partial overlap
+end
 @kwdef struct HEX <: AbstractTiling 
     direction::Symbol = :pointy
 end

@@ -48,9 +48,38 @@ function gen_hex_lattice(spacing, direction=:pointy, f::Function=identity; kwarg
     return map(x -> f.(x), lat)
 end
 
+"""
+    _adapted_icogrid
+
+The `_adapted_icogrid` function generates an icosahedral grid with a specified
+radius. It defines the separation angle for the icosahedral grid using a
+correction factor to adapt the cell centers' distances, ensuring the grid is
+appropriate for the desired scale.
+
+## Arguments
+- `radius::Number`: The radius used to define the separation angle for the \
+icosahedral grid. This radius helps determine the distance between the grid \
+points.
+
+## Keyword Arguments
+- `correctionFactor=1.2`: The correction factor used to adapt the cell centers' \
+distances to ensure the grid is appropriate for the desired scale.
+    
+## Returns
+- `grid`: The generated icosahedral grid based on the calculated separation \
+angle. The specific structure and format of the returned grid depend on the \
+`icogrid` function being used.
+"""
+function _adapted_icogrid(radius::Number; correctionFactor=6/5)
+    # Define the separation angle for the icosahedral grid in a similar way as for the hexagonal grid using a correction factor 1.2 to adapt the cell centers distances (from old MATLAB grid).
+    # The correction factor would be √3 if the original hex grid approach was used.
+    sepAng = radius * correctionFactor / constants.Re_mean |> rad2deg
+
+    return icogrid(; sepAng)
+end
 
 function gen_cell_layout(region::GlobalRegion, radius::Number, type::ICO)
-
+    return _adapted_icogrid(radius; correctionFactor=type.correction)
 end
 
 function gen_cell_layout(region::GlobalRegion, radius::Number, type::H3)
@@ -58,7 +87,9 @@ function gen_cell_layout(region::GlobalRegion, radius::Number, type::H3)
 end
 
 function gen_cell_layout(region::LatBeltRegion, radius::Number, type::ICO)
+    grid = _adapted_icogrid(radius; correctionFactor=type.correction)
 
+    return filter_points(grid, region)
 end
 
 function gen_cell_layout(region::LatBeltRegion, radius::Number, type::H3)
@@ -67,7 +98,7 @@ end
 
 function gen_cell_layout(region::GeoRegion, radius::Number, type::HEX; hex_direction::Symbol=:pointy, kwargs_lattice...)
     ## Find the domain center as seed for the cell grid layout.
-    domain = extract_countries(region)[1]; # The indicization is used to extract directly the Multi or PolyArea from the view
+    domain = extract_countries(region)[1] # The indicization is used to extract directly the Multi or PolyArea from the view
     centre = let
         c = if domain isa Multi
             idxMain = findmax(x -> length(vertices(x)), domain.geoms)[2] # Find the PolyArea with the most vertices. It is assumed also to be the largest one so the main area of that country to be considered for the centroid computation.
@@ -77,19 +108,19 @@ function gen_cell_layout(region::GeoRegion, radius::Number, type::HEX; hex_direc
         else
             error("Unrecognised type of GeoRegion domain...")
         end
-        (;x,y) = c.coords
+        (; x, y) = c.coords
         SVector(x |> ustrip, y |> ustrip) # SVector of lon-lat in deg
     end
-    
+
     ## Generate the lattice centered in 0,0.
-    spacing = radius*√3/constants.Re_mean # spacing (angular in rad) between lattice points, considering a sphere of radius equivalent to the Earth mean radius.
+    spacing = radius * √3 / constants.Re_mean # spacing (angular in rad) between lattice points, considering a sphere of radius equivalent to the Earth mean radius.
     lattice = gen_hex_lattice(spacing, hex_direction, rad2deg; kwargs_lattice...)
 
     ## Re-center the lattice around the seed point.
     new_lattice = map(lattice) do point
         new = point + centre # This SVector is still in the order lon-lat
-        lat,lon = _wrap_latlon(new[2], new[1])
-        SimpleLatLon(lat,lon)
+        lat, lon = _wrap_latlon(new[2], new[1])
+        SimpleLatLon(lat, lon)
     end
 
     return filter_points(new_lattice, region)
@@ -97,9 +128,9 @@ end
 
 function gen_cell_layout(region::GeoRegion, radius::Number, type::ICO)
     # sepAng = radius*√3/constants.Re_mean |> rad2deg # Define the separation angle for the icosahedral grid in a similar way as for the hexagonal grid.
-    sepAng = radius*1.2/constants.Re_mean |> rad2deg # Define the separation angle for the icosahedral grid in a similar way as for the hexagonal grid using a correction factor 1.2 to adapt the cell centers distances (from old MATLAB grid).
+    sepAng = radius * 1.2 / constants.Re_mean |> rad2deg # Define the separation angle for the icosahedral grid in a similar way as for the hexagonal grid using a correction factor 1.2 to adapt the cell centers distances (from old MATLAB grid).
 
-    grid = icogrid(;sepAng)
+    grid = icogrid(; sepAng)
 
     return filter_points(grid, region)
 end
@@ -124,7 +155,7 @@ function _wrap_latlon(lat, lon)
     # Normalize lat to the range [-180, 180)
     lat = rem(lat, 360, RoundNearest)
     lon = rem(lon, 360, RoundNearest)
-    
+
     # Wrap to the range [-90, 90] and make the longitude "jump"
     if lat > 90
         lat = 180 - lat
@@ -144,150 +175,3 @@ end
 
 
 
-
-
-
-
-
-
-
-# satAlt, minEl
-# function make_cells!(cellsInit; em::EllipsoidModel)    
-#     ellipsoid = get_ellipsoid(em)
-
-#     ## Earth-Space Geometry ----------------------------------------------------------------------------------
-#     ρ = asin(ellipsoid.a ./ (ellipsoid.a + cellsInit.satAlt)) # [rad]
-#     η = asin(cosd(cellsInit.minEl)*sin(ρ)) # [rad]
-#     λ = π/2 - η + deg2rad(cellsInit.minEl) # [rad]
-
-#     if cellsInit.maxLatCovered == 999
-#         if cellsInit.satIncl == 999
-#             error("Satellite orbital plane reference inclination or Max LAT to be covered must be specified.")
-#         else
-#             @warn("maxLatCovered is not specified. Automatically computed based on the other cellsInit paramenters.")
-#             cellsInit.maxLatCovered = cellsInit.satIncl + rad2deg(λ)
-#         end
-#     end
-
-#     # Find earth angle for scan cell at sizing elevation angle
-#     scanAng = asin(cosd(cellsInit.minEl)*sin(ρ)); # 5-56b [1]
-#     satAntBW = deg2rad(cellsInit.bwBoresightSat)/cos(scanAng); # 1.63 [2] [radians] 
-#     # Lambda@(scan+beamScan_radius) - Lambda@scanSizing = Earth_centralAngle for the cell
-#     # Half cone angle of the cell at Eart h centre
-#     cellEarthAng = (π/2 - acos(sin(scanAng+satAntBW/2)/sin(ρ)) - (scanAng+satAntBW/2)) - (π/2 - acos(sin(scanAng)/sin(ρ)) - (scanAng)) # 5-27 [1] [rad] take in consideration both antenna scan angle distortion and geometrical distortion
-#     # //COMMENT: (sphere_surface_area/spherical_cap_area), (4*pi*R^2)/(2*pi*R^2*(1-cos(central_angle))) [https://en.wikipedia.org/wiki/Spherical_cap] a correction factor of 1.2 is considered for cell overlap
-#     Ncells = 1.2 * 4π ./ (2π * (1 .- cos.(cellEarthAng))) # approximate number of cells required to cover the are of interest
-
-#     ## Generate cells Centres --------------------------------------------------------------------------------    
-#     if cellsInit.gridType == :leg   
-#         geoCoord = celldeploy_legacy(Ncells)    
-#     else
-#         geoCoord = sort(vec(fibonaccigrid(;N=Ncells)), by = x -> x[2]) # Sort cells positions by LAT  
-#     end
-
-#     cells = map(geoCoord) do p
-#         cell_lla = LLA(reverse(p)...) # Default altitude 0.0
-#         cell_ecef = get_ecef(cell_lla; ellipsoid) 
-#         Cell(position = CellPosition(cell_ecef, cell_lla))
-#     end	
-
-#     # Update cellsInit with the sinzing angles
-#     # cellsInit can be modified because passed by reference (because it is a mutable struct)
-#     cellsInit.satScanAng   = scanAng
-#     cellsInit.satAntBW     = satAntBW
-#     cellsInit.cellEarthAng = cellEarthAng
-
-#     return cells
-# end
-
-
-# function celldeploy_legacy(N)
-#     # //UGLY: improve code, avoid push!() 
-#     a = 4π*1^2/N # surface of a cell (spherical cap) on a unit sphere
-#     M_Theta = round(π/sqrt(a)) # how many circles are in pi (half circle), total number of circle from 90:-90 //NOTE: maybe you can use something different than sqrt(a) like 2*theta of the spherical cap
-#     # M_Theta looks like the squaring of the circle sqrt(a) is the edge of the equiarea square of that circle. So it is like to consider how many edge of the square you can accomodate in -90:90 [https://en.wikipedia.org/wiki/Squaring_the_circle]
-#     # d_theta and d_phi are basically the diameter of each cell, represented as the Earth central angle
-#     d_theta = π/M_Theta # represent 2*theta of the spherical cap
-#     d_phi = a/d_theta # ? it's equal to d_theta
-
-#     cellCoord = []
-#     for i = 0:M_Theta-1 # from 90 to -90 LAT
-#         Theta_ThisTheta = π*(i+0.5)/M_Theta # center of the m-th tier (theta angle from Earth center - spherical cap like) of circles (steps of LAT), you need to normalize on the total number of circle from 90:-90 (M_Theta)
-#         M_Phi = round(2π*sin(Theta_ThisTheta)/d_phi) # number of circles for this LAT tier (360, all the LON) - circonference/cell_diameter
-#         for j = 0:M_Phi-1
-#             Phi_ThisTheta = 2π*j/M_Phi # position of the centers (steps of LON)  
-#             # Wrap LON in -180:180
-#             Phi_ThisTheta > π ? temp_lon=Phi_ThisTheta-2π : temp_lon=Phi_ThisTheta    
-#             push!(cellCoord, SVector(temp_lon, π/2-Theta_ThisTheta)) # lon-lat
-#         end
-#     end
-
-#     return cellCoord
-# end
-
-
-
-
-
-# function plot_cells_geo(cellTuple...; N=1000, title="Cells Position GEO Map", camera::Symbol=:twodim)
-# 	# Check the number of Cells to be plotted, if to high plot only centers, otherwise also the contour
-# 	count = 0
-# 	for i ∈ eachindex(cellTuple)
-# 		count += length(cellTuple[i][1])
-# 	end
-
-# 	if count < N 
-# 		# //FIX: implement function similar to MATLAB scircle1
-# 	else
-# 		# Plot only markers for the cell centers
-# 		markers = []
-# 		for p ∈ eachindex(cellTuple)
-# 			push!(markers,
-# 				scattergeo(;
-# 					lat = map(x -> rad2deg(x.lat), cellTuple[p][1]),
-# 					lon = map(x -> rad2deg(x.lon), cellTuple[p][1]),
-# 					mode = "markers",
-# 					marker_size = 5,
-# 					marker_color = cellTuple[p][2]			
-# 				)
-# 			)
-# 		end
-# 	end
-
-# 	if camera == :threedim
-# 		projection = "orthographic"
-# 	else
-# 		projection = "natural earth"
-# 	end
-
-# 	# Create the geo layout
-# 	layout = Layout(
-# 		geo =  attr(
-# 			projection =  attr(
-# 			type =  "robinson",
-# 			),
-# 			showocean =  true,
-# 			# oceancolor =  "rgb(0, 255, 255)",
-# 			oceancolor =  "rgb(255, 255, 255)",
-# 			showland =  true,
-# 			# landcolor =  "rgb(230, 145, 56)",
-# 			landcolor =  "rgb(217, 217, 217)",
-# 			showlakes =  true,
-# 			# lakecolor =  "rgb(0, 255, 255)",
-# 			lakecolor =  "rgb(255, 255, 255)",
-# 			showcountries =  true,
-# 			lonaxis =  attr(
-# 				showgrid =  true,
-# 				gridcolor =  "rgb(102, 102, 102)"
-# 			),
-# 			lataxis =  attr(
-# 				showgrid =  true,
-# 				gridcolor =  "rgb(102, 102, 102)"
-# 			)
-# 		),
-# 		title = title;
-# 		geo_projection_type = projection
-# 	)
-
-# 	plotly_plot([markers...],layout)
-# end
