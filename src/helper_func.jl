@@ -132,3 +132,22 @@ function _gen_circle(center::SimpleLatLon, r::Number, n::Int=100)
 
     return _gen_circle(cx, cy, r, rad2deg, n)
 end
+
+function _wrap_latlon(lat, lon)
+    # Normalize lat to the range [-180, 180)
+    lat = rem(lat, 360, RoundNearest)
+    lon = rem(lon, 360, RoundNearest)
+
+    # Wrap to the range [-90, 90] and make the longitude "jump"
+    if lat > 90
+        lat = 180 - lat
+        lon = lon + 180
+        lon = rem(lon, 360, RoundNearest)
+    elseif lat < -90
+        lat = -180 - lat
+        lon = lon + 180
+        lon = rem(lon, 360, RoundNearest)
+    end
+
+    return lat, lon
+end

@@ -86,12 +86,6 @@ function gen_cell_layout(region::GlobalRegion, radius::Number, type::H3)
     error("H3 tassellation is not yet implemented in this version...")
 end
 
-function gen_cell_layout(region::LatBeltRegion, radius::Number, type::ICO)
-    grid = _adapted_icogrid(radius; correctionFactor=type.correction)
-
-    return filter_points(grid, region)
-end
-
 function gen_cell_layout(region::LatBeltRegion, radius::Number, type::H3)
     error("H3 tassellation is not yet implemented in this version...")
 end
@@ -126,52 +120,36 @@ function gen_cell_layout(region::GeoRegion, radius::Number, type::HEX; hex_direc
     return filter_points(new_lattice, region)
 end
 
-function gen_cell_layout(region::GeoRegion, radius::Number, type::ICO)
-    # sepAng = radius*√3/constants.Re_mean |> rad2deg # Define the separation angle for the icosahedral grid in a similar way as for the hexagonal grid.
-    sepAng = radius * 1.2 / constants.Re_mean |> rad2deg # Define the separation angle for the icosahedral grid in a similar way as for the hexagonal grid using a correction factor 1.2 to adapt the cell centers distances (from old MATLAB grid).
-
-    grid = icogrid(; sepAng)
-
-    return filter_points(grid, region)
-end
-
 function gen_cell_layout(region::GeoRegion, radius::Number, type::H3)
     error("H3 tassellation is not yet implemented in this version...")
 end
 
 function gen_cell_layout(region::PolyRegion, radius::Number, type::HEX)
+    ## Find the domain center as seed for the cell grid layout.
+    centre = centroid(region.domain)
+    (; x, y) = centre.coords
+    SVector(x |> ustrip, y |> ustrip) # SVector of lon-lat in deg
 
+    ## Generate the lattice centered in 0,0.
+    spacing = radius * √3 / constants.Re_mean # spacing (angular in rad) between lattice points, considering a sphere of radius equivalent to the Earth mean radius.
+    lattice = gen_hex_lattice(spacing, hex_direction, rad2deg; kwargs_lattice...)
+
+    ## Re-center the lattice around the seed point.
+    new_lattice = map(lattice) do point
+        new = point + centre # This SVector is still in the order lon-lat
+        lat, lon = _wrap_latlon(new[2], new[1])
+        SimpleLatLon(lat, lon)
+    end
+
+    return filter_points(new_lattice, region)
 end
 
-function gen_cell_layout(region::PolyRegion, radius::Number, type::ICO)
+function gen_cell_layout(region::Union{LatBeltRegion, GeoRegion, PolyRegion}, radius::Number, type::ICO)
+    grid = _adapted_icogrid(radius; correctionFactor=type.correction)
 
+    return filter_points(grid, region)
 end
 
 function gen_cell_layout(region::PolyRegion, radius::Number, type::H3)
     error("H3 tassellation is not yet implemented in this version...")
 end
-
-function _wrap_latlon(lat, lon)
-    # Normalize lat to the range [-180, 180)
-    lat = rem(lat, 360, RoundNearest)
-    lon = rem(lon, 360, RoundNearest)
-
-    # Wrap to the range [-90, 90] and make the longitude "jump"
-    if lat > 90
-        lat = 180 - lat
-        lon = lon + 180
-        lon = rem(lon, 360, RoundNearest)
-    elseif lat < -90
-        lat = -180 - lat
-        lon = lon + 180
-        lon = rem(lon, 360, RoundNearest)
-    end
-
-    return lat, lon
-end
-
-
-
-
-
-
