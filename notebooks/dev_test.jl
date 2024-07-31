@@ -40,6 +40,19 @@ md"""
 # Test Tessellation
 """
 
+# ╔═╡ df161e7c-b8af-4934-99b7-54570f2b4fae
+md"""
+## HEX
+"""
+
+# ╔═╡ 083cd3e2-2034-4adb-8545-018a167dd964
+
+
+# ╔═╡ 65025a77-8d99-4867-adc9-83d960273e1b
+md"""
+## ICO
+"""
+
 # ╔═╡ 2f6c6420-ffb5-4bb6-b757-1ce852c35e78
 md"""
 ## Local grid on Earth
@@ -144,19 +157,58 @@ let
 	plot_geo_points(dd)
 end
 
-# ╔═╡ 6c74f37c-56a6-4d2c-ab92-25cac0a3c648
-_gen_hex_vertices(SimpleLatLon(0,0), 1000)
-
 # ╔═╡ e0b2c99d-c689-48fb-91d5-6a3b4ee4d044
 let 
 	reg = GeoRegion(; regionName="Tassellation", admin="Switzerland")
 	dd = gen_cell_layout(reg, 20000, HEX())
 	    
-	plot_geo_cells(dd, 20000)
+	plot_geo_cells(dd, 20000, :circ)
 end
 
-# ╔═╡ 2d90e567-c76c-48c5-a2a3-7ae189ce49eb
-methods(_gen_hex_vertices)
+# ╔═╡ f807f42f-a867-492a-b5e4-b1a1e52066d3
+c=extract_countries("Spain")
+
+# ╔═╡ f9db7d93-056d-48e4-9f43-aa65227b9309
+c[1]
+
+# ╔═╡ 2b7813bf-bf1f-4ec7-bd69-cbae8ca79446
+poly=PolyArea((0,0),(1,1),(2,2))
+
+# ╔═╡ c5f2b0eb-c8ef-4702-9630-361bddeb5caf
+Meshes.convexhull(poly)
+
+# ╔═╡ d5e03a2e-1a3c-4bce-b889-87f74282f555
+v = vertices(c[1])
+
+# ╔═╡ 54032d42-a961-49e0-8772-d9cdb59ddc89
+length(v)
+
+# ╔═╡ 4aded9e3-8324-471e-9de5-edb4e19962a8
+let 
+	reg = GeoRegion(; regionName="Tassellation", admin="Switzerland")
+	dd = gen_cell_layout(reg, 20000, ICO())
+	
+	plot_geo_points(dd)
+end
+
+# ╔═╡ 9b6c95c7-7fb3-44ec-805c-7318c2e53eb5
+let 
+	reg = GeoRegion(; regionName="Tassellation", admin="Spain")
+	dd = gen_cell_layout(reg, 20000, ICO())
+	    
+	plot_geo_cells(dd, 20000, :circ)
+end
+
+# ╔═╡ 474da875-6a71-4216-9a10-69d1e0e00576
+let 
+	radius = 20000
+	
+	reg = GeoRegion(; regionName="Tassellation", admin="Switzerland")
+	
+	dd = gen_cell_layout(reg, radius, ICO())
+	    
+	plot_geo_cells(dd, radius, :circ)
+end
 
 # ╔═╡ 69ff22ae-93ac-466d-ba16-5a2521e1729e
 begin
@@ -651,10 +703,20 @@ version = "17.4.0+2"
 # ╠═75264458-e8a8-4186-809b-0fd97a22b9d2
 # ╠═d529382c-3174-45b5-9eda-dfe114108b98
 # ╟─222fb774-1693-4b3c-b2ef-5fd38eca773c
+# ╟─df161e7c-b8af-4934-99b7-54570f2b4fae
+# ╠═083cd3e2-2034-4adb-8545-018a167dd964
 # ╠═d05078cc-f277-492e-85a6-aab35f38f2f4
-# ╠═6c74f37c-56a6-4d2c-ab92-25cac0a3c648
 # ╠═e0b2c99d-c689-48fb-91d5-6a3b4ee4d044
-# ╠═2d90e567-c76c-48c5-a2a3-7ae189ce49eb
+# ╟─65025a77-8d99-4867-adc9-83d960273e1b
+# ╠═f9db7d93-056d-48e4-9f43-aa65227b9309
+# ╠═f807f42f-a867-492a-b5e4-b1a1e52066d3
+# ╠═2b7813bf-bf1f-4ec7-bd69-cbae8ca79446
+# ╠═c5f2b0eb-c8ef-4702-9630-361bddeb5caf
+# ╠═d5e03a2e-1a3c-4bce-b889-87f74282f555
+# ╠═54032d42-a961-49e0-8772-d9cdb59ddc89
+# ╠═4aded9e3-8324-471e-9de5-edb4e19962a8
+# ╠═9b6c95c7-7fb3-44ec-805c-7318c2e53eb5
+# ╠═474da875-6a71-4216-9a10-69d1e0e00576
 # ╟─2f6c6420-ffb5-4bb6-b757-1ce852c35e78
 # ╟─833103c3-9d4c-4c78-b83f-49e0c6b16104
 # ╠═ea40cb99-2bf1-4225-84fe-e8aee4f7863a

@@ -141,14 +141,20 @@ function GeoGrids.plot_geo_points(points::Array{<:Union{SimpleLatLon,AbstractVec
     plotly_plot([scatterpoints], layout)
 end
 
-function _get_scatter_cells(cellCenter::Array{<:Union{SimpleLatLon,AbstractVector,Tuple}}, radius::Number, type::Symbol=:hex; hex_direction::Symbol=:pointy, kwargs...)
+function _get_scatter_cells(cellCenter::Array{<:Union{SimpleLatLon,AbstractVector,Tuple}}, radius::Number, type::Symbol=:hex; hex_direction::Symbol=:pointy, circ_res=100,kwargs...)
     cellCenter = map(x -> GeoGrids._cast_geopoint(x), cellCenter[:]) # Convert in a vector of SimpleLatLon
     x_plot = [] # deg
 	y_plot = [] # deg
 	for c in cellCenter
-		hex = GeoGrids._gen_hex_vertices(c, radius, hex_direction)
-		push!(x_plot, [first.(hex)..., NaN]...)
-		push!(y_plot, [last.(hex)..., NaN]...)
+        points = if type == :hex
+            GeoGrids._gen_hex_vertices(c, radius, hex_direction)
+        elseif type == :circ
+            GeoGrids._gen_circle(c, radius, circ_res)
+        else
+            error("Unrecognised type for cell shape, only :hex or :circ are supported...")
+        end
+		push!(x_plot, [first.(points)..., NaN]...)
+		push!(y_plot, [last.(points)..., NaN]...)
 	end
 	
     # Markers for the points
