@@ -1,5 +1,5 @@
 # Basic generator for regular lattice
-function _generate_regular_lattice(dx::T, dy, ds; x0=zero(T), y0=zero(T), M::Int=70, N::Int=M) where {T}
+function _gen_regular_lattice(dx::T, dy, ds; x0=zero(T), y0=zero(T), M::Int=70, N::Int=M) where {T}
     # Function to generate x position as function of row,column number m,n
     x(m, n) = m * dx + n * ds + x0
     # Function to generate y position as function of row,column number m,n
@@ -12,7 +12,7 @@ end
 
 # Hex Lattice
 """
-	_generate_hex_lattice(spacing, direction = :pointy; kwargs...)
+	_gen_hex_lattice(spacing, direction = :pointy; kwargs...)
 Generate a hexagonal lattice of points with equal distance `spacing` between neighboring points.
 
 The generated hexagonal lattice will have distance between points on the same
@@ -32,7 +32,7 @@ will have a distance equivalent to `√3 * spacing`.
 - `direction`: specifies the direction of minimum distance between neighboring\
 points. Defaults to `:pointy`.
 """
-function _generate_hex_lattice(spacing, direction=:pointy; kwargs...)
+function _gen_hex_lattice(spacing, direction=:pointy; kwargs...)
     coeffs = if direction === :pointy # Hexagon orientation with the pointy side up
         1.0, √3 / 2, 0.5
     elseif direction === :flat # Hexagon orientation with the flat side up
@@ -43,13 +43,13 @@ function _generate_hex_lattice(spacing, direction=:pointy; kwargs...)
 
     dx, dy, ds = spacing .* coeffs
 
-    return _generate_regular_lattice(dx, dy, ds; kwargs...)
+    return _gen_regular_lattice(dx, dy, ds; kwargs...)
 end
 
 """
-    _generate_hex_vertices(cx::Number, cy::Number, r::Number, direction::Symbol=:pointy) -> Vector{Number}
+    _gen_hex_vertices(cx::Number, cy::Number, r::Number, direction::Symbol=:pointy) -> Vector{Number}
 
-The `_generate_hex_vertices` function generates the vertices of a hexagon
+The `_gen_hex_vertices` function generates the vertices of a hexagon
 centered at a given point `(cx, cy)` with a specified radius `r`. The function
 allows for two orientations of the hexagon: "pointy" (vertex pointing upwards)
 or "flat" (edge pointing upwards).
@@ -69,7 +69,7 @@ tuple represents the `(x, y)` coordinates of a vertex of the hexagon. The \
 vector contains 7 tuples, with the last vertex being the same as the first to \
 close the hexagon.
 """
-function _generate_hex_vertices(cx::Number, cy::Number, r::Number, direction::Symbol=:pointy)
+function _gen_hex_vertices(cx::Number, cy::Number, r::Number, direction::Symbol=:pointy)
     vertices = if direction === :pointy
         [(cx + r * sin(2π * i / 6), cy + r * cos(2π * i / 6)) for i in 0:6]
     else
@@ -83,9 +83,9 @@ end
 
 # - Add multiple dispatch for different types of grid ICO, HEX, H3
 # - Add multiple dispatch for different types of Regions
-function generate_cell_layout(initLayout::TilingInit; hex_direction=:pointy)
+function gen_cell_layout(initLayout::TilingInit; hex_direction=:pointy)
     (; radius, type, region) = initLayout
-    # Una volta capito lon=x lat=y e’ ok alla fine
+    # For SimpleLatLon consider that lon=x and lat=y (it's importand for the operations with 2D points/vec)
     centre = if region isa GeoRegion
         dmn = extract_countries(region)[1] # The indicization is used to extract directly the Multi or PolyArea from the view
         c = if dmn isa Multi
@@ -94,11 +94,12 @@ function generate_cell_layout(initLayout::TilingInit; hex_direction=:pointy)
         elseif dmn isa PolyArea
             centroid(dmn)
         else
-            error("Unrecognised type of GeoRegion domain")
+            error("Unrecognised type of GeoRegion domain...")
         end
     elseif region isa PolyRegion
         centroid(region.domain)
     elseif region isa GlobalRegion
+
     end    
 
     d = first(dmn)
@@ -106,7 +107,7 @@ function generate_cell_layout(initLayout::TilingInit; hex_direction=:pointy)
     
     # Create grid layout
     if initLayout.type == :HEX
-        return _generate_hex_lattice(initLayout.radius, hex_direction)
+        return _gen_hex_lattice(initLayout.radius, hex_direction)
     elseif initLayout.type == :ICO
 
     else
@@ -114,6 +115,18 @@ function generate_cell_layout(initLayout::TilingInit; hex_direction=:pointy)
     end
 
 end
+
+function _gen_cell_layout(region::GlobalRegion; hex_direction=:pointy)
+
+
+end
+
+    GlobalRegion
+    GeoRegion
+    PolyRegion
+    LatBeltRegion
+
+
 
 
 

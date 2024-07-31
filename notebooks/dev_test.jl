@@ -60,6 +60,47 @@ begin
 	θ = linearSpacing/Re # equivalent angular spacing [rad]
 end
 
+# ╔═╡ 69ff22ae-93ac-466d-ba16-5a2521e1729e
+begin
+	# 2. Define the lattice in u,v (linear)
+	# Now that we have the theta wrt a source in the center of the sphere, we retrieve u,v coord then the linear distance in uv which will be the actual spacing of our lattice.
+	# Since we can consider a generic ϕ, we'll use ϕ=0 such that we end up with the only u component, which will also corresponds to the spacing.
+	sp = sin(θ)
+	lat = _gen_hex_lattice(sp;M=3)
+end
+
+# ╔═╡ a6e2e847-9ce9-4080-8965-f128ca84c1ad
+let
+	plot(
+		scatter(;
+			x=map(x->first(x), lat[:]),
+			y=map(x->last(x), lat[:]),
+			mode="markers",
+		)
+	)
+end
+
+# ╔═╡ b95d1de2-9cdc-4d01-b105-2d59e1643864
+let
+	x = []
+	y = []
+	for c in lat
+		hex = _gen_hex_vertices(first(c), last(c), Rc/Re, :pointy)
+		push!(x, first.(hex)...)
+		push!(x, NaN)
+		push!(y, last.(hex)...)
+		push!(y, NaN)
+	end
+	
+	plot(
+		scatter(;
+			x=x,
+			y=y,
+		 	mode="lines",
+        )
+	)	
+end
+
 # ╔═╡ b94c71b6-0601-4a4c-ac92-417f0c372334
 md"""
 # Packages
@@ -148,47 +189,6 @@ TilingInit(12, :ICO, GlobalRegion())
 
 # ╔═╡ aa980a61-139b-4a46-a04c-4ce8552a2766
 TilingInit(radius=12, type=:ICO)
-
-# ╔═╡ 69ff22ae-93ac-466d-ba16-5a2521e1729e
-begin
-	# 2. Define the lattice in u,v (linear)
-	# Now that we have the theta wrt a source in the center of the sphere, we retrieve u,v coord then the linear distance in uv which will be the actual spacing of our lattice.
-	# Since we can consider a generic ϕ, we'll use ϕ=0 such that we end up with the only u component, which will also corresponds to the spacing.
-	sp = sin(θ)
-	lat = _generate_hex_lattice(sp;M=3)
-end
-
-# ╔═╡ a6e2e847-9ce9-4080-8965-f128ca84c1ad
-let
-	plot(
-		scatter(;
-			x=map(x->first(x), lat[:]),
-			y=map(x->last(x), lat[:]),
-			mode="markers",
-		)
-	)
-end
-
-# ╔═╡ b95d1de2-9cdc-4d01-b105-2d59e1643864
-let
-	x = []
-	y = []
-	for c in lat
-		hex = _generate_hex_vertices(first(c), last(c), Rc/Re, :pointy)
-		push!(x, first.(hex)...)
-		push!(x, NaN)
-		push!(y, last.(hex)...)
-		push!(y, NaN)
-	end
-	
-	plot(
-		scatter(;
-			x=x,
-			y=y,
-		 	mode="lines",
-        )
-	)	
-end
 
 # ╔═╡ 00000000-0000-0000-0000-000000000001
 PLUTO_PROJECT_TOML_CONTENTS = """

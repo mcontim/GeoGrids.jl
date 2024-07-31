@@ -63,6 +63,11 @@ end
 LatBeltRegion(; regionName::String="region_name", latLim) = LatBeltRegion(regionName, latLim)
 
 ## Define Tessellation Types
+abstract type AbstractTiling end
+struct ICO <: AbstractTiling end
+struct HEX <: AbstractTiling end
+struct H3 <: AbstractTiling end
+
 mutable struct TilingInit
     "Radius of the single element (cell)"
     radius::Number  

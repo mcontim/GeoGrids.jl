@@ -146,7 +146,7 @@ function _get_scatter_cells(cellCenter::Array{<:Union{SimpleLatLon,AbstractVecto
     x = []
 	y = []
 	for c in cellCenter
-		hex = _generate_hex_vertices(first(c), last(c), Rc/Re, :pointy)
+		hex = _gen_hex_vertices(first(c), last(c), Rc/Re, :pointy)
 		push!(x, [first.(hex)..., NaN]...)
 		push!(y, [last.(hex)..., NaN]...)
 	end
