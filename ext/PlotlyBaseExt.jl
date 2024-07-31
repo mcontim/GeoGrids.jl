@@ -143,24 +143,20 @@ end
 
 function _get_scatter_cells(cellCenter::Array{<:Union{SimpleLatLon,AbstractVector,Tuple}}, radius::Number, type::Symbol=:hex; hex_direction::Symbol=:pointy, kwargs...)
     cellCenter = map(x -> GeoGrids._cast_geopoint(x), cellCenter[:]) # Convert in a vector of SimpleLatLon
-
     x_plot = [] # deg
 	y_plot = [] # deg
 	for c in cellCenter
-        x = c.lon |> ustrip |> deg2rad
-        y = c.lat |> ustrip |> deg2rad
-		hex = _gen_hex_vertices(x, y, radius/constants.Re_mean, hex_direction, rad2deg)
+		hex = GeoGrids._gen_hex_vertices(c, radius, hex_direction)
 		push!(x_plot, [first.(hex)..., NaN]...)
 		push!(y_plot, [last.(hex)..., NaN]...)
 	end
 	
     # Markers for the points
-    vec_p = map(x -> GeoGrids._cast_geopoint(x), points[:]) # Convert in a vector of SimpleLatLon
     scatterpoints = scattergeo(
         lat = y_plot, # Vectorize such to be sure to avoid matrices.
         lon = x_plot, # Vectorize such to be sure to avoid matrices.
         mode = "lines",
-        marker_size = 5,
+        marker_size = 1,
         kwargs...
     )
 

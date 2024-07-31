@@ -139,21 +139,24 @@ typeof(ustrip(deg2rad(SimpleLatLon(deg2rad(-70)*rad, deg2rad(11)*rad).lat)))
 
 # ╔═╡ d05078cc-f277-492e-85a6-aab35f38f2f4
 let 
-	reg = GeoRegion(; regionName="Tassellation", admin="Spain")
-	dd = _gen_cell_layout(reg, 100000, HEX())
+	reg = GeoRegion(; regionName="Tassellation", admin="Switzerland")
+	dd = _gen_cell_layout(reg, 20000, HEX())
 	plot_geo_points(dd)
 end
 
-# ╔═╡ d83ce3fa-1a72-429a-a5af-30d22261ad1f
-SimpleLatLon(1,2).lat
+# ╔═╡ 6c74f37c-56a6-4d2c-ab92-25cac0a3c648
+_gen_hex_vertices(SimpleLatLon(0,0), 1000)
 
 # ╔═╡ e0b2c99d-c689-48fb-91d5-6a3b4ee4d044
 let 
-	reg = GeoRegion(; regionName="Tassellation", admin="Spain")
-	dd = _gen_cell_layout(reg, 100000, HEX())
-	
-	plot_geo_cells(dd, 100000)
+	reg = GeoRegion(; regionName="Tassellation", admin="Switzerland")
+	dd = _gen_cell_layout(reg, 20000, HEX())
+	    
+	plot_geo_cells(dd, 20000)
 end
+
+# ╔═╡ 2d90e567-c76c-48c5-a2a3-7ae189ce49eb
+methods(_gen_hex_vertices)
 
 # ╔═╡ 69ff22ae-93ac-466d-ba16-5a2521e1729e
 begin
@@ -649,8 +652,9 @@ version = "17.4.0+2"
 # ╠═d529382c-3174-45b5-9eda-dfe114108b98
 # ╟─222fb774-1693-4b3c-b2ef-5fd38eca773c
 # ╠═d05078cc-f277-492e-85a6-aab35f38f2f4
-# ╠═d83ce3fa-1a72-429a-a5af-30d22261ad1f
+# ╠═6c74f37c-56a6-4d2c-ab92-25cac0a3c648
 # ╠═e0b2c99d-c689-48fb-91d5-6a3b4ee4d044
+# ╠═2d90e567-c76c-48c5-a2a3-7ae189ce49eb
 # ╟─2f6c6420-ffb5-4bb6-b757-1ce852c35e78
 # ╟─833103c3-9d4c-4c78-b83f-49e0c6b16104
 # ╠═ea40cb99-2bf1-4225-84fe-e8aee4f7863a

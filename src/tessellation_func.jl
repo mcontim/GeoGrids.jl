@@ -1,5 +1,5 @@
 # Basic generator for regular lattice
-function _gen_regular_lattice(dx::T, dy, ds; x0=zero(T), y0=zero(T), M::Int=70, N::Int=M) where {T}
+function _gen_regular_lattice(dx::T, dy, ds; x0=zero(T), y0=zero(T), M::Int=100, N::Int=M) where {T}
     # Function to generate x position as function of row,column number m,n
     x(m, n) = m * dx + n * ds + x0
     # Function to generate y position as function of row,column number m,n
@@ -81,7 +81,21 @@ function _gen_hex_vertices(cx::Number, cy::Number, r::Number, direction::Symbol=
     return map(x -> f.(x), vertices)
 end
 
+function _gen_hex_vertices(center::SimpleLatLon, r::Number, direction::Symbol=:pointy)
+    # Radius in meters.
+    # The output is a Vector of values in deg for the sake of simplicity of the plotting.
+    cx = center.lon |> ustrip |> deg2rad
+    cy = center.lat |> ustrip |> deg2rad
+    r = r/constants.Re_mean
+    
+    vertices = if direction === :pointy
+        [(cx + r * sin(2π * i / 6), cy + r * cos(2π * i / 6)) for i in 0:6]
+    else
+        [(cx + r * cos(2π * i / 6), cy + r * sin(2π * i / 6)) for i in 0:6]
+    end
 
+    return map(x -> rad2deg.(x), vertices)
+end
 
 # - Add multiple dispatch for different types of grid ICO, HEX, H3
 # - Add multiple dispatch for different types of Regions
@@ -165,6 +179,8 @@ function _gen_cell_layout(region::GeoRegion, radius::Number, type::HEX; hex_dire
 end
 
 function _gen_cell_layout(region::GeoRegion, radius::Number, type::ICO)
+    # Define the separation angle for the icosahedral grid in a similar way as for the hexagonal grid.
+    sepAng = radius*√3/constants.Re_mean # spacing (angular in rad) between lattice points, considering a sphere of radius equivalent to the Earth mean radius.
 
 end
 
