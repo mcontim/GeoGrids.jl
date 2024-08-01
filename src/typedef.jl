@@ -74,4 +74,6 @@ struct H3 <: AbstractTiling end
 
 const constants = (
     Re_mean = 6371e3, # Mean Earth Radius [m]
+    a = 6378137, # [m] WGS84 semi-major axis
+    b = 6356752.315 # [m] WGS84 semi-minor axis
 )

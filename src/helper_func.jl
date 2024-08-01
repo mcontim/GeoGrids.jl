@@ -66,8 +66,8 @@ function CountriesBorders.extract_countries(r::GeoRegion)
 end
 
 """
-    _gen_hex_vertices(cx::Number, cy::Number, r::Number, direction::Symbol=:pointy) -> Vector{Number}
-    _gen_hex_vertices(center::SimpleLatLon, r::Number, direction::Symbol=:pointy) -> Vector{Number}
+    _gen_hex_vertices(cx::Number, cy::Number, r::Number; direction::Symbol=:pointy, f::Function=identity)
+    _gen_hex_vertices(center::SimpleLatLon, r::Number; earth_local_radius = constants.Re_mean, direction::Symbol=:pointy)    
 
 The `_gen_hex_vertices` function generates the vertices of a hexagon
 centered at a given point `(cx, cy)` with a specified radius `r`. The function
@@ -92,7 +92,7 @@ vector contains 7 tuples, with the last vertex being the same as the first to \
 close the hexagon. When `SimpleLatLon` is given as input the output vector \
 contains `Number` representing lon=x and lat=y in deg (useful for geoscatter plotting). 
 """
-function _gen_hex_vertices(cx::Number, cy::Number, r::Number, direction::Symbol=:pointy, f::Function=identity)
+function _gen_hex_vertices(cx::Number, cy::Number, r::Number; direction::Symbol=:pointy, f::Function=identity)
     vertices = if direction === :pointy
         [(cx + r * sin(2π * i / 6), cy + r * cos(2π * i / 6)) for i in 0:6]
     else
@@ -102,14 +102,14 @@ function _gen_hex_vertices(cx::Number, cy::Number, r::Number, direction::Symbol=
     return map(x -> f.(x), vertices)
 end
 
-function _gen_hex_vertices(center::SimpleLatLon, r::Number, direction::Symbol=:pointy)
+function _gen_hex_vertices(center::SimpleLatLon, r::Number; earth_local_radius = constants.Re_mean, direction::Symbol=:pointy)
     # Radius in meters.
     # The output is a Vector of values in deg for the sake of simplicity of the plotting.
     cx = center.lon |> ustrip |> deg2rad
     cy = center.lat |> ustrip |> deg2rad
-    r = r / constants.Re_mean
+    r = r / earth_local_radius
 
-    return _gen_hex_vertices(cx, cy, r, direction, rad2deg)
+    return _gen_hex_vertices(cx, cy, r; direction=direction, f=rad2deg)
 end
 
 """
@@ -136,7 +136,7 @@ value is 100.
 - `Array`: An array of points `(x, y)` on the circle, after applying the \
 function `f` to each point.
 """
-function _gen_circle(cx::Number, cy::Number, r::Number, f::Function=identity, n::Int=100)
+function _gen_circle(cx::Number, cy::Number, r::Number; f::Function=identity, n::Int=100)
     # Calculate the angle step
     angle = 0:2π/n:2π
 
@@ -147,14 +147,14 @@ function _gen_circle(cx::Number, cy::Number, r::Number, f::Function=identity, n:
     return map(x -> f.(x), circle_points)
 end
 
-function _gen_circle(center::SimpleLatLon, r::Number, n::Int=100)
+function _gen_circle(center::SimpleLatLon, r::Number; earth_local_radius = constants.Re_mean, n::Int=100)
     # Radius in meters.
     # The output is a Vector of values in deg for the sake of simplicity of the plotting.
     cx = center.lon |> ustrip |> deg2rad
     cy = center.lat |> ustrip |> deg2rad
-    r = r / constants.Re_mean
+    r = r / earth_local_radius
 
-    return _gen_circle(cx, cy, r, rad2deg, n)
+    return _gen_circle(cx, cy, r; f=rad2deg, n=n)
 end
 
 """
@@ -191,4 +191,18 @@ function _wrap_latlon(lat::Number, lon::Number)
     end
 
     return lat, lon
+end
+
+function _get_local_radius(lat::Number, lon::Number, alt::Number)
+    sΦ, cΦ = sincos(deg2rad(lat))
+    sλ, cλ = sincos(deg2rad(lon))
+
+    e = (constants.a^2 - constants.b^2) / constants.a^2
+    N = constants.a / sqrt(1 - e^2 * sind(lon)^2) # N(lon)
+
+    x = (N + alt) * cΦ * cλ
+    y = (N + alt) * cΦ * sλ
+    z = (N * (1 - e^2) + alt) * sΦ
+    
+    return sqrt(x^2 + y^2 + z^2)
 end

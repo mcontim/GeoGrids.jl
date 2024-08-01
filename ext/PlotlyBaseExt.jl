@@ -147,9 +147,9 @@ function _get_scatter_cells(cellCenter::Array{<:Union{SimpleLatLon,AbstractVecto
 	y_plot = [] # deg
 	for c in cellCenter
         points = if type == :hex
-            GeoGrids._gen_hex_vertices(c, radius, hex_direction)
+            GeoGrids._gen_hex_vertices(c, radius; direction=hex_direction)
         elseif type == :circ
-            GeoGrids._gen_circle(c, radius, circ_res)
+            GeoGrids._gen_circle(c, radius; n=circ_res)
         else
             error("Unrecognised type for cell shape, only :hex or :circ are supported...")
         end

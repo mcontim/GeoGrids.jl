@@ -93,10 +93,10 @@ distances to ensure the grid is appropriate for the desired scale.
 angle. The specific structure and format of the returned grid depend on the \
 `icogrid` function being used.
 """
-function _adapted_icogrid(radius::Number; correctionFactor=6/5)
+function _adapted_icogrid(radius::Number; earth_local_radius=constants.Re_mean, correctionFactor=6/5)
     # Define the separation angle for the icosahedral grid in a similar way as for the hexagonal grid using a correction factor 1.2 to adapt the cell centers distances (from old MATLAB grid).
     # The correction factor would be √3 if the original hex grid approach was used.
-    sepAng = radius * correctionFactor / constants.Re_mean |> rad2deg
+    sepAng = radius * correctionFactor / earth_local_radius |> rad2deg
 
     return icogrid(; sepAng)
 end
@@ -142,7 +142,8 @@ function gen_cell_layout(region::GeoRegion, radius::Number, type::HEX; kwargs_la
     end
 
     ## Generate the lattice centered in 0,0.
-    spacing = radius * √3 / constants.Re_mean # spacing (angular in rad) between lattice points, considering a sphere of radius equivalent to the Earth mean radius.
+    Re_local = _get_local_radius(centre[2], centre[1], 0.0)
+    spacing = radius * √3 / Re_local # spacing (angular in rad) between lattice points, considering a sphere of radius equivalent to the Earth mean radius.
     lattice = gen_hex_lattice(spacing, type.direction, rad2deg; kwargs_lattice...)
 
     ## Re-center the lattice around the seed point.
@@ -162,7 +163,8 @@ function gen_cell_layout(region::PolyRegion, radius::Number, type::HEX; kwargs_l
     SVector(x |> ustrip, y |> ustrip) # SVector of lon-lat in deg
 
     ## Generate the lattice centered in 0,0.
-    spacing = radius * √3 / constants.Re_mean # spacing (angular in rad) between lattice points, considering a sphere of radius equivalent to the Earth mean radius.
+    Re_local = _get_local_radius(centre[2], centre[1], 0.0)
+    spacing = radius * √3 / Re_local # spacing (angular in rad) between lattice points, considering a sphere of radius equivalent to the Earth mean radius.
     lattice = gen_hex_lattice(spacing, type.direction, rad2deg; kwargs_lattice...)
 
     ## Re-center the lattice around the seed point.
