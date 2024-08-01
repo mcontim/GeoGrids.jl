@@ -196,13 +196,14 @@ end
 function _get_local_radius(lat::Number, lon::Number, alt::Number)
     sΦ, cΦ = sincos(deg2rad(lat))
     sλ, cλ = sincos(deg2rad(lon))
-
-    e = (constants.a^2 - constants.b^2) / constants.a^2
-    N = constants.a / sqrt(1 - e^2 * sind(lon)^2) # N(lon)
+    
+    f = (constants.a - constants.b) / constants.a
+    e² = 2f - f^2
+    N = constants.a / sqrt(1 - e² * sλ^2) # N(lon)
 
     x = (N + alt) * cΦ * cλ
     y = (N + alt) * cΦ * sλ
-    z = (N * (1 - e^2) + alt) * sΦ
-    
+    z = (N * (1 - e²) + alt) * sΦ
+
     return sqrt(x^2 + y^2 + z^2)
 end
