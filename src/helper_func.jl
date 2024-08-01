@@ -107,11 +107,35 @@ function _gen_hex_vertices(center::SimpleLatLon, r::Number, direction::Symbol=:p
     # The output is a Vector of values in deg for the sake of simplicity of the plotting.
     cx = center.lon |> ustrip |> deg2rad
     cy = center.lat |> ustrip |> deg2rad
-    r = r/constants.Re_mean
+    r = r / constants.Re_mean
 
     return _gen_hex_vertices(cx, cy, r, direction, rad2deg)
 end
 
+"""
+    _gen_circle(cx::Number, cy::Number, r::Number, f::Function=identity, n::Int=100)
+    _gen_circle(center::SimpleLatLon, r::Number, n::Int=100)
+
+The `_gen_circle` function generates a set of points representing a circle
+centered at `(cx, cy)` with a radius `r`. The points are calculated using the
+parametric equations for a circle. An optional function `f` can be applied to
+each point, and the number of points `n` can be specified to control the
+resolution of the circle.
+
+## Arguments
+- `cx::Number`: The x-coordinate of the circle's center.
+- `cy::Number`: The y-coordinate of the circle's center.
+- `r::Number`: The radius of the circle.
+- `f::Function=identity`: An optional function to be applied to each point of \
+the circle. The default function is `identity`, which returns the points \
+unchanged.
+- `n::Int=100`: The number of points to generate on the circle. The default \
+value is 100.
+
+## Returns
+- `Array`: An array of points `(x, y)` on the circle, after applying the \
+function `f` to each point.
+"""
 function _gen_circle(cx::Number, cy::Number, r::Number, f::Function=identity, n::Int=100)
     # Calculate the angle step
     angle = 0:2π/n:2π
@@ -128,12 +152,29 @@ function _gen_circle(center::SimpleLatLon, r::Number, n::Int=100)
     # The output is a Vector of values in deg for the sake of simplicity of the plotting.
     cx = center.lon |> ustrip |> deg2rad
     cy = center.lat |> ustrip |> deg2rad
-    r = r/constants.Re_mean
+    r = r / constants.Re_mean
 
     return _gen_circle(cx, cy, r, rad2deg, n)
 end
 
-function _wrap_latlon(lat, lon)
+"""
+    _wrap_latlon(lat::Number, lon::Number)
+
+The `_wrap_latlon` function normalizes and wraps geographic coordinates,
+latitude (`lat`) and longitude (`lon`). It ensures that the latitude is within
+the range [-90, 90] degrees and the longitude is within the range [-180, 180)
+degrees. This function is useful for handling geographic data where coordinates
+might exceed their typical bounds.
+
+## Arguments
+- `lat::Number`: The latitude value to be normalized and wrapped.
+- `lon::Number`: The longitude value to be normalized and wrapped.
+
+## Returns
+- `Tuple{Number, Number}`: A tuple `(lat, lon)` where `lat` is in the range \
+[-90, 90] and `lon` is in the range [-180, 180).
+"""
+function _wrap_latlon(lat::Number, lon::Number)
     # Normalize lat to the range [-180, 180)
     lat = rem(lat, 360, RoundNearest)
     lon = rem(lon, 360, RoundNearest)

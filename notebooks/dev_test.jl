@@ -53,11 +53,6 @@ md"""
 ## ICO
 """
 
-# ╔═╡ 2f6c6420-ffb5-4bb6-b757-1ce852c35e78
-md"""
-## Local grid on Earth
-"""
-
 # ╔═╡ 833103c3-9d4c-4c78-b83f-49e0c6b16104
 md"""
 - We use sphere a pproximation for the tasselltion which is a fair assumption for local grid.
@@ -72,6 +67,11 @@ begin
 	linearSpacing = Rc*√3 # linear spacing between lattice points (considering a pointy topped formation to ease the toughts)
 	θ = linearSpacing/Re # equivalent angular spacing [rad]
 end
+
+# ╔═╡ 2f6c6420-ffb5-4bb6-b757-1ce852c35e78
+md"""
+## Local grid on Earth
+"""
 
 # ╔═╡ b94c71b6-0601-4a4c-ac92-417f0c372334
 md"""
@@ -165,51 +165,6 @@ let
 	plot_geo_cells(dd, 20000, :circ)
 end
 
-# ╔═╡ f807f42f-a867-492a-b5e4-b1a1e52066d3
-c=extract_countries("Spain")
-
-# ╔═╡ f9db7d93-056d-48e4-9f43-aa65227b9309
-c[1]
-
-# ╔═╡ 2b7813bf-bf1f-4ec7-bd69-cbae8ca79446
-poly=PolyArea((0,0),(1,1),(2,2))
-
-# ╔═╡ c5f2b0eb-c8ef-4702-9630-361bddeb5caf
-Meshes.convexhull(poly)
-
-# ╔═╡ d5e03a2e-1a3c-4bce-b889-87f74282f555
-v = vertices(c[1])
-
-# ╔═╡ 54032d42-a961-49e0-8772-d9cdb59ddc89
-length(v)
-
-# ╔═╡ 4aded9e3-8324-471e-9de5-edb4e19962a8
-let 
-	reg = GeoRegion(; regionName="Tassellation", admin="Switzerland")
-	dd = gen_cell_layout(reg, 20000, ICO())
-	
-	plot_geo_points(dd)
-end
-
-# ╔═╡ 9b6c95c7-7fb3-44ec-805c-7318c2e53eb5
-let 
-	reg = GeoRegion(; regionName="Tassellation", admin="Spain")
-	dd = gen_cell_layout(reg, 20000, ICO())
-	    
-	plot_geo_cells(dd, 20000, :circ)
-end
-
-# ╔═╡ 474da875-6a71-4216-9a10-69d1e0e00576
-let 
-	radius = 20000
-	
-	reg = GeoRegion(; regionName="Tassellation", admin="Switzerland")
-	
-	dd = gen_cell_layout(reg, radius, ICO())
-	    
-	plot_geo_cells(dd, radius, :circ)
-end
-
 # ╔═╡ 69ff22ae-93ac-466d-ba16-5a2521e1729e
 begin
 	# 2. Define the lattice in u,v (linear)
@@ -254,8 +209,32 @@ let
 	)	
 end
 
-# ╔═╡ 2671fc8c-d53b-4682-a912-7c213defe7e0
-Meshes |> pkgversion
+# ╔═╡ 4aded9e3-8324-471e-9de5-edb4e19962a8
+let 
+	reg = GeoRegion(; regionName="Tassellation", admin="Switzerland")
+	dd = gen_cell_layout(reg, 20000, ICO())
+	
+	plot_geo_points(dd)
+end
+
+# ╔═╡ 9b6c95c7-7fb3-44ec-805c-7318c2e53eb5
+let 
+	reg = GeoRegion(; regionName="Tassellation", admin="Spain")
+	dd = gen_cell_layout(reg, 20000, ICO())
+	    
+	plot_geo_cells(dd, 20000, :circ)
+end
+
+# ╔═╡ 474da875-6a71-4216-9a10-69d1e0e00576
+let 
+	radius = 20000
+	
+	reg = GeoRegion(; regionName="Tassellation", admin="Switzerland")
+	
+	dd = gen_cell_layout(reg, radius, ICO())
+	    
+	plot_geo_cells(dd, radius, :circ)
+end
 
 # ╔═╡ 00000000-0000-0000-0000-000000000001
 PLUTO_PROJECT_TOML_CONTENTS = """
@@ -708,23 +687,16 @@ version = "17.4.0+2"
 # ╠═d05078cc-f277-492e-85a6-aab35f38f2f4
 # ╠═e0b2c99d-c689-48fb-91d5-6a3b4ee4d044
 # ╟─65025a77-8d99-4867-adc9-83d960273e1b
-# ╠═f9db7d93-056d-48e4-9f43-aa65227b9309
-# ╠═f807f42f-a867-492a-b5e4-b1a1e52066d3
-# ╠═2b7813bf-bf1f-4ec7-bd69-cbae8ca79446
-# ╠═c5f2b0eb-c8ef-4702-9630-361bddeb5caf
-# ╠═d5e03a2e-1a3c-4bce-b889-87f74282f555
-# ╠═54032d42-a961-49e0-8772-d9cdb59ddc89
-# ╠═4aded9e3-8324-471e-9de5-edb4e19962a8
-# ╠═9b6c95c7-7fb3-44ec-805c-7318c2e53eb5
-# ╠═474da875-6a71-4216-9a10-69d1e0e00576
-# ╟─2f6c6420-ffb5-4bb6-b757-1ce852c35e78
 # ╟─833103c3-9d4c-4c78-b83f-49e0c6b16104
 # ╠═ea40cb99-2bf1-4225-84fe-e8aee4f7863a
 # ╠═69ff22ae-93ac-466d-ba16-5a2521e1729e
 # ╠═0f807392-647c-4063-9d1d-0f3b1e0751c2
 # ╠═a6e2e847-9ce9-4080-8965-f128ca84c1ad
 # ╠═b95d1de2-9cdc-4d01-b105-2d59e1643864
-# ╠═2671fc8c-d53b-4682-a912-7c213defe7e0
+# ╟─2f6c6420-ffb5-4bb6-b757-1ce852c35e78
+# ╠═4aded9e3-8324-471e-9de5-edb4e19962a8
+# ╠═9b6c95c7-7fb3-44ec-805c-7318c2e53eb5
+# ╠═474da875-6a71-4216-9a10-69d1e0e00576
 # ╟─b94c71b6-0601-4a4c-ac92-417f0c372334
 # ╠═bf20cace-b64b-4155-90c1-1ec3644510d7
 # ╠═0e3793aa-13d2-4aeb-ad60-b98927932dc6
