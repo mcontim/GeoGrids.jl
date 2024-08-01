@@ -196,7 +196,7 @@ end
 function _get_local_radius(lat::Number, lon::Number, alt::Number)
     sΦ, cΦ = sincos(deg2rad(lat))
     sλ, cλ = sincos(deg2rad(lon))
-    
+
     f = (constants.a - constants.b) / constants.a
     e² = 2f - f^2
     N = constants.a / sqrt(1 - e² * sλ^2) # N(lon)
@@ -206,4 +206,43 @@ function _get_local_radius(lat::Number, lon::Number, alt::Number)
     z = (N * (1 - e²) + alt) * sΦ
 
     return sqrt(x^2 + y^2 + z^2)
+end
+
+using LinearAlgebra
+
+function rotate_spherical(r, θ, φ, Δθ, Δϕ)
+    sϕ, cϕ = sincos(ϕ)
+    sθ, cθ = sincos(θ)
+    sΔϕ, cΔϕ = sincos(Δϕ)
+    sΔθ, cΔθ = sincos(Δθ)
+
+    # Convert spherical to Cartesian coordinates
+    x = r * sθ * cϕ
+    y = r * sθ * sϕ
+    z = r * cθ
+
+    # Combined rotation matrix (first z-axis, then y-axis)
+    Rz = [
+        cΔϕ -sΔϕ 0;
+        sΔϕ  cΔϕ 0;
+        0    0   1
+    ]
+
+    Ry = [
+        cΔθ 0 sΔθ;
+        0   1   0;
+        -sΔθ 0 cΔθ
+    ]
+
+    # Combined rotation
+    R = Ry * Rz
+    v = R * [x, y, z]
+
+    # Convert back to spherical coordinates
+    x, y, z = v
+    r' = norm(v)
+    θ' = acos(z / r')
+    φ' = atan(y, x)
+
+    return r', θ', φ'
 end
