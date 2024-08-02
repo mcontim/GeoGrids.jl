@@ -37,23 +37,6 @@ end
 # ╔═╡ 267d6bfc-23d8-4351-9000-067457ca01a6
 vertices(dd.domain[1])[1].coords.lat
 
-# ╔═╡ 28955e5e-9197-4c8c-ac38-b898e58d3451
-# mesh2 = let 
-# 	allVorPoints = map(x -> Point(ustrip(x.lon), ustrip(x.lat)), all_lat)
-# 	mesh = tesselate_v2(allVorPoints[:], VoronoiTesselation())
-# end
-
-# ╔═╡ 1884db68-1f8d-4854-b0b8-35134481cd3e
-for i in 1:length(mesh2.topology.elems)
-	val = mesh2.topology.elems[i]
-	if val != i
-		@info "PD $val, $i"
-	end
-end
-
-# ╔═╡ aa89fea1-82e8-4967-b95d-33aa80326942
-mesh2.topology.elems
-
 # ╔═╡ 76ae50d9-c933-4fa4-8ee8-c7ed210b8ed5
 begin # Convenience functions
 function sll2tp(sll::SimpleLatLon)
@@ -126,6 +109,23 @@ end
 
 # ╔═╡ 01f2939b-1c80-4894-98d4-7f26dfb50623
 crs(ps)
+
+# ╔═╡ 28955e5e-9197-4c8c-ac38-b898e58d3451
+mesh2 = let 
+	allVorPoints = map(x -> Point(ustrip(x.lon), ustrip(x.lat)), all_lat)
+	mesh = tesselate_v2(allVorPoints[:], VoronoiTesselation())
+end
+
+# ╔═╡ 1884db68-1f8d-4854-b0b8-35134481cd3e
+for i in 1:length(mesh2.topology.elems)
+	val = mesh2.topology.elems[i]
+	if val != i
+		@info "PD $val, $i"
+	end
+end
+
+# ╔═╡ aa89fea1-82e8-4967-b95d-33aa80326942
+mesh2.topology.elems
 
 # ╔═╡ 22b544de-c906-4134-b9b7-ff61e4c4f8e2
 length(all_lat)
