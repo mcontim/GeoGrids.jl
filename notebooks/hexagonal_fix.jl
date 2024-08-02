@@ -1,5 +1,5 @@
 ### A Pluto.jl notebook ###
-# v0.19.41
+# v0.19.45
 
 using Markdown
 using InteractiveUtils
@@ -100,6 +100,17 @@ mesh = let
 	allVorPoints = map(x -> Point(ustrip(x.lon), ustrip(x.lat)), all_lat)
 	mesh = tesselate(allVorPoints[:], VoronoiTesselation())
 end
+
+# ╔═╡ 1884db68-1f8d-4854-b0b8-35134481cd3e
+for i in 1:length(mesh.topology.elems)
+	val = mesh.topology.elems[i]
+	if val != i
+		@info "PD $val, $i"
+	end
+end
+
+# ╔═╡ aa89fea1-82e8-4967-b95d-33aa80326942
+mesh.topology.elems
 
 # ╔═╡ 22b544de-c906-4134-b9b7-ff61e4c4f8e2
 length(all_lat)
@@ -1557,6 +1568,8 @@ version = "17.4.0+2"
 # ╠═2bc912fb-2034-40b3-90ee-1d5ad7c9ddd0
 # ╠═918ecfa2-c889-4303-922d-dc24ed3c0c74
 # ╠═22b544de-c906-4134-b9b7-ff61e4c4f8e2
+# ╠═1884db68-1f8d-4854-b0b8-35134481cd3e
+# ╠═aa89fea1-82e8-4967-b95d-33aa80326942
 # ╠═f5e6ebc1-3a00-4582-9a4a-0d0330269690
 # ╠═3f950632-89ad-49cf-9ff5-10cca1596f53
 # ╠═76ae50d9-c933-4fa4-8ee8-c7ed210b8ed5
