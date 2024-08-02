@@ -37,6 +37,9 @@ end
 # ╔═╡ 267d6bfc-23d8-4351-9000-067457ca01a6
 vertices(dd.domain[1])[1].coords.lat
 
+# ╔═╡ e26263ee-3bc4-423c-946e-271b0b4ddb90
+methods(tesselate)
+
 # ╔═╡ 76ae50d9-c933-4fa4-8ee8-c7ed210b8ed5
 begin # Convenience functions
 function sll2tp(sll::SimpleLatLon)
@@ -265,30 +268,73 @@ function min_dist(dd)
 end
 
 # ╔═╡ 695fe05d-ef35-49fb-aa67-e9be7ed82b70
-let 
- reg = GeoRegion(; regionName="Tassellation", admin="italy")
- dd = gen_cell_layout(reg, 20000, HEX())
- dd2 = gen_cell_layout2(reg, 20000, HEX())
+# let 
+#  reg = GeoRegion(; regionName="Tassellation", admin="italy")
+#  dd = gen_cell_layout(reg, 20000, HEX())
+#  dd2 = gen_cell_layout2(reg, 20000, HEX())
 
- min_dist(dd), min_dist(dd2)
-end
+#  min_dist(dd), min_dist(dd2)
+# end
 
 # ╔═╡ 36ddca33-097f-4821-bf4a-65a1d8455b67
-let 
- reg = GeoRegion(; regionName="Tassellation", admin="norway")
- dd = gen_cell_layout(reg, 20000, HEX())
- dd2 = gen_cell_layout2(reg, 20000, HEX())
+# let 
+#  reg = GeoRegion(; regionName="Tassellation", admin="norway")
+#  dd = gen_cell_layout(reg, 20000, HEX())
+#  dd2 = gen_cell_layout2(reg, 20000, HEX())
 
- min_dist(dd), min_dist(dd2)
-end
+#  min_dist(dd), min_dist(dd2)
+# end
 
 # ╔═╡ 582c5ffe-5178-41aa-88b1-35452167fe8f
-let 
- reg = GeoRegion(; regionName="Tassellation", admin="Greenland")
- dd = gen_cell_layout(reg, 20000, HEX())
- dd2 = gen_cell_layout2(reg, 20000, HEX())
+# let 
+#  reg = GeoRegion(; regionName="Tassellation", admin="Greenland")
+#  dd = gen_cell_layout(reg, 20000, HEX())
+#  dd2 = gen_cell_layout2(reg, 20000, HEX())
 
- min_dist(dd), min_dist(dd2)
+#  min_dist(dd), min_dist(dd2)
+# end
+
+# ╔═╡ 15a28d6a-312a-4d5b-80a4-33257345920d
+md"""
+# New Func
+"""
+
+# ╔═╡ fea58600-6e5b-469c-a924-e9693801a82d
+# using DelaunayTriangulation
+
+# ╔═╡ bfc6554a-4ef8-4946-ae75-9b4030df7ce8
+function tesselate_v2(pset::PointSet, method::VoronoiTesselation)
+  C = crs(pset)
+  T = numtype(lentype(pset))
+  assertion(CoordRefSystems.ncoords(C) == 2, "points must have 2 coordinates")
+
+  # perform tesselation with raw coordinates
+  rawval = map(p -> CoordRefSystems.raw(coords(p)), pset)
+  triang = triangulate(rawval, rng=method.rng, randomise=false)
+  vorono = voronoi(triang, clip=true)
+
+  # mesh with all (possibly unused) points
+  points = map(get_polygon_points(vorono)) do xy
+    coords = CoordRefSystems.reconstruct(C, T.(xy))
+    Point(coords)
+  end
+  polygs = each_polygon(vorono)
+  tuples = [Tuple(inds[begin:(end - 1)]) for inds in polygs]
+  connec = connect.(tuples)
+  mesh = SimpleMesh(points, connec)
+
+  # remove unused points
+  mesh |> Repair{1}()
+end
+
+# ╔═╡ 423e555d-0895-4752-a516-ccaf122bc954
+methods(tesselate_v2)
+
+# ╔═╡ 28955e5e-9197-4c8c-ac38-b898e58d3451
+let 
+	lat = gen_hex_lattice(2, :flat; M=3)
+	points = map(x -> Point(x...), lat)
+	mesh = tesselate_v2(points, VoronoiTesselation())
 end
 
 # ╔═╡ 00000000-0000-0000-0000-000000000001
@@ -1567,6 +1613,9 @@ version = "17.4.0+2"
 # ╠═676ba628-9a6c-4fab-9396-3356c86bf42e
 # ╠═2bc912fb-2034-40b3-90ee-1d5ad7c9ddd0
 # ╠═918ecfa2-c889-4303-922d-dc24ed3c0c74
+# ╠═e26263ee-3bc4-423c-946e-271b0b4ddb90
+# ╠═423e555d-0895-4752-a516-ccaf122bc954
+# ╠═28955e5e-9197-4c8c-ac38-b898e58d3451
 # ╠═22b544de-c906-4134-b9b7-ff61e4c4f8e2
 # ╠═1884db68-1f8d-4854-b0b8-35134481cd3e
 # ╠═aa89fea1-82e8-4967-b95d-33aa80326942
@@ -1581,5 +1630,8 @@ version = "17.4.0+2"
 # ╠═695fe05d-ef35-49fb-aa67-e9be7ed82b70
 # ╠═36ddca33-097f-4821-bf4a-65a1d8455b67
 # ╠═582c5ffe-5178-41aa-88b1-35452167fe8f
+# ╠═15a28d6a-312a-4d5b-80a4-33257345920d
+# ╠═fea58600-6e5b-469c-a924-e9693801a82d
+# ╠═bfc6554a-4ef8-4946-ae75-9b4030df7ce8
 # ╟─00000000-0000-0000-0000-000000000001
 # ╟─00000000-0000-0000-0000-000000000002
