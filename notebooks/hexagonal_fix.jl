@@ -25,6 +25,18 @@ let
  plot_geo_cells(dd, 20000, :hex)
 end
 
+# ╔═╡ aad14bef-eb39-46ca-ad62-cb30ef411fd1
+dd=let 
+	 reg = GeoRegion(; regionName="Tassellation", admin="Italy")
+	 # dd = gen_cell_layout2(reg, 20000, HEX())
+	     
+	 # plot_geo_cells(dd, 20000, :hex; kwargs_layout=geoattr)
+	 # plot_geo_cells(dd, 20000, :hex, kwargs_layout=(;geo_projection_type="equirectangular"))
+end
+
+# ╔═╡ 267d6bfc-23d8-4351-9000-067457ca01a6
+vertices(dd.domain[1])[1].coords.lat
+
 # ╔═╡ 76ae50d9-c933-4fa4-8ee8-c7ed210b8ed5
 begin # Convenience functions
 function sll2tp(sll::SimpleLatLon)
@@ -40,6 +52,109 @@ end
 end
 
 # ╔═╡ 108973a1-bfcb-4178-b44e-df5a0efe609d
+function gen_cell_layout3(region::GeoRegion, radius::Number, type::HEX; kwargs_lattice...)
+    ## Find the domain center as seed for the cell grid layout.
+    domain = extract_countries(region)[1] # The indicization is used to extract directly the Multi or PolyArea from the view
+    centre = let
+        c = if domain isa Multi
+            idxMain = findmax(x -> length(vertices(x)), domain.geoms)[2] # Find the PolyArea with the most vertices. It is assumed also to be the largest one so the main area of that country to be considered for the centroid computation.
+            c = centroid(domain.geoms[idxMain]) # Find the centroid of the main PolyArea to be used as grid layout seed.
+        elseif domain isa PolyArea
+            centroid(domain)
+        else
+            error("Unrecognised type of GeoRegion domain...")
+        end
+        (; x, y) = c.coords
+		# ALBERTO: We create a thetaphi here just because we have functions in telecomutils to add angles conveniently to a starting thetaphi
+        sll2tp(SimpleLatLon(y |> ustrip, x |> ustrip)) # Centroid in ThetaPhi
+    end
+
+    ## Generate the lattice centered in 0,0.
+	# ALBERTO: here I put 2 instead of √3 because the spacing in input to the lattice is equivalent to the beamwidth/diameter of the cell
+    spacing = 2radius / constants.Re_mean # spacing (angular in rad) between lattice points, considering a sphere of radius equivalent to the Earth mean radius.
+    lattice = gen_hex_lattice(spacing, type.direction; kwargs_lattice...) # ALBERTO: removed the rad2deg as we want the output in rad
+
+  #   ## Re-center the lattice around the seed point.
+    new_lattice = map(lattice) do point
+		x,y = point # ALBERTO: get the x,y of the offset
+		θ = sqrt(x^2 + y^2) # ALBERTO: θ is the angular distance between center and target point, which is euclidean distance based on how we created the lattice
+		φ = atan(y,x) # ALBERTO: φ remains the atan as usual
+		offset = ThetaPhi(θ, φ)
+        new = add_angular_offset(centre, offset) # ALBERTO: This is the resulting ThetaPhi by adding an angular offset to the center
+        tp2sll(new) # Convert back from ThetaPhi to SimpleLatLon
+    end
+
+	filter,idxs = filter_points(new_lattice[:], region)
+
+	return filter, new_lattice[:], idxs
+end
+
+# ╔═╡ 2bc912fb-2034-40b3-90ee-1d5ad7c9ddd0
+filter,all_lat,idx_sel = let
+	reg = GeoRegion(; regionName="Tassellation", admin="Spain")
+ 	filter,all_lat,idx_sel = gen_cell_layout3(reg, 20000, HEX())
+end
+
+# ╔═╡ 918ecfa2-c889-4303-922d-dc24ed3c0c74
+mesh = let 
+	allVorPoints = map(x -> Point(ustrip(x.lon), ustrip(x.lat)), all_lat)
+	mesh = tesselate(allVorPoints[:], VoronoiTesselation())
+end
+
+# ╔═╡ 22b544de-c906-4134-b9b7-ff61e4c4f8e2
+length(all_lat)
+
+# ╔═╡ f5e6ebc1-3a00-4582-9a4a-0d0330269690
+let
+	traces = []
+	vertex = mesh.vertices
+	polygons = mesh.topology.connec[idx_sel]
+	for poly in polygons
+		for idx in poly.indices
+			v = vertex[idx]
+			push!(traces, (ustrip(v.coords.x), ustrip(v.coords.y)))
+		end
+		push!(traces, (ustrip(vertex[poly.indices[1]].coords.x), ustrip(vertex[poly.indices[1]].coords.y))) # add first vertex
+		push!(traces, (NaN,NaN))
+	end
+
+	plot(scattergeo(
+		lat = map(x -> last(x), traces),
+		lon = map(x -> first(x), traces),
+		mode = "lines",
+		marker_size = 1,
+	))
+end
+
+# ╔═╡ 3f950632-89ad-49cf-9ff5-10cca1596f53
+plot_geo_points(all_lat[idx_sel])
+
+# ╔═╡ 7cb92b4b-94ca-40c5-adce-b7aeea692dff
+function _get_vor_scatter(points, idx_select)
+	# Create the Voronoi mesh for plot
+	allVorPoints = map(x -> Point(ustrip(x.lon), ustrip(x.lat)), points)
+	mesh = tesselate(allVorPoints[:], VoronoiTesselation())
+	
+	traces = []
+	vertex = mesh.vertices
+	for poly in mesh.topology.connec[idx_select]
+		for idx in poly.indices
+			v = vertex[idx]
+			push!(traces, (ustrip(v.coords.x), ustrip(v.coords.y)))
+		end
+		push!(traces, (ustrip(vertex[poly.indices[1]].coords.x), ustrip(vertex[poly.indices[1]].coords.y))) # add first vertex
+		push!(traces, (NaN,NaN))
+	end
+
+	vor_scatter = scattergeo(
+		lat = map(x -> last(x), traces),
+		lon = map(x -> first(x), traces),
+		mode = "lines",
+		marker_size = 1,
+	)
+end
+
+# ╔═╡ 087c21e7-f80c-4b37-9b0d-c431d48a44d8
 function gen_cell_layout2(region::GeoRegion, radius::Number, type::HEX; kwargs_lattice...)
     ## Find the domain center as seed for the cell grid layout.
     domain = extract_countries(region)[1] # The indicization is used to extract directly the Multi or PolyArea from the view
@@ -72,33 +187,79 @@ function gen_cell_layout2(region::GeoRegion, radius::Number, type::HEX; kwargs_l
         tp2sll(new) # Convert back from ThetaPhi to SimpleLatLon
     end
 
-    return filter_points(new_lattice, region)
+	filter,idxs = filter_points(new_lattice, region)
+
+	return filter
+		
 end
 
-# ╔═╡ aad14bef-eb39-46ca-ad62-cb30ef411fd1
-let 
- reg = GeoRegion(; regionName="Tassellation", admin="Norway")
- dd = gen_cell_layout2(reg, 20000, HEX())
-     
- # plot_geo_cells(dd, 20000, :hex; kwargs_layout=geoattr)
- plot_geo_cells(dd, 20000, :hex)
+# ╔═╡ 676ba628-9a6c-4fab-9396-3356c86bf42e
+let
+	reg = GeoRegion(; regionName="Tassellation", admin="Spain")
+ 	cc = gen_cell_layout2(reg, 20000, HEX())
+
+	mesh = let
+		points1 = map(x -> Point(ustrip(x.coords.lon), ustrip(x.coords.lat)), vertices(reg.domain[1]))
+		points2 = map(x -> Point(ustrip(x.lon), ustrip(x.lat)), cc)
+		points = vcat(points1, points2)
+		mesh = tesselate(points2[:], VoronoiTesselation())
+	end
+	
+	traces = []
+	vertex = mesh.vertices
+	for poly in mesh.topology.connec
+		# if !(poly isa Connectivity{Hexagon, 6})
+		# 	continue # skip if not a complete exagon (???)
+		# end
+		for idx in poly.indices
+			v = vertex[idx]
+			push!(traces, (ustrip(v.coords.x), ustrip(v.coords.y)))
+		end
+		push!(traces, (ustrip(vertex[poly.indices[1]].coords.x), ustrip(vertex[poly.indices[1]].coords.y))) # add first vertex
+		push!(traces, (NaN,NaN))
+	end
+
+	
+	plot(
+		scattergeo(
+	        lat = map(x -> last(x), traces),
+	        lon = map(x -> first(x), traces),
+	        mode = "lines",
+	        marker_size = 1,
+    	)
+	)
+end
+
+# ╔═╡ c7511df5-35c7-4e83-a1af-d8579c8467d5
+function _get_voronoi_plot(points, idxIn)
+	new_points = map(x -> Point(ustrip(x.lon), ustrip(x.lat)), points)
+	mesh = tesselate(new_points, VoronoiTesselation())
 end
 
 # ╔═╡ 015b57ad-5d2e-4d04-b957-1c7536482248
 function min_dist(dd)
 	mindist = Inf
 	np = length(dd)
+	res = []
 	for i in 1:np
 		for j in i+1:np
 			p1 = dd[i]
 			p2 = dd[j]
 			lla1 = LLA(p1.lat, p1.lon)
 			lla2 = LLA(p2.lat, p2.lon)
-			d = get_distance_on_earth(lla1, lla2)
-			mindist = min(mindist, d)
+			push!(res,get_distance_on_earth(lla1, lla2))
 		end
 	end
-	return mindist
+	return minimum(res)
+end
+
+# ╔═╡ 695fe05d-ef35-49fb-aa67-e9be7ed82b70
+let 
+ reg = GeoRegion(; regionName="Tassellation", admin="italy")
+ dd = gen_cell_layout(reg, 20000, HEX())
+ dd2 = gen_cell_layout2(reg, 20000, HEX())
+
+ min_dist(dd), min_dist(dd2)
 end
 
 # ╔═╡ 36ddca33-097f-4821-bf4a-65a1d8455b67
@@ -110,9 +271,9 @@ let
  min_dist(dd), min_dist(dd2)
 end
 
-# ╔═╡ 695fe05d-ef35-49fb-aa67-e9be7ed82b70
+# ╔═╡ 582c5ffe-5178-41aa-88b1-35452167fe8f
 let 
- reg = GeoRegion(; regionName="Tassellation", admin="italy")
+ reg = GeoRegion(; regionName="Tassellation", admin="Greenland")
  dd = gen_cell_layout(reg, 20000, HEX())
  dd2 = gen_cell_layout2(reg, 20000, HEX())
 
@@ -1391,10 +1552,21 @@ version = "17.4.0+2"
 # ╠═f24ba34b-5bce-4abb-b76a-c270e9b2c260
 # ╠═b37ce62a-ac90-4701-9b0f-8935b51abb57
 # ╠═aad14bef-eb39-46ca-ad62-cb30ef411fd1
+# ╠═267d6bfc-23d8-4351-9000-067457ca01a6
+# ╠═676ba628-9a6c-4fab-9396-3356c86bf42e
+# ╠═2bc912fb-2034-40b3-90ee-1d5ad7c9ddd0
+# ╠═918ecfa2-c889-4303-922d-dc24ed3c0c74
+# ╠═22b544de-c906-4134-b9b7-ff61e4c4f8e2
+# ╠═f5e6ebc1-3a00-4582-9a4a-0d0330269690
+# ╠═3f950632-89ad-49cf-9ff5-10cca1596f53
 # ╠═76ae50d9-c933-4fa4-8ee8-c7ed210b8ed5
 # ╠═108973a1-bfcb-4178-b44e-df5a0efe609d
+# ╠═7cb92b4b-94ca-40c5-adce-b7aeea692dff
+# ╠═087c21e7-f80c-4b37-9b0d-c431d48a44d8
+# ╠═c7511df5-35c7-4e83-a1af-d8579c8467d5
 # ╠═015b57ad-5d2e-4d04-b957-1c7536482248
-# ╠═36ddca33-097f-4821-bf4a-65a1d8455b67
 # ╠═695fe05d-ef35-49fb-aa67-e9be7ed82b70
+# ╠═36ddca33-097f-4821-bf4a-65a1d8455b67
+# ╠═582c5ffe-5178-41aa-88b1-35452167fe8f
 # ╟─00000000-0000-0000-0000-000000000001
 # ╟─00000000-0000-0000-0000-000000000002

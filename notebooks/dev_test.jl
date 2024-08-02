@@ -33,6 +33,17 @@ md"""
 # Test
 """
 
+# ╔═╡ f33655ca-5da5-45af-9608-341bcb609477
+# ╠═╡ disabled = true
+#=╠═╡
+aaa=extract_countries(GeoRegion(regionName="ITA", continent="Europe"))
+  ╠═╡ =#
+
+# ╔═╡ 5a60a99f-ff3b-4867-86ba-03813a817430
+#=╠═╡
+aaa
+  ╠═╡ =#
+
 # ╔═╡ 75264458-e8a8-4186-809b-0fd97a22b9d2
 
 
@@ -99,6 +110,269 @@ geoattr = (; geo=attr(
             )
         ))
 
+# ╔═╡ 39554aa7-779d-4bf5-a217-37b2c0882598
+# ╠═╡ disabled = true
+#=╠═╡
+let 
+	reg = GeoRegion(; regionName="Tassellation", admin="Kenya")
+
+	# Original Code
+	dd = gen_cell_layout(reg, 20000, HEX())
+	minDist_v1 = Inf
+	for p1 in dd
+		for p2 in dd
+			if p1 == p2 
+				continue
+			end
+			lla1 = LLA(p1.lat, p1.lon)
+			lla2 = LLA(p2.lat, p2.lon)
+			temp = get_distance_on_earth(lla1, lla2)
+			minDist_v1 = temp < minDist_v1 ? temp : minDist_v1
+		end
+	end
+
+	# New Code
+	dd2 = gen_cell_layout_v2(reg, 20000, HEX())
+	minDist_v2 = Inf
+	for p1 in dd2
+		for p2 in dd2
+			if p1 == p2 
+				continue
+			end
+			lla1 = LLA(p1.lat, p1.lon)
+			lla2 = LLA(p2.lat, p2.lon)
+			temp = get_distance_on_earth(lla1, lla2)
+			minDist_v2 = temp < minDist_v2 ? temp : minDist_v2
+		end
+	end
+
+	
+	minDist_v1, minDist_v2
+end
+  ╠═╡ =#
+
+# ╔═╡ ef11c61d-c89c-4a61-bea6-05751b3804de
+# ╠═╡ disabled = true
+#=╠═╡
+let 
+	reg = GeoRegion(; regionName="Tassellation", admin="Switzerland")
+	dd = gen_cell_layout(reg, 20000, ICO())
+
+	minDist = Inf
+	dist = []
+	for p1 in dd
+		for p2 in dd
+			if p1 == p2 
+				continue
+			end
+			lla1 = LLA(p1.lat, p1.lon)
+			lla2 = LLA(p2.lat, p2.lon)
+			temp = get_distance_on_earth(lla1, lla2)
+			minDist = temp < minDist ? temp : minDist
+		end
+	end
+	minDist
+end
+  ╠═╡ =#
+
+# ╔═╡ 4aded9e3-8324-471e-9de5-edb4e19962a8
+# ╠═╡ disabled = true
+#=╠═╡
+let 
+	reg = GeoRegion(; regionName="Tassellation", admin="Switzerland")
+	dd = gen_cell_layout(reg, 20000, ICO())
+	
+	plot_geo_points(dd; kwargs_layout=geoattr)
+end
+  ╠═╡ =#
+
+# ╔═╡ 474da875-6a71-4216-9a10-69d1e0e00576
+# ╠═╡ disabled = true
+#=╠═╡
+let 
+	radius = 20000
+	
+	reg = GeoRegion(; regionName="Tassellation", admin="Switzerland")
+	
+	dd = gen_cell_layout(reg, radius, ICO())
+	    
+	plot_geo_cells(dd, radius, :circ; kwargs_layout=geoattr)
+end
+  ╠═╡ =#
+
+# ╔═╡ d272905a-dfd4-4ade-88bd-ca10abf86f77
+md"""
+# Test
+"""
+
+# ╔═╡ dc4c7aa9-a677-4e96-9913-6b7ea4c13927
+sqrt(3)/2
+
+# ╔═╡ 9ae83d91-f3da-4880-98a6-1dbea60546ef
+# Function to generate a 2D hexagonal grid centered around (0, 0)
+function hexagonal_grid(radius::Float64, num_cells::Int)
+    centers = []
+    dx = radius * sqrt(3)  # Horizontal distance between hexagon centers
+    dy = radius * 1.5      # Vertical distance between hexagon centers
+    # dy = radius * (1+sqrt(3)/2)      # Vertical distance between hexagon centers
+    
+    for i in -num_cells:num_cells
+        for j in -num_cells:num_cells
+            x = i * dx
+            y = j * dy + (i % 2 == 0 ? 0 : radius * 0.75)
+            push!(centers, (x, y))
+        end
+    end
+    return centers
+end
+
+# ╔═╡ 0838584d-5bf3-47cf-8b58-c4e60bc685c6
+# Function to convert 2D grid coordinates to lat-lon on a sphere
+function project_to_sphere(centers, radius, lat0, lon0)
+    latlon_centers = []
+    R = 6371.0  # Earth's radius in kilometers
+    for (x, y) in centers
+        # Convert x, y to lat, lon using (inverse) equirectangular approximation
+        lat = lat0 + (y / R) * (180 / π)
+        lon = lon0 + (x / (R * cos(lat0 * π / 180))) * (180 / π)
+        push!(latlon_centers, (lat, lon))
+    end
+    return latlon_centers
+end
+
+# ╔═╡ c521b927-71cc-4e06-b7ad-e8af02631c44
+# # Function to create a hexagon given its center and radius
+# function hexagon_vertices(lat, lon, radius)
+#     R = 6371.0  # Earth's radius in kilometers
+#     d_lat = (radius / R) * (180 / π)
+#     d_lon = (radius / (R * cos(lat * π / 180))) * (180 / π)
+#     vertices = []
+#     for k in 0:5
+#         angle = π / 3 * k
+#         vertex_lat = lat + d_lat * cos(angle)
+#         vertex_lon = lon + d_lon * sin(angle)
+#         push!(vertices, (vertex_lat, vertex_lon))
+#     end
+#     # Close the hexagon by repeating the first vertex
+#     push!(vertices, vertices[1])
+#     return vertices
+# end
+
+# ╔═╡ f4801220-f100-4f88-acad-9e8f24464984
+# # Function to plot hexagonal grid
+# function plot_hexagonal_grid(latlon_centers, radius)
+#     traces = []
+#     for (lat, lon) in latlon_centers
+#         vertices = hexagon_vertices(lat, lon, radius)
+#         lats, lons = map(x -> x[1], vertices), map(x -> x[2], vertices)
+#         trace = scattergeo(
+#             lat = lats,
+#             lon = lons,
+#             mode = "lines",
+#             fill = "toself",
+#             fillcolor = "rgba(0, 100, 255, 0.3)",
+#             line = attr(color = "blue")
+#         )
+#         push!(traces, trace)
+#     end
+#     layout = Layout(
+#         title = "Hexagonal Grid on Sphere",
+#         geo = attr(
+#             scope = "world",
+#             showland = true,
+#             landcolor = "rgb(243, 243, 243)",
+#             countrycolor = "rgb(204, 204, 204)"
+#         )
+#     )
+#     plot([traces...], layout)
+# end
+
+# ╔═╡ c41c300f-2765-49d9-bd68-65de58c7040f
+# # Function to create a hexagon given its center and radius
+# function hexagon_vertices(lat, lon, radius)
+#     R = 6371.0  # Earth's radius in kilometers
+#     vertices = []
+#     for k in 0:5
+#         angle = π / 3 * k
+#         # Small arc approximation to find the vertex positions
+#         d_lat = radius * cos(angle) / R * (180 / π)
+#         d_lon = radius * sin(angle) / (R * cos(lat * π / 180)) * (180 / π)
+#         vertex_lat = lat + d_lat
+#         vertex_lon = lon + d_lon
+#         push!(vertices, (vertex_lat, vertex_lon))
+#     end
+#     # Close the hexagon by repeating the first vertex
+#     push!(vertices, vertices[1])
+#     return vertices
+# end
+
+
+# ╔═╡ 978d4d2b-0e1f-40e3-a8c0-ab958dafab72
+function hexagon_vertices(lat, lon, radius, rotation_angle=π/6)
+    R = 6371.0  # Earth's radius in kilometers
+    vertices = []
+    for k in 0:5
+        angle = rotation_angle + π / 3 * k
+        # Small arc approximation to find the vertex positions
+        d_lat = radius * cos(angle) / R * (180 / π)
+        d_lon = radius * sin(angle) / (R * cos(lat * π / 180)) * (180 / π)
+        vertex_lat = lat + d_lat
+        vertex_lon = lon + d_lon
+        push!(vertices, (vertex_lat, vertex_lon))
+    end
+    # Close the hexagon by repeating the first vertex
+    push!(vertices, vertices[1])
+    return vertices
+end
+
+# ╔═╡ ce49e8d1-539c-446e-9443-24238593a611
+
+# Function to plot hexagonal grid
+function plot_hexagonal_grid(latlon_centers, radius)
+    traces = []
+    for (lat, lon) in latlon_centers
+        vertices = hexagon_vertices(lat, lon, radius)
+        lats, lons = map(x -> x[1], vertices), map(x -> x[2], vertices)
+        trace = scattergeo(
+            lat = lats,
+            lon = lons,
+            mode = "lines",
+            fill = "toself",
+            fillcolor = "rgba(0, 100, 255, 0.3)",
+            line = attr(color = "blue")
+        )
+        push!(traces, trace)
+    end
+    layout = Layout(
+        title = "Hexagonal Grid on Sphere",
+        geo = attr(
+            scope = "world",
+            showland = true,
+            landcolor = "rgb(243, 243, 243)",
+            countrycolor = "rgb(204, 204, 204)"
+        )
+    )
+    plot([traces...], layout)
+end
+
+# ╔═╡ e904b396-4794-4783-9039-a2e66f82ec07
+let
+	# Parameters
+	cell_radius = 10.0  # radius of each hexagon cell in kilometers
+	num_cells = 5       # number of cells in each direction from the center
+	lat0 = 0.0         # starting latitude
+	lon0 = 0.0        # starting longitude
+	
+	# Generate hexagonal grid
+	centers = hexagonal_grid(cell_radius, num_cells)
+	
+	# Project to sphere (lat, lon)
+	latlon_centers = project_to_sphere(centers, cell_radius, lat0, lon0)
+	
+	# Plot the hexagonal grid
+	plot_hexagonal_grid(latlon_centers, cell_radius)
+end
+
 # ╔═╡ b94c71b6-0601-4a4c-ac92-417f0c372334
 md"""
 # Packages
@@ -155,12 +429,6 @@ typeof(points)
 # ╔═╡ 28aa42db-f470-4170-8f91-4b2897389fd5
 SimpleLatLon(60°,180°).lat 
 
-# ╔═╡ f33655ca-5da5-45af-9608-341bcb609477
-aaa=extract_countries(GeoRegion(regionName="ITA", continent="Europe"))
-
-# ╔═╡ 5a60a99f-ff3b-4867-86ba-03813a817430
-aaa
-
 # ╔═╡ d9334bde-6ae5-4da4-b8ed-b16bd9678785
 extract_countries(GeoRegion(regionName="ITA", continent="Europe"))
 
@@ -207,8 +475,62 @@ let
 	)
 end
 
-# ╔═╡ 0f807392-647c-4063-9d1d-0f3b1e0751c2
-SVector(1,1) + SVector(2,2)
+# ╔═╡ 66e702bd-0e81-433b-bcf5-65aedd90472a
+mesh = let
+	points = map(x -> Point(x...), lat)
+	mesh = tesselate(points[:], VoronoiTesselation())
+end
+
+# ╔═╡ 64ebd8d3-e8ba-4894-9d77-6fa5738cdc23
+mesh.topology.connec[1] isa Connectivity{Hexagon, 6}
+
+# ╔═╡ 07497371-3173-4e98-ab10-400ca58d110c
+let
+	traces = []
+	vertex = mesh.vertices
+	for poly in mesh.topology.connec
+		for idx in poly.indices
+			v = vertex[idx]
+			# @info v
+			push!(traces, (ustrip(v.coords.x), ustrip(v.coords.y)))
+		end
+		push!(traces, (ustrip(vertex[poly.indices[1]].coords.x), ustrip(vertex[poly.indices[1]].coords.y))) # add first vertex
+		push!(traces, (NaN,NaN))
+	end
+		
+	plot(
+		scatter(;
+			x=map(x -> first(x), traces),
+			y=map(x -> last(x), traces),
+			mode="lines",
+		)
+	)
+end
+
+# ╔═╡ 404e4b0a-071d-43a1-bd9c-01f5cdd094e1
+let
+	traces = []
+	vertex = mesh.vertices
+	for poly in mesh.topology.connec
+		if !(poly isa Connectivity{Hexagon, 6})
+			continue # skip if not a complete exagon (???)
+		end
+		for idx in poly.indices
+			v = vertex[idx]
+			push!(traces, (ustrip(v.coords.x), ustrip(v.coords.y)))
+		end
+		push!(traces, (ustrip(vertex[poly.indices[1]].coords.x), ustrip(vertex[poly.indices[1]].coords.y))) # add first vertex
+		push!(traces, (NaN,NaN))
+	end
+		
+	plot(
+		scatter(;
+			x=map(x -> first(x), traces),
+			y=map(x -> last(x), traces),
+			mode="lines",
+		)
+	)
+end
 
 # ╔═╡ b95d1de2-9cdc-4d01-b105-2d59e1643864
 let
@@ -240,8 +562,17 @@ end
 
 # ╔═╡ e0b2c99d-c689-48fb-91d5-6a3b4ee4d044
 let 
-	reg = GeoRegion(; regionName="Tassellation", admin="Norway")
+	reg = GeoRegion(; regionName="Tassellation", admin="Spain")
 	dd = gen_cell_layout(reg, 20000, HEX())
+	    
+	# plot_geo_cells(dd, 20000, :hex; kwargs_layout=geoattr)
+	plot_geo_cells(dd, 20000, :hex)
+end
+
+# ╔═╡ 4f27f06a-661e-491c-b4b6-cc2510a3c95c
+let 
+	reg = GeoRegion(; regionName="Tassellation", admin="Spain")
+	dd = gen_cell_layout_v2(reg, 20000, HEX())
 	    
 	# plot_geo_cells(dd, 20000, :hex; kwargs_layout=geoattr)
 	plot_geo_cells(dd, 20000, :hex)
@@ -250,15 +581,28 @@ end
 # ╔═╡ 8e31f7c1-5a86-4f02-9bb1-bd046573c573
 _get_local_radius(0,0,0)
 
-# ╔═╡ 39554aa7-779d-4bf5-a217-37b2c0882598
-let 
-	reg = GeoRegion(; regionName="Tassellation", admin="Norway")
-	dd = gen_cell_layout(reg, 20000, HEX())
+# ╔═╡ ed222264-461a-4efb-90b1-42324c7eea63
+let
+	# Parameters
+	cell_radius = 10.0  # radius of each hexagon cell in kilometers
+	num_cells = 5       # number of cells in each direction from the center
+	lat0 = 0.0         # starting latitude
+	lon0 = 0.0        # starting longitude
+	
+	# Generate hexagonal grid
+	centers = hexagonal_grid(cell_radius, num_cells)
+	
+	# Project to sphere (lat, lon)
+	latlon_centers = project_to_sphere(centers, cell_radius, lat0, lon0)
+	
+	# Print lat-lon centers
+	points = map(latlon_centers) do ll
+		SimpleLatLon(ll[1],ll[2])
+	end
 
 	minDist = Inf
-	dist = []
-	for p1 in dd
-		for p2 in dd
+	for p1 in points
+		for p2 in points
 			if p1 == p2 
 				continue
 			end
@@ -269,56 +613,20 @@ let
 		end
 	end
 	minDist
+	# plot_geo_cells(points, cell_radius*1e3, :hex; hex_direction=:flat)
+
 end
 
-# ╔═╡ ef11c61d-c89c-4a61-bea6-05751b3804de
-# ╠═╡ disabled = true
-#=╠═╡
-let 
-	reg = GeoRegion(; regionName="Tassellation", admin="Switzerland")
-	dd = gen_cell_layout(reg, 20000, ICO())
-
-	minDist = Inf
-	dist = []
-	for p1 in dd
-		for p2 in dd
-			if p1 == p2 
-				continue
-			end
-			lla1 = LLA(p1.lat, p1.lon)
-			lla2 = LLA(p2.lat, p2.lon)
-			temp = get_distance_on_earth(lla1, lla2)
-			minDist = temp < minDist ? temp : minDist
-		end
-	end
-	minDist
-end
-  ╠═╡ =#
-
-# ╔═╡ 4aded9e3-8324-471e-9de5-edb4e19962a8
-# ╠═╡ disabled = true
-#=╠═╡
-let 
-	reg = GeoRegion(; regionName="Tassellation", admin="Switzerland")
-	dd = gen_cell_layout(reg, 20000, ICO())
+# ╔═╡ 07d6cd31-5518-460c-a90c-a427a78325e0
+let
+	points = Meshes.rand(Point, 100, crs=Meshes.Cartesian2D)
 	
-	plot_geo_points(dd; kwargs_layout=geoattr)
-end
-  ╠═╡ =#
-
-# ╔═╡ 474da875-6a71-4216-9a10-69d1e0e00576
-# ╠═╡ disabled = true
-#=╠═╡
-let 
-	radius = 20000
+	mesh = tesselate(points, VoronoiTesselation())
 	
-	reg = GeoRegion(; regionName="Tassellation", admin="Switzerland")
-	
-	dd = gen_cell_layout(reg, radius, ICO())
-	    
-	plot_geo_cells(dd, radius, :circ; kwargs_layout=geoattr)
+	# viz(mesh, showsegments = true)
+	# viz!(points, color = :red)
+	# Mke.current_figure()
 end
-  ╠═╡ =#
 
 # ╔═╡ 00000000-0000-0000-0000-000000000001
 PLUTO_PROJECT_TOML_CONTENTS = """
@@ -1670,18 +1978,34 @@ version = "17.4.0+2"
 # ╟─833103c3-9d4c-4c78-b83f-49e0c6b16104
 # ╠═ea40cb99-2bf1-4225-84fe-e8aee4f7863a
 # ╠═69ff22ae-93ac-466d-ba16-5a2521e1729e
-# ╠═0f807392-647c-4063-9d1d-0f3b1e0751c2
+# ╠═66e702bd-0e81-433b-bcf5-65aedd90472a
+# ╠═64ebd8d3-e8ba-4894-9d77-6fa5738cdc23
+# ╠═07497371-3173-4e98-ab10-400ca58d110c
+# ╠═404e4b0a-071d-43a1-bd9c-01f5cdd094e1
 # ╠═a6e2e847-9ce9-4080-8965-f128ca84c1ad
 # ╠═b95d1de2-9cdc-4d01-b105-2d59e1643864
 # ╟─2f6c6420-ffb5-4bb6-b757-1ce852c35e78
 # ╠═e21179c3-4412-441c-9f5c-3d7a2d881d30
 # ╠═d05078cc-f277-492e-85a6-aab35f38f2f4
 # ╠═e0b2c99d-c689-48fb-91d5-6a3b4ee4d044
+# ╠═4f27f06a-661e-491c-b4b6-cc2510a3c95c
 # ╠═8e31f7c1-5a86-4f02-9bb1-bd046573c573
 # ╠═39554aa7-779d-4bf5-a217-37b2c0882598
 # ╠═ef11c61d-c89c-4a61-bea6-05751b3804de
 # ╠═4aded9e3-8324-471e-9de5-edb4e19962a8
 # ╠═474da875-6a71-4216-9a10-69d1e0e00576
+# ╟─d272905a-dfd4-4ade-88bd-ca10abf86f77
+# ╠═dc4c7aa9-a677-4e96-9913-6b7ea4c13927
+# ╠═9ae83d91-f3da-4880-98a6-1dbea60546ef
+# ╠═0838584d-5bf3-47cf-8b58-c4e60bc685c6
+# ╠═c521b927-71cc-4e06-b7ad-e8af02631c44
+# ╠═f4801220-f100-4f88-acad-9e8f24464984
+# ╠═c41c300f-2765-49d9-bd68-65de58c7040f
+# ╠═978d4d2b-0e1f-40e3-a8c0-ab958dafab72
+# ╠═ce49e8d1-539c-446e-9443-24238593a611
+# ╠═e904b396-4794-4783-9039-a2e66f82ec07
+# ╠═ed222264-461a-4efb-90b1-42324c7eea63
+# ╠═07d6cd31-5518-460c-a90c-a427a78325e0
 # ╟─b94c71b6-0601-4a4c-ac92-417f0c372334
 # ╠═bf20cace-b64b-4155-90c1-1ec3644510d7
 # ╠═0e3793aa-13d2-4aeb-ad60-b98927932dc6

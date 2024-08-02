@@ -102,7 +102,7 @@ function _gen_hex_vertices(cx::Number, cy::Number, r::Number; direction::Symbol=
     return map(x -> f.(x), vertices)
 end
 
-function _gen_hex_vertices(center::SimpleLatLon, r::Number; earth_local_radius = constants.Re_mean, direction::Symbol=:pointy)
+function _gen_hex_vertices(center::SimpleLatLon, r::Number; earth_local_radius=constants.Re_mean, direction::Symbol=:pointy)
     # Radius in meters.
     # The output is a Vector of values in deg for the sake of simplicity of the plotting.
     cx = center.lon |> ustrip |> deg2rad
@@ -147,7 +147,7 @@ function _gen_circle(cx::Number, cy::Number, r::Number; f::Function=identity, n:
     return map(x -> f.(x), circle_points)
 end
 
-function _gen_circle(center::SimpleLatLon, r::Number; earth_local_radius = constants.Re_mean, n::Int=100)
+function _gen_circle(center::SimpleLatLon, r::Number; earth_local_radius=constants.Re_mean, n::Int=100)
     # Radius in meters.
     # The output is a Vector of values in deg for the sake of simplicity of the plotting.
     cx = center.lon |> ustrip |> deg2rad
@@ -167,12 +167,14 @@ degrees. This function is useful for handling geographic data where coordinates
 might exceed their typical bounds.
 
 ## Arguments
-- `lat::Number`: The latitude value to be normalized and wrapped.
-- `lon::Number`: The longitude value to be normalized and wrapped.
+- `lat::Number`: The latitude value to be normalized and wrapped, expressed in \
+degrees.
+- `lon::Number`: The longitude value to be normalized and wrapped, expressed \
+in degrees.
 
 ## Returns
-- `Tuple{Number, Number}`: A tuple `(lat, lon)` where `lat` is in the range \
-[-90, 90] and `lon` is in the range [-180, 180).
+- `Tuple{Number, Number}`: A tuple `(lat, lon)` in degrees where `lat` is in the \
+range [-90, 90] and `lon` is in the range [-180, 180).
 """
 function _wrap_latlon(lat::Number, lon::Number)
     # Normalize lat to the range [-180, 180)
@@ -208,29 +210,27 @@ function _get_local_radius(lat::Number, lon::Number, alt::Number)
     return sqrt(x^2 + y^2 + z^2)
 end
 
-using LinearAlgebra
-
-function rotate_spherical(r, θ, φ, Δθ, Δϕ)
-    sϕ, cϕ = sincos(ϕ)
-    sθ, cθ = sincos(θ)
-    sΔϕ, cΔϕ = sincos(Δϕ)
-    sΔθ, cΔθ = sincos(Δθ)
+function _add_angular_offset(centre, offset, local_r=constants.Re_mean)
+    sϕ, cϕ = sincos(centre.ϕ)
+    sθ, cθ = sincos(centre.θ)
+    sΔϕ, cΔϕ = sincos(offset.ϕ)
+    sΔθ, cΔθ = sincos(offset.θ)
 
     # Convert spherical to Cartesian coordinates
-    x = r * sθ * cϕ
-    y = r * sθ * sϕ
-    z = r * cθ
+    x = local_r * sθ * cϕ
+    y = local_r * sθ * sϕ
+    z = local_r * cθ
 
     # Combined rotation matrix (first z-axis, then y-axis)
     Rz = [
         cΔϕ -sΔϕ 0;
-        sΔϕ  cΔϕ 0;
-        0    0   1
+        sΔϕ cΔϕ 0;
+        0 0 1
     ]
 
     Ry = [
         cΔθ 0 sΔθ;
-        0   1   0;
+        0 1 0;
         -sΔθ 0 cΔθ
     ]
 
@@ -240,9 +240,9 @@ function rotate_spherical(r, θ, φ, Δθ, Δϕ)
 
     # Convert back to spherical coordinates
     x, y, z = v
-    r' = norm(v)
-    θ' = acos(z / r')
-    φ' = atan(y, x)
+    r_new = norm(v)
+    θ_new = acos(z / r_new)
+    ϕ_new = atan(y, x)
 
-    return r', θ', φ'
+    return θ_new, ϕ_new, r_new
 end

@@ -23,7 +23,7 @@ equal to `M`.
 (`SVector{2,T}`) from the `StaticArrays` package. Each point is in the form \
 `(x, y)`.
 """    
-function _gen_regular_lattice(dx::T, dy, ds; x0=zero(T), y0=zero(T), M::Int=100, N::Int=M) where {T}
+function _gen_regular_lattice(dx::T, dy, ds; x0=zero(T), y0=zero(T), M::Int=70, N::Int=M) where {T}
     # Function to generate x position as function of row,column number m,n
     x(m, n) = m * dx + n * ds + x0
     # Function to generate y position as function of row,column number m,n
@@ -147,13 +147,15 @@ function gen_cell_layout(region::GeoRegion, radius::Number, type::HEX; kwargs_la
     lattice = gen_hex_lattice(spacing, type.direction, rad2deg; kwargs_lattice...)
 
     ## Re-center the lattice around the seed point.
-    new_lattice = map(lattice) do point
+    newLattice = map(lattice) do point
         new = point + centre # This SVector is still in the order lon-lat
         lat, lon = _wrap_latlon(new[2], new[1])
         SimpleLatLon(lat, lon)
     end
 
-    return filter_points(new_lattice, region)
+    filter,_ = filter_points(newLattice, region)
+
+    return filter
 end
 
 function gen_cell_layout(region::PolyRegion, radius::Number, type::HEX; kwargs_lattice...)
@@ -168,13 +170,64 @@ function gen_cell_layout(region::PolyRegion, radius::Number, type::HEX; kwargs_l
     lattice = gen_hex_lattice(spacing, type.direction, rad2deg; kwargs_lattice...)
 
     ## Re-center the lattice around the seed point.
-    new_lattice = map(lattice) do point
+    newLattice = map(lattice) do point
         new = point + centre # This SVector is still in the order lon-lat
         lat, lon = _wrap_latlon(new[2], new[1])
         SimpleLatLon(lat, lon)
     end
 
-    return filter_points(new_lattice, region)
+    return filter_points(newLattice, region)
+end
+
+function gen_cell_layout_v2(region::GeoRegion, radius::Number, type::HEX; kwargs_lattice...)
+    ## Find the domain center as seed for the cell grid layout.
+    domain = extract_countries(region)[1] # The indicization is used to extract directly the Multi or PolyArea from the view
+    centre = let
+        c = if domain isa Multi
+            idxMain = findmax(x -> length(vertices(x)), domain.geoms)[2] # Find the PolyArea with the most vertices. It is assumed also to be the largest one so the main area of that country to be considered for the centroid computation.
+            c = centroid(domain.geoms[idxMain]) # Find the centroid of the main PolyArea to be used as grid layout seed.
+        elseif domain isa PolyArea
+            centroid(domain)
+        else
+            error("Unrecognised type of GeoRegion domain...")
+        end
+        (; x, y) = c.coords
+        (; lat = y |> ustrip, lon = x |> ustrip) # Tuple of lon-lat in deg
+    end
+
+    ## Generate the lattice centered in 0,0.
+    Re_local = _get_local_radius(centre.lat, centre.lon, 0.0)
+    spacing = radius * √3 / Re_local # spacing (angular in rad) between lattice points, considering a sphere of radius equivalent to the Earth mean radius.
+    offsetLattice = gen_hex_lattice(spacing, type.direction; kwargs_lattice...) # [rad]
+
+    ## Re-center the lattice around the seed point.
+    # Convert lat-lon in theta-phi (shperical approximation)
+    centreθφ = (; θ = deg2rad(90 - centre.lat), ϕ = deg2rad(centre.lon)) # [rad]
+    newLattice = map(offsetLattice) do offset
+        # 1 - Convert the lat-lon of the grid seed in spherical (ISO).
+        # 2 - The lattice give us the θ-ϕ offset to be used for the computation of the actual position of the points on the lat-lon grid.
+        # 3 - Pass to Cartesian coordinate such to rotate the vector representing the grid center by the angle described by the offset.
+        # 4 - Convert the cartesian position of the newly identified vector back to spherical, (ISO) then to lat-lon
+        # This is an approximate approach which can be considered enough accurate for tassellation of small surfaces. 
+        # However, the points are equidisant from the center, if we want to keep equidistance between adjacent points as accurate as possible, 
+        # we could solve the geodesic direct problem using each point of the lattice to determinte the sourrounding neighbours.
+        # In this case we could compute the azimuth between each of the points and each of its neighbours from the lattice and use the 
+        # defaul distance we want to obtain between them (radius). Knowing also the lat-lon position of the starting point we have all the 
+        # parameters to compute the geodesic direct.
+        # Even if more accurate, this approch would require to discard the points already computed from the newly computed neighbours (not trivial to be done precisely).
+        x,y = offset # Get the x,y of the offset
+		θ = sqrt(x^2 + y^2) # θ is the angular distance between center and target offset, which is euclidean distance based on how we created the lattice [rad]
+		ϕ = atan(y,x) # [rad]
+		offsetθφ = (; θ, ϕ) # [rad]
+        newθ, newϕ, _  = _add_angular_offset(centreθφ, offsetθφ, Re_local)
+        
+        lat, lon = _wrap_latlon(π/2-newθ |> rad2deg, newϕ |> rad2deg)
+        SimpleLatLon(lat, lon)
+    end
+    
+    filter,_ = filter_points(newLattice, region)
+
+    return filter
 end
 
 """

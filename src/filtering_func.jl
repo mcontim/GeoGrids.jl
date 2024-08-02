@@ -33,8 +33,10 @@ geographical domain.
 input vector.
 """
 function filter_points(points::Array{<:SimpleLatLon}, domain::Union{GeoRegion,PolyRegion,LatBeltRegion})
-    filt = filter(x -> in(x, domain), points)
-    return filt
+    # filt = filter(x -> in(x, domain), points)
+    indices = findall(x -> in(x, domain), points)
+
+    return points[indices], indices
 end
 
 """

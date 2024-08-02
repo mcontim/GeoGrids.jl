@@ -182,9 +182,9 @@ function GeoGrids.plot_geo_cells(cellCenter::Array{<:Union{SimpleLatLon,Abstract
     # Create the geo layout
     layout = Layout(
         geo=attr(
-            projection=attr(
-                type="robinson",
-            ),
+            # projection=attr(
+            #     type="robinson",
+            # ),
             showocean=true,
             # oceancolor =  "rgb(0, 255, 255)",
             oceancolor="rgb(255, 255, 255)",
