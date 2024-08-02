@@ -22,7 +22,7 @@ equal to `M`.
 - `Array{SVector{2,T},2}`: A 2D array of points represented as static vectors \
 (`SVector{2,T}`) from the `StaticArrays` package. Each point is in the form \
 `(x, y)`.
-"""    
+"""
 function _gen_regular_lattice(dx::T, dy, ds; x0=zero(T), y0=zero(T), M::Int=70, N::Int=M) where {T}
     # Function to generate x position as function of row,column number m,n
     x(m, n) = m * dx + n * ds + x0
@@ -93,7 +93,7 @@ distances to ensure the grid is appropriate for the desired scale.
 angle. The specific structure and format of the returned grid depend on the \
 `icogrid` function being used.
 """
-function _adapted_icogrid(radius::Number; earth_local_radius=constants.Re_mean, correctionFactor=6/5)
+function _adapted_icogrid(radius::Number; earth_local_radius=constants.Re_mean, correctionFactor=6 / 5)
     # Define the separation angle for the icosahedral grid in a similar way as for the hexagonal grid using a correction factor 1.2 to adapt the cell centers distances (from old MATLAB grid).
     # The correction factor would be √3 if the original hex grid approach was used.
     sepAng = radius * correctionFactor / earth_local_radius |> rad2deg
@@ -153,7 +153,7 @@ function gen_cell_layout(region::GeoRegion, radius::Number, type::HEX; kwargs_la
         SimpleLatLon(lat, lon)
     end
 
-    filter,_ = filter_points(newLattice, region)
+    filter, _ = filter_points(newLattice, region)
 
     return filter
 end
@@ -192,7 +192,7 @@ function gen_cell_layout_v2(region::GeoRegion, radius::Number, type::HEX; kwargs
             error("Unrecognised type of GeoRegion domain...")
         end
         (; x, y) = c.coords
-        (; lat = y |> ustrip, lon = x |> ustrip) # Tuple of lon-lat in deg
+        (; lat=y |> ustrip, lon=x |> ustrip) # Tuple of lon-lat in deg
     end
 
     ## Generate the lattice centered in 0,0.
@@ -202,7 +202,7 @@ function gen_cell_layout_v2(region::GeoRegion, radius::Number, type::HEX; kwargs
 
     ## Re-center the lattice around the seed point.
     # Convert lat-lon in theta-phi (shperical approximation)
-    centreθφ = (; θ = deg2rad(90 - centre.lat), ϕ = deg2rad(centre.lon)) # [rad]
+    centreθφ = (; θ=deg2rad(90 - centre.lat), ϕ=deg2rad(centre.lon)) # [rad]
     newLattice = map(offsetLattice) do offset
         # 1 - Convert the lat-lon of the grid seed in spherical (ISO).
         # 2 - The lattice give us the θ-ϕ offset to be used for the computation of the actual position of the points on the lat-lon grid.
@@ -215,17 +215,17 @@ function gen_cell_layout_v2(region::GeoRegion, radius::Number, type::HEX; kwargs
         # defaul distance we want to obtain between them (radius). Knowing also the lat-lon position of the starting point we have all the 
         # parameters to compute the geodesic direct.
         # Even if more accurate, this approch would require to discard the points already computed from the newly computed neighbours (not trivial to be done precisely).
-        x,y = offset # Get the x,y of the offset
-		θ = sqrt(x^2 + y^2) # θ is the angular distance between center and target offset, which is euclidean distance based on how we created the lattice [rad]
-		ϕ = atan(y,x) # [rad]
-		offsetθφ = (; θ, ϕ) # [rad]
-        newθ, newϕ, _  = _add_angular_offset(centreθφ, offsetθφ, Re_local)
-        
-        lat, lon = _wrap_latlon(π/2-newθ |> rad2deg, newϕ |> rad2deg)
+        x, y = offset # Get the x,y of the offset
+        θ = sqrt(x^2 + y^2) # θ is the angular distance between center and target offset, which is euclidean distance based on how we created the lattice [rad]
+        ϕ = atan(y, x) # [rad]
+        offsetθφ = (; θ, ϕ) # [rad]
+        newθ, newϕ, _ = _add_angular_offset(centreθφ, offsetθφ, Re_local)
+
+        lat, lon = _wrap_latlon(π / 2 - newθ |> rad2deg, newϕ |> rad2deg)
         SimpleLatLon(lat, lon)
     end
-    
-    filter,_ = filter_points(newLattice, region)
+
+    filter, _ = filter_points(newLattice, region)
 
     return filter
 end
@@ -260,12 +260,39 @@ function gen_cell_layout(region::GlobalRegion, radius::Number, type::ICO)
     return _adapted_icogrid(radius; correctionFactor=type.correction)
 end
 
-function gen_cell_layout(region::Union{LatBeltRegion, GeoRegion, PolyRegion}, radius::Number, type::ICO)
+function gen_cell_layout(region::Union{LatBeltRegion,GeoRegion,PolyRegion}, radius::Number, type::ICO)
     grid = _adapted_icogrid(radius; correctionFactor=type.correction)
 
     return filter_points(grid, region)
 end
 
-function gen_cell_layout(region::Union{GlobalRegion, LatBeltRegion, GeoRegion, PolyRegion}, radius::Number, type::H3)
+function gen_cell_layout(region::Union{GlobalRegion,LatBeltRegion,GeoRegion,PolyRegion}, radius::Number, type::H3)
     error("H3 tassellation is not yet implemented in this version...")
 end
+
+# Work on this old version of tesselate
+function tesselate_v2(pset::PointSet, method::VoronoiTesselation)
+    C = crs(pset)
+    T = numtype(lentype(pset))
+    assertion(CoordRefSystems.ncoords(C) == 2, "points must have 2 coordinates")
+    
+    # perform tesselation with raw coordinates
+    rawval = map(p -> CoordRefSystems.rawvalues(coords(p)), pset)
+    triang = triangulate(rawval, randomise=false, rng=method.rng)
+    vorono = voronoi(triang, clip=true)
+    
+    # mesh with all (possibly unused) points
+    points = map(get_polygon_points(vorono)) do xy
+        coords = CoordRefSystems.reconstruct(C, T.(xy))
+        Point(coords)
+    end
+    polygs = each_polygon(vorono)
+    tuples = [Tuple(inds[begin:(end - 1)]) for inds in polygs]
+    connec = connect.(tuples)
+    mesh = SimpleMesh(points, connec)
+    
+    # remove unused points
+    mesh |> Repair{1}()
+end
+
+tesselate_v2(points::AbstractVector{<:Point}, method::TesselationMethod) = tesselate_v2(PointSet(points), method)

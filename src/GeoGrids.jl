@@ -1,6 +1,7 @@
 module GeoGrids
 
 using AngleBetweenVectors
+using CoordRefSystems
 using CountriesBorders
 using Dictionaries
 using LinearAlgebra
