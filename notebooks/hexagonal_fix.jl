@@ -280,13 +280,14 @@ function min_dist(dd)
 end
 
 # ╔═╡ 695fe05d-ef35-49fb-aa67-e9be7ed82b70
-# let 
-#  reg = GeoRegion(; regionName="Tassellation", admin="italy")
-#  dd = gen_cell_layout(reg, 20000, HEX())
-#  dd2 = gen_cell_layout2(reg, 20000, HEX())
+let 
+ reg = GeoRegion(; regionName="Tassellation", admin="Norway")
+ dd = gen_cell_layout(reg, 20000, HEX())
+ dd2 = gen_cell_layout2(reg, 20000, HEX())
+ dd3 = gen_cell_layout_v2(reg, 20000, HEX())
 
-#  min_dist(dd), min_dist(dd2)
-# end
+ min_dist(dd), min_dist(dd2), min_dist(dd3)
+end
 
 # ╔═╡ 36ddca33-097f-4821-bf4a-65a1d8455b67
 # let 

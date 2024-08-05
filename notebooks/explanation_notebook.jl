@@ -82,7 +82,7 @@ This mapping has 2 main problems:
 
 # ╔═╡ 4457e406-3b1b-4237-b02d-767f76a0d6e2
 md"""
-The main source can be found at this [link](http://extremelearning.com.au/how-to-evenly-distribute-points-on-a-sphere-more-effectively-than-the-canonical-fibonacci-lattice/).
+The main source can be found at this [link](http://extremelearning.com.au/how-to-evenly-distribute-points-on-a-sph  ere-more-effectively-than-the-canonical-fibonacci-lattice/).
 """
 
 # ╔═╡ e7e7a9d5-6f6c-45ab-b1cd-5a20a4569176

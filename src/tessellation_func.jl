@@ -216,7 +216,7 @@ function gen_cell_layout_v2(region::GeoRegion, radius::Number, type::HEX; kwargs
         # parameters to compute the geodesic direct.
         # Even if more accurate, this approch would require to discard the points already computed from the newly computed neighbours (not trivial to be done precisely).
         x, y = offset # Get the x,y of the offset
-        θ = sqrt(x^2 + y^2) # θ is the angular distance between center and target offset, which is euclidean distance based on how we created the lattice [rad]
+        θ = asin(sqrt(x^2 + y^2)) # θ is the angular distance between center and target offset, which is euclidean distance based on how we created the lattice [rad]
         ϕ = atan(y, x) # [rad]
         offsetθφ = (; θ, ϕ) # [rad]
         newθ, newϕ, _ = _add_angular_offset(centreθφ, offsetθφ, Re_local)
@@ -224,6 +224,8 @@ function gen_cell_layout_v2(region::GeoRegion, radius::Number, type::HEX; kwargs
         lat, lon = _wrap_latlon(π / 2 - newθ |> rad2deg, newϕ |> rad2deg)
         SimpleLatLon(lat, lon)
     end
+    
+    # return newLattice
 
     filter, _ = filter_points(newLattice, region)
 
@@ -271,15 +273,16 @@ function gen_cell_layout(region::Union{GlobalRegion,LatBeltRegion,GeoRegion,Poly
 end
 
 # Work on this old version of tesselate
-function tesselate_v2(pset::PointSet, method::VoronoiTesselation)
+function tesselate_v2(pset::PointSet, method::VoronoiTesselation; sorted=true)
     C = crs(pset)
     T = Meshes.numtype(Meshes.lentype(pset))
     Meshes.assertion(CoordRefSystems.ncoords(C) == 2, "points must have 2 coordinates")
     
     # perform tesselation with raw coordinates
     rawval = map(p -> CoordRefSystems.rawvalues(coords(p)), pset)
+
     triang = Meshes.triangulate(rawval, randomise=false, rng=method.rng)
-    vorono = Meshes.voronoi(triang, clip=true)
+    vorono = Meshes.voronoi(triang, clip=true) # Using the Dict we loose the correct sorting of elements (polygons), which can be recovered later.
     
     # mesh with all (possibly unused) points
     points = map(Meshes.get_polygon_points(vorono)) do xy
@@ -288,6 +291,12 @@ function tesselate_v2(pset::PointSet, method::VoronoiTesselation)
     end
     polygs = Meshes.each_polygon(vorono)
     tuples = [Tuple(inds[begin:(end - 1)]) for inds in polygs]
+    
+    if sorted # Recover correct sorting of polygons.
+        original_idxs = keys(vorono.polygons) |> collect
+        invpermute!(tuples, original_idxs)
+    end
+
     connec = connect.(tuples)
     mesh = SimpleMesh(points, connec)
     

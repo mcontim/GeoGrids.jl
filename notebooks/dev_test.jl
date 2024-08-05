@@ -110,6 +110,9 @@ geoattr = (; geo=attr(
             )
         ))
 
+# ╔═╡ 34755273-58fb-494a-bb7d-6a29f9e60028
+size([1,2,3])
+
 # ╔═╡ 39554aa7-779d-4bf5-a217-37b2c0882598
 # ╠═╡ disabled = true
 #=╠═╡
@@ -569,13 +572,35 @@ let
 	plot_geo_cells(dd, 20000, :hex)
 end
 
+# ╔═╡ bf97c9f8-1ca9-421b-8c63-00b7acfafe88
+let
+	lat = gen_hex_lattice(20000/6371e3, :pointy; M=1)
+	theta = map(lat) do l
+		asind(sqrt(l[1]^2+l[2]^2))
+	end
+	phi = map(lat) do l
+		atand(l[2],l[1])
+	end
+
+	theta, phi
+end
+
+# ╔═╡ d9f28c97-0aa2-4551-8d17-f9becd5d0570
+begin
+		r̂ = SA_F64[1,2,3]
+		θ̂ = SA_F64[4,5,6]
+		φ̂ = SA_F64[7,8,9]
+	
+	    R = hcat(-φ̂, θ̂, r̂)
+end
+
 # ╔═╡ 4f27f06a-661e-491c-b4b6-cc2510a3c95c
 let 
-	reg = GeoRegion(; regionName="Tassellation", admin="Spain")
+	reg = GeoRegion(; regionName="Tassellation", admin="Kenya")
 	dd = gen_cell_layout_v2(reg, 20000, HEX())
 	    
 	# plot_geo_cells(dd, 20000, :hex; kwargs_layout=geoattr)
-	plot_geo_cells(dd, 20000, :hex)
+	plot_geo_points(dd[:];camera=:threedim)
 end
 
 # ╔═╡ 8e31f7c1-5a86-4f02-9bb1-bd046573c573
@@ -1988,6 +2013,9 @@ version = "17.4.0+2"
 # ╠═e21179c3-4412-441c-9f5c-3d7a2d881d30
 # ╠═d05078cc-f277-492e-85a6-aab35f38f2f4
 # ╠═e0b2c99d-c689-48fb-91d5-6a3b4ee4d044
+# ╠═bf97c9f8-1ca9-421b-8c63-00b7acfafe88
+# ╠═34755273-58fb-494a-bb7d-6a29f9e60028
+# ╠═d9f28c97-0aa2-4551-8d17-f9becd5d0570
 # ╠═4f27f06a-661e-491c-b4b6-cc2510a3c95c
 # ╠═8e31f7c1-5a86-4f02-9bb1-bd046573c573
 # ╠═39554aa7-779d-4bf5-a217-37b2c0882598
