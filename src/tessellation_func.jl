@@ -23,7 +23,7 @@ equal to `M`.
 (`SVector{2,T}`) from the `StaticArrays` package. Each point is in the form \
 `(x, y)`.
 """
-function _gen_regular_lattice(dx::T, dy, ds; x0=zero(T), y0=zero(T), M::Int=70, N::Int=M) where {T}
+function _gen_regular_lattice(dx::T, dy, ds; x0=zero(T), y0=zero(T), M::Int=50, N::Int=M) where {T}
     # Function to generate x position as function of row,column number m,n
     x(m, n) = m * dx + n * ds + x0
     # Function to generate y position as function of row,column number m,n
@@ -97,12 +97,12 @@ distances to ensure the grid is appropriate for the desired scale.
 angle. The specific structure and format of the returned grid depend on the \
 `icogrid` function being used.
 """
-function _adapted_icogrid(radius::Number; earth_local_radius=constants.Re_mean, correctionFactor=6 / 5)
+function _adapted_icogrid(radius::Number; refRadius=constants.Re_mean, correctionFactor=6 / 5)
     # Define the separation angle for the icosahedral grid in a similar way as
     # for the hexagonal grid using a correction factor 1.2 to adapt the cell
     # centers distances (from old MATLAB grid). The correction factor would be
     # √3 if the original hex grid approach was used.
-    sepAng = radius * correctionFactor / earth_local_radius |> rad2deg
+    sepAng = radius * correctionFactor / refRadius |> rad2deg
 
     return icogrid(; sepAng)
 end
@@ -170,7 +170,7 @@ function _hex_tesselation_centroids(origin::SimpleLatLon, radius::Number; direct
         SimpleLatLon(lat, lon)
     end
 
-    return newLattice
+    return newLattice[:]
 end
 
 function _generate_tesselation(region::GeoRegion, radius::Number, type::HEX; refRadius::Number=constants.Re_mean, kwargs_lattice...)
@@ -206,8 +206,8 @@ function _generate_tesselation(region::PolyRegion, radius::Number, type::HEX; re
 end
 
 """
-    generate_tesselation(region::Union{GeoRegion, PolyRegion}, radius::Number, type::HEX; refRadius::Number=constants.Re_mean, kwargs_lattice...)
-    generate_tesselation(region::Union{GeoRegion, PolyRegion}, radius::Number, type::HEX, ::ExtraOutput; refRadius::Number=constants.Re_mean, kwargs_lattice...)
+    generate_tesselation(region::Union{GeoRegion, PolyRegion}, radius::Number, type::HEX; refRadius::Number=constants.Re_mean, kwargs_lattice...) -> AbstractVector{<:SimpleLatLon}
+    generate_tesselation(region::Union{GeoRegion, PolyRegion}, radius::Number, type::HEX, ::ExtraOutput; refRadius::Number=constants.Re_mean, kwargs_lattice...) -> AbstractVector{<:SimpleLatLon}, AbstractVector{<:Ngon}
 
 The `generate_tesselation` function generates a hexagonal cell layout for a given
 geographical region. It calculates the cell grid layout centered around the
@@ -247,7 +247,7 @@ function generate_tesselation(region::Union{GeoRegion,PolyRegion}, radius::Numbe
 end
 
 function generate_tesselation(region::Union{GeoRegion,PolyRegion}, radius::Number, type::HEX, ::ExtraOutput; refRadius::Number=constants.Re_mean, kwargs_lattice...)
-    # Generate the tassellation centroids and filter the ones in the region.
+    # Generate the tassellation centroids.
     centroids = _generate_tesselation(region, radius, type; refRadius, kwargs_lattice...)
 
     # Create the tasselation from all the centroids.
@@ -260,8 +260,10 @@ function generate_tesselation(region::Union{GeoRegion,PolyRegion}, radius::Numbe
 end
 
 """
-    generate_tesselation(region::GlobalRegion, radius::Number, type::ICO)
-    generate_tesselation(region::Union{LatBeltRegion, GeoRegion, PolyRegion}, radius::Number, type::ICO)
+    generate_tesselation(region::GlobalRegion, radius::Number, type::ICO; refRadius::Number=constants.Re_mean) -> AbstractVector{<:SimpleLatLon}
+    generate_tesselation(region::GlobalRegion, radius::Number, type::ICO, ::ExtraOutput; refRadius::Number=constants.Re_mean) -> AbstractVector{<:SimpleLatLon}, AbstractVector{<:Ngon}
+    generate_tesselation(region::Union{LatBeltRegion, GeoRegion, PolyRegion}, radius::Number, type::ICO; refRadius::Number=constants.Re_mean) -> AbstractVector{<:SimpleLatLon}
+    generate_tesselation(region::Union{LatBeltRegion, GeoRegion, PolyRegion}, radius::Number, type::ICO, ::ExtraOutput; refRadius::Number=constants.Re_mean) -> AbstractVector{<:SimpleLatLon}, AbstractVector{<:Ngon}
 
 The `generate_tesselation` function generates a cell layout using an icosahedral grid
 for a given geographical region. The function adapts the grid based on the
@@ -277,6 +279,9 @@ for which the cell layout is generated. This can be a `LatBeltRegion`, \
 - `radius::Number`: The radius used to adapt the icosahedral grid.
 - `type::ICO`: An object specifying the type of icosahedral grid and its \
 correction factor.
+- `::ExtraOutput`: an extra parameter enabling a `Vector{Ngon}` the contours of \
+each cell. The mesh originating these contours is obtained using \
+`VoronoiTesselation`.
 
 ## Returns
 - `Array{PointType, 1}`: An array of points representing the cell centers within \
@@ -287,17 +292,37 @@ See also: [`_adapted_icogrid()`](@ref), [`icogrid()`](@ref),
 [`filter_points()`](@ref), [`GeoRegion`](@ref), [`LatBeltRegion`](@ref),
 [`PolyRegion`](@ref), [`GlobalRegion`](@ref), [`ICO`](@ref)
 """
-function generate_tesselation(region::GlobalRegion, radius::Number, type::ICO)
-    return _adapted_icogrid(radius; correctionFactor=type.correction)
+function generate_tesselation(region::GlobalRegion, radius::Number, type::ICO; refRadius::Number=constants.Re_mean)
+    return _adapted_icogrid(radius; refRadius, correctionFactor=type.correction)
 end
 
-function generate_tesselation(region::Union{LatBeltRegion,GeoRegion,PolyRegion}, radius::Number, type::ICO)
-    grid = _adapted_icogrid(radius; correctionFactor=type.correction)
+function generate_tesselation(region::GlobalRegion, radius::Number, type::ICO, ::ExtraOutput; refRadius::Number=constants.Re_mean)
+    # Generate the tassellation centroids.
+    centroids = _adapted_icogrid(radius; refRadius, correctionFactor=type.correction)
+    # Create the tasselation from all the centroids.
+    mesh = my_tesselate(centroids)
 
-    return filter_points(grid, region)
+    return centroids, mesh[1:end]
 end
 
-function generate_tesselation(region::Union{GlobalRegion,LatBeltRegion,GeoRegion,PolyRegion}, radius::Number, type::H3)
+function generate_tesselation(region::Union{LatBeltRegion,GeoRegion,PolyRegion}, radius::Number, type::ICO; refRadius::Number=constants.Re_mean)
+    centroids = _adapted_icogrid(radius; refRadius, correctionFactor=type.correction)
+
+    return filter_points(centroids, region)
+end
+
+function generate_tesselation(region::Union{LatBeltRegion,GeoRegion,PolyRegion}, radius::Number, type::ICO, ::ExtraOutput; refRadius::Number=constants.Re_mean)
+    # Generate the tassellation centroids.
+    centroids = _adapted_icogrid(radius; refRadius, correctionFactor=type.correction)
+    # Create the tasselation from all the centroids.
+    mesh = my_tesselate(centroids)
+    # Filter centroids in the region.
+    filtered, idxs = filter_points(centroids, region, ExtraOutput())
+
+    return filtered, mesh[idxs]
+end
+
+function generate_tesselation(region::Union{GlobalRegion,LatBeltRegion,GeoRegion,PolyRegion}, radius::Number, type::H3; refRadius::Number=constants.Re_mean)
     error("H3 tassellation is not yet implemented in this version...")
 end
 

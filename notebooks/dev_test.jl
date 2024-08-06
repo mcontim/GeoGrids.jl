@@ -69,6 +69,31 @@ geoattr = (; geo=attr(
 # ╔═╡ 34755273-58fb-494a-bb7d-6a29f9e60028
 size([1,2,3])
 
+# ╔═╡ 4aded9e3-8324-471e-9de5-edb4e19962a8
+# ╠═╡ disabled = true
+#=╠═╡
+let 
+	reg = GeoRegion(; regionName="Tassellation", admin="Switzerland")
+	dd = generate_tesselation(reg, 20000, ICO())
+	
+	plot_geo_points(dd; kwargs_layout=geoattr)
+end
+  ╠═╡ =#
+
+# ╔═╡ 474da875-6a71-4216-9a10-69d1e0e00576
+# ╠═╡ disabled = true
+#=╠═╡
+let 
+	radius = 20000
+	
+	reg = GeoRegion(; regionName="Tassellation", admin="Switzerland")
+	
+	dd = generate_tesselation(reg, radius, ICO())
+	    
+	plot_geo_cells(dd, radius, :circ; kwargs_layout=geoattr)
+end
+  ╠═╡ =#
+
 # ╔═╡ d272905a-dfd4-4ade-88bd-ca10abf86f77
 md"""
 # Additional Functions
@@ -151,12 +176,23 @@ md"""
 end
 
 # ╔═╡ d05078cc-f277-492e-85a6-aab35f38f2f4
-let 
+c, ngon = let 
 	reg = GeoRegion(; regionName="Tassellation", admin="Switzerland")
-	dd = generate_tesselation(reg, 20000, HEX())
+	c, ngon = generate_tesselation(reg, 20000, HEX(), ExtraOutput())
+	# _generate_tesselation(reg, 20000, HEX())
 	# plot_geo_points(dd; kwargs_layout=geoattr)
-	min_dist(dd)
+
+	c, ngon
 end
+
+# ╔═╡ 66072100-a1f9-4fef-912c-48ce59ff17fe
+typeof(ngon)
+
+# ╔═╡ 177a1a2c-7c2c-4820-85cd-62b2d2e46e49
+ngon isa AbstractVector{<:Ngon}
+
+# ╔═╡ ea682852-12c2-47ae-80e6-4a224025edcb
+methods(generate_tesselation)
 
 # ╔═╡ e0b2c99d-c689-48fb-91d5-6a3b4ee4d044
 dd=let 
@@ -171,6 +207,9 @@ mesh = my_tesselate(dd)
 
 # ╔═╡ 9fe9264c-b9dc-45ee-87d6-85c34b4d2f74
 typeof(mesh[[1,482]])
+
+# ╔═╡ 62e47749-9bcd-4d8e-89d1-21275085cf8a
+mesh[1:end] isa AbstractVector{<:Ngon}
 
 # ╔═╡ 3a7a1f4f-c386-4372-ae5f-beaad06ba8af
 let
@@ -219,31 +258,6 @@ begin
 	
 	    R = hcat(-φ̂, θ̂, r̂)
 end
-
-# ╔═╡ 4aded9e3-8324-471e-9de5-edb4e19962a8
-# ╠═╡ disabled = true
-#=╠═╡
-let 
-	reg = GeoRegion(; regionName="Tassellation", admin="Switzerland")
-	dd = generate_tesselation(reg, 20000, ICO())
-	
-	plot_geo_points(dd; kwargs_layout=geoattr)
-end
-  ╠═╡ =#
-
-# ╔═╡ 474da875-6a71-4216-9a10-69d1e0e00576
-# ╠═╡ disabled = true
-#=╠═╡
-let 
-	radius = 20000
-	
-	reg = GeoRegion(; regionName="Tassellation", admin="Switzerland")
-	
-	dd = generate_tesselation(reg, radius, ICO())
-	    
-	plot_geo_cells(dd, radius, :circ; kwargs_layout=geoattr)
-end
-  ╠═╡ =#
 
 # ╔═╡ ed222264-461a-4efb-90b1-42324c7eea63
 let
@@ -334,9 +348,9 @@ manifest_format = "2.0"
 project_hash = "ce773dacfad0cfeefa5783526c26ec2142cc4cb3"
 
 [[deps.ADTypes]]
-git-tree-sha1 = "aa4d425271a914d8c4af6ad9fccb6eb3aec662c7"
+git-tree-sha1 = "6778bcc27496dae5723ff37ee30af451db8b35fe"
 uuid = "47edcb42-4c32-4615-8424-f2b9edc5f35b"
-version = "1.6.1"
+version = "1.6.2"
 weakdeps = ["ChainRulesCore", "EnzymeCore"]
 
     [deps.ADTypes.extensions]
@@ -472,15 +486,15 @@ version = "0.1.13"
 
 [[deps.CodeTracking]]
 deps = ["InteractiveUtils", "UUIDs"]
-git-tree-sha1 = "c0216e792f518b39b22212127d4a84dc31e4e386"
+git-tree-sha1 = "7eee164f122511d3e4e1ebadb7956939ea7e1c77"
 uuid = "da1fd8a2-8d9e-5ec2-8556-3022fb5608a2"
-version = "1.3.5"
+version = "1.3.6"
 
 [[deps.ColorSchemes]]
 deps = ["ColorTypes", "ColorVectorSpace", "Colors", "FixedPointNumbers", "PrecompileTools", "Random"]
-git-tree-sha1 = "4b270d6465eb21ae89b732182c20dc165f8bf9f2"
+git-tree-sha1 = "b5278586822443594ff615963b0c09755771b3e0"
 uuid = "35d6a980-a343-548e-a6ea-1d62b119f2f4"
-version = "3.25.0"
+version = "3.26.0"
 
 [[deps.ColorTypes]]
 deps = ["FixedPointNumbers", "Random"]
@@ -613,10 +627,10 @@ uuid = "85a47980-9c8c-11e8-2b9f-f7ca1fa99fb4"
 version = "0.4.2"
 
 [[deps.DiffEqBase]]
-deps = ["ArrayInterface", "ConcreteStructs", "DataStructures", "DocStringExtensions", "EnumX", "EnzymeCore", "FastBroadcast", "FastClosures", "ForwardDiff", "FunctionWrappers", "FunctionWrappersWrappers", "LinearAlgebra", "Logging", "Markdown", "MuladdMacro", "Parameters", "PreallocationTools", "PrecompileTools", "Printf", "RecursiveArrayTools", "Reexport", "SciMLBase", "SciMLOperators", "Setfield", "SparseArrays", "Static", "StaticArraysCore", "Statistics", "Tricks", "TruncatedStacktraces"]
-git-tree-sha1 = "d1e8a4642e28b0945bde6e2e1ac569b9e0abd728"
+deps = ["ArrayInterface", "ConcreteStructs", "DataStructures", "DocStringExtensions", "EnumX", "EnzymeCore", "FastBroadcast", "FastClosures", "ForwardDiff", "FunctionWrappers", "FunctionWrappersWrappers", "LinearAlgebra", "Logging", "Markdown", "MuladdMacro", "Parameters", "PreallocationTools", "PrecompileTools", "Printf", "RecursiveArrayTools", "Reexport", "SciMLBase", "SciMLOperators", "Setfield", "Static", "StaticArraysCore", "Statistics", "Tricks", "TruncatedStacktraces"]
+git-tree-sha1 = "72950e082d2241a1da1c924147943e2918471af9"
 uuid = "2b5f629d-d688-5b77-993f-72d75c75574e"
-version = "6.151.5"
+version = "6.152.2"
 
     [deps.DiffEqBase.extensions]
     DiffEqBaseCUDAExt = "CUDA"
@@ -628,6 +642,7 @@ version = "6.151.5"
     DiffEqBaseMeasurementsExt = "Measurements"
     DiffEqBaseMonteCarloMeasurementsExt = "MonteCarloMeasurements"
     DiffEqBaseReverseDiffExt = "ReverseDiff"
+    DiffEqBaseSparseArraysExt = "SparseArrays"
     DiffEqBaseTrackerExt = "Tracker"
     DiffEqBaseUnitfulExt = "Unitful"
 
@@ -641,6 +656,7 @@ version = "6.151.5"
     Measurements = "eff96d63-e80a-5855-80a2-b1b0885c5ab7"
     MonteCarloMeasurements = "0987c9cc-fe09-11e8-30f0-b96dd679fdca"
     ReverseDiff = "37e2e3b7-166d-5795-8a7a-e32c996b4267"
+    SparseArrays = "2f01184e-e22b-5df5-ae63-d93ebab69eaf"
     Tracker = "9f7883ad-71c0-57eb-9f7f-b5c9e6d3789c"
     Unitful = "1986cc42-f94f-5a68-af5c-568840ba703d"
 
@@ -658,9 +674,9 @@ version = "1.15.1"
 
 [[deps.DifferentiationInterface]]
 deps = ["ADTypes", "Compat", "DocStringExtensions", "FillArrays", "LinearAlgebra", "PackageExtensionCompat", "SparseArrays", "SparseMatrixColorings"]
-git-tree-sha1 = "c81579b549a00edf31582d318fec06523e0b607a"
+git-tree-sha1 = "6bd550abccb7aa156141e10d5367c580af9128af"
 uuid = "a0c0ee7d-e4b9-4e03-894e-1c5f64a51d63"
-version = "0.5.9"
+version = "0.5.11"
 
     [deps.DifferentiationInterface.extensions]
     DifferentiationInterfaceChainRulesCoreExt = "ChainRulesCore"
@@ -913,9 +929,9 @@ version = "3.0.3+0"
 
 [[deps.JuliaInterpreter]]
 deps = ["CodeTracking", "InteractiveUtils", "Random", "UUIDs"]
-git-tree-sha1 = "a6adc2dcfe4187c40dc7c2c9d2128e326360e90a"
+git-tree-sha1 = "5d3a5a206297af3868151bb4a2cf27ebce46f16d"
 uuid = "aa1ae85d-cabe-5617-a682-6adf51b2e16a"
-version = "0.9.32"
+version = "0.9.33"
 
 [[deps.LERC_jll]]
 deps = ["Artifacts", "JLLWrappers", "Libdl", "Pkg"]
@@ -1164,9 +1180,9 @@ version = "0.2.2"
 
 [[deps.PreallocationTools]]
 deps = ["Adapt", "ArrayInterface", "ForwardDiff"]
-git-tree-sha1 = "406c29a7f46706d379a3bce45671b4e3a39ddfbc"
+git-tree-sha1 = "d7f3f63331c7c8c81245b4ee2815b7d496365833"
 uuid = "d236fae5-4411-538c-8e31-a6e3d9e00b46"
-version = "0.4.22"
+version = "0.4.23"
 
     [deps.PreallocationTools.extensions]
     PreallocationToolsReverseDiffExt = "ReverseDiff"
@@ -1322,9 +1338,9 @@ version = "0.1.8"
 
 [[deps.SciMLBase]]
 deps = ["ADTypes", "Accessors", "ArrayInterface", "CommonSolve", "ConstructionBase", "Distributed", "DocStringExtensions", "EnumX", "Expronicon", "FunctionWrappersWrappers", "IteratorInterfaceExtensions", "LinearAlgebra", "Logging", "Markdown", "PrecompileTools", "Preferences", "Printf", "RecipesBase", "RecursiveArrayTools", "Reexport", "RuntimeGeneratedFunctions", "SciMLOperators", "SciMLStructures", "StaticArraysCore", "Statistics", "SymbolicIndexingInterface", "Tables"]
-git-tree-sha1 = "b316ed5e5e71a6414b0c0e0c9f334afcc701ebf8"
+git-tree-sha1 = "7f0e208db50f5fee2386b6d8dc9608d580059331"
 uuid = "0bca4576-84f4-4d90-8ffe-ffa030f20462"
-version = "2.48.0"
+version = "2.48.1"
 
     [deps.SciMLBase.extensions]
     SciMLBaseChainRulesCoreExt = "ChainRulesCore"
@@ -1353,9 +1369,9 @@ version = "0.3.8"
 
 [[deps.SciMLStructures]]
 deps = ["ArrayInterface"]
-git-tree-sha1 = "cfdd1200d150df1d3c055cc72ee6850742e982d7"
+git-tree-sha1 = "20ad3e7c137156c50c93c888d0f2bc5b7883c729"
 uuid = "53ae85a6-f571-4167-b2af-e1d143709226"
-version = "1.4.1"
+version = "1.4.2"
 
 [[deps.Scratch]]
 deps = ["Dates"]
@@ -1547,9 +1563,9 @@ uuid = "8290d209-cae3-49c0-8002-c8c24d57dab5"
 version = "0.5.2"
 
 [[deps.Tricks]]
-git-tree-sha1 = "eae1bb484cd63b36999ee58be2de6c178105112f"
+git-tree-sha1 = "7822b97e99a1672bfb1b49b668a6d46d58d8cbcb"
 uuid = "410a4b4d-49e4-4fbc-ab6d-cb71b17b3775"
-version = "0.1.8"
+version = "0.1.9"
 
 [[deps.TruncatedStacktraces]]
 deps = ["InteractiveUtils", "MacroTools", "Preferences"]
@@ -1630,8 +1646,12 @@ version = "17.4.0+2"
 # ╟─2f6c6420-ffb5-4bb6-b757-1ce852c35e78
 # ╠═e21179c3-4412-441c-9f5c-3d7a2d881d30
 # ╠═d05078cc-f277-492e-85a6-aab35f38f2f4
+# ╠═66072100-a1f9-4fef-912c-48ce59ff17fe
+# ╠═177a1a2c-7c2c-4820-85cd-62b2d2e46e49
+# ╠═ea682852-12c2-47ae-80e6-4a224025edcb
 # ╠═e0b2c99d-c689-48fb-91d5-6a3b4ee4d044
 # ╠═6cf1f091-7ca6-4487-826d-7788126fc926
+# ╠═62e47749-9bcd-4d8e-89d1-21275085cf8a
 # ╠═9fe9264c-b9dc-45ee-87d6-85c34b4d2f74
 # ╠═3a7a1f4f-c386-4372-ae5f-beaad06ba8af
 # ╠═2524d256-eddf-4582-b433-ffd6f5f92db9
