@@ -248,8 +248,7 @@ icosahedral grid. It then filters the grid points to include only those within
 the specified region.
 
 ## Arguments
-- `region::Union{LatBeltRegion, GeoRegion, PolyRegion}`: The geographical region
-  \
+- `region::Union{LatBeltRegion, GeoRegion, PolyRegion}`: The geographical region \
 for which the cell layout is generated. This can be a `LatBeltRegion`, \
 `GeoRegion`, or `PolyRegion`.
 - `radius::Number`: The radius used to adapt the icosahedral grid.
@@ -257,8 +256,7 @@ for which the cell layout is generated. This can be a `LatBeltRegion`, \
 correction factor.
 
 ## Returns
-- `Array{PointType, 1}`: An array of points representing the cell centers within
-  \
+- `Array{PointType, 1}`: An array of points representing the cell centers within \
 the specified region. The exact type of `PointType` depends on the \
 implementation of the `_adapted_icogrid` and `filter_points` functions.
 
@@ -278,19 +276,40 @@ function gen_cell_layout(region::Union{GlobalRegion,LatBeltRegion,GeoRegion,Poly
     error("H3 tassellation is not yet implemented in this version...")
 end
 
-# Work on this old version of tesselate
-function tesselate_v2(pset::PointSet, method::VoronoiTesselation; sorted=true)
+"""
+    my_tesselate(pset::PointSet, method::VoronoiTesselation; sorted=true) -> SimpleMesh
+    my_tesselate(points::AbstractVector{<:Point}, method::TesselationMethod) -> SimpleMesh
+
+This function performs a Voronoi tessellation on a given set of 2D points. The
+tessellation divides the plane into polygons such that each polygon contains
+exactly one generating point and every point in a given polygon is closer to its
+generating point than to any other. The function handles the conversion between
+coordinate systems and ensures that the resulting polygons are correctly sorted
+if specified.
+
+## Arguments
+- `pset::PointSet`: The set of points to be tessellated. Must have 2 coordinates \
+per point.
+- `method::VoronoiTesselation`: The tessellation method containing parameters \
+for the Voronoi tessellation, including the random number generator (`rng`).
+- `sorted::Bool`: Whether to sort the polygons in the tessellation output to \
+match the original order of points (default: `true`).
+
+## Returns
+- `SimpleMesh`: A mesh object representing the tessellated polygons.
+"""
+function my_tesselate(pset::PointSet, method::VoronoiTesselation; sorted=true)
     C = crs(pset)
     T = Meshes.numtype(Meshes.lentype(pset))
     Meshes.assertion(CoordRefSystems.ncoords(C) == 2, "points must have 2 coordinates")
 
-    # perform tesselation with raw coordinates
+    # Perform tesselation with raw coordinates
     rawval = map(p -> CoordRefSystems.rawvalues(coords(p)), pset)
 
     triang = Meshes.triangulate(rawval, randomise=false, rng=method.rng)
     vorono = Meshes.voronoi(triang, clip=true) # Using the Dict we loose the correct sorting of elements (polygons), which can be recovered later.
 
-    # mesh with all (possibly unused) points
+    # Mesh with all (possibly unused) points
     points = map(Meshes.get_polygon_points(vorono)) do xy
         coords = CoordRefSystems.reconstruct(C, T.(xy))
         Point(coords)
@@ -306,8 +325,8 @@ function tesselate_v2(pset::PointSet, method::VoronoiTesselation; sorted=true)
     connec = connect.(tuples)
     mesh = SimpleMesh(points, connec)
 
-    # remove unused points
+    # Remove unused points
     mesh |> Repair{1}()
 end
 
-tesselate_v2(points::AbstractVector{<:Point}, method::TesselationMethod) = tesselate_v2(PointSet(points), method)
+my_tesselate(points::AbstractVector{<:Point}, method::TesselationMethod) = my_tesselate(PointSet(points), method)

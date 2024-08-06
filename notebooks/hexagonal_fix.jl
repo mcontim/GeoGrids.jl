@@ -113,7 +113,7 @@ crs(ps)
 # ╔═╡ 28955e5e-9197-4c8c-ac38-b898e58d3451
 mesh2 = let 
 	allVorPoints = map(x -> Point(ustrip(x.lon), ustrip(x.lat)), all_lat)
-	mesh = tesselate_v2(allVorPoints[:], VoronoiTesselation())
+	mesh = my_tesselate(allVorPoints[:], VoronoiTesselation())
 end
 
 # ╔═╡ 1884db68-1f8d-4854-b0b8-35134481cd3e
@@ -336,7 +336,7 @@ md"""
 # ╔═╡ 3480b3b3-6146-4fd6-ad72-d495946f33e3
 let
 	p = map(x -> Point(ustrip(x.lon), ustrip(x.lat)), filter)
-	tesselate_v2(p, VoronoiTesselation())
+	my_tesselate(p, VoronoiTesselation())
 end
 
 # ╔═╡ 00000000-0000-0000-0000-000000000001
