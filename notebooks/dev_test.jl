@@ -28,25 +28,6 @@ end
 # ╔═╡ 069444e1-4e89-4f4f-ae2f-f5fb3131e398
 ExtendedTableOfContents()
 
-# ╔═╡ 8717aaad-3791-40ec-82a3-3957fb10a562
-md"""
-# Test
-"""
-
-# ╔═╡ f33655ca-5da5-45af-9608-341bcb609477
-# ╠═╡ disabled = true
-#=╠═╡
-aaa=extract_countries(GeoRegion(regionName="ITA", continent="Europe"))
-  ╠═╡ =#
-
-# ╔═╡ 5a60a99f-ff3b-4867-86ba-03813a817430
-#=╠═╡
-aaa
-  ╠═╡ =#
-
-# ╔═╡ 75264458-e8a8-4186-809b-0fd97a22b9d2
-
-
 # ╔═╡ 222fb774-1693-4b3c-b2ef-5fd38eca773c
 md"""
 # Test Tessellation
@@ -205,127 +186,24 @@ end
 
 # ╔═╡ d272905a-dfd4-4ade-88bd-ca10abf86f77
 md"""
-# Test
+# Additional Functions
 """
 
-# ╔═╡ dc4c7aa9-a677-4e96-9913-6b7ea4c13927
-sqrt(3)/2
-
-# ╔═╡ 9ae83d91-f3da-4880-98a6-1dbea60546ef
-# Function to generate a 2D hexagonal grid centered around (0, 0)
-function hexagonal_grid(radius::Float64, num_cells::Int)
-    centers = []
-    dx = radius * sqrt(3)  # Horizontal distance between hexagon centers
-    dy = radius * 1.5      # Vertical distance between hexagon centers
-    # dy = radius * (1+sqrt(3)/2)      # Vertical distance between hexagon centers
-    
-    for i in -num_cells:num_cells
-        for j in -num_cells:num_cells
-            x = i * dx
-            y = j * dy + (i % 2 == 0 ? 0 : radius * 0.75)
-            push!(centers, (x, y))
-        end
-    end
-    return centers
-end
-
-# ╔═╡ 0838584d-5bf3-47cf-8b58-c4e60bc685c6
-# Function to convert 2D grid coordinates to lat-lon on a sphere
-function project_to_sphere(centers, radius, lat0, lon0)
-    latlon_centers = []
-    R = 6371.0  # Earth's radius in kilometers
-    for (x, y) in centers
-        # Convert x, y to lat, lon using (inverse) equirectangular approximation
-        lat = lat0 + (y / R) * (180 / π)
-        lon = lon0 + (x / (R * cos(lat0 * π / 180))) * (180 / π)
-        push!(latlon_centers, (lat, lon))
-    end
-    return latlon_centers
-end
-
-# ╔═╡ c521b927-71cc-4e06-b7ad-e8af02631c44
-# # Function to create a hexagon given its center and radius
-# function hexagon_vertices(lat, lon, radius)
-#     R = 6371.0  # Earth's radius in kilometers
-#     d_lat = (radius / R) * (180 / π)
-#     d_lon = (radius / (R * cos(lat * π / 180))) * (180 / π)
-#     vertices = []
-#     for k in 0:5
-#         angle = π / 3 * k
-#         vertex_lat = lat + d_lat * cos(angle)
-#         vertex_lon = lon + d_lon * sin(angle)
-#         push!(vertices, (vertex_lat, vertex_lon))
-#     end
-#     # Close the hexagon by repeating the first vertex
-#     push!(vertices, vertices[1])
-#     return vertices
-# end
-
-# ╔═╡ f4801220-f100-4f88-acad-9e8f24464984
-# # Function to plot hexagonal grid
-# function plot_hexagonal_grid(latlon_centers, radius)
-#     traces = []
-#     for (lat, lon) in latlon_centers
-#         vertices = hexagon_vertices(lat, lon, radius)
-#         lats, lons = map(x -> x[1], vertices), map(x -> x[2], vertices)
-#         trace = scattergeo(
-#             lat = lats,
-#             lon = lons,
-#             mode = "lines",
-#             fill = "toself",
-#             fillcolor = "rgba(0, 100, 255, 0.3)",
-#             line = attr(color = "blue")
-#         )
-#         push!(traces, trace)
-#     end
-#     layout = Layout(
-#         title = "Hexagonal Grid on Sphere",
-#         geo = attr(
-#             scope = "world",
-#             showland = true,
-#             landcolor = "rgb(243, 243, 243)",
-#             countrycolor = "rgb(204, 204, 204)"
-#         )
-#     )
-#     plot([traces...], layout)
-# end
-
-# ╔═╡ c41c300f-2765-49d9-bd68-65de58c7040f
-# # Function to create a hexagon given its center and radius
-# function hexagon_vertices(lat, lon, radius)
-#     R = 6371.0  # Earth's radius in kilometers
-#     vertices = []
-#     for k in 0:5
-#         angle = π / 3 * k
-#         # Small arc approximation to find the vertex positions
-#         d_lat = radius * cos(angle) / R * (180 / π)
-#         d_lon = radius * sin(angle) / (R * cos(lat * π / 180)) * (180 / π)
-#         vertex_lat = lat + d_lat
-#         vertex_lon = lon + d_lon
-#         push!(vertices, (vertex_lat, vertex_lon))
-#     end
-#     # Close the hexagon by repeating the first vertex
-#     push!(vertices, vertices[1])
-#     return vertices
-# end
-
-
-# ╔═╡ 978d4d2b-0e1f-40e3-a8c0-ab958dafab72
-function hexagon_vertices(lat, lon, radius, rotation_angle=π/6)
-    R = 6371.0  # Earth's radius in kilometers
-    vertices = []
-    for k in 0:5
-        angle = rotation_angle + π / 3 * k
-        # Small arc approximation to find the vertex positions
-        d_lat = radius * cos(angle) / R * (180 / π)
-        d_lon = radius * sin(angle) / (R * cos(lat * π / 180)) * (180 / π)
-        vertex_lat = lat + d_lat
-        vertex_lon = lon + d_lon
-        push!(vertices, (vertex_lat, vertex_lon))
-    end
-    # Close the hexagon by repeating the first vertex
-    push!(vertices, vertices[1])
-    return vertices
+# ╔═╡ d12aece5-8625-4667-9f65-6588f63849c4
+function min_dist(dd)
+	mindist = Inf
+	np = length(dd)
+	res = []
+	for i in 1:np
+		for j in i+1:np
+			p1 = dd[i]
+			p2 = dd[j]
+			lla1 = LLA(p1.lat, p1.lon)
+			lla2 = LLA(p2.lat, p2.lon)
+			push!(res,get_distance_on_earth(lla1, lla2))
+		end
+	end
+	return minimum(res)
 end
 
 # ╔═╡ ce49e8d1-539c-446e-9443-24238593a611
@@ -386,77 +264,6 @@ md"""
 	import ^: * # to eport all functions from parent package
 	import >.CoordRefSystems
 end
-
-# ╔═╡ cd0f6997-c95c-4fd7-9be8-88d8dbcf760a
-r = [
-	GeoRegion(regionName="ITA", admin="Italy"), 
-	PolyRegion(regionName="POLY", domain=[SimpleLatLon(-60°,-180°), SimpleLatLon(-60°,180°), SimpleLatLon(60°,180°), SimpleLatLon(60°,-180°)]),
-	LatBeltRegion(regionName="test", latLim=(50°, 60°)),
-	# LatBeltRegion(regionName="test", latLim=(45, 60)),
-	# LatBeltRegion(regionName="test", latLim=((pi/4)rad, (pi/2)rad))
-]
-
-# ╔═╡ aed8268b-3432-434c-a764-03bfc49b6333
-typeof(r)
-
-# ╔═╡ 3a7b7e4e-8555-488f-be49-c82cac515376
-SimpleLatLon(43.997568°, 11.647423°) in r[2]
-
-# ╔═╡ 56cef4fa-7aea-40c8-83da-e6431ff9a915
-SimpleLatLon(-70°, 11.647423°) in r
-
-# ╔═╡ d2c92cda-1d17-49c0-82af-40da55db9ccd
-methods(filter_points)
-
-# ╔═╡ e05e7a8c-3957-4329-950c-7cc41383662f
-points = [SimpleLatLon(43.997568°, 11.647423°), SimpleLatLon(-70°, 11.647423°)]
-
-# ╔═╡ af171b47-c943-4d70-93cc-e55f1ef9d2c2
-filter_points(points, r[1])
-
-# ╔═╡ 8eb93dcd-118a-4988-a4bc-a59db70053ea
-gr = group_by_domain(points, r; flagUnique=false)
-
-# ╔═╡ 18a8cc75-79ae-49c2-8c7b-3ea6c318f383
-gr["ITA"]
-
-# ╔═╡ b638c73e-72d8-4140-aa7a-97d6293794a4
-gr["POLY"]
-
-# ╔═╡ f9a83ad1-ae48-429d-825f-a2db78c27d83
-gr["test"]
-
-# ╔═╡ b6dda362-d709-4628-aa45-a42ca377ee70
-typeof(points)
-
-# ╔═╡ 28aa42db-f470-4170-8f91-4b2897389fd5
-SimpleLatLon(60°,180°).lat 
-
-# ╔═╡ d9334bde-6ae5-4da4-b8ed-b16bd9678785
-extract_countries(GeoRegion(regionName="ITA", continent="Europe"))
-
-# ╔═╡ 4ff0540b-c3ba-408f-894e-5fda86c0769d
-plot_geo_points([SimpleLatLon(-70°, 11°),SimpleLatLon(-0°, 12°)]; 
-kwargs_layout= (; 
-	geo = attr(;
-		lataxis = attr(;
-			range = [25, 70],
-			showgrid = true,
-			dtick = 10,
-		),
-		lonaxis = attr(;
-			range = [-35, 55],
-			showgrid = true,
-		))))
-
-# ╔═╡ 4bec169d-5243-439f-92e0-b623aaa1c31c
-plot_unitarysphere([[1.0,1.0,1.0],[1.0,1.0,2.0]])
-
-# ╔═╡ 5c75483b-9e9b-4188-91f4-4d7464d11843
-SimpleLatLon(-70°, 11°).lat
-
-# ╔═╡ d529382c-3174-45b5-9eda-dfe114108b98
-typeof(ustrip(deg2rad(SimpleLatLon(deg2rad(-70)*rad, deg2rad(11)*rad).lat)))
 
 # ╔═╡ 69ff22ae-93ac-466d-ba16-5a2521e1729e
 begin
@@ -560,7 +367,8 @@ end
 let 
 	reg = GeoRegion(; regionName="Tassellation", admin="Switzerland")
 	dd = gen_cell_layout(reg, 20000, HEX())
-	plot_geo_points(dd; kwargs_layout=geoattr)
+	# plot_geo_points(dd; kwargs_layout=geoattr)
+	min_dist(dd)
 end
 
 # ╔═╡ e0b2c99d-c689-48fb-91d5-6a3b4ee4d044
@@ -593,18 +401,6 @@ begin
 	
 	    R = hcat(-φ̂, θ̂, r̂)
 end
-
-# ╔═╡ 4f27f06a-661e-491c-b4b6-cc2510a3c95c
-let 
-	reg = GeoRegion(; regionName="Tassellation", admin="Norway")
-	dd = gen_cell_layout_v2(reg, 20000, HEX(); M=10)
-	    
-	# plot_geo_cells(dd, 20000, :hex; kwargs_layout=geoattr)
-	plot_geo_points(dd[:];camera=:threedim)
-end
-
-# ╔═╡ 8e31f7c1-5a86-4f02-9bb1-bd046573c573
-_get_local_radius(0,0,0)
 
 # ╔═╡ ed222264-461a-4efb-90b1-42324c7eea63
 let
@@ -1987,28 +1783,6 @@ version = "17.4.0+2"
 
 # ╔═╡ Cell order:
 # ╠═069444e1-4e89-4f4f-ae2f-f5fb3131e398
-# ╟─8717aaad-3791-40ec-82a3-3957fb10a562
-# ╠═cd0f6997-c95c-4fd7-9be8-88d8dbcf760a
-# ╠═3a7b7e4e-8555-488f-be49-c82cac515376
-# ╠═56cef4fa-7aea-40c8-83da-e6431ff9a915
-# ╠═af171b47-c943-4d70-93cc-e55f1ef9d2c2
-# ╠═8eb93dcd-118a-4988-a4bc-a59db70053ea
-# ╠═18a8cc75-79ae-49c2-8c7b-3ea6c318f383
-# ╠═b638c73e-72d8-4140-aa7a-97d6293794a4
-# ╠═f9a83ad1-ae48-429d-825f-a2db78c27d83
-# ╠═b6dda362-d709-4628-aa45-a42ca377ee70
-# ╠═d2c92cda-1d17-49c0-82af-40da55db9ccd
-# ╠═e05e7a8c-3957-4329-950c-7cc41383662f
-# ╠═aed8268b-3432-434c-a764-03bfc49b6333
-# ╠═28aa42db-f470-4170-8f91-4b2897389fd5
-# ╠═f33655ca-5da5-45af-9608-341bcb609477
-# ╠═d9334bde-6ae5-4da4-b8ed-b16bd9678785
-# ╠═5a60a99f-ff3b-4867-86ba-03813a817430
-# ╠═4ff0540b-c3ba-408f-894e-5fda86c0769d
-# ╠═4bec169d-5243-439f-92e0-b623aaa1c31c
-# ╠═5c75483b-9e9b-4188-91f4-4d7464d11843
-# ╠═75264458-e8a8-4186-809b-0fd97a22b9d2
-# ╠═d529382c-3174-45b5-9eda-dfe114108b98
 # ╟─222fb774-1693-4b3c-b2ef-5fd38eca773c
 # ╟─df161e7c-b8af-4934-99b7-54570f2b4fae
 # ╟─65025a77-8d99-4867-adc9-83d960273e1b
@@ -2028,20 +1802,12 @@ version = "17.4.0+2"
 # ╠═bf97c9f8-1ca9-421b-8c63-00b7acfafe88
 # ╠═34755273-58fb-494a-bb7d-6a29f9e60028
 # ╠═d9f28c97-0aa2-4551-8d17-f9becd5d0570
-# ╠═4f27f06a-661e-491c-b4b6-cc2510a3c95c
-# ╠═8e31f7c1-5a86-4f02-9bb1-bd046573c573
 # ╠═39554aa7-779d-4bf5-a217-37b2c0882598
 # ╠═ef11c61d-c89c-4a61-bea6-05751b3804de
 # ╠═4aded9e3-8324-471e-9de5-edb4e19962a8
 # ╠═474da875-6a71-4216-9a10-69d1e0e00576
 # ╟─d272905a-dfd4-4ade-88bd-ca10abf86f77
-# ╠═dc4c7aa9-a677-4e96-9913-6b7ea4c13927
-# ╠═9ae83d91-f3da-4880-98a6-1dbea60546ef
-# ╠═0838584d-5bf3-47cf-8b58-c4e60bc685c6
-# ╠═c521b927-71cc-4e06-b7ad-e8af02631c44
-# ╠═f4801220-f100-4f88-acad-9e8f24464984
-# ╠═c41c300f-2765-49d9-bd68-65de58c7040f
-# ╠═978d4d2b-0e1f-40e3-a8c0-ab958dafab72
+# ╠═d12aece5-8625-4667-9f65-6588f63849c4
 # ╠═ce49e8d1-539c-446e-9443-24238593a611
 # ╠═e904b396-4794-4783-9039-a2e66f82ec07
 # ╠═ed222264-461a-4efb-90b1-42324c7eea63

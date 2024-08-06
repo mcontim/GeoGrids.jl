@@ -137,7 +137,9 @@ function _hex_tesselation_centroids(origin::SimpleLatLon, radius::Number; direct
     offsetLattice = gen_hex_lattice(spacing, direction; kwargs_lattice...) # [rad]
 
     ## Re-center the lattice around the seed point.
-    centreθφ = (; θ = 90 - (origin.lat |> ustrip), ϕ = origin.lon |> ustrip) # [rad] Convert lat-lon in theta-phi (shperical approximation)
+    θ = 90 - (origin.lat |> ustrip) |> deg2rad
+    ϕ = origin.lon |> ustrip |> deg2rad
+    centreθφ = (; θ=θ, ϕ=ϕ) # [rad] Convert lat-lon in theta-phi (shperical approximation)
     newLattice = map(offsetLattice) do offset
         # 1 - Convert the lat-lon of the grid seed in spherical (ISO). 2 - The
         # lattice give us the θ-ϕ offset to be used for the computation of the
@@ -225,7 +227,7 @@ function gen_cell_layout(region::PolyRegion, radius::Number, type::HEX; kwargs_l
         (; x, y) = centre.coords
         SimpleLatLon(y |> ustrip, x |> ustrip) # SimpleLatLon in deg
     end
-    
+
     ## Generate the tassellation centroids and filter the ones in the region.
     centroids = _hex_tesselation_centroids(origin, radius; direction=type.direction, Re=constants.Re_mean, kwargs_lattice...)
 
