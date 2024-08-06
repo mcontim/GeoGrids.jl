@@ -106,6 +106,71 @@ function _adapted_icogrid(radius::Number; earth_local_radius=constants.Re_mean, 
 end
 
 """
+    _hex_tesselation_centroids(origin::SimpleLatLon, radius::Number; direction::Symbol=:pointy, Re::Number=constants.Re_mean, kwargs_lattice...)
+
+This function generates the centroids of a hexagonal tessellation on the Earth's
+surface, centered at the origin. The tessellation is created based on a given
+radius and direction. The function converts the offsets of the hexagonal grid to
+latitude and longitude coordinates.
+
+## Arguments
+- `origin::SimpleLatLon`: The lat-lon coordinates of the center of the tessellation. 
+- `radius::Number`: The radius of the hexagons in the tessellation in meters.
+- `direction::Symbol`: The direction of the hexagons, either `:pointy` (default) \
+or `:flat`.
+- `Re::Number`: The mean radius of the Earth in meters (default is \
+`constants.Re_mean`).
+- `kwargs_lattice...`: Additional keyword arguments for the hexagonal lattice \
+generation.
+
+## Returns
+- `Vector{SimpleLatLon}`: A vector of `SimpleLatLon` objects representing the \
+centroids of the hexagonal tessellation in latitude and longitude.
+
+"""
+function _hex_tesselation_centroids(origin::SimpleLatLon, radius::Number; direction::Symbol=:pointy, Re::Number=constants.Re_mean, kwargs_lattice...)
+    ## Generate the lattice centered in 0,0.
+    # Angular spacing [rad] between lattice points considering a triple-point
+    # overlap. This spacing represents the angle of the arc of length radius, on
+    # a circonference of radius equivalent to the Earth mean radius.
+    spacing = radius * √3 / Re
+    offsetLattice = gen_hex_lattice(spacing, direction; kwargs_lattice...) # [rad]
+
+    ## Re-center the lattice around the seed point.
+    centreθφ = (; θ = 90 - (origin.lat |> ustrip), ϕ = origin.lon |> ustrip) # [rad] Convert lat-lon in theta-phi (shperical approximation)
+    newLattice = map(offsetLattice) do offset
+        # 1 - Convert the lat-lon of the grid seed in spherical (ISO). 2 - The
+        # lattice give us the θ-ϕ offset to be used for the computation of the
+        # actual position of the points on the lat-lon grid. 3 - Pass to
+        # Cartesian coordinate such to rotate the vector representing the grid
+        # center by the angle described by the offset. 4 - Convert the cartesian
+        # position of the newly identified vector back to spherical, (ISO) then
+        # to lat-lon This is an approximate approach which can be considered
+        # enough accurate for tassellation of small surfaces. However, the
+        # points are equidisant from the center, if we want to keep equidistance
+        # between adjacent points as accurate as possible, we could solve the
+        # geodesic direct problem using each point of the lattice to determinte
+        # the sourrounding neighbours. In this case we could compute the azimuth
+        # between each of the points and each of its neighbours from the lattice
+        # and use the defaul distance we want to obtain between them (radius).
+        # Knowing also the lat-lon position of the starting point we have all
+        # the parameters to compute the geodesic direct. Even if more accurate,
+        # this approch would require to discard the points already computed from
+        # the newly computed neighbours (not trivial to be done precisely).
+        x, y = offset # Get the x,y of the offset
+        θ = sqrt(x^2 + y^2) # [rad] θ is the angular distance between center and target offset, which is exactly the euclidean distance based on how we created the lattice, instead of the asin() like it is to transform from uv -> θϕ
+        ϕ = atan(y, x) # [rad]
+        offsetθφ = (; θ, ϕ) # [rad]
+        new = _add_angular_offset(centreθφ, offsetθφ)
+
+        lat, lon = _wrap_latlon(π / 2 - new.θ |> rad2deg, new.ϕ |> rad2deg)
+        SimpleLatLon(lat, lon)
+    end
+
+    return newLattice
+end
+
+"""
     gen_cell_layout(region::GeoRegion, radius::Number, type::HEX; kwargs_lattice...)
     gen_cell_layout(region::PolyRegion, radius::Number, type::HEX; kwargs_lattice...)
 
@@ -132,7 +197,7 @@ cell centers within the specified region.
 function gen_cell_layout(region::GeoRegion, radius::Number, type::HEX; kwargs_lattice...)
     ## Find the domain center as seed for the cell grid layout.
     domain = extract_countries(region)[1] # The indicization is used to extract directly the Multi or PolyArea from the view
-    centre = let
+    origin = let
         c = if domain isa Multi
             idxMain = findmax(x -> length(vertices(x)), domain.geoms)[2] # Find the PolyArea with the most vertices. It is assumed also to be the largest one so the main area of that country to be considered for the centroid computation.
             c = centroid(domain.geoms[idxMain]) # Find the centroid of the main PolyArea to be used as grid layout seed.
@@ -142,75 +207,34 @@ function gen_cell_layout(region::GeoRegion, radius::Number, type::HEX; kwargs_la
             error("Unrecognised type of GeoRegion domain...")
         end
         (; x, y) = c.coords
-        (; lat=y |> ustrip, lon=x |> ustrip) # Tuple of lon-lat in deg
+        SimpleLatLon(y |> ustrip, x |> ustrip) # SimpleLatLon in deg
     end
 
-    ## Generate the lattice centered in 0,0.
-    Re_local = _get_local_radius(centre.lat, centre.lon, 0.0)
-    spacing = radius * √3 / Re_local # spacing (angular in rad) between lattice points considering a triple-point overlap, considering a sphere of radius equivalent to the Earth mean radius.
-    offsetLattice = gen_hex_lattice(spacing, type.direction; kwargs_lattice...) # [rad]
+    ## Generate the tassellation centroids and filter the ones in the region.
+    centroids = _hex_tesselation_centroids(origin, radius; direction=type.direction, Re=constants.Re_mean, kwargs_lattice...)
 
-    ## Re-center the lattice around the seed point.
-    # Convert lat-lon in theta-phi (shperical approximation)
-    centreθφ = (; θ=deg2rad(90 - centre.lat), ϕ=deg2rad(centre.lon)) # [rad]
-    newLattice = map(offsetLattice) do offset
-        # 1 - Convert the lat-lon of the grid seed in spherical (ISO). 2 - The
-        # lattice give us the θ-ϕ offset to be used for the computation of the
-        # actual position of the points on the lat-lon grid. 3 - Pass to
-        # Cartesian coordinate such to rotate the vector representing the grid
-        # center by the angle described by the offset. 4 - Convert the cartesian
-        # position of the newly identified vector back to spherical, (ISO) then
-        # to lat-lon This is an approximate approach which can be considered
-        # enough accurate for tassellation of small surfaces. However, the
-        # points are equidisant from the center, if we want to keep equidistance
-        # between adjacent points as accurate as possible, we could solve the
-        # geodesic direct problem using each point of the lattice to determinte
-        # the sourrounding neighbours. In this case we could compute the azimuth
-        # between each of the points and each of its neighbours from the lattice
-        # and use the defaul distance we want to obtain between them (radius).
-        # Knowing also the lat-lon position of the starting point we have all
-        # the parameters to compute the geodesic direct. Even if more accurate,
-        # this approch would require to discard the points already computed from
-        # the newly computed neighbours (not trivial to be done precisely).
-        x, y = offset # Get the x,y of the offset
-        θ = sqrt(x^2 + y^2) # [rad] θ is the angular distance between center and target offset, which is exactly the euclidean distance based on how we created the lattice, instead of the asin() like it is to transform from uv -> θϕ
-        ϕ = atan(y, x) # [rad]
-        offsetθφ = (; θ, ϕ) # [rad]
-        newθ, newϕ, _ = _add_angular_offset(centreθφ, offsetθφ, Re_local)
+    filtered, _ = filter_points(centroids, region)
 
-        lat, lon = _wrap_latlon(π / 2 - newθ |> rad2deg, newϕ |> rad2deg)
-        SimpleLatLon(lat, lon)
-    end
-    
-    # return newLattice
-
-    filter, _ = filter_points(newLattice, region)
-
-    return filter
+    return filtered
 end
 
 function gen_cell_layout(region::PolyRegion, radius::Number, type::HEX; kwargs_lattice...)
     ## Find the domain center as seed for the cell grid layout.
-    centre = centroid(region.domain)
-    (; x, y) = centre.coords
-    SVector(x |> ustrip, y |> ustrip) # SVector of lon-lat in deg
-
-    ## Generate the lattice centered in 0,0.
-    Re_local = _get_local_radius(centre[2], centre[1], 0.0)
-    spacing = radius * √3 / Re_local # spacing (angular in rad) between lattice points, considering a sphere of radius equivalent to the Earth mean radius.
-    lattice = gen_hex_lattice(spacing, type.direction, rad2deg; kwargs_lattice...)
-
-    ## Re-center the lattice around the seed point.
-    newLattice = map(lattice) do point
-        new = point + centre # This SVector is still in the order lon-lat
-        lat, lon = _wrap_latlon(new[2], new[1])
-        SimpleLatLon(lat, lon)
+    origin = let
+        centre = centroid(region.domain)
+        (; x, y) = centre.coords
+        SimpleLatLon(y |> ustrip, x |> ustrip) # SimpleLatLon in deg
     end
+    
+    ## Generate the tassellation centroids and filter the ones in the region.
+    centroids = _hex_tesselation_centroids(origin, radius; direction=type.direction, Re=constants.Re_mean, kwargs_lattice...)
+
+    filtered, _ = filter_points(centroids, region)
+
+    return filtered
 
     return filter_points(newLattice, region)
 end
-
-
 
 """
     gen_cell_layout(region::GlobalRegion, radius::Number, type::ICO)
@@ -259,21 +283,21 @@ function tesselate_v2(pset::PointSet, method::VoronoiTesselation; sorted=true)
     C = crs(pset)
     T = Meshes.numtype(Meshes.lentype(pset))
     Meshes.assertion(CoordRefSystems.ncoords(C) == 2, "points must have 2 coordinates")
-    
+
     # perform tesselation with raw coordinates
     rawval = map(p -> CoordRefSystems.rawvalues(coords(p)), pset)
 
     triang = Meshes.triangulate(rawval, randomise=false, rng=method.rng)
     vorono = Meshes.voronoi(triang, clip=true) # Using the Dict we loose the correct sorting of elements (polygons), which can be recovered later.
-    
+
     # mesh with all (possibly unused) points
     points = map(Meshes.get_polygon_points(vorono)) do xy
         coords = CoordRefSystems.reconstruct(C, T.(xy))
         Point(coords)
     end
     polygs = Meshes.each_polygon(vorono)
-    tuples = [Tuple(inds[begin:(end - 1)]) for inds in polygs]
-    
+    tuples = [Tuple(inds[begin:(end-1)]) for inds in polygs]
+
     if sorted # Recover correct sorting of polygons.
         original_idxs = keys(vorono.polygons) |> collect
         invpermute!(tuples, original_idxs)
@@ -281,7 +305,7 @@ function tesselate_v2(pset::PointSet, method::VoronoiTesselation; sorted=true)
 
     connec = connect.(tuples)
     mesh = SimpleMesh(points, connec)
-    
+
     # remove unused points
     mesh |> Repair{1}()
 end

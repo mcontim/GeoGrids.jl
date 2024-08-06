@@ -195,26 +195,28 @@ function _wrap_latlon(lat::Number, lon::Number)
     return lat, lon
 end
 
-function _get_local_radius(lat::Number, lon::Number, alt::Number)
-    sΦ, cΦ = sincos(deg2rad(lat))
-    sλ, cλ = sincos(deg2rad(lon))
+"""
+    _add_angular_offset(inputθϕ, offsetθϕ) -> NamedTuple{(:θ, :ϕ), Tuple{Float64, Float64}}
 
-    f = (constants.a - constants.b) / constants.a
-    e² = 2f - f^2
-    N = constants.a / sqrt(1 - e² * sλ^2) # N(lon)
+Add an angular offset to given spherical coordinates.
 
-    x = (N + alt) * cΦ * cλ
-    y = (N + alt) * cΦ * sλ
-    z = (N * (1 - e²) + alt) * sΦ
+## Arguments
+- `inputθϕ::NamedTuple{(:θ, :ϕ), Tuple{Float64, Float64}}`: The input spherical \
+coordinates with components `θ` (polar angle) and `ϕ` (azimuthal angle) in \
+radians.
+- `offsetθϕ::NamedTuple{(:θ, :ϕ), Tuple{Float64, Float64}}`: The offset \
+spherical coordinates with components `θ` (polar angle) and `ϕ` (azimuthal \
+angle) in radians.
 
-    return sqrt(x^2 + y^2 + z^2)
-end
-
-function _add_angular_offset(centre, offset, local_r=constants.Re_mean)
-    sϕ, cϕ = sincos(centre.ϕ)
-    sθ, cθ = sincos(centre.θ)
-    sΔϕ, cΔϕ = sincos(offset.ϕ)
-    sΔθ, cΔθ = sincos(offset.θ)
+## Returns
+- `NamedTuple{(:θ, :ϕ), Tuple{Float64, Float64}}`: The new spherical coordinates \
+after applying the angular offset, with components `θ` and `ϕ` in radians.
+"""
+function _add_angular_offset(inputθϕ, offsetθϕ)
+    sϕ, cϕ = sincos(inputθϕ.ϕ)
+    sθ, cθ = sincos(inputθϕ.θ)
+    sΔϕ, cΔϕ = sincos(offsetθϕ.ϕ)
+    sΔθ, cΔθ = sincos(offsetθϕ.θ)
 
     # Define the orthonormal basis describing a new reference system [r̂, θ̂, ϕ̂] 
     # and it's relation with ECEF cartesian [x̂, ŷ, ẑ] as per
@@ -236,11 +238,44 @@ function _add_angular_offset(centre, offset, local_r=constants.Re_mean)
     R = hcat(θ̂, ϕ̂ , r̂) # [θ̂, ϕ̂, r̂] -> [x̂, ŷ, ẑ]  
 
     # Write the offset vector wrt the new referene system.
-    vᴵ = local_r * [sΔθ*cΔϕ, sΔθ*sΔϕ, cΔθ]
+    vᴵ = [sΔθ*cΔϕ, sΔθ*sΔϕ, cΔθ]
 
     # Transform the offset vector to the ECEF cartesian system.
     v = R * vᴵ  
 
     # Convert back to spherical coordinates
-    return (r=norm(v), θ=acos(v[3]/r_new), ϕ=atan(v[2], v[1]))
+    r = norm(v)
+    θ = acos(v[3]/r)
+    ϕ = atan(v[2], v[1])
+    
+    return (θ=θ, ϕ=ϕ) # [deg]
 end
+
+# """
+#     _get_local_radius(lat::Number, lon::Number, alt::Number) -> Float64
+
+# Calculate the local radius of the Earth at a given latitude, longitude, and
+# altitude.
+
+# ## Arguments
+# - `lat::Number`: Latitude in degrees.
+# - `lon::Number`: Longitude in degrees.
+# - `alt::Number`: Altitude in meters.
+
+# ## Returns
+# - `Float64`: The local radius of the Earth in meters.
+# """
+# function _get_local_radius(lat::Number, lon::Number, alt::Number)
+#     sΦ, cΦ = sincos(deg2rad(lat))
+#     sλ, cλ = sincos(deg2rad(lon))
+
+#     f = (constants.a - constants.b) / constants.a
+#     e² = 2f - f^2
+#     N = constants.a / sqrt(1 - e² * sλ^2) # N(lon)
+
+#     x = (N + alt) * cΦ * cλ
+#     y = (N + alt) * cΦ * sλ
+#     z = (N * (1 - e²) + alt) * sΦ
+
+#     return sqrt(x^2 + y^2 + z^2)
+# end

@@ -284,34 +284,15 @@ end
 
 # ╔═╡ 695fe05d-ef35-49fb-aa67-e9be7ed82b70
 let 
- reg = GeoRegion(; regionName="Tassellation",  admin="Iceland")
- dd = gen_cell_layout(reg, 20000, HEX())
- dd2 = gen_cell_layout2(reg, 20000, HEX())
- dd3 = gen_cell_layout_v2(reg, 20000, HEX())
+ reg = GeoRegion(; regionName="Tassellation",  admin="KenyA")
+ dd1 = gen_cell_layout2(reg, 20000, HEX())
+ dd2 = gen_cell_layout(reg, 20000, HEX())
 
- min_dist(dd), min_dist(dd2), min_dist(dd3)
+ min_dist(dd1), min_dist(dd2)
 end
 
-# ╔═╡ c05ac81e-ab4c-4629-8940-3fc3c466c9a0
-# 5752.7
-# 39793.4
-# 39841.0
-
-# 23820.6
-# 39913.8
-# 39912.2
-
-# 34391.4
-# 39778.1
-# 39750.1
-
-# 52.4338
-# 38076.2
-# 38000.1
-
-# 29563.4
-# 39772.5
-# 39764.7
+# ╔═╡ 3e547c4f-23fd-41b8-af0d-1aebd3bb525c
+reg = GeoRegion(; regionName="Tassellation",  continent="Antarctica")
 
 # ╔═╡ 36ddca33-097f-4821-bf4a-65a1d8455b67
 # let 
@@ -330,6 +311,22 @@ end
 
 #  min_dist(dd), min_dist(dd2)
 # end
+
+# ╔═╡ 22e737e2-6a4b-4eb0-8107-445bb7e9008f
+a=(a=1,b=1)
+
+# ╔═╡ 39db57ff-39a9-470a-a8a4-f59a4d9ff480
+a isa @NamedTuple{a::Int64, b::Int64}
+
+# ╔═╡ 59192e2a-f3d3-4e5c-97e5-70b9d3ab6790
+let
+	o = SimpleLatLon(10,20)
+
+	lat = 90 - (o.lat |> ustrip)
+	lon = o.lon |> ustrip
+
+	lat,lon
+end
 
 # ╔═╡ 15a28d6a-312a-4d5b-80a4-33257345920d
 md"""
@@ -1638,9 +1635,12 @@ version = "17.4.0+2"
 # ╠═c7511df5-35c7-4e83-a1af-d8579c8467d5
 # ╠═015b57ad-5d2e-4d04-b957-1c7536482248
 # ╠═695fe05d-ef35-49fb-aa67-e9be7ed82b70
-# ╠═c05ac81e-ab4c-4629-8940-3fc3c466c9a0
+# ╠═3e547c4f-23fd-41b8-af0d-1aebd3bb525c
 # ╠═36ddca33-097f-4821-bf4a-65a1d8455b67
 # ╠═582c5ffe-5178-41aa-88b1-35452167fe8f
+# ╠═22e737e2-6a4b-4eb0-8107-445bb7e9008f
+# ╠═39db57ff-39a9-470a-a8a4-f59a4d9ff480
+# ╠═59192e2a-f3d3-4e5c-97e5-70b9d3ab6790
 # ╠═15a28d6a-312a-4d5b-80a4-33257345920d
 # ╠═3480b3b3-6146-4fd6-ad72-d495946f33e3
 # ╟─00000000-0000-0000-0000-000000000001
