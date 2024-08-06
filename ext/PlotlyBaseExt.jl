@@ -212,4 +212,27 @@ function GeoGrids.plot_geo_cells(cellCenter::Array{<:Union{SimpleLatLon,Abstract
     plotly_plot([scatterpoints], layout)
 end
 
+
+# let
+# 	traces = []
+# 	vertex = mesh2.vertices
+# 	polygons = mesh2.topology.connec[idx_sel]
+# 	for poly in polygons
+# 		for idx in poly.indices
+# 			v = vertex[idx]
+# 			push!(traces, (ustrip(v.coords.x), ustrip(v.coords.y)))
+# 		end
+# 		push!(traces, (ustrip(vertex[poly.indices[1]].coords.x), ustrip(vertex[poly.indices[1]].coords.y))) # add first vertex
+# 		push!(traces, (NaN,NaN))
+# 	end
+
+# 	plot(scattergeo(
+# 		lat = map(x -> last(x), traces),
+# 		lon = map(x -> first(x), traces),
+# 		mode = "lines",
+# 		marker_size = 1,
+# 	))
+# end
+
+
 end # module PlotlyBaseExt

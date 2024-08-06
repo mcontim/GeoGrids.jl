@@ -23,6 +23,6 @@ export AbstractRegion, GeoRegion, PolyRegion, LatBeltRegion
 export icogrid, rectgrid, vecgrid,
 extract_countries, in, filter_points, group_by_domain
 
-export °, rad, SimpleLatLon, PolyArea, SVector
+export °, rad, SimpleLatLon, PolyArea, SVector, ExtraOutput
 
 end # module GeoGrids

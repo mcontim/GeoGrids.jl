@@ -72,6 +72,12 @@ end
 end
 struct H3 <: AbstractTiling end
 
+"""
+Struct used to create function methods that return more than one output.
+Used within multiple methods of the GeoGrids API, usually given as last optional argument.
+"""
+struct ExtraOutput end
+
 const constants = (
     Re_mean = 6371e3, # Mean Earth Radius [m]
     a = 6378137, # [m] WGS84 semi-major axis

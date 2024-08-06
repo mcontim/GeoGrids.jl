@@ -33,31 +33,6 @@ md"""
 # Test Tessellation
 """
 
-# ╔═╡ df161e7c-b8af-4934-99b7-54570f2b4fae
-md"""
-## HEX
-"""
-
-# ╔═╡ 65025a77-8d99-4867-adc9-83d960273e1b
-md"""
-## ICO
-"""
-
-# ╔═╡ 833103c3-9d4c-4c78-b83f-49e0c6b16104
-md"""
-- We use sphere a pproximation for the tasselltion which is a fair assumption for local grid.
-- To increase precision we will also implement H3, however, it won't allow us full flexibility in terms of lattice spacing definition (as we have here with HEX grid).
-"""
-
-# ╔═╡ ea40cb99-2bf1-4225-84fe-e8aee4f7863a
-begin
-	# 1. Find lattice spacing as angular distance related to cell size
-	Re = 6371e3 # Earth radius
-	Rc = 30e3 # 30 km cell radius (circumscribed circle to hex cell)
-	linearSpacing = Rc*√3 # linear spacing between lattice points (considering a pointy topped formation to ease the toughts)
-	θ = linearSpacing/Re # equivalent angular spacing [rad]
-end
-
 # ╔═╡ 2f6c6420-ffb5-4bb6-b757-1ce852c35e78
 md"""
 ## Local grid on Earth
@@ -93,71 +68,6 @@ geoattr = (; geo=attr(
 
 # ╔═╡ 34755273-58fb-494a-bb7d-6a29f9e60028
 size([1,2,3])
-
-# ╔═╡ 39554aa7-779d-4bf5-a217-37b2c0882598
-# ╠═╡ disabled = true
-#=╠═╡
-let 
-	reg = GeoRegion(; regionName="Tassellation", admin="Kenya")
-
-	# Original Code
-	dd = gen_cell_layout(reg, 20000, HEX())
-	minDist_v1 = Inf
-	for p1 in dd
-		for p2 in dd
-			if p1 == p2 
-				continue
-			end
-			lla1 = LLA(p1.lat, p1.lon)
-			lla2 = LLA(p2.lat, p2.lon)
-			temp = get_distance_on_earth(lla1, lla2)
-			minDist_v1 = temp < minDist_v1 ? temp : minDist_v1
-		end
-	end
-
-	# New Code
-	dd2 = gen_cell_layout_v2(reg, 20000, HEX())
-	minDist_v2 = Inf
-	for p1 in dd2
-		for p2 in dd2
-			if p1 == p2 
-				continue
-			end
-			lla1 = LLA(p1.lat, p1.lon)
-			lla2 = LLA(p2.lat, p2.lon)
-			temp = get_distance_on_earth(lla1, lla2)
-			minDist_v2 = temp < minDist_v2 ? temp : minDist_v2
-		end
-	end
-
-	
-	minDist_v1, minDist_v2
-end
-  ╠═╡ =#
-
-# ╔═╡ ef11c61d-c89c-4a61-bea6-05751b3804de
-# ╠═╡ disabled = true
-#=╠═╡
-let 
-	reg = GeoRegion(; regionName="Tassellation", admin="Switzerland")
-	dd = gen_cell_layout(reg, 20000, ICO())
-
-	minDist = Inf
-	dist = []
-	for p1 in dd
-		for p2 in dd
-			if p1 == p2 
-				continue
-			end
-			lla1 = LLA(p1.lat, p1.lon)
-			lla2 = LLA(p2.lat, p2.lon)
-			temp = get_distance_on_earth(lla1, lla2)
-			minDist = temp < minDist ? temp : minDist
-		end
-	end
-	minDist
-end
-  ╠═╡ =#
 
 # ╔═╡ 4aded9e3-8324-471e-9de5-edb4e19962a8
 # ╠═╡ disabled = true
@@ -265,104 +175,6 @@ md"""
 	import >.CoordRefSystems
 end
 
-# ╔═╡ 69ff22ae-93ac-466d-ba16-5a2521e1729e
-begin
-	# 2. Define the lattice in u,v (linear)
-	# Now that we have the theta wrt a source in the center of the sphere, we retrieve u,v coord then the linear distance in uv which will be the actual spacing of our lattice.
-	# Since we can consider a generic ϕ, we'll use ϕ=0 such that we end up with the only u component, which will also corresponds to the spacing.
-	sp = sin(θ)
-	lat = gen_hex_lattice(sp, :flat; M=3)
-end
-
-# ╔═╡ a6e2e847-9ce9-4080-8965-f128ca84c1ad
-let
-	plot(
-		scatter(;
-			x=map(x->first(x), lat[:]),
-			y=map(x->last(x), lat[:]),
-			mode="markers",
-		)
-	)
-end
-
-# ╔═╡ 66e702bd-0e81-433b-bcf5-65aedd90472a
-mesh = let
-	points = map(x -> Point(x...), lat)
-	mesh = tesselate(points[:], VoronoiTesselation())
-end
-
-# ╔═╡ 64ebd8d3-e8ba-4894-9d77-6fa5738cdc23
-mesh.topology.connec[1] isa Connectivity{Hexagon, 6}
-
-# ╔═╡ 07497371-3173-4e98-ab10-400ca58d110c
-let
-	traces = []
-	vertex = mesh.vertices
-	for poly in mesh.topology.connec
-		for idx in poly.indices
-			v = vertex[idx]
-			# @info v
-			push!(traces, (ustrip(v.coords.x), ustrip(v.coords.y)))
-		end
-		push!(traces, (ustrip(vertex[poly.indices[1]].coords.x), ustrip(vertex[poly.indices[1]].coords.y))) # add first vertex
-		push!(traces, (NaN,NaN))
-	end
-		
-	plot(
-		scatter(;
-			x=map(x -> first(x), traces),
-			y=map(x -> last(x), traces),
-			mode="lines",
-		)
-	)
-end
-
-# ╔═╡ 404e4b0a-071d-43a1-bd9c-01f5cdd094e1
-let
-	traces = []
-	vertex = mesh.vertices
-	for poly in mesh.topology.connec
-		if !(poly isa Connectivity{Hexagon, 6})
-			continue # skip if not a complete exagon (???)
-		end
-		for idx in poly.indices
-			v = vertex[idx]
-			push!(traces, (ustrip(v.coords.x), ustrip(v.coords.y)))
-		end
-		push!(traces, (ustrip(vertex[poly.indices[1]].coords.x), ustrip(vertex[poly.indices[1]].coords.y))) # add first vertex
-		push!(traces, (NaN,NaN))
-	end
-		
-	plot(
-		scatter(;
-			x=map(x -> first(x), traces),
-			y=map(x -> last(x), traces),
-			mode="lines",
-		)
-	)
-end
-
-# ╔═╡ b95d1de2-9cdc-4d01-b105-2d59e1643864
-let
-	x = []
-	y = []
-	for c in lat
-		hex = _gen_hex_vertices(first(c), last(c), Rc/Re; direction=:flat)
-		push!(x, first.(hex)...)
-		push!(x, NaN)
-		push!(y, last.(hex)...)
-		push!(y, NaN)
-	end
-	
-	plot(
-		scatter(;
-			x=x,
-			y=y,
-		 	mode="lines",
-        )
-	)	
-end
-
 # ╔═╡ d05078cc-f277-492e-85a6-aab35f38f2f4
 let 
 	reg = GeoRegion(; regionName="Tassellation", admin="Switzerland")
@@ -372,13 +184,44 @@ let
 end
 
 # ╔═╡ e0b2c99d-c689-48fb-91d5-6a3b4ee4d044
-let 
+dd=let 
 	reg = GeoRegion(; regionName="Tassellation", admin="Spain")
 	dd = gen_cell_layout(reg, 20000, HEX())
-	    
 	# plot_geo_cells(dd, 20000, :hex; kwargs_layout=geoattr)
-	plot_geo_cells(dd, 20000, :hex)
+	# plot_geo_cells(dd, 20000, :hex)
 end
+
+# ╔═╡ 6cf1f091-7ca6-4487-826d-7788126fc926
+mesh = my_tesselate(dd)
+
+# ╔═╡ 9fe9264c-b9dc-45ee-87d6-85c34b4d2f74
+typeof(mesh[[1,482]])
+
+# ╔═╡ 3a7a1f4f-c386-4372-ae5f-beaad06ba8af
+let
+	traces = []
+	vertex = mesh.vertices
+	# polygons = mesh.topology.connec[idx_sel]
+	polygons = mesh.topology.connec
+	for poly in polygons
+		for idx in poly.indices
+			v = vertex[idx]
+			push!(traces, (ustrip(v.coords.x), ustrip(v.coords.y)))
+		end
+		push!(traces, (ustrip(vertex[poly.indices[1]].coords.x), ustrip(vertex[poly.indices[1]].coords.y))) # add first vertex
+		push!(traces, (NaN,NaN))
+	end
+
+	plot(scattergeo(
+		lat = map(x -> last(x), traces),
+		lon = map(x -> first(x), traces),
+		mode = "lines",
+		marker_size = 1,
+	))
+end
+
+# ╔═╡ 2524d256-eddf-4582-b433-ffd6f5f92db9
+dd isa AbstractVector{<:SimpleLatLon}
 
 # ╔═╡ bf97c9f8-1ca9-421b-8c63-00b7acfafe88
 let
@@ -1784,26 +1627,17 @@ version = "17.4.0+2"
 # ╔═╡ Cell order:
 # ╠═069444e1-4e89-4f4f-ae2f-f5fb3131e398
 # ╟─222fb774-1693-4b3c-b2ef-5fd38eca773c
-# ╟─df161e7c-b8af-4934-99b7-54570f2b4fae
-# ╟─65025a77-8d99-4867-adc9-83d960273e1b
-# ╟─833103c3-9d4c-4c78-b83f-49e0c6b16104
-# ╠═ea40cb99-2bf1-4225-84fe-e8aee4f7863a
-# ╠═69ff22ae-93ac-466d-ba16-5a2521e1729e
-# ╠═66e702bd-0e81-433b-bcf5-65aedd90472a
-# ╠═64ebd8d3-e8ba-4894-9d77-6fa5738cdc23
-# ╠═07497371-3173-4e98-ab10-400ca58d110c
-# ╠═404e4b0a-071d-43a1-bd9c-01f5cdd094e1
-# ╠═a6e2e847-9ce9-4080-8965-f128ca84c1ad
-# ╠═b95d1de2-9cdc-4d01-b105-2d59e1643864
 # ╟─2f6c6420-ffb5-4bb6-b757-1ce852c35e78
 # ╠═e21179c3-4412-441c-9f5c-3d7a2d881d30
 # ╠═d05078cc-f277-492e-85a6-aab35f38f2f4
 # ╠═e0b2c99d-c689-48fb-91d5-6a3b4ee4d044
+# ╠═6cf1f091-7ca6-4487-826d-7788126fc926
+# ╠═9fe9264c-b9dc-45ee-87d6-85c34b4d2f74
+# ╠═3a7a1f4f-c386-4372-ae5f-beaad06ba8af
+# ╠═2524d256-eddf-4582-b433-ffd6f5f92db9
 # ╠═bf97c9f8-1ca9-421b-8c63-00b7acfafe88
 # ╠═34755273-58fb-494a-bb7d-6a29f9e60028
 # ╠═d9f28c97-0aa2-4551-8d17-f9becd5d0570
-# ╠═39554aa7-779d-4bf5-a217-37b2c0882598
-# ╠═ef11c61d-c89c-4a61-bea6-05751b3804de
 # ╠═4aded9e3-8324-471e-9de5-edb4e19962a8
 # ╠═474da875-6a71-4216-9a10-69d1e0e00576
 # ╟─d272905a-dfd4-4ade-88bd-ca10abf86f77

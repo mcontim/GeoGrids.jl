@@ -101,6 +101,9 @@ mesh = let
 	mesh = tesselate(allVorPoints[:], VoronoiTesselation())
 end
 
+# ╔═╡ c64c21b4-1f1e-4e4b-a061-987bf5797fd9
+mesh
+
 # ╔═╡ 52203618-220f-48ea-8231-30754295b0e6
 ps=let
 	allVorPoints = map(x -> Point(ustrip(x.lon), ustrip(x.lat)), all_lat)
@@ -126,6 +129,9 @@ end
 
 # ╔═╡ aa89fea1-82e8-4967-b95d-33aa80326942
 mesh2.topology.elems
+
+# ╔═╡ ed98f95a-c6f7-4358-96c5-5645c2937b08
+mesh2
 
 # ╔═╡ 22b544de-c906-4134-b9b7-ff61e4c4f8e2
 length(all_lat)
@@ -1616,6 +1622,7 @@ version = "17.4.0+2"
 # ╠═b37ce62a-ac90-4701-9b0f-8935b51abb57
 # ╠═aad14bef-eb39-46ca-ad62-cb30ef411fd1
 # ╠═267d6bfc-23d8-4351-9000-067457ca01a6
+# ╠═c64c21b4-1f1e-4e4b-a061-987bf5797fd9
 # ╠═676ba628-9a6c-4fab-9396-3356c86bf42e
 # ╠═2bc912fb-2034-40b3-90ee-1d5ad7c9ddd0
 # ╠═918ecfa2-c889-4303-922d-dc24ed3c0c74
@@ -1625,6 +1632,7 @@ version = "17.4.0+2"
 # ╠═22b544de-c906-4134-b9b7-ff61e4c4f8e2
 # ╠═1884db68-1f8d-4854-b0b8-35134481cd3e
 # ╠═aa89fea1-82e8-4967-b95d-33aa80326942
+# ╠═ed98f95a-c6f7-4358-96c5-5645c2937b08
 # ╠═f5e6ebc1-3a00-4582-9a4a-0d0330269690
 # ╠═3f950632-89ad-49cf-9ff5-10cca1596f53
 # ╠═76ae50d9-c933-4fa4-8ee8-c7ed210b8ed5

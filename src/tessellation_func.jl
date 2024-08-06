@@ -128,12 +128,12 @@ generation.
 centroids of the hexagonal tessellation in latitude and longitude.
 
 """
-function _hex_tesselation_centroids(origin::SimpleLatLon, radius::Number; direction::Symbol=:pointy, Re::Number=constants.Re_mean, kwargs_lattice...)
+function _hex_tesselation_centroids(origin::SimpleLatLon, radius::Number; direction::Symbol=:pointy, refRadius::Number=constants.Re_mean, kwargs_lattice...)
     ## Generate the lattice centered in 0,0.
     # Angular spacing [rad] between lattice points considering a triple-point
     # overlap. This spacing represents the angle of the arc of length radius, on
     # a circonference of radius equivalent to the Earth mean radius.
-    spacing = radius * √3 / Re
+    spacing = radius * √3 / refRadius
     offsetLattice = gen_hex_lattice(spacing, direction; kwargs_lattice...) # [rad]
 
     ## Re-center the lattice around the seed point.
@@ -172,31 +172,7 @@ function _hex_tesselation_centroids(origin::SimpleLatLon, radius::Number; direct
     return newLattice
 end
 
-"""
-    gen_cell_layout(region::GeoRegion, radius::Number, type::HEX; kwargs_lattice...)
-    gen_cell_layout(region::PolyRegion, radius::Number, type::HEX; kwargs_lattice...)
-
-The `gen_cell_layout` function generates a hexagonal cell layout for a given
-geographical region. It calculates the cell grid layout centered around the
-centroid of the main area of the region and returns the points within the
-specified region.
-
-## Arguments
-- `region::Union{GeoRegion, PolyRegion}`: The geographical region for which the
-cell layout is generated. Larger regions like global and LatBeltRegions are not
-supported because of the problem of regular tassellation of the sphere.
-- `radius::Number`: The radius of each hexagonal cell. Has to be intended as the \
-circumscribed circumference.
-- `type::HEX`: A parameter indicating the type of lattice (only HEX is \
-supported).
-- `kwargs_lattice...`: Additional keyword arguments passed to the \
-`gen_hex_lattice` function.
-
-## Returns
-- `Array{SimpleLatLon,1}`: An array of points (`SimpleLatLon`) representing the \
-cell centers within the specified region.
-"""
-function gen_cell_layout(region::GeoRegion, radius::Number, type::HEX; kwargs_lattice...)
+function _gen_cell_layout(region::GeoRegion, radius::Number, type::HEX; refRadius::Number=constants.Re_mean, kwargs_lattice...)
     ## Find the domain center as seed for the cell grid layout.
     domain = extract_countries(region)[1] # The indicization is used to extract directly the Multi or PolyArea from the view
     origin = let
@@ -213,29 +189,71 @@ function gen_cell_layout(region::GeoRegion, radius::Number, type::HEX; kwargs_la
     end
 
     ## Generate the tassellation centroids and filter the ones in the region.
-    centroids = _hex_tesselation_centroids(origin, radius; direction=type.direction, Re=constants.Re_mean, kwargs_lattice...)
-
-    filtered, _ = filter_points(centroids, region)
-
-    return filtered
+    return _hex_tesselation_centroids(origin, radius; direction=type.direction, refRadius, kwargs_lattice...)
 end
 
-function gen_cell_layout(region::PolyRegion, radius::Number, type::HEX; kwargs_lattice...)
-    ## Find the domain center as seed for the cell grid layout.
+function _gen_cell_layout(region::PolyRegion, radius::Number, type::HEX; refRadius::Number=constants.Re_mean, kwargs_lattice...)
+    # Find the domain center as seed for the cell grid layout.
     origin = let
         centre = centroid(region.domain)
         (; x, y) = centre.coords
         SimpleLatLon(y |> ustrip, x |> ustrip) # SimpleLatLon in deg
     end
 
-    ## Generate the tassellation centroids and filter the ones in the region.
-    centroids = _hex_tesselation_centroids(origin, radius; direction=type.direction, Re=constants.Re_mean, kwargs_lattice...)
+    # Generate the tassellation centroids.
+    return _hex_tesselation_centroids(origin, radius; direction=type.direction, refRadius, kwargs_lattice...)
+end
 
-    filtered, _ = filter_points(centroids, region)
+"""
+    gen_cell_layout(region::Union{GeoRegion, PolyRegion}, radius::Number, type::HEX; refRadius::Number=constants.Re_mean, kwargs_lattice...)
+    gen_cell_layout(region::Union{GeoRegion, PolyRegion}, radius::Number, type::HEX, ::ExtraOutput; refRadius::Number=constants.Re_mean, kwargs_lattice...)
 
-    return filtered
+The `gen_cell_layout` function generates a hexagonal cell layout for a given
+geographical region. It calculates the cell grid layout centered around the
+centroid of the main area of the region and returns the points within the
+specified region.
 
-    return filter_points(newLattice, region)
+## Arguments
+- `region::Union{GeoRegion, PolyRegion}`: The geographical region for which the
+cell layout is generated. Larger regions like global and LatBeltRegions are not
+supported because of the problem of regular tassellation of the sphere.
+- `radius::Number`: The radius of each hexagonal cell. Has to be intended as the \
+circumscribed circumference.
+- `type::HEX`: A parameter indicating the type of lattice (only HEX is \
+supported).
+- `refRadius::Number`: The radius of the Earth in meters (default is \
+`constants.Re_mean`).
+- `::ExtraOutput`: an extra parameter enabling a `Vector{Ngon}` the contours of \
+each cell. The mesh originating these contours is obtained using \
+`VoronoiTesselation`.
+- `kwargs_lattice...`: Additional keyword arguments passed to the \
+`gen_hex_lattice` function.
+
+## Returns
+- `Array{SimpleLatLon,1}`: An array of points (`SimpleLatLon`) representing the \
+cell centers within the specified region.
+
+See also: [`gen_hex_lattice`](@ref), [`_gen_cell_layout`](@ref), [`_hex_tesselation_centroids`](@ref), [`my_tesselate`](@ref), [`HEX`](@ref), [`GeoRegion`](@ref), [`PolyRegion`](@ref)
+"""
+function gen_cell_layout(region::Union{GeoRegion, PolyRegion}, radius::Number, type::HEX; refRadius::Number=constants.Re_mean, kwargs_lattice...)
+    # Generate the tassellation centroids.
+    centroids = _gen_cell_layout(region, radius, type; refRadius, kwargs_lattice...)
+
+    # Filter centroids in the region.
+    return filter_points(centroids, region)
+end
+
+function gen_cell_layout(region::Union{GeoRegion, PolyRegion}, radius::Number, type::HEX, ::ExtraOutput; refRadius::Number=constants.Re_mean, kwargs_lattice...)
+    # Generate the tassellation centroids and filter the ones in the region.
+    centroids = _gen_cell_layout(region, radius, type; refRadius, kwargs_lattice...)
+
+    # Create the tasselation from all the centroids.
+    mesh = my_tesselate(centroids)
+
+    # Filter centroids in the region.
+    filtered, idxs = filter_points(centroids, region, ExtraOutput())
+
+    return filtered, mesh[idxs]
 end
 
 """
@@ -300,7 +318,7 @@ match the original order of points (default: `true`).
 ## Returns
 - `SimpleMesh`: A mesh object representing the tessellated polygons.
 """
-function my_tesselate(pset::PointSet, method::VoronoiTesselation; sorted=true)
+function my_tesselate(pset::PointSet; method::VoronoiTesselation=VoronoiTesselation(), sorted=true)
     C = crs(pset)
     T = Meshes.numtype(Meshes.lentype(pset))
     Meshes.assertion(CoordRefSystems.ncoords(C) == 2, "points must have 2 coordinates")
@@ -331,4 +349,13 @@ function my_tesselate(pset::PointSet, method::VoronoiTesselation; sorted=true)
     mesh |> Repair{1}()
 end
 
-my_tesselate(points::AbstractVector{<:Point}, method::TesselationMethod) = my_tesselate(PointSet(points), method)
+my_tesselate(points::AbstractVector{<:Point}; kwargs...) = my_tesselate(PointSet(points); kwargs...)
+
+function my_tesselate(points::AbstractVector{<:SimpleLatLon}; kwargs...)
+    # Convert the input points in a PointSet. Rememeber that in Meshes.jl we
+    # must consider lat=y and lon=x (that's why we invert the order when
+    # creating the converted point).
+    converted = map(x -> Point(ustrip(x.lon), ustrip(x.lat)), points)
+
+    my_tesselate(PointSet(converted); kwargs...)
+end
