@@ -1,5 +1,5 @@
 ### A Pluto.jl notebook ###
-# v0.19.41
+# v0.19.45
 
 #> custom_attrs = ["hide-enabled"]
 
@@ -16,16 +16,6 @@ macro bind(def, element)
     end
 end
 
-# ╔═╡ 1aab6599-3b14-422d-acf6-3cbd953c555e
-@fromparent begin
-	import ^: * # to eport all functions from parent package
-	using >. AngleBetweenVectors
-	using >. CountriesBorders
-    using >. LinearAlgebra
-	using >. PlotlyExtensionsHelper
-	using >. StaticArrays
-end
-
 # ╔═╡ ca17905e-687a-4603-ab2f-d651123a12d1
 begin
 	using PlutoUI
@@ -35,6 +25,16 @@ begin
 	using PlutoPlotly
 	using PlotlyBase
 	using MAT	
+end
+
+# ╔═╡ 1aab6599-3b14-422d-acf6-3cbd953c555e
+@fromparent begin
+	import ^: * # to eport all functions from parent package
+	using >. AngleBetweenVectors
+	using >. CountriesBorders
+    using >. LinearAlgebra
+	using >. PlotlyExtensionsHelper
+	using >. StaticArrays
 end
 
 # ╔═╡ ac88e13f-73dc-451c-b3f3-2a4b4a422f19
@@ -288,7 +288,7 @@ PlutoUI = "~0.7.59"
 PLUTO_MANIFEST_TOML_CONTENTS = """
 # This file is machine-generated - editing it directly is not advised
 
-julia_version = "1.10.3"
+julia_version = "1.10.4"
 manifest_format = "2.0"
 project_hash = "e9000912970992ae44f2ff7b66ce0d09cd24afbf"
 

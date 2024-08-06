@@ -596,8 +596,8 @@ end
 
 # ╔═╡ 4f27f06a-661e-491c-b4b6-cc2510a3c95c
 let 
-	reg = GeoRegion(; regionName="Tassellation", admin="Kenya")
-	dd = gen_cell_layout_v2(reg, 20000, HEX())
+	reg = GeoRegion(; regionName="Tassellation", admin="Norway")
+	dd = gen_cell_layout_v2(reg, 20000, HEX(); M=10)
 	    
 	# plot_geo_cells(dd, 20000, :hex; kwargs_layout=geoattr)
 	plot_geo_points(dd[:];camera=:threedim)
@@ -652,6 +652,15 @@ let
 	# viz!(points, color = :red)
 	# Mke.current_figure()
 end
+
+# ╔═╡ a5317c4a-395a-4e81-8a5c-c9b17dad403b
+let 
+ 	reg = GeoRegion(; regionName="Tassellation", admin="Norway")
+ 	dd3 = gen_cell_layout_v2(reg, 20000, HEX())
+end
+
+# ╔═╡ 1fd9e97b-7e5e-4784-b84a-e55afd1f0dd9
+CountriesBorders.possible_selector_values()
 
 # ╔═╡ 00000000-0000-0000-0000-000000000001
 PLUTO_PROJECT_TOML_CONTENTS = """
@@ -2034,6 +2043,8 @@ version = "17.4.0+2"
 # ╠═e904b396-4794-4783-9039-a2e66f82ec07
 # ╠═ed222264-461a-4efb-90b1-42324c7eea63
 # ╠═07d6cd31-5518-460c-a90c-a427a78325e0
+# ╠═a5317c4a-395a-4e81-8a5c-c9b17dad403b
+# ╠═1fd9e97b-7e5e-4784-b84a-e55afd1f0dd9
 # ╟─b94c71b6-0601-4a4c-ac92-417f0c372334
 # ╠═bf20cace-b64b-4155-90c1-1ec3644510d7
 # ╠═0e3793aa-13d2-4aeb-ad60-b98927932dc6

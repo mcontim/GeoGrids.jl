@@ -210,113 +210,37 @@ function _get_local_radius(lat::Number, lon::Number, alt::Number)
     return sqrt(x^2 + y^2 + z^2)
 end
 
-function _add_angular_offset_old(centre, offset, local_r=constants.Re_mean)
+function _add_angular_offset(centre, offset, local_r=constants.Re_mean)
     sϕ, cϕ = sincos(centre.ϕ)
     sθ, cθ = sincos(centre.θ)
     sΔϕ, cΔϕ = sincos(offset.ϕ)
     sΔθ, cΔθ = sincos(offset.θ)
 
-    # Convert spherical to Cartesian coordinates
-    x = local_r * sθ * cϕ
-    y = local_r * sθ * sϕ
-    z = local_r * cθ
+    # Define the orthonormal basis describing a new reference system [r̂, θ̂, ϕ̂] 
+    # and it's relation with ECEF cartesian [x̂, ŷ, ẑ] as per
+    # [Wikipedia](https://en.wikipedia.org/wiki/Spherical_coordinate_system#Integration_and_differentiation_in_spherical_coordinates)
+	r̂ = SA_F64[sθ*cϕ, sθ*sϕ, cθ]
+	θ̂ = SA_F64[cθ*cϕ, cθ*sϕ, -sθ]
+    ϕ̂ = SA_F64[-sϕ, cϕ, 0]
 
-    # Combined rotation matrix (first z-axis, then y-axis)
-    Rz = [
-        cΔϕ -sΔϕ 0;
-        sΔϕ cΔϕ 0;
-        0 0 1
-    ]
+    # Define the rotation matrix to go from the new local reference system to
+    # the ECEF cartesian system. We want the z axis of the new system to be
+    # aligned with the direction of the input vector [centre], so the order of
+    # axis such to have a right-handed reference system will be [θ̂, ϕ̂, r̂]. At
+    # this point we can describe the offset rotation as a vector represented ni
+    # this new reference system, as described in:
+    # https://math.stackexchange.com/questions/4343044/rotate-vector-by-a-random-little-amount
+    # Even if we inverted the axes such to get the z axis aligned with the
+    # input, the system of equations still hold to get the ordered [x̂, ŷ, ẑ]
+    # axes.
+    R = hcat(θ̂, ϕ̂ , r̂) # [θ̂, ϕ̂, r̂] -> [x̂, ŷ, ẑ]  
 
-    Ry = [
-        cΔθ 0 sΔθ;
-        0 1 0;
-        -sΔθ 0 cΔθ
-    ]
+    # Write the offset vector wrt the new referene system.
+    vᴵ = local_r * [sΔθ*cΔϕ, sΔθ*sΔϕ, cΔθ]
 
-    # Combined rotation
-    R = Ry * Rz
-    v = R * [x, y, z]
-
-    # Convert back to spherical coordinates
-    x, y, z = v
-    r_new = norm(v)
-    θ_new = acos(z / r_new)
-    ϕ_new = atan(y, x)
-
-    return θ_new, ϕ_new, r_new
-end
-
-function _add_angular_offset(centre, offset, local_r=constants.Re_mean)
-    sφ, cφ = sincos(centre.ϕ)
-    sθ, cθ = sincos(centre.θ)
-    sΔφ, cΔφ = sincos(offset.ϕ)
-    sΔθ, cΔθ = sincos(offset.θ)
-
-    # Compute the versors of the spherical to cartesian transformation as per
-	# [Wikipedia](https://en.wikipedia.org/wiki/Spherical_coordinate_system#Integration_and_differentiation_in_spherical_coordinates)
-	r̂ = SA_F64[sθ*cφ, sθ*sφ, cθ]
-	θ̂ = SA_F64[cθ*cφ, cθ*sφ, -sθ]
-	φ̂ = SA_F64[-sφ, cφ, 0]
-
-    R = hcat(-φ̂, θ̂, r̂)
-
-    __R = SA_F64[
-		sφ -cφ 0
-		cφ sφ 0
-		0 0 1
-	] # ????
-
-    # Convert spherical to Cartesian coordinates the input vector.
-    vⁱ= local_r * [sΔθ*cΔφ, sΔθ*sΔφ, cΔθ]
-
-    v = R * __R * vⁱ # Rotation in Cartesian coords
+    # Transform the offset vector to the ECEF cartesian system.
+    v = R * vᴵ  
 
     # Convert back to spherical coordinates
-    x, y, z = v
-    r_new = norm(v)
-    θ_new = acos(z / r_new)
-    ϕ_new = atan(y, x)
-
-    return θ_new, ϕ_new, r_new
+    return (r=norm(v), θ=acos(v[3]/r_new), ϕ=atan(v[2], v[1]))
 end
-
-# function _add_angular_offset(θ, φ) #(centre, offset, local_r=constants.Re_mean))
-# 	# Precompute the sines and cosines
-# 	sθ, cθ = sincos(θ)
-# 	sφ, cφ = sincos(φ)
-	
-# 	# Compute the versors of the spherical to cartesian transformation as per
-# 	# [Wikipedia](https://en.wikipedia.org/wiki/Spherical_coordinate_system#Integration_and_differentiation_in_spherical_coordinates)
-# 	r̂ = SA_F64[sθ*cφ, sθ*sφ, cθ]
-# 	θ̂ = SA_F64[cθ*cφ, cθ*sφ, -sθ]
-# 	φ̂ = SA_F64[-sφ, cφ, 0]
-
-# 	# The standard basis for spherical coordinates is r̂, θ̂, φ̂. We instead
-# 	# want a basis that has r̂ as third vector (e.g. ẑ in normal cartesian
-# 	# coordinates), and we want to rotate the other two vectors in a way that
-# 	# the second vector is pointing towards Positive ŷ (i.e. similar to how ENU
-# 	# has the second direction pointing towards North). 
-# 	# To achieve this, we have to reorder the versor and then perform a matrix
-# 	# rotation around the new third axis (which is r̂) by an angle that depends
-# 	# on φ.
-# 	# See
-# 	# ![image](https://upload.wikimedia.org/wikipedia/commons/thumb/a/a2/Kugelkoord-lokale-Basis-s.svg/360px-Kugelkoord-lokale-Basis-s.svg.png)
-# 	# for a reference figure of the original spherical versors.
-# 	_R = hcat(-φ̂, θ̂, r̂) # φ̂ has to change sign to maintain the right-rule axis order
-# 	# We have to create a rotation matrix around Z that is equivalent to π/2 - φ
-
-# 	# We use the RotZ Matrix definition in
-# 	# https://en.wikipedia.org/wiki/Rotation_matrix#Basic_rotations, but
-# 	# remembering that: 
-# 	# cos(π/2 - φ) = sin(φ)
-# 	# sin(π/2 - φ) = cos(φ)
-# 	__R = SA_F64[
-# 		sφ -cφ 0
-# 		cφ sφ 0
-# 		0 0 1
-# 	]
-
-# 	# return __R, _R, __R*_R, _R*__R
-# 	return _R*__R
-# end
