@@ -19,7 +19,7 @@ using TelecomUtils
 # ╔═╡ b37ce62a-ac90-4701-9b0f-8935b51abb57
 let 
  reg = GeoRegion(; regionName="Tassellation", admin="Norway")
- dd = gen_cell_layout(reg, 20000, HEX())
+ dd = generate_tesselation(reg, 20000, HEX())
      
  # plot_geo_cells(dd, 20000, :hex; kwargs_layout=geoattr)
  plot_geo_cells(dd, 20000, :hex)
@@ -292,7 +292,7 @@ end
 let 
  reg = GeoRegion(; regionName="Tassellation",  admin="KenyA")
  dd1 = gen_cell_layout2(reg, 20000, HEX())
- dd2 = gen_cell_layout(reg, 20000, HEX())
+ dd2 = generate_tesselation(reg, 20000, HEX())
 
  min_dist(dd1), min_dist(dd2)
 end
@@ -303,7 +303,7 @@ reg = GeoRegion(; regionName="Tassellation",  continent="Antarctica")
 # ╔═╡ 36ddca33-097f-4821-bf4a-65a1d8455b67
 # let 
 #  reg = GeoRegion(; regionName="Tassellation", admin="norway")
-#  dd = gen_cell_layout(reg, 20000, HEX())
+#  dd = generate_tesselation(reg, 20000, HEX())
 #  dd2 = gen_cell_layout2(reg, 20000, HEX())
 
 #  min_dist(dd), min_dist(dd2)
@@ -312,7 +312,7 @@ reg = GeoRegion(; regionName="Tassellation",  continent="Antarctica")
 # ╔═╡ 582c5ffe-5178-41aa-88b1-35452167fe8f
 # let 
 #  reg = GeoRegion(; regionName="Tassellation", admin="Greenland")
-#  dd = gen_cell_layout(reg, 20000, HEX())
+#  dd = generate_tesselation(reg, 20000, HEX())
 #  dd2 = gen_cell_layout2(reg, 20000, HEX())
 
 #  min_dist(dd), min_dist(dd2)

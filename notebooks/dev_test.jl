@@ -69,31 +69,6 @@ geoattr = (; geo=attr(
 # ╔═╡ 34755273-58fb-494a-bb7d-6a29f9e60028
 size([1,2,3])
 
-# ╔═╡ 4aded9e3-8324-471e-9de5-edb4e19962a8
-# ╠═╡ disabled = true
-#=╠═╡
-let 
-	reg = GeoRegion(; regionName="Tassellation", admin="Switzerland")
-	dd = gen_cell_layout(reg, 20000, ICO())
-	
-	plot_geo_points(dd; kwargs_layout=geoattr)
-end
-  ╠═╡ =#
-
-# ╔═╡ 474da875-6a71-4216-9a10-69d1e0e00576
-# ╠═╡ disabled = true
-#=╠═╡
-let 
-	radius = 20000
-	
-	reg = GeoRegion(; regionName="Tassellation", admin="Switzerland")
-	
-	dd = gen_cell_layout(reg, radius, ICO())
-	    
-	plot_geo_cells(dd, radius, :circ; kwargs_layout=geoattr)
-end
-  ╠═╡ =#
-
 # ╔═╡ d272905a-dfd4-4ade-88bd-ca10abf86f77
 md"""
 # Additional Functions
@@ -178,7 +153,7 @@ end
 # ╔═╡ d05078cc-f277-492e-85a6-aab35f38f2f4
 let 
 	reg = GeoRegion(; regionName="Tassellation", admin="Switzerland")
-	dd = gen_cell_layout(reg, 20000, HEX())
+	dd = generate_tesselation(reg, 20000, HEX())
 	# plot_geo_points(dd; kwargs_layout=geoattr)
 	min_dist(dd)
 end
@@ -186,7 +161,7 @@ end
 # ╔═╡ e0b2c99d-c689-48fb-91d5-6a3b4ee4d044
 dd=let 
 	reg = GeoRegion(; regionName="Tassellation", admin="Spain")
-	dd = gen_cell_layout(reg, 20000, HEX())
+	dd = generate_tesselation(reg, 20000, HEX())
 	# plot_geo_cells(dd, 20000, :hex; kwargs_layout=geoattr)
 	# plot_geo_cells(dd, 20000, :hex)
 end
@@ -244,6 +219,31 @@ begin
 	
 	    R = hcat(-φ̂, θ̂, r̂)
 end
+
+# ╔═╡ 4aded9e3-8324-471e-9de5-edb4e19962a8
+# ╠═╡ disabled = true
+#=╠═╡
+let 
+	reg = GeoRegion(; regionName="Tassellation", admin="Switzerland")
+	dd = generate_tesselation(reg, 20000, ICO())
+	
+	plot_geo_points(dd; kwargs_layout=geoattr)
+end
+  ╠═╡ =#
+
+# ╔═╡ 474da875-6a71-4216-9a10-69d1e0e00576
+# ╠═╡ disabled = true
+#=╠═╡
+let 
+	radius = 20000
+	
+	reg = GeoRegion(; regionName="Tassellation", admin="Switzerland")
+	
+	dd = generate_tesselation(reg, radius, ICO())
+	    
+	plot_geo_cells(dd, radius, :circ; kwargs_layout=geoattr)
+end
+  ╠═╡ =#
 
 # ╔═╡ ed222264-461a-4efb-90b1-42324c7eea63
 let
