@@ -85,52 +85,6 @@ function _cast_geopoint(p::Union{AbstractVector,Tuple})
 end
 _cast_geopoint(p::SimpleLatLon) = p
 
-# Produce specific geometries for plots.
-"""
-    _gen_circle(cx::Number, cy::Number, r::Number, f::Function=identity, n::Int=100)
-    _gen_circle(center::SimpleLatLon, r::Number, n::Int=100)
-
-The `_gen_circle` function generates a set of points representing a circle
-centered at `(cx, cy)` with a radius `r`. The points are calculated using the
-parametric equations for a circle. An optional function `f` can be applied to
-each point, and the number of points `n` can be specified to control the
-resolution of the circle.
-
-## Arguments
-- `cx::Number`: The x-coordinate of the circle's center.
-- `cy::Number`: The y-coordinate of the circle's center.
-- `r::Number`: The radius of the circle.
-- `f::Function=identity`: An optional function to be applied to each point of \
-the circle. The default function is `identity`, which returns the points \
-unchanged.
-- `n::Int=100`: The number of points to generate on the circle. The default \
-value is 100.
-
-## Returns
-- `Array`: An array of points `(x, y)` on the circle, after applying the \
-function `f` to each point.
-"""
-function _gen_circle(cx::Number, cy::Number, r::Number; f::Function=identity, n::Int=100)
-    # Calculate the angle step
-    angle = 0:2π/n:2π
-
-    circle_points = map(angle) do ang
-        (cx + r * cos(ang), cy + r * sin(ang))
-    end
-
-    return map(x -> f.(x), circle_points)
-end
-
-function _gen_circle(center::SimpleLatLon, r::Number; earth_local_radius=constants.Re_mean, n::Int=100)
-    # Radius in meters. The output is a Vector of values in deg for the sake of
-    # simplicity of the plotting.
-    cx = center.lon |> ustrip |> deg2rad
-    cy = center.lat |> ustrip |> deg2rad
-    r = r / earth_local_radius
-
-    return _gen_circle(cx, cy, r; f=rad2deg, n=n)
-end
-
 # Internal functions for creating the scatter plots.
 """
     _get_scatter_points(points::Array{<:Union{SimpleLatLon, AbstractVector, Tuple}}; kwargs...) -> PlotlyJS.Plot
@@ -401,23 +355,10 @@ and their polygonal contours.
 See also: [`_get_scatter_points`](@ref), [`_get_scatter_cellcontour`](@ref),
 [`_default_geolayout`](@ref), [`plot_geo_points`](@ref)
 """
-function GeoGrids.plot_geo_cells(cellCenters::Array{<:Union{SimpleLatLon,AbstractVector,Tuple}}; title="Cell Layout GEO Map", camera::Symbol=:twodim, kwargs_scatter=(;), kwargs_layout=(;))
+function GeoGrids.plot_geo_cells(cellCenters::Array{<:Union{SimpleLatLon,AbstractVector,Tuple}}; title="Cell Layout GEO Map", camera::Symbol=:twodim, kwargs_centers=(;), kwargs_layout=(;))
     # Fallback method to plot only cell centers
-    GeoGrids.plot_geo_points(cellCenters; title, camera, kwargs_scatter, kwargs_layout)
-end
-
-function GeoGrids.plot_geo_cells(cellCenters::Array{<:Union{SimpleLatLon,AbstractVector,Tuple}}, radius::Number; title="Cell Layout GEO Map", camera::Symbol=:twodim, circ_res=100, kwargs_centers=(;), kwargs_layout=(;))
-    # Create scatter plot for the cells contours.
-    scatterContours = _get_scatter_cellcontour(cellCenters, radius; circ_res, kwargs_centers...)
-
-    # Create scatter plot for the cell centers.
     k = (; defaultScatterCellCenters..., text=map(x -> string(x), 1:length(cellCenters)), kwargs_centers...) # Default for text mode for cellCenters
-    scatterCenters = _get_scatter_points(cellCenters; k...)
-
-    # Create layout
-    layout = _default_geolayout(; title, camera, kwargs_layout...)
-
-    plotly_plot([scatterContours, scatterCenters], layout)
+    GeoGrids.plot_geo_points(cellCenters; title, camera, kwargs_scatter=k, kwargs_layout)
 end
 
 function GeoGrids.plot_geo_cells(cellCenters::Array{<:Union{SimpleLatLon,AbstractVector,Tuple}}, cellContours::AbstractVector{<:Ngon}; title="Cell Layout GEO Map", camera::Symbol=:twodim, kwargs_centers=(;), kwargs_contours=(;), kwargs_layout=(;))

@@ -33,6 +33,16 @@ md"""
 # Test Tessellation
 """
 
+# ╔═╡ 80fef4bb-eec0-4256-a88a-b8fe9d117c1c
+md"""
+## Cell Layout Ngon
+"""
+
+# ╔═╡ 9f15a742-d191-4b31-a0c3-95e31e7cd4b8
+md"""
+## Cell Layout Points
+"""
+
 # ╔═╡ 474da875-6a71-4216-9a10-69d1e0e00576
 # ╠═╡ disabled = true
 #=╠═╡
@@ -129,10 +139,17 @@ md"""
 end
 
 # ╔═╡ e0b2c99d-c689-48fb-91d5-6a3b4ee4d044
-begin 
+let 
 	reg = GeoRegion(; regionName="Tassellation", admin="Spain")
 	centers,ngon = generate_tesselation(reg, 40000, HEX(), ExtraOutput())
 	plot_geo_cells(centers, ngon)
+end
+
+# ╔═╡ 02e8d382-8de1-46a0-a540-f95d0683ef8c
+let 
+	reg = GeoRegion(; regionName="Tassellation", admin="Spain")
+	centers = generate_tesselation(reg, 40000, HEX())
+	plot_geo_cells(centers)
 end
 
 # ╔═╡ 6cf1f091-7ca6-4487-826d-7788126fc926
@@ -1557,7 +1574,10 @@ version = "17.4.0+2"
 # ╔═╡ Cell order:
 # ╠═069444e1-4e89-4f4f-ae2f-f5fb3131e398
 # ╟─222fb774-1693-4b3c-b2ef-5fd38eca773c
+# ╟─80fef4bb-eec0-4256-a88a-b8fe9d117c1c
 # ╠═e0b2c99d-c689-48fb-91d5-6a3b4ee4d044
+# ╟─9f15a742-d191-4b31-a0c3-95e31e7cd4b8
+# ╠═02e8d382-8de1-46a0-a540-f95d0683ef8c
 # ╠═6cf1f091-7ca6-4487-826d-7788126fc926
 # ╠═62e47749-9bcd-4d8e-89d1-21275085cf8a
 # ╠═9fe9264c-b9dc-45ee-87d6-85c34b4d2f74
