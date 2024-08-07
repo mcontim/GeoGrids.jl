@@ -18,11 +18,11 @@ include("ico_func.jl")
 include("rect_func.jl")
 include("tessellation_func.jl")
 
-export AbstractRegion, GeoRegion, PolyRegion, LatBeltRegion
+export AbstractRegion, GeoRegion, PolyRegion, LatBeltRegion, ExtraOutput
 
 export icogrid, rectgrid, vecgrid,
 extract_countries, in, filter_points, group_by_domain
 
-export °, rad, SimpleLatLon, PolyArea, SVector, ExtraOutput
+export °, rad, SimpleLatLon, PolyArea, SVector, Ngon
 
 end # module GeoGrids
