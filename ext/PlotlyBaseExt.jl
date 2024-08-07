@@ -2,8 +2,58 @@ module PlotlyBaseExt
 
 using PlotlyExtensionsHelper
 using PlotlyBase
+using Unitful: ustrip
+using Meshes: Ngon
 
 using GeoGrids
+
+const defaultScatterCellContour = (;
+    mode="lines",
+    marker=attr(;
+        size=1,
+        color="rgb(92,97,102)",
+    ),
+    name="Cell Contour",
+    showlegend=false
+)
+
+const defaultScatterCellCenters = (;
+    mode="text", 
+    textfont=attr(; size=10), 
+    name="Cell Number",
+    showlegend=false
+)
+
+const defaultScatterPoints = (;
+    mode="markers",
+    marker_size=5,
+)
+
+const defaultLayoutGeo = (;
+    geo=attr(
+        projection=attr(
+            type="robinson",
+        ),
+        showocean=true,
+        # oceancolor =  "rgb(0, 255, 255)",
+        oceancolor="rgb(255, 255, 255)",
+        showland=true,
+        # landcolor =  "rgb(230, 145, 56)",
+        landcolor="rgb(217, 217, 217)",
+        showlakes=true,
+        # lakecolor =  "rgb(0, 255, 255)",
+        lakecolor="rgb(255, 255, 255)",
+        showcountries=true,
+        lonaxis=attr(
+            showgrid=true,
+            gridcolor="rgb(102, 102, 102)"
+        ),
+        lataxis=attr(
+            showgrid=true,
+            gridcolor="rgb(102, 102, 102)"
+        )
+    )
+)
 
 ## Auxiliary Functions
 """
@@ -111,11 +161,10 @@ function _get_scatter_points(points::Array{<:Union{SimpleLatLon,AbstractVector,T
     # Markers for the points
     vec_p = map(x -> _cast_geopoint(x), points[:]) # Convert in a vector of SimpleLatLon
 
-    return scattergeo(
+    return scattergeo(;
         lat=map(x -> x.lat, vec_p), # Vectorize such to be sure to avoid matrices.
         lon=map(x -> x.lon, vec_p), # Vectorize such to be sure to avoid matrices.
-        mode="markers",
-        marker_size=5,
+        defaultScatterPoints...,
         kwargs...
     )
 end
@@ -172,11 +221,10 @@ function _get_scatter_cellcontour(cellCenters::Array{<:Union{SimpleLatLon,Abstra
     end
 
     # Markers for the points
-    return scattergeo(
+    return scattergeo(;
         lat=y_plot, # Vectorize such to be sure to avoid matrices.
         lon=x_plot, # Vectorize such to be sure to avoid matrices.
-        mode="lines",
-        marker_size=1,
+        defaultScatterCellContour...,
         kwargs...
     )
 end
@@ -185,23 +233,22 @@ function _get_scatter_cellcontour(mesh::AbstractVector{<:Ngon}; kwargs...)
     # Extract scatter plot from mesh.
     meshTrace = []
     for poly in mesh
-        thisNgon = map(poly.vertices) do vertex
+        thisNgon = map([poly.vertices..., poly.vertices[1]]) do vertex # Loop through vertices to create the hexagon for plotting
             (ustrip(vertex.coords.x), ustrip(vertex.coords.y))
         end
         push!(meshTrace, [thisNgon..., (NaN, NaN)]...)
     end
 
-    return scattergeo(
+    return scattergeo(;
         lat=map(x -> last(x), meshTrace),
         lon=map(x -> first(x), meshTrace),
-        mode="lines",
-        marker_size=1,
+        defaultScatterCellContour...,
         kwargs...
     )
 end
 
 """
-    _get_default_geolayout(; title::String="Point Position GEO Map", camera::Symbol=:twodim, kwargs...) -> PlotlyJS.Layout
+    _default_geolayout(; title::String="Point Position GEO Map", camera::Symbol=:twodim, kwargs...) -> PlotlyJS.Layout
 
 This function generates a default geographic layout for a PlotlyJS plot. It sets
 up the layout with a geographic projection, ocean and land colors, and grid
@@ -220,45 +267,173 @@ arguments are passed directly to the `Layout` constructor.
 - A `PlotlyJS.Layout` object representing the default geographic layout with the \
 specified options.
 """
-function _get_default_geolayout(; title="Point Position GEO Map", camera::Symbol=:twodim, kwargs...)
-    if camera == :threedim
-        projection = "orthographic"
-    else
-        projection = "natural earth"
-    end
+function _default_geolayout(; title="Point Position GEO Map", camera::Symbol=:twodim, kwargs...)
+    projection = camera == :threedim ? "orthographic" : "natural earth"
 
     # Create the geo layout
-    return Layout(
-        geo=attr(
-            projection=attr(
-                type="robinson",
-            ),
-            showocean=true,
-            # oceancolor =  "rgb(0, 255, 255)",
-            oceancolor="rgb(255, 255, 255)",
-            showland=true,
-            # landcolor =  "rgb(230, 145, 56)",
-            landcolor="rgb(217, 217, 217)",
-            showlakes=true,
-            # lakecolor =  "rgb(0, 255, 255)",
-            lakecolor="rgb(255, 255, 255)",
-            showcountries=true,
-            lonaxis=attr(
-                showgrid=true,
-                gridcolor="rgb(102, 102, 102)"
-            ),
-            lataxis=attr(
-                showgrid=true,
-                gridcolor="rgb(102, 102, 102)"
-            )
-        ),
-        title=title;
+    return Layout(;
+        defaultLayoutGeo...,
+        title=title,
         geo_projection_type=projection,
         kwargs...
     )
 end
 
 ## Core plotting functions.
+"""
+    plot_geo_points(points::Array{<:Union{SimpleLatLon, AbstractVector, Tuple}}; title::String="Point Position GEO Map", camera::Symbol=:twodim, kwargs_scatter::NamedTuple=(); kwargs_layout::NamedTuple=()) -> PlotlyJS.Plot
+
+This function generates a geographic plot for a given array of points. It
+creates a scatter plot of the points using `_get_scatter_points` and sets up the
+layout with `_default_geolayout`. The plot is created using the
+`plotly_plot` function from PlotlyJS.
+
+## Arguments
+- `points::Array{<:Union{SimpleLatLon, AbstractVector, Tuple}}`: An array of \
+points to be plotted. Each point can be of type `SimpleLatLon`, \
+`AbstractVector`, or `Tuple` containing latitude and longitude.
+
+## Keyword Arguments
+- `title::String="Point Position GEO Map"`: The title of the plot. Defaults to \
+"Point Position GEO Map".
+- `camera::Symbol=:twodim`: The camera perspective of the plot. Can be `:twodim` \
+for a 2D view or other supported camera views.
+- `kwargs_scatter::NamedTuple=()` : Additional keyword arguments for customizing \
+the scatter plot. These arguments are passed directly to the \
+`_get_scatter_points` function.
+- `kwargs_layout::NamedTuple=()` : Additional keyword arguments for customizing \
+the plot layout. These arguments are passed directly to the \
+`_default_geolayout` function.
+
+## Returns
+- A `PlotlyJS.Plot` object representing the geographic plot of the provided \
+points.
+
+See also: [`_get_scatter_points`](@ref), [`_default_geolayout`](@ref),
+[`plot_geo_cells`](@ref)
+"""
+function GeoGrids.plot_geo_points(points::Array{<:Union{SimpleLatLon,AbstractVector,Tuple}}; title="Point Position GEO Map", camera::Symbol=:twodim, kwargs_scatter=(;), kwargs_layout=(;))
+    # Markers for the points
+    scatterpoints = _get_scatter_points(points; kwargs_scatter...)
+
+    layout = _default_geolayout(; title, camera, kwargs_layout...)
+
+    plotly_plot([scatterpoints], layout)
+end
+
+"""
+    plot_geo_cells(cellCenters::Array{<:Union{SimpleLatLon, AbstractVector, Tuple}}; title::String="Cell Layout GEO Map", camera::Symbol=:twodim, kwargs_scatter::NamedTuple=(), kwargs_layout::NamedTuple=()) -> PlotlyJS.Plot
+    plot_geo_cells(cellCenters::Array{<:Union{SimpleLatLon, AbstractVector, Tuple}}, radius::Number; title::String="Cell Layout GEO Map", camera::Symbol=:twodim, circ_res::Integer=100, kwargs_centers::NamedTuple=(), kwargs_layout::NamedTuple=()) -> PlotlyJS.Plot
+    plot_geo_cells(cellCenters::Array{<:Union{SimpleLatLon, AbstractVector, Tuple}}, cellContours::AbstractVector{<:Ngon}; title::String="Cell Layout GEO Map", camera::Symbol=:twodim, kwargs_centers::NamedTuple=(), kwargs_contours::NamedTuple=(), kwargs_layout::NamedTuple=()) -> PlotlyJS.Plot
+
+This function generates geographic plots for cell layouts with three methods:
+1. Plotting only the cell centers.
+2. Plotting the cell centers along with circular contours.
+3. Plotting the cell centers along with polygonal contours.
+
+# Method 1: Plot Cell Centers Only
+## Arguments
+- `cellCenters::Array{<:Union{SimpleLatLon, AbstractVector, Tuple}}`: An array \
+of points representing the centers of cells. Each point can be of type \
+`SimpleLatLon`, `AbstractVector`, or `Tuple`.
+- `title::String="Cell Layout GEO Map"`: The title of the plot. Defaults to \
+"Cell Layout GEO Map".
+- `camera::Symbol=:twodim`: The camera perspective of the plot. Can be `:twodim` \
+for a 2D view or other supported camera views.
+- `kwargs_scatter::NamedTuple=()` : Additional keyword arguments for customizing \
+the scatter plot. These arguments are passed directly to the \
+`GeoGrids.plot_geo_points` function.
+- `kwargs_layout::NamedTuple=()` : Additional keyword arguments for customizing \
+the plot layout. These arguments are passed directly to the \
+`GeoGrids.plot_geo_points` function.
+
+## Returns
+- A `PlotlyJS.Plot` object representing the geographic plot of the cell centers.
+
+# Method 2: Plot Cell Centers with Circular Contours
+## Arguments
+- `cellCenters::Array{<:Union{SimpleLatLon, AbstractVector, Tuple}}`: An array \
+of points representing the centers of cells. Each point can be of type \
+`SimpleLatLon`, `AbstractVector`, or `Tuple`.
+- `radius::Number`: The radius of the circular cell contours.
+- `title::String="Cell Layout GEO Map"`: The title of the plot. Defaults to \
+"Cell Layout GEO Map".
+- `camera::Symbol=:twodim`: The camera perspective of the plot. Can be `:twodim` \
+for a 2D view or other supported camera views.
+- `circ_res::Integer=100`: (Optional) The number of points used to approximate \
+the circle. Defaults to 100.
+- `kwargs_centers::NamedTuple=()` : Additional keyword arguments for customizing \
+the scatter plot of cell centers. These arguments are passed directly to the \
+`_get_scatter_points` function.
+- `kwargs_layout::NamedTuple=()` : Additional keyword arguments for customizing \
+the plot layout. These arguments are passed directly to the \
+`_default_geolayout` function.
+
+## Returns
+- A `PlotlyJS.Plot` object representing the geographic plot of the cell centers \
+and their circular contours.
+
+# Method 3: Plot Cell Centers with Polygonal Contours
+## Arguments
+- `cellCenters::Array{<:Union{SimpleLatLon, AbstractVector, Tuple}}`: An array \
+of points representing the centers of cells. Each point can be of type \
+`SimpleLatLon`, `AbstractVector`, or `Tuple`.
+- `cellContours::AbstractVector{<:Ngon}`: An array of `Ngon` objects \
+representing the contours of the cells.
+- `title::String="Cell Layout GEO Map"`: The title of the plot. Defaults to \
+"Cell Layout GEO Map".
+- `camera::Symbol=:twodim`: The camera perspective of the plot. Can be `:twodim` \
+for a 2D view or other supported camera views.
+- `kwargs_centers::NamedTuple=()` : Additional keyword arguments for customizing \
+the scatter plot of cell centers. These arguments are passed directly to the \
+`_get_scatter_points` function.
+- `kwargs_contours::NamedTuple=()` : Additional keyword arguments for \
+customizing the scatter plot of cell contours. These arguments are passed \
+directly to the `_get_scatter_cellcontour` function.
+- `kwargs_layout::NamedTuple=()` : Additional keyword arguments for customizing \
+the plot layout. These arguments are passed directly to the \
+`_default_geolayout` function.
+
+## Returns
+- A `PlotlyJS.Plot` object representing the geographic plot of the cell centers \
+and their polygonal contours.
+
+See also: [`_get_scatter_points`](@ref), [`_get_scatter_cellcontour`](@ref),
+[`_default_geolayout`](@ref), [`plot_geo_points`](@ref)
+"""
+function GeoGrids.plot_geo_cells(cellCenters::Array{<:Union{SimpleLatLon,AbstractVector,Tuple}}; title="Cell Layout GEO Map", camera::Symbol=:twodim, kwargs_scatter=(;), kwargs_layout=(;))
+    # Fallback method to plot only cell centers
+    GeoGrids.plot_geo_points(cellCenters; title, camera, kwargs_scatter, kwargs_layout)
+end
+
+function GeoGrids.plot_geo_cells(cellCenters::Array{<:Union{SimpleLatLon,AbstractVector,Tuple}}, radius::Number; title="Cell Layout GEO Map", camera::Symbol=:twodim, circ_res=100, kwargs_centers=(;), kwargs_layout=(;))
+    # Create scatter plot for the cells contours.
+    scatterContours = _get_scatter_cellcontour(cellCenters, radius; circ_res, kwargs_centers...)
+
+    # Create scatter plot for the cell centers.
+    k = (; defaultScatterCellCenters..., text=map(x -> string(x), 1:length(cellCenters)), kwargs_centers...) # Default for text mode for cellCenters
+    scatterCenters = _get_scatter_points(cellCenters; k...)
+
+    # Create layout
+    layout = _default_geolayout(; title, camera, kwargs_layout...)
+
+    plotly_plot([scatterContours, scatterCenters], layout)
+end
+
+function GeoGrids.plot_geo_cells(cellCenters::Array{<:Union{SimpleLatLon,AbstractVector,Tuple}}, cellContours::AbstractVector{<:Ngon}; title="Cell Layout GEO Map", camera::Symbol=:twodim, kwargs_centers=(;), kwargs_contours=(;), kwargs_layout=(;))
+    # Create scatter plot for the cells contours.
+    scatterContours = _get_scatter_cellcontour(cellContours; kwargs_contours...)
+
+    # Create scatter plot for the cell centers.
+    k = (; defaultScatterCellCenters..., text=map(x -> string(x), 1:length(cellCenters)), kwargs_centers...) # Default for text mode for cellCenters
+    scatterCenters = _get_scatter_points(cellCenters; k...)
+
+    # Create layout
+    layout = _default_geolayout(; title, camera, kwargs_layout...)
+
+    plotly_plot([scatterContours, scatterCenters], layout)
+end
+
 """
     plot_unitarysphere(points_cart)
 
@@ -318,160 +493,6 @@ function GeoGrids.plot_unitarysphere(points_cart; kwargs_scatter=(;), kwargs_lay
 
     # Plot([sphere,markers],layout)
     plotly_plot([sphere, markers], layout)
-end
-
-"""
-    plot_geo_points(points::Array{<:Union{SimpleLatLon, AbstractVector, Tuple}}; title::String="Point Position GEO Map", camera::Symbol=:twodim, kwargs_scatter::NamedTuple=(); kwargs_layout::NamedTuple=()) -> PlotlyJS.Plot
-
-This function generates a geographic plot for a given array of points. It
-creates a scatter plot of the points using `_get_scatter_points` and sets up the
-layout with `_get_default_geolayout`. The plot is created using the
-`plotly_plot` function from PlotlyJS.
-
-## Arguments
-- `points::Array{<:Union{SimpleLatLon, AbstractVector, Tuple}}`: An array of \
-points to be plotted. Each point can be of type `SimpleLatLon`, \
-`AbstractVector`, or `Tuple` containing latitude and longitude.
-
-## Keyword Arguments
-- `title::String="Point Position GEO Map"`: The title of the plot. Defaults to \
-"Point Position GEO Map".
-- `camera::Symbol=:twodim`: The camera perspective of the plot. Can be `:twodim` \
-for a 2D view or other supported camera views.
-- `kwargs_scatter::NamedTuple=()` : Additional keyword arguments for customizing \
-the scatter plot. These arguments are passed directly to the \
-`_get_scatter_points` function.
-- `kwargs_layout::NamedTuple=()` : Additional keyword arguments for customizing \
-the plot layout. These arguments are passed directly to the \
-`_get_default_geolayout` function.
-
-## Returns
-- A `PlotlyJS.Plot` object representing the geographic plot of the provided \
-points.
-
-See also: [`_get_scatter_points`](@ref), [`_get_default_geolayout`](@ref),
-[`plot_geo_cells`](@ref)
-"""
-function GeoGrids.plot_geo_points(points::Array{<:Union{SimpleLatLon,AbstractVector,Tuple}}; title="Point Position GEO Map", camera::Symbol=:twodim, kwargs_scatter=(;), kwargs_layout=(;))
-    # Markers for the points
-    scatterpoints = _get_scatter_points(points; kwargs_scatter...)
-
-    layout = _get_default_geolayout(; title, camera, kwargs_layout...)
-
-    plotly_plot([scatterpoints], layout)
-end
-
-"""
-    plot_geo_cells(cellCenters::Array{<:Union{SimpleLatLon, AbstractVector, Tuple}}; title::String="Cell Layout GEO Map", camera::Symbol=:twodim, kwargs_scatter::NamedTuple=(), kwargs_layout::NamedTuple=()) -> PlotlyJS.Plot
-    plot_geo_cells(cellCenters::Array{<:Union{SimpleLatLon, AbstractVector, Tuple}}, radius::Number; title::String="Cell Layout GEO Map", camera::Symbol=:twodim, circ_res::Integer=100, kwargs_centers::NamedTuple=(), kwargs_layout::NamedTuple=()) -> PlotlyJS.Plot
-    plot_geo_cells(cellCenters::Array{<:Union{SimpleLatLon, AbstractVector, Tuple}}, cellContours::AbstractVector{<:Ngon}; title::String="Cell Layout GEO Map", camera::Symbol=:twodim, kwargs_centers::NamedTuple=(), kwargs_contours::NamedTuple=(), kwargs_layout::NamedTuple=()) -> PlotlyJS.Plot
-
-This function generates geographic plots for cell layouts with three methods:
-1. Plotting only the cell centers.
-2. Plotting the cell centers along with circular contours.
-3. Plotting the cell centers along with polygonal contours.
-
-# Method 1: Plot Cell Centers Only
-## Arguments
-- `cellCenters::Array{<:Union{SimpleLatLon, AbstractVector, Tuple}}`: An array \
-of points representing the centers of cells. Each point can be of type \
-`SimpleLatLon`, `AbstractVector`, or `Tuple`.
-- `title::String="Cell Layout GEO Map"`: The title of the plot. Defaults to \
-"Cell Layout GEO Map".
-- `camera::Symbol=:twodim`: The camera perspective of the plot. Can be `:twodim` \
-for a 2D view or other supported camera views.
-- `kwargs_scatter::NamedTuple=()` : Additional keyword arguments for customizing \
-the scatter plot. These arguments are passed directly to the \
-`GeoGrids.plot_geo_points` function.
-- `kwargs_layout::NamedTuple=()` : Additional keyword arguments for customizing \
-the plot layout. These arguments are passed directly to the \
-`GeoGrids.plot_geo_points` function.
-
-## Returns
-- A `PlotlyJS.Plot` object representing the geographic plot of the cell centers.
-
-# Method 2: Plot Cell Centers with Circular Contours
-## Arguments
-- `cellCenters::Array{<:Union{SimpleLatLon, AbstractVector, Tuple}}`: An array \
-of points representing the centers of cells. Each point can be of type \
-`SimpleLatLon`, `AbstractVector`, or `Tuple`.
-- `radius::Number`: The radius of the circular cell contours.
-- `title::String="Cell Layout GEO Map"`: The title of the plot. Defaults to \
-"Cell Layout GEO Map".
-- `camera::Symbol=:twodim`: The camera perspective of the plot. Can be `:twodim` \
-for a 2D view or other supported camera views.
-- `circ_res::Integer=100`: (Optional) The number of points used to approximate \
-the circle. Defaults to 100.
-- `kwargs_centers::NamedTuple=()` : Additional keyword arguments for customizing \
-the scatter plot of cell centers. These arguments are passed directly to the \
-`_get_scatter_points` function.
-- `kwargs_layout::NamedTuple=()` : Additional keyword arguments for customizing \
-the plot layout. These arguments are passed directly to the \
-`_get_default_geolayout` function.
-
-## Returns
-- A `PlotlyJS.Plot` object representing the geographic plot of the cell centers \
-and their circular contours.
-
-# Method 3: Plot Cell Centers with Polygonal Contours
-## Arguments
-- `cellCenters::Array{<:Union{SimpleLatLon, AbstractVector, Tuple}}`: An array \
-of points representing the centers of cells. Each point can be of type \
-`SimpleLatLon`, `AbstractVector`, or `Tuple`.
-- `cellContours::AbstractVector{<:Ngon}`: An array of `Ngon` objects \
-representing the contours of the cells.
-- `title::String="Cell Layout GEO Map"`: The title of the plot. Defaults to \
-"Cell Layout GEO Map".
-- `camera::Symbol=:twodim`: The camera perspective of the plot. Can be `:twodim` \
-for a 2D view or other supported camera views.
-- `kwargs_centers::NamedTuple=()` : Additional keyword arguments for customizing \
-the scatter plot of cell centers. These arguments are passed directly to the \
-`_get_scatter_points` function.
-- `kwargs_contours::NamedTuple=()` : Additional keyword arguments for \
-customizing the scatter plot of cell contours. These arguments are passed \
-directly to the `_get_scatter_cellcontour` function.
-- `kwargs_layout::NamedTuple=()` : Additional keyword arguments for customizing \
-the plot layout. These arguments are passed directly to the \
-`_get_default_geolayout` function.
-
-## Returns
-- A `PlotlyJS.Plot` object representing the geographic plot of the cell centers \
-and their polygonal contours.
-
-See also: [`_get_scatter_points`](@ref), [`_get_scatter_cellcontour`](@ref),
-[`_get_default_geolayout`](@ref), [`plot_geo_points`](@ref)
-"""
-function GeoGrids.plot_geo_cells(cellCenters::Array{<:Union{SimpleLatLon,AbstractVector,Tuple}}; title="Cell Layout GEO Map", camera::Symbol=:twodim, kwargs_scatter=(;), kwargs_layout=(;))
-    # Fallback method to plot only cell centers
-    GeoGrids.plot_geo_points(cellCenters; title, camera, kwargs_scatter, kwargs_layout)
-end
-
-function GeoGrids.plot_geo_cells(cellCenters::Array{<:Union{SimpleLatLon,AbstractVector,Tuple}}, radius::Number; title="Cell Layout GEO Map", camera::Symbol=:twodim, circ_res=100, kwargs_centers=(;), kwargs_layout=(;))
-    # Create scatter plot for the cells contours.
-    scatterContours = _get_scatter_cellcontour(cellCenters, radius; circ_res, kwargs_centers...)
-
-    # Create scatter plot for the cell centers.
-    k = (; mode="text", text=map(x -> string(x), 1:length(cellCenters)), kwargs_centers...) # Default for text mode for cellCenters
-    scatterCenters = _get_scatter_points(cellCenters; k...)
-
-    # Create layout
-    layout = _get_default_geolayout(; title, camera, kwargs_layout...)
-
-    plotly_plot([scatterContours, scatterCenters], layout)
-end
-
-function GeoGrids.plot_geo_cells(cellCenters::Array{<:Union{SimpleLatLon,AbstractVector,Tuple}}, cellContours::AbstractVector{<:Ngon}; title="Cell Layout GEO Map", camera::Symbol=:twodim, kwargs_centers=(;), kwargs_contours=(;), kwargs_layout=(;))
-    # Create scatter plot for the cells contours.
-    scatterContours = _get_scatter_cellcontour(cellContours; kwargs_contours...)
-
-    # Create scatter plot for the cell centers.
-    k = (; mode="text", text=map(x -> string(x), 1:length(cellCenters)), kwargs_centers...) # Default for text mode for cellCenters
-    scatterCenters = _get_scatter_points(cellCenters; k...)
-
-    # Create layout
-    layout = _get_default_geolayout(; title, camera, kwargs_layout...)
-
-    plotly_plot([scatterContours, scatterCenters], layout)
 end
 
 end # module PlotlyBaseExt

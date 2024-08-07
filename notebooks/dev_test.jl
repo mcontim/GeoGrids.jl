@@ -33,53 +33,17 @@ md"""
 # Test Tessellation
 """
 
-# ╔═╡ 2f6c6420-ffb5-4bb6-b757-1ce852c35e78
-md"""
-## Local grid on Earth
-"""
-
-# ╔═╡ e21179c3-4412-441c-9f5c-3d7a2d881d30
-geoattr = (; geo=attr(
-            projection=attr(
-                type="robinson",
-            ),
-            showocean=true,
-            # oceancolor =  "rgb(0, 255, 255)",
-            oceancolor="rgb(255, 255, 255)",
-            showland=true,
-            # landcolor =  "rgb(230, 145, 56)",
-            landcolor="rgb(217, 217, 217)",
-            showlakes=true,
-            # lakecolor =  "rgb(0, 255, 255)",
-            lakecolor="rgb(255, 255, 255)",
-            showcountries=true,
-            lonaxis=attr(
-				range = [-10, 20],
-                showgrid=true,
-                gridcolor="rgb(102, 102, 102)"
-            ),
-            lataxis=attr(
-				range = [35, 50],
-                showgrid=true,
-                gridcolor="rgb(102, 102, 102)",
-				dtick = 10,
-            )
-        ))
-
-# ╔═╡ 32db1de7-868a-452e-8460-47c718d41519
-_gen_circle([(0.0,0.0),(1.0,1.0)],1.0)
-
-# ╔═╡ 34755273-58fb-494a-bb7d-6a29f9e60028
-size([1,2,3])
-
-# ╔═╡ 4aded9e3-8324-471e-9de5-edb4e19962a8
+# ╔═╡ 474da875-6a71-4216-9a10-69d1e0e00576
 # ╠═╡ disabled = true
 #=╠═╡
 let 
-	reg = GeoRegion(; regionName="Tassellation", admin="Switzerland")
-	dd = generate_tesselation(reg, 20000, ICO())
+	radius = 20000
 	
-	plot_geo_points(dd; kwargs_layout=geoattr)
+	reg = GeoRegion(; regionName="Tassellation", admin="Switzerland")
+	
+	dd = generate_tesselation(reg, radius, ICO())
+
+	plot_geo_cells(dd, radius, :circ; kwargs_layout=geoattr)
 end
   ╠═╡ =#
 
@@ -164,58 +128,11 @@ md"""
 	import >.CoordRefSystems
 end
 
-# ╔═╡ d05078cc-f277-492e-85a6-aab35f38f2f4
-c, ngon = let 
-	reg = GeoRegion(; regionName="Tassellation", admin="Switzerland")
-	c, ngon = generate_tesselation(reg, 20000, HEX(), ExtraOutput())
-	# _generate_tesselation(reg, 20000, HEX())
-	# plot_geo_points(dd; kwargs_layout=geoattr)
-
-	c, ngon
-end
-
-# ╔═╡ 9b36d67a-b36d-49f9-8d22-d027d1c20c68
-ngon[1].vertices[1].coords.x
-
-# ╔═╡ 10a22013-c99e-49c4-bb88-c720ff7f8809
-for poly in ngon
-	map(poly.vertices) do vertex
-		@info vertex.coords.x
-	end
-end
-
-# ╔═╡ 66072100-a1f9-4fef-912c-48ce59ff17fe
-typeof(ngon)
-
-# ╔═╡ 87930908-63b8-4f95-acf6-3ae1c6fe8ddc
-[(0.0,0.0),(1.0,1.0)] isa Array{<:Union{SimpleLatLon,AbstractVector,Tuple}}
-
-# ╔═╡ 5f011cbc-4314-4060-a817-d06f9b678c05
-begin
-	traces = []
-	for poly in ngon
-		thisNgon = map(poly.vertices) do vertex
-			(ustrip(vertex.coords.x), ustrip(vertex.coords.y))
-		end
-		push!(traces, [thisNgon...,(NaN,NaN)]...)
-	end
-end
-
-# ╔═╡ 5694d1c0-cba9-409e-bc9e-14a81f718bae
-traces
-
-# ╔═╡ 177a1a2c-7c2c-4820-85cd-62b2d2e46e49
-ngon isa AbstractVector{<:Ngon}
-
-# ╔═╡ ea682852-12c2-47ae-80e6-4a224025edcb
-methods(generate_tesselation)
-
 # ╔═╡ e0b2c99d-c689-48fb-91d5-6a3b4ee4d044
-dd=let 
+begin 
 	reg = GeoRegion(; regionName="Tassellation", admin="Spain")
-	dd = generate_tesselation(reg, 20000, HEX())
-	# plot_geo_cells(dd, 20000, :hex; kwargs_layout=geoattr)
-	# plot_geo_cells(dd, 20000, :hex)
+	centers,ngon = generate_tesselation(reg, 40000, HEX(), ExtraOutput())
+	plot_geo_cells(centers, ngon)
 end
 
 # ╔═╡ 6cf1f091-7ca6-4487-826d-7788126fc926
@@ -250,44 +167,11 @@ let
 	))
 end
 
-# ╔═╡ 2524d256-eddf-4582-b433-ffd6f5f92db9
-dd isa AbstractVector{<:SimpleLatLon}
-
-# ╔═╡ bf97c9f8-1ca9-421b-8c63-00b7acfafe88
-let
-	lat = gen_hex_lattice(20000/6371e3, :pointy; M=1)
-	theta = map(lat) do l
-		asind(sqrt(l[1]^2+l[2]^2))
-	end
-	phi = map(lat) do l
-		atand(l[2],l[1])
-	end
-
-	theta, phi
-end
-
-# ╔═╡ d9f28c97-0aa2-4551-8d17-f9becd5d0570
-begin
-		r̂ = SA_F64[1,2,3]
-		θ̂ = SA_F64[4,5,6]
-		φ̂ = SA_F64[7,8,9]
-	
-	    R = hcat(-φ̂, θ̂, r̂)
-end
-
-# ╔═╡ 474da875-6a71-4216-9a10-69d1e0e00576
-# ╠═╡ disabled = true
-#=╠═╡
+# ╔═╡ 4aded9e3-8324-471e-9de5-edb4e19962a8
 let 
-	radius = 20000
-	
 	reg = GeoRegion(; regionName="Tassellation", admin="Switzerland")
-	
-	dd = generate_tesselation(reg, radius, ICO())
-
-	plot_geo_cells(dd, radius, :circ; kwargs_layout=geoattr)
+	dd = generate_tesselation(reg, 20000, ICO())
 end
-  ╠═╡ =#
 
 # ╔═╡ ed222264-461a-4efb-90b1-42324c7eea63
 let
@@ -1673,27 +1557,11 @@ version = "17.4.0+2"
 # ╔═╡ Cell order:
 # ╠═069444e1-4e89-4f4f-ae2f-f5fb3131e398
 # ╟─222fb774-1693-4b3c-b2ef-5fd38eca773c
-# ╟─2f6c6420-ffb5-4bb6-b757-1ce852c35e78
-# ╠═e21179c3-4412-441c-9f5c-3d7a2d881d30
-# ╠═d05078cc-f277-492e-85a6-aab35f38f2f4
-# ╠═9b36d67a-b36d-49f9-8d22-d027d1c20c68
-# ╠═10a22013-c99e-49c4-bb88-c720ff7f8809
-# ╠═32db1de7-868a-452e-8460-47c718d41519
-# ╠═87930908-63b8-4f95-acf6-3ae1c6fe8ddc
-# ╠═5f011cbc-4314-4060-a817-d06f9b678c05
-# ╠═5694d1c0-cba9-409e-bc9e-14a81f718bae
-# ╠═66072100-a1f9-4fef-912c-48ce59ff17fe
-# ╠═177a1a2c-7c2c-4820-85cd-62b2d2e46e49
-# ╠═ea682852-12c2-47ae-80e6-4a224025edcb
 # ╠═e0b2c99d-c689-48fb-91d5-6a3b4ee4d044
 # ╠═6cf1f091-7ca6-4487-826d-7788126fc926
 # ╠═62e47749-9bcd-4d8e-89d1-21275085cf8a
 # ╠═9fe9264c-b9dc-45ee-87d6-85c34b4d2f74
 # ╠═3a7a1f4f-c386-4372-ae5f-beaad06ba8af
-# ╠═2524d256-eddf-4582-b433-ffd6f5f92db9
-# ╠═bf97c9f8-1ca9-421b-8c63-00b7acfafe88
-# ╠═34755273-58fb-494a-bb7d-6a29f9e60028
-# ╠═d9f28c97-0aa2-4551-8d17-f9becd5d0570
 # ╠═4aded9e3-8324-471e-9de5-edb4e19962a8
 # ╠═474da875-6a71-4216-9a10-69d1e0e00576
 # ╟─d272905a-dfd4-4ade-88bd-ca10abf86f77
