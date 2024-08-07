@@ -102,7 +102,8 @@ function _adapted_icogrid(radius::Number; refRadius=constants.Re_mean, correctio
     # for the hexagonal grid using a correction factor 1.2 to adapt the cell
     # centers distances (from old MATLAB grid). The correction factor would be
     # √3 if the original hex grid approach was used.
-    sepAng = radius * correctionFactor / refRadius |> rad2deg
+    # sepAng = radius * correctionFactor / refRadius |> rad2deg
+    sepAng = radius * 1.4 / refRadius |> rad2deg # //FIX: define the right packing and maybe allow circle plot also for HEX() tesselation as alternative
 
     return icogrid(; sepAng)
 end
@@ -388,4 +389,71 @@ function my_tesselate(points::AbstractVector{<:SimpleLatLon}; kwargs...)
     converted = map(x -> Point(ustrip(x.lon), ustrip(x.lat)), points)
 
     my_tesselate(PointSet(converted); kwargs...)
+end
+
+# Cirle cella contour.
+"""
+    _gen_circle(cx::Number, cy::Number, r::Number, f::Function=identity, n::Int=100)
+    _gen_circle(center::SimpleLatLon, r::Number, n::Int=100)
+
+The `_gen_circle` function generates a set of points representing a circle
+centered at `(cx, cy)` with a radius `r`. The points are calculated using the
+parametric equations for a circle. An optional function `f` can be applied to
+each point, and the number of points `n` can be specified to control the
+resolution of the circle.
+
+## Arguments
+- `cx::Number`: The x-coordinate of the circle's center.
+- `cy::Number`: The y-coordinate of the circle's center.
+- `r::Number`: The radius of the circle.
+- `f::Function=identity`: An optional function to be applied to each point of \
+the circle. The default function is `identity`, which returns the points \
+unchanged.
+- `n::Int=100`: The number of points to generate on the circle. The default \
+value is 100.
+
+## Returns
+- `Array`: An array of points `(x, y)` on the circle, after applying the \
+function `f` to each point.
+"""
+function _gen_circle(cx::Number, cy::Number, r::Number; f::Function=identity, n::Int=100)
+    # Calculate the angle step
+    angle = 0:2π/n:2π
+
+    circle_points = map(angle) do ang
+        (cx + r * cos(ang), cy + r * sin(ang))
+    end
+
+    return map(x -> f.(x), circle_points)
+end
+
+function _gen_circle(center::SimpleLatLon, r::Number; earth_local_radius=constants.Re_mean, n::Int=100)
+    # Radius in meters. The output is a Vector of values in deg for the sake of
+    # simplicity of the plotting.
+    cx = center.lon |> ustrip |> deg2rad
+    cy = center.lat |> ustrip |> deg2rad
+    r = r / earth_local_radius
+
+    return _gen_circle(cx, cy, r; f=rad2deg, n=n)
+end
+
+function circle_tessellation(centers::AbstractVector{<:SimpleLatLon}, radius::Number; earth_local_radius=constants.Re_mean, n::Int=100)
+    circles = []
+    for c in centers 
+        θ = 90 - (c.lat |> ustrip) |> deg2rad
+        ϕ = c.lon |> ustrip |> deg2rad
+        centreθφ = (; θ=θ, ϕ=ϕ) # [rad] Convert lat-lon in theta-phi (shperical approximation)
+
+        Δθ = radius / earth_local_radius # [rad]
+        Δϕ = 0:2π/n:2π # [rad]
+        thisCircle = map(Δϕ) do dϕ
+            offsetθφ = (; θ=Δθ, ϕ=dϕ) # [rad]
+            new = _add_angular_offset(centreθφ, offsetθφ)
+            lat, lon = _wrap_latlon(π / 2 - new.θ |> rad2deg, new.ϕ |> rad2deg)
+            SimpleLatLon(lat, lon)
+        end
+        push!(circles, thisCircle)
+    end        
+
+    return circles
 end

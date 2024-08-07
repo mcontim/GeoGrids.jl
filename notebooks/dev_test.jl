@@ -38,24 +38,19 @@ md"""
 ## Cell Layout Ngon
 """
 
+# ╔═╡ fec07e73-815b-4090-a414-b02d922682d4
+test_country = "Norway"
+
+# ╔═╡ a61d9a85-bbd6-499e-aa5e-5630ebc2464c
+(68858.69245840429/2)*(2/√3)
+
+# ╔═╡ cbda1f01-66ab-4bf3-bff3-7c15a6033bf2
+sqrt(3)
+
 # ╔═╡ 9f15a742-d191-4b31-a0c3-95e31e7cd4b8
 md"""
 ## Cell Layout Points
 """
-
-# ╔═╡ 474da875-6a71-4216-9a10-69d1e0e00576
-# ╠═╡ disabled = true
-#=╠═╡
-let 
-	radius = 20000
-	
-	reg = GeoRegion(; regionName="Tassellation", admin="Switzerland")
-	
-	dd = generate_tesselation(reg, radius, ICO())
-
-	plot_geo_cells(dd, radius, :circ; kwargs_layout=geoattr)
-end
-  ╠═╡ =#
 
 # ╔═╡ d272905a-dfd4-4ade-88bd-ca10abf86f77
 md"""
@@ -109,24 +104,6 @@ function plot_hexagonal_grid(latlon_centers, radius)
     plot([traces...], layout)
 end
 
-# ╔═╡ e904b396-4794-4783-9039-a2e66f82ec07
-let
-	# Parameters
-	cell_radius = 10.0  # radius of each hexagon cell in kilometers
-	num_cells = 5       # number of cells in each direction from the center
-	lat0 = 0.0         # starting latitude
-	lon0 = 0.0        # starting longitude
-	
-	# Generate hexagonal grid
-	centers = hexagonal_grid(cell_radius, num_cells)
-	
-	# Project to sphere (lat, lon)
-	latlon_centers = project_to_sphere(centers, cell_radius, lat0, lon0)
-	
-	# Plot the hexagonal grid
-	plot_hexagonal_grid(latlon_centers, cell_radius)
-end
-
 # ╔═╡ b94c71b6-0601-4a4c-ac92-417f0c372334
 md"""
 # Packages
@@ -145,6 +122,36 @@ let
 	plot_geo_cells(centers, ngon)
 end
 
+# ╔═╡ a0f1257d-467a-4875-aad7-1b763d608ab4
+let 
+	reg = LatBeltRegion(latLim=(-10,10))
+	centers,ngon = generate_tesselation(reg, 400000, ICO(), ExtraOutput())
+	plot_geo_cells(centers,ngon)
+end
+
+# ╔═╡ efe29293-38f2-49c1-a426-25cdbe0d78c3
+let 
+	reg = GlobalRegion()
+	centers,ngon = generate_tesselation(reg, 1000000, ICO(), ExtraOutput())
+	plot_geo_cells(centers,ngon)
+end
+
+# ╔═╡ a33d7400-64c2-47df-add5-f6603221210d
+let 
+	reg = GeoRegion(; regionName="Tassellation", admin=test_country)
+	centers = generate_tesselation(reg, 40000, HEX())
+	# plot_geo_cells(centers,40000)
+	min_dist(centers)
+end
+
+# ╔═╡ 27325150-8f6f-4c42-832f-b47aa139f72a
+let 
+	reg = GeoRegion(; regionName="Tassellation", admin=test_country)	
+	centers = generate_tesselation(reg, 40000, ICO(1))
+	# plot_geo_cells(centers,40000)
+	min_dist(centers)
+end
+
 # ╔═╡ 02e8d382-8de1-46a0-a540-f95d0683ef8c
 let 
 	reg = GeoRegion(; regionName="Tassellation", admin="Spain")
@@ -152,102 +159,26 @@ let
 	plot_geo_cells(centers)
 end
 
-# ╔═╡ 6cf1f091-7ca6-4487-826d-7788126fc926
-mesh = my_tesselate(dd)
-
-# ╔═╡ 9fe9264c-b9dc-45ee-87d6-85c34b4d2f74
-typeof(mesh[[1,482]])
-
-# ╔═╡ 62e47749-9bcd-4d8e-89d1-21275085cf8a
-mesh[1:end] isa AbstractVector{<:Ngon}
-
-# ╔═╡ 3a7a1f4f-c386-4372-ae5f-beaad06ba8af
-let
-	traces = []
-	vertex = mesh.vertices
-	# polygons = mesh.topology.connec[idx_sel]
-	polygons = mesh.topology.connec
-	for poly in polygons
-		for idx in poly.indices
-			v = vertex[idx]
-			push!(traces, (ustrip(v.coords.x), ustrip(v.coords.y)))
-		end
-		push!(traces, (ustrip(vertex[poly.indices[1]].coords.x), ustrip(vertex[poly.indices[1]].coords.y))) # add first vertex
-		push!(traces, (NaN,NaN))
-	end
-
-	plot(scattergeo(
-		lat = map(x -> last(x), traces),
-		lon = map(x -> first(x), traces),
-		mode = "lines",
-		marker_size = 1,
-	))
-end
-
-# ╔═╡ 4aded9e3-8324-471e-9de5-edb4e19962a8
+# ╔═╡ 900cd46a-89fe-471e-b6da-f643e9dcc689
 let 
-	reg = GeoRegion(; regionName="Tassellation", admin="Switzerland")
-	dd = generate_tesselation(reg, 20000, ICO())
+	reg = GlobalRegion()
+	centers = generate_tesselation(reg, 400000, ICO())
+	plot_geo_cells(centers)
 end
 
-# ╔═╡ ed222264-461a-4efb-90b1-42324c7eea63
-let
-	# Parameters
-	cell_radius = 10.0  # radius of each hexagon cell in kilometers
-	num_cells = 5       # number of cells in each direction from the center
-	lat0 = 0.0         # starting latitude
-	lon0 = 0.0        # starting longitude
-	
-	# Generate hexagonal grid
-	centers = hexagonal_grid(cell_radius, num_cells)
-	
-	# Project to sphere (lat, lon)
-	latlon_centers = project_to_sphere(centers, cell_radius, lat0, lon0)
-	
-	# Print lat-lon centers
-	points = map(latlon_centers) do ll
-		SimpleLatLon(ll[1],ll[2])
-	end
-
-	minDist = Inf
-	for p1 in points
-		for p2 in points
-			if p1 == p2 
-				continue
-			end
-			lla1 = LLA(p1.lat, p1.lon)
-			lla2 = LLA(p2.lat, p2.lon)
-			temp = get_distance_on_earth(lla1, lla2)
-			minDist = temp < minDist ? temp : minDist
-		end
-	end
-	minDist
-	# plot_geo_cells(points, cell_radius*1e3, :hex; hex_direction=:flat)
-
-end
-
-# ╔═╡ 07d6cd31-5518-460c-a90c-a427a78325e0
-let
-	points = Meshes.rand(Point, 100, crs=Meshes.Cartesian2D)
-	
-	mesh = tesselate(points, VoronoiTesselation())
-	
-	# viz(mesh, showsegments = true)
-	# viz!(points, color = :red)
-	# Mke.current_figure()
-end
-
-# ╔═╡ a5317c4a-395a-4e81-8a5c-c9b17dad403b
+# ╔═╡ ee000447-7d89-4069-91fb-5262a2f2925d
 let 
- 	reg = GeoRegion(; regionName="Tassellation", admin="Norway")
- 	dd3 = gen_cell_layout_v2(reg, 20000, HEX())
+	reg = LatBeltRegion(latLim=(-10,10))
+	centers = generate_tesselation(reg, 400000, ICO())
+	plot_geo_cells(centers)
 end
 
-# ╔═╡ 1fd9e97b-7e5e-4784-b84a-e55afd1f0dd9
-CountriesBorders.possible_selector_values()
-
-# ╔═╡ 0804dd6d-9688-438e-a88f-1409d146a988
-_add_angular_offset((θ=0,ϕ=0),(θ=2,ϕ=2))
+# ╔═╡ 31cfc91f-00b7-432f-a54d-077d34756536
+let
+	reg = LatBeltRegion(latLim=(-10,10))
+	centers = generate_tesselation(reg, 400000, ICO())
+	circle_tessellation(centers, 400000)
+end
 
 # ╔═╡ 00000000-0000-0000-0000-000000000001
 PLUTO_PROJECT_TOML_CONTENTS = """
@@ -1576,23 +1507,21 @@ version = "17.4.0+2"
 # ╟─222fb774-1693-4b3c-b2ef-5fd38eca773c
 # ╟─80fef4bb-eec0-4256-a88a-b8fe9d117c1c
 # ╠═e0b2c99d-c689-48fb-91d5-6a3b4ee4d044
+# ╠═a0f1257d-467a-4875-aad7-1b763d608ab4
+# ╠═efe29293-38f2-49c1-a426-25cdbe0d78c3
+# ╠═fec07e73-815b-4090-a414-b02d922682d4
+# ╠═a33d7400-64c2-47df-add5-f6603221210d
+# ╠═a61d9a85-bbd6-499e-aa5e-5630ebc2464c
+# ╠═27325150-8f6f-4c42-832f-b47aa139f72a
+# ╠═cbda1f01-66ab-4bf3-bff3-7c15a6033bf2
 # ╟─9f15a742-d191-4b31-a0c3-95e31e7cd4b8
 # ╠═02e8d382-8de1-46a0-a540-f95d0683ef8c
-# ╠═6cf1f091-7ca6-4487-826d-7788126fc926
-# ╠═62e47749-9bcd-4d8e-89d1-21275085cf8a
-# ╠═9fe9264c-b9dc-45ee-87d6-85c34b4d2f74
-# ╠═3a7a1f4f-c386-4372-ae5f-beaad06ba8af
-# ╠═4aded9e3-8324-471e-9de5-edb4e19962a8
-# ╠═474da875-6a71-4216-9a10-69d1e0e00576
+# ╠═900cd46a-89fe-471e-b6da-f643e9dcc689
+# ╠═ee000447-7d89-4069-91fb-5262a2f2925d
+# ╠═31cfc91f-00b7-432f-a54d-077d34756536
 # ╟─d272905a-dfd4-4ade-88bd-ca10abf86f77
 # ╠═d12aece5-8625-4667-9f65-6588f63849c4
 # ╠═ce49e8d1-539c-446e-9443-24238593a611
-# ╠═e904b396-4794-4783-9039-a2e66f82ec07
-# ╠═ed222264-461a-4efb-90b1-42324c7eea63
-# ╠═07d6cd31-5518-460c-a90c-a427a78325e0
-# ╠═a5317c4a-395a-4e81-8a5c-c9b17dad403b
-# ╠═1fd9e97b-7e5e-4784-b84a-e55afd1f0dd9
-# ╠═0804dd6d-9688-438e-a88f-1409d146a988
 # ╟─b94c71b6-0601-4a4c-ac92-417f0c372334
 # ╠═bf20cace-b64b-4155-90c1-1ec3644510d7
 # ╠═0e3793aa-13d2-4aeb-ad60-b98927932dc6

@@ -164,20 +164,23 @@ PlotlyJS.
 See also: [`_cast_geopoint`](@ref), [`_gen_circle`](@ref)
 """
 function _get_scatter_cellcontour(cellCenters::Array{<:Union{SimpleLatLon,AbstractVector,Tuple}}, radius::Number; circ_res=100, kwargs...)
-    # This function generates the scatter plot for circular cell contour.
-    cellCenters = map(x -> _cast_geopoint(x), cellCenters[:]) # Convert in a vector of SimpleLatLon
-    x_plot = [] # deg
-    y_plot = [] # deg
-    for c in cellCenters
-        points = _gen_circle(c, radius; n=circ_res)
-        push!(x_plot, [first.(points)..., NaN]...)
-        push!(y_plot, [last.(points)..., NaN]...)
+    vec_c = map(x -> _cast_geopoint(x), cellCenters[:]) # Convert in a vector of SimpleLatLon
+
+    circ_vec = GeoGrids.circle_tessellation(vec_c, radius; earth_local_radius=GeoGrids.constants.Re_mean, n=circ_res)
+
+    lat=[]
+    lon=[]
+    for c in circ_vec
+        map(x -> push!(lat, x.lat), c)
+        map(x -> push!(lon, x.lon), c)
+        push!(lat, NaN)
+        push!(lon, NaN)
     end
 
     # Markers for the points
     return scattergeo(;
-        lat=y_plot, # Vectorize such to be sure to avoid matrices.
-        lon=x_plot, # Vectorize such to be sure to avoid matrices.
+        lat=lat, # Vectorize such to be sure to avoid matrices.
+        lon=lon, # Vectorize such to be sure to avoid matrices.
         defaultScatterCellContour...,
         kwargs...
     )
@@ -364,6 +367,20 @@ end
 function GeoGrids.plot_geo_cells(cellCenters::Array{<:Union{SimpleLatLon,AbstractVector,Tuple}}, cellContours::AbstractVector{<:Ngon}; title="Cell Layout GEO Map", camera::Symbol=:twodim, kwargs_centers=(;), kwargs_contours=(;), kwargs_layout=(;))
     # Create scatter plot for the cells contours.
     scatterContours = _get_scatter_cellcontour(cellContours; kwargs_contours...)
+
+    # Create scatter plot for the cell centers.
+    k = (; defaultScatterCellCenters..., text=map(x -> string(x), 1:length(cellCenters)), kwargs_centers...) # Default for text mode for cellCenters
+    scatterCenters = _get_scatter_points(cellCenters; k...)
+
+    # Create layout
+    layout = _default_geolayout(; title, camera, kwargs_layout...)
+
+    plotly_plot([scatterContours, scatterCenters], layout)
+end
+
+function GeoGrids.plot_geo_cells(cellCenters::Array{<:Union{SimpleLatLon,AbstractVector,Tuple}}, radius::Number; title="Cell Layout GEO Map", camera::Symbol=:twodim, kwargs_centers=(;), kwargs_contours=(;), kwargs_layout=(;))
+    # Create scatter plot for the cells contours.
+    scatterContours = _get_scatter_cellcontour(cellCenters, radius; kwargs_contours...)
 
     # Create scatter plot for the cell centers.
     k = (; defaultScatterCellCenters..., text=map(x -> string(x), 1:length(cellCenters)), kwargs_centers...) # Default for text mode for cellCenters
