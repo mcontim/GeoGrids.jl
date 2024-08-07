@@ -185,8 +185,35 @@ c, ngon = let
 	c, ngon
 end
 
+# ╔═╡ 9b36d67a-b36d-49f9-8d22-d027d1c20c68
+ngon[1].vertices[1].coords.x
+
+# ╔═╡ 10a22013-c99e-49c4-bb88-c720ff7f8809
+for poly in ngon
+	map(poly.vertices) do vertex
+		@info vertex.coords.x
+	end
+end
+
+# ╔═╡ 32db1de7-868a-452e-8460-47c718d41519
+map(ngon[1])
+
 # ╔═╡ 66072100-a1f9-4fef-912c-48ce59ff17fe
 typeof(ngon)
+
+# ╔═╡ 5f011cbc-4314-4060-a817-d06f9b678c05
+begin
+	traces = []
+	for poly in ngon
+		thisNgon = map(poly.vertices) do vertex
+			(ustrip(vertex.coords.x), ustrip(vertex.coords.y))
+		end
+		push!(traces, [thisNgon...,(NaN,NaN)]...)
+	end
+end
+
+# ╔═╡ 5694d1c0-cba9-409e-bc9e-14a81f718bae
+traces
 
 # ╔═╡ 177a1a2c-7c2c-4820-85cd-62b2d2e46e49
 ngon isa AbstractVector{<:Ngon}
@@ -1646,6 +1673,11 @@ version = "17.4.0+2"
 # ╟─2f6c6420-ffb5-4bb6-b757-1ce852c35e78
 # ╠═e21179c3-4412-441c-9f5c-3d7a2d881d30
 # ╠═d05078cc-f277-492e-85a6-aab35f38f2f4
+# ╠═9b36d67a-b36d-49f9-8d22-d027d1c20c68
+# ╠═10a22013-c99e-49c4-bb88-c720ff7f8809
+# ╠═32db1de7-868a-452e-8460-47c718d41519
+# ╠═5f011cbc-4314-4060-a817-d06f9b678c05
+# ╠═5694d1c0-cba9-409e-bc9e-14a81f718bae
 # ╠═66072100-a1f9-4fef-912c-48ce59ff17fe
 # ╠═177a1a2c-7c2c-4820-85cd-62b2d2e46e49
 # ╠═ea682852-12c2-47ae-80e6-4a224025edcb

@@ -158,7 +158,7 @@ function _get_scatter_cells(cellCenter::Array{<:Union{SimpleLatLon,AbstractVecto
 	end
 	
     # Markers for the points
-    scatterpoints = scattergeo(
+    return scattergeo(
         lat = y_plot, # Vectorize such to be sure to avoid matrices.
         lon = x_plot, # Vectorize such to be sure to avoid matrices.
         mode = "lines",
@@ -167,6 +167,24 @@ function _get_scatter_cells(cellCenter::Array{<:Union{SimpleLatLon,AbstractVecto
     )
 
     return scatterpoints
+end
+
+function _get_scatter_mesh(mesh::AbstractVector{<:Ngon}; kwargs...)
+    # Extract scatter plot from mesh.
+    meshTrace = []    
+    for poly in mesh
+        thisNgon = map(poly.vertices) do vertex
+            (ustrip(vertex.coords.x), ustrip(vertex.coords.y))
+        end
+        push!(meshTrace, [thisNgon...,(NaN,NaN)]...)
+    end
+
+    return scattergeo(
+        lat = map(x -> last(x), meshTrace),
+        lon = map(x -> first(x), meshTrace),
+        mode = "lines",
+        marker_size = 1,
+    )
 end
 
 function GeoGrids.plot_geo_cells(cellCenter::Array{<:Union{SimpleLatLon,AbstractVector,Tuple}}, radius::Number; title="Cell Layout GEO Map", camera::Symbol=:twodim, kwargs_scatter=(;), kwargs_layout=(;))
@@ -179,25 +197,8 @@ function GeoGrids.plot_geo_cells(cellCenter::Array{<:Union{SimpleLatLon,Abstract
 end
 
 function GeoGrids.plot_geo_cells(cellCenter::Array{<:Union{SimpleLatLon,AbstractVector,Tuple}}, mesh::AbstractVector{<:Ngon}; title="Cell Layout GEO Map", camera::Symbol=:twodim, kwargs_scatter=(;), kwargs_mesh=(;), kwargs_layout=(;))
-    # Extract scatter plot from mesh.
-    traces = []
-    vertex = mesh2.vertices
-    polygons = mesh2.topology.connec[idx_sel]
-    for poly in polygons
-        for idx in poly.indices
-            v = vertex[idx]
-            push!(traces, (ustrip(v.coords.x), ustrip(v.coords.y)))
-        end
-        push!(traces, (ustrip(vertex[poly.indices[1]].coords.x), ustrip(vertex[poly.indices[1]].coords.y))) # add first vertex
-        push!(traces, (NaN,NaN))
-    end
-
-    plot(scattergeo(
-        lat = map(x -> last(x), traces),
-        lon = map(x -> first(x), traces),
-        mode = "lines",
-        marker_size = 1,
-    ))
+    # Scatter plot for the cells contours.
+    scatterMesh = _get_scatter_mesh(mesh; kwargs_mesh...)
 end
 
 function GeoGrids.plot_geo_cells(cellCenter::Array{<:Union{SimpleLatLon,AbstractVector,Tuple}}, radius, type::Symbol=:hex; hex_direction=:pointy, title="Cell Layout GEO Map", camera::Symbol=:twodim, kwargs_scatter=(;), kwargs_layout=(;))
