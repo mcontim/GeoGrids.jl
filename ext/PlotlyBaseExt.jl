@@ -5,6 +5,64 @@ using PlotlyBase
 
 using GeoGrids
 
+# Internal functions for creating the scatter plots.
+function _get_scatter_points(points::Array{<:Union{SimpleLatLon,AbstractVector,Tuple}}; kwargs...)
+    # Markers for the points
+    vec_p = map(x -> GeoGrids._cast_geopoint(x), points[:]) # Convert in a vector of SimpleLatLon
+    
+    return scattergeo(
+        lat=map(x -> x.lat, vec_p), # Vectorize such to be sure to avoid matrices.
+        lon=map(x -> x.lon, vec_p), # Vectorize such to be sure to avoid matrices.
+        mode="markers",
+        marker_size=5,
+        kwargs...
+    )
+end
+
+function _get_scatter_cells(cellCenter::Array{<:Union{SimpleLatLon,AbstractVector,Tuple}}, radius::Number, type::Symbol=:hex; hex_direction::Symbol=:pointy, circ_res=100,kwargs...)
+    cellCenter = map(x -> GeoGrids._cast_geopoint(x), cellCenter[:]) # Convert in a vector of SimpleLatLon
+    x_plot = [] # deg
+	y_plot = [] # deg
+	for c in cellCenter
+        points = if type == :hex
+            GeoGrids._gen_hex_vertices(c, radius; direction=hex_direction)
+        elseif type == :circ
+            GeoGrids._gen_circle(c, radius; n=circ_res)
+        else
+            error("Unrecognised type for cell shape, only :hex or :circ are supported...")
+        end
+		push!(x_plot, [first.(points)..., NaN]...)
+		push!(y_plot, [last.(points)..., NaN]...)
+	end
+	
+    # Markers for the points
+    return scattergeo(
+        lat = y_plot, # Vectorize such to be sure to avoid matrices.
+        lon = x_plot, # Vectorize such to be sure to avoid matrices.
+        mode = "lines",
+        marker_size = 1,
+        kwargs...
+    )
+end
+
+function _get_scatter_cellcontour(mesh::AbstractVector{<:Ngon}; kwargs...)
+    # Extract scatter plot from mesh.
+    meshTrace = []    
+    for poly in mesh
+        thisNgon = map(poly.vertices) do vertex
+            (ustrip(vertex.coords.x), ustrip(vertex.coords.y))
+        end
+        push!(meshTrace, [thisNgon...,(NaN,NaN)]...)
+    end
+
+    return scattergeo(
+        lat = map(x -> last(x), meshTrace),
+        lon = map(x -> first(x), meshTrace),
+        mode = "lines",
+        marker_size = 1,
+    )
+end
+
 """
     plot_unitarysphere(points_cart)
 
@@ -64,20 +122,6 @@ function GeoGrids.plot_unitarysphere(points_cart; kwargs_scatter=(;), kwargs_lay
 
     # Plot([sphere,markers],layout)
     plotly_plot([sphere, markers], layout)
-end
-
-function _get_scatter_points(points::Array{<:Union{SimpleLatLon,AbstractVector,Tuple}}; kwargs...)
-    # Markers for the points
-    vec_p = map(x -> GeoGrids._cast_geopoint(x), points[:]) # Convert in a vector of SimpleLatLon
-    scatterpoints = scattergeo(
-        lat=map(x -> x.lat, vec_p), # Vectorize such to be sure to avoid matrices.
-        lon=map(x -> x.lon, vec_p), # Vectorize such to be sure to avoid matrices.
-        mode="markers",
-        marker_size=5,
-        kwargs...
-    )
-
-    return scatterpoints
 end
 
 """
@@ -141,51 +185,7 @@ function GeoGrids.plot_geo_points(points::Array{<:Union{SimpleLatLon,AbstractVec
     plotly_plot([scatterpoints], layout)
 end
 
-function _get_scatter_cells(cellCenter::Array{<:Union{SimpleLatLon,AbstractVector,Tuple}}, radius::Number, type::Symbol=:hex; hex_direction::Symbol=:pointy, circ_res=100,kwargs...)
-    cellCenter = map(x -> GeoGrids._cast_geopoint(x), cellCenter[:]) # Convert in a vector of SimpleLatLon
-    x_plot = [] # deg
-	y_plot = [] # deg
-	for c in cellCenter
-        points = if type == :hex
-            GeoGrids._gen_hex_vertices(c, radius; direction=hex_direction)
-        elseif type == :circ
-            GeoGrids._gen_circle(c, radius; n=circ_res)
-        else
-            error("Unrecognised type for cell shape, only :hex or :circ are supported...")
-        end
-		push!(x_plot, [first.(points)..., NaN]...)
-		push!(y_plot, [last.(points)..., NaN]...)
-	end
-	
-    # Markers for the points
-    return scattergeo(
-        lat = y_plot, # Vectorize such to be sure to avoid matrices.
-        lon = x_plot, # Vectorize such to be sure to avoid matrices.
-        mode = "lines",
-        marker_size = 1,
-        kwargs...
-    )
 
-    return scatterpoints
-end
-
-function _get_scatter_mesh(mesh::AbstractVector{<:Ngon}; kwargs...)
-    # Extract scatter plot from mesh.
-    meshTrace = []    
-    for poly in mesh
-        thisNgon = map(poly.vertices) do vertex
-            (ustrip(vertex.coords.x), ustrip(vertex.coords.y))
-        end
-        push!(meshTrace, [thisNgon...,(NaN,NaN)]...)
-    end
-
-    return scattergeo(
-        lat = map(x -> last(x), meshTrace),
-        lon = map(x -> first(x), meshTrace),
-        mode = "lines",
-        marker_size = 1,
-    )
-end
 
 function GeoGrids.plot_geo_cells(cellCenter::Array{<:Union{SimpleLatLon,AbstractVector,Tuple}}, radius::Number; title="Cell Layout GEO Map", camera::Symbol=:twodim, kwargs_scatter=(;), kwargs_layout=(;))
     # Fallback method to plot only cell centers
@@ -196,9 +196,13 @@ function GeoGrids.plot_geo_cells(cellCenter::Array{<:Union{SimpleLatLon,Abstract
     # Plot with circles
 end
 
-function GeoGrids.plot_geo_cells(cellCenter::Array{<:Union{SimpleLatLon,AbstractVector,Tuple}}, mesh::AbstractVector{<:Ngon}; title="Cell Layout GEO Map", camera::Symbol=:twodim, kwargs_scatter=(;), kwargs_mesh=(;), kwargs_layout=(;))
+function GeoGrids.plot_geo_cells(cellCenter::Array{<:Union{SimpleLatLon,AbstractVector,Tuple}}, cellContours::AbstractVector{<:Ngon}; title="Cell Layout GEO Map", camera::Symbol=:twodim, kwargs_center=(;), kwargs_contour=(;), kwargs_layout=(;))
     # Scatter plot for the cells contours.
-    scatterMesh = _get_scatter_mesh(mesh; kwargs_mesh...)
+    scatterMesh = _get_scatter_cellcontour(cellContours; kwargs_contour...)
+    # Scatter plot for the cell centers.
+    k = (; mode="text", text=map(x -> string(x), 1:length(cellCenter)), kwargs_center...) # Default for text mode for cellCenter
+    scatterCenters = _get_scatter_points(cellCenter; k...)
+
 end
 
 function GeoGrids.plot_geo_cells(cellCenter::Array{<:Union{SimpleLatLon,AbstractVector,Tuple}}, radius, type::Symbol=:hex; hex_direction=:pointy, title="Cell Layout GEO Map", camera::Symbol=:twodim, kwargs_scatter=(;), kwargs_layout=(;))

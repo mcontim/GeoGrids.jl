@@ -66,53 +66,6 @@ function CountriesBorders.extract_countries(r::GeoRegion)
 end
 
 """
-    _gen_hex_vertices(cx::Number, cy::Number, r::Number; direction::Symbol=:pointy, f::Function=identity)
-    _gen_hex_vertices(center::SimpleLatLon, r::Number; earth_local_radius = constants.Re_mean, direction::Symbol=:pointy)    
-
-The `_gen_hex_vertices` function generates the vertices of a hexagon
-centered at a given point `(cx, cy)` with a specified radius `r`. The function
-allows for two orientations of the hexagon: "pointy" (vertex pointing upwards)
-or "flat" (edge pointing upwards).
-
-## Arguments
-- `cx::Number`: The x-coordinate of the center of the hexagon.
-- `cy::Number`: The y-coordinate of the center of the hexagon.
-- `center::SimpleLatLon`: The center of the hexagon as a `SimpleLatLon` object.
-- `r::Number`: The radius of the hexagon, which is the distance from the center \
-to any vertex.
-- `direction::Symbol`: The orientation of the hexagon. It can be either \
-`:pointy` for a hexagon with a vertex pointing upwards or `:flat` for a \
-hexagon with an edge pointing upwards. The default value is `:pointy`.
-- f::Function: A function to apply to the vertices before returning them.
-
-## Returns
-- `vertices::Vector{Tuple{Number, Number}}`: A vector of tuples, where each \
-tuple represents the `(x, y)` coordinates of a vertex of the hexagon. The \
-vector contains 7 tuples, with the last vertex being the same as the first to \
-close the hexagon. When `SimpleLatLon` is given as input the output vector \
-contains `Number` representing lon=x and lat=y in deg (useful for geoscatter plotting). 
-"""
-function _gen_hex_vertices(cx::Number, cy::Number, r::Number; direction::Symbol=:pointy, f::Function=identity)
-    vertices = if direction === :pointy
-        [(cx + r * sin(2π * i / 6), cy + r * cos(2π * i / 6)) for i in 0:6]
-    else
-        [(cx + r * cos(2π * i / 6), cy + r * sin(2π * i / 6)) for i in 0:6]
-    end
-
-    return map(x -> f.(x), vertices)
-end
-
-function _gen_hex_vertices(center::SimpleLatLon, r::Number; earth_local_radius=constants.Re_mean, direction::Symbol=:pointy)
-    # Radius in meters.
-    # The output is a Vector of values in deg for the sake of simplicity of the plotting.
-    cx = center.lon |> ustrip |> deg2rad
-    cy = center.lat |> ustrip |> deg2rad
-    r = r / earth_local_radius
-
-    return _gen_hex_vertices(cx, cy, r; direction=direction, f=rad2deg)
-end
-
-"""
     _gen_circle(cx::Number, cy::Number, r::Number, f::Function=identity, n::Int=100)
     _gen_circle(center::SimpleLatLon, r::Number, n::Int=100)
 
