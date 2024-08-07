@@ -66,6 +66,9 @@ geoattr = (; geo=attr(
             )
         ))
 
+# ╔═╡ 32db1de7-868a-452e-8460-47c718d41519
+_gen_circle([(0.0,0.0),(1.0,1.0)],1.0)
+
 # ╔═╡ 34755273-58fb-494a-bb7d-6a29f9e60028
 size([1,2,3])
 
@@ -77,20 +80,6 @@ let
 	dd = generate_tesselation(reg, 20000, ICO())
 	
 	plot_geo_points(dd; kwargs_layout=geoattr)
-end
-  ╠═╡ =#
-
-# ╔═╡ 474da875-6a71-4216-9a10-69d1e0e00576
-# ╠═╡ disabled = true
-#=╠═╡
-let 
-	radius = 20000
-	
-	reg = GeoRegion(; regionName="Tassellation", admin="Switzerland")
-	
-	dd = generate_tesselation(reg, radius, ICO())
-	    
-	plot_geo_cells(dd, radius, :circ; kwargs_layout=geoattr)
 end
   ╠═╡ =#
 
@@ -195,11 +184,11 @@ for poly in ngon
 	end
 end
 
-# ╔═╡ 32db1de7-868a-452e-8460-47c718d41519
-map(ngon[1])
-
 # ╔═╡ 66072100-a1f9-4fef-912c-48ce59ff17fe
 typeof(ngon)
+
+# ╔═╡ 87930908-63b8-4f95-acf6-3ae1c6fe8ddc
+[(0.0,0.0),(1.0,1.0)] isa Array{<:Union{SimpleLatLon,AbstractVector,Tuple}}
 
 # ╔═╡ 5f011cbc-4314-4060-a817-d06f9b678c05
 begin
@@ -285,6 +274,20 @@ begin
 	
 	    R = hcat(-φ̂, θ̂, r̂)
 end
+
+# ╔═╡ 474da875-6a71-4216-9a10-69d1e0e00576
+# ╠═╡ disabled = true
+#=╠═╡
+let 
+	radius = 20000
+	
+	reg = GeoRegion(; regionName="Tassellation", admin="Switzerland")
+	
+	dd = generate_tesselation(reg, radius, ICO())
+
+	plot_geo_cells(dd, radius, :circ; kwargs_layout=geoattr)
+end
+  ╠═╡ =#
 
 # ╔═╡ ed222264-461a-4efb-90b1-42324c7eea63
 let
@@ -1676,6 +1679,7 @@ version = "17.4.0+2"
 # ╠═9b36d67a-b36d-49f9-8d22-d027d1c20c68
 # ╠═10a22013-c99e-49c4-bb88-c720ff7f8809
 # ╠═32db1de7-868a-452e-8460-47c718d41519
+# ╠═87930908-63b8-4f95-acf6-3ae1c6fe8ddc
 # ╠═5f011cbc-4314-4060-a817-d06f9b678c05
 # ╠═5694d1c0-cba9-409e-bc9e-14a81f718bae
 # ╠═66072100-a1f9-4fef-912c-48ce59ff17fe

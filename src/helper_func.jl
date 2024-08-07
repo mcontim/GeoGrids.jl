@@ -1,34 +1,4 @@
 """
-    _cast_geopoint(p::Union{AbstractVector, Tuple})
-    _cast_geopoint(p::SimpleLatLon)
-
-Convert various types of input representations into a `SimpleLatLon` object.
-This method assumes that the input coordinates are in degrees. It converts the
-latitude and longitude from degrees to radians before creating a `SimpleLatLon`
-object.
-
-## Arguments
-- `p::Union{AbstractVector, Tuple}`: A 2D point where the first element is the \
-latitude and the second element is the longitude, both in degrees.
-
-## Returns
-- `SimpleLatLon`: An object representing the geographical point with latitude \
-and longitude converted to radians.
-
-## Errors
-- Throws an `ArgumentError` if the input `p` does not have exactly two elements.
-"""
-function _cast_geopoint(p::Union{AbstractVector,Tuple})
-    length(p) != 2 && error("The input must be a 2D point...")
-    lat = first(p)
-    lon = last(p)
-    # Inputs are considered in degrees
-    return SimpleLatLon(lat * °, lon * °)
-end
-_cast_geopoint(p::SimpleLatLon) = p
-
-## Aux Functions
-"""
     extract_countries(r::GeoRegion)
 
 Extracts the countries from a given region.
@@ -63,51 +33,6 @@ function CountriesBorders.extract_countries(r::GeoRegion)
     kwargs = NamedTuple(filter(x -> !isempty(x[2]), all_pairs))
 
     return CountriesBorders.extract_countries(; kwargs...)
-end
-
-"""
-    _gen_circle(cx::Number, cy::Number, r::Number, f::Function=identity, n::Int=100)
-    _gen_circle(center::SimpleLatLon, r::Number, n::Int=100)
-
-The `_gen_circle` function generates a set of points representing a circle
-centered at `(cx, cy)` with a radius `r`. The points are calculated using the
-parametric equations for a circle. An optional function `f` can be applied to
-each point, and the number of points `n` can be specified to control the
-resolution of the circle.
-
-## Arguments
-- `cx::Number`: The x-coordinate of the circle's center.
-- `cy::Number`: The y-coordinate of the circle's center.
-- `r::Number`: The radius of the circle.
-- `f::Function=identity`: An optional function to be applied to each point of \
-the circle. The default function is `identity`, which returns the points \
-unchanged.
-- `n::Int=100`: The number of points to generate on the circle. The default \
-value is 100.
-
-## Returns
-- `Array`: An array of points `(x, y)` on the circle, after applying the \
-function `f` to each point.
-"""
-function _gen_circle(cx::Number, cy::Number, r::Number; f::Function=identity, n::Int=100)
-    # Calculate the angle step
-    angle = 0:2π/n:2π
-
-    circle_points = map(angle) do ang
-        (cx + r * cos(ang), cy + r * sin(ang))
-    end
-
-    return map(x -> f.(x), circle_points)
-end
-
-function _gen_circle(center::SimpleLatLon, r::Number; earth_local_radius=constants.Re_mean, n::Int=100)
-    # Radius in meters.
-    # The output is a Vector of values in deg for the sake of simplicity of the plotting.
-    cx = center.lon |> ustrip |> deg2rad
-    cy = center.lat |> ustrip |> deg2rad
-    r = r / earth_local_radius
-
-    return _gen_circle(cx, cy, r; f=rad2deg, n=n)
 end
 
 """
