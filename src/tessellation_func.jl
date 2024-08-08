@@ -208,7 +208,7 @@ end
 
 """
     generate_tesselation(region::Union{GeoRegion, PolyRegion}, radius::Number, type::HEX; refRadius::Number=constants.Re_mean, kwargs_lattice...) -> AbstractVector{<:SimpleLatLon}
-    generate_tesselation(region::Union{GeoRegion, PolyRegion}, radius::Number, type::HEX, ::ExtraOutput; refRadius::Number=constants.Re_mean, kwargs_lattice...) -> AbstractVector{<:SimpleLatLon}, AbstractVector{<:Ngon}
+    generate_tesselation(region::Union{GeoRegion, PolyRegion}, radius::Number, type::HEX, ::ExtraOutput; refRadius::Number=constants.Re_mean, kwargs_lattice...) -> AbstractVector{<:SimpleLatLon}, AbstractVector{<:AbstractVector{<:SimpleLatLon}}
 
 The `generate_tesselation` function generates a hexagonal cell layout for a given
 geographical region. It calculates the cell grid layout centered around the
@@ -264,7 +264,7 @@ function generate_tesselation(region::Union{GeoRegion,PolyRegion}, radius::Numbe
         return filtered, hexagons
     else # Circular pattern
         # Filter centroids in the region.
-        filtered, centers = filter_points(centroids, region)
+        filtered = filter_points(centroids, region)
         # Create the circular pattern from the filtered centroids.
         circles = my_tesselate_circle(filtered, radius; refRadius, n=20)
         return filtered, circles
@@ -273,9 +273,9 @@ end
 
 """
     generate_tesselation(region::GlobalRegion, radius::Number, type::ICO; refRadius::Number=constants.Re_mean) -> AbstractVector{<:SimpleLatLon}
-    generate_tesselation(region::GlobalRegion, radius::Number, type::ICO, ::ExtraOutput; refRadius::Number=constants.Re_mean) -> AbstractVector{<:SimpleLatLon}, AbstractVector{<:Ngon}
+    generate_tesselation(region::GlobalRegion, radius::Number, type::ICO, ::ExtraOutput; refRadius::Number=constants.Re_mean) -> AbstractVector{<:SimpleLatLon}, AbstractVector{<:AbstractVector{<:SimpleLatLon}}
     generate_tesselation(region::Union{LatBeltRegion, GeoRegion, PolyRegion}, radius::Number, type::ICO; refRadius::Number=constants.Re_mean) -> AbstractVector{<:SimpleLatLon}
-    generate_tesselation(region::Union{LatBeltRegion, GeoRegion, PolyRegion}, radius::Number, type::ICO, ::ExtraOutput; refRadius::Number=constants.Re_mean) -> AbstractVector{<:SimpleLatLon}, AbstractVector{<:Ngon}
+    generate_tesselation(region::Union{LatBeltRegion, GeoRegion, PolyRegion}, radius::Number, type::ICO, ::ExtraOutput; refRadius::Number=constants.Re_mean) -> AbstractVector{<:SimpleLatLon}, AbstractVector{<:AbstractVector{<:SimpleLatLon}}
 
 The `generate_tesselation` function generates a cell layout using an icosahedral grid
 for a given geographical region. The function adapts the grid based on the
@@ -345,7 +345,7 @@ function generate_tesselation(region::Union{LatBeltRegion,GeoRegion,PolyRegion},
         return filtered, hexagons
     else # Circular pattern
         # Filter centroids in the region.
-        filtered, centers = filter_points(centroids, region)
+        filtered = filter_points(centroids, region)
         # Create the circular pattern from the filtered centroids.
         circles = my_tesselate_circle(filtered, radius; refRadius, n=20)
         return filtered, circles
@@ -410,6 +410,7 @@ function my_tesselate(pset::PointSet; method::VoronoiTesselation=VoronoiTesselat
 end
 
 my_tesselate(points::AbstractVector{<:Point}; kwargs...) = my_tesselate(PointSet(points); kwargs...)
+my_tesselate(point::Point; kwargs...) = my_tesselate([point]; kwargs...)
 
 function my_tesselate(points::AbstractVector{<:SimpleLatLon}; kwargs...)
     # Convert the input points in a PointSet. Rememeber that in Meshes.jl we
@@ -419,6 +420,7 @@ function my_tesselate(points::AbstractVector{<:SimpleLatLon}; kwargs...)
 
     my_tesselate(PointSet(converted); kwargs...)
 end
+my_tesselate(point::SimpleLatLon; kwargs...) = my_tesselate([point]; kwargs...)
 
 # Cirle cella contour.
 """
@@ -497,7 +499,7 @@ tessellation.
 vector of `SimpleLatLon` points forming the circumference of a circle. Each \
 circle corresponds to a center point from the input `centers` vector.
 """
-function my_tesselate_circle(centers::AbstractVector{<:SimpleLatLon}, radius::Number; refRadius=constants.Re_mean, n::Int=20)
+function my_tesselate_circle(centers::AbstractVector{<:SimpleLatLon}, radius::Number; refRadius::Number=constants.Re_mean, n::Int=20)
     Δϕ = [collect(0:2π/n:2π)..., 0.0] # [rad]
     circles = [fill(SimpleLatLon(0, 0), length(Δϕ)) for i in 1:length(centers)] # Each element of the vector is a vector of SimpleLatLon points composing a circle.
     for c in eachindex(centers)
@@ -516,9 +518,10 @@ function my_tesselate_circle(centers::AbstractVector{<:SimpleLatLon}, radius::Nu
 
     return circles
 end
+my_tesselate_circle(centers<:SimpleLatLon, radius::Number; kwargs...) = my_tesselate_circle([centers], radius; kwargs...)
 
 """
-    my_tesselate_hexagon(filtered::AbstractVector{<:SimpleLatLon}, idxs::AbstractVector{Int}, mesh::AbstractVector{<:Ngon})
+    my_tesselate_hexagon(filtered::AbstractVector{<:SimpleLatLon}, idxs::AbstractVector{Int}, mesh::SimpleMesh)
 
 This function generates a set of hexagons by converting the vertices of polygons
 in the `mesh` to `SimpleLatLon` points. These hexagons are created around the
@@ -532,7 +535,7 @@ want to tessellate around.
 - `idxs::AbstractVector{Int}`: A vector of integers indicating indices into the \
 `mesh` vector. These indices correspond to the hexagons in the `mesh` that \
 should be tessellated.
-- `mesh::AbstractVector{<:Ngon}`: A vector of `Ngon` objects, where each `Ngon` \
+- `mesh::SimpleMesh`: A vector of `Ngon` objects, where each `Ngon` \
 represents a polygon (in this case, a hexagon) with vertices. Each vertex has \
 associated coordinates (latitude and longitude).
 
@@ -541,7 +544,7 @@ associated coordinates (latitude and longitude).
 vector of `SimpleLatLon` points forming the vertices of a hexagon. Each \
 hexagon corresponds to an element in the `filtered` vector.
 """
-function my_tesselate_hexagon(filtered::AbstractVector{<:SimpleLatLon}, idxs::AbstractVector{Int}, mesh::AbstractVector{<:Ngon})
+function my_tesselate_hexagon(filtered::AbstractVector{<:SimpleLatLon}, idxs::AbstractVector{<:Number}, mesh::SimpleMesh)
     hexagons = [fill(SimpleLatLon(0, 0), 7) for i in 1:length(filtered)]
     for (p, poly) in enumerate(mesh[idxs])
         for (v, vertex) in enumerate([poly.vertices..., poly.vertices[1]]) # Loop through vertices to create the hexagon for plotting)
@@ -551,3 +554,4 @@ function my_tesselate_hexagon(filtered::AbstractVector{<:SimpleLatLon}, idxs::Ab
 
     return hexagons
 end
+my_tesselate_hexagon(filtered::SimpleLatLon, idxs::Number, mesh::SimpleMesh) = my_tesselate_hexagon([filtered], [idxs], mesh)

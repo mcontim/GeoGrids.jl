@@ -149,14 +149,14 @@ function _get_scatter_cellcontour(polygons::AbstractVector{<:AbstractVector{<:Si
     polygonsTrace = []
     for ngon in polygons
         thisNgon = map(ngon) do vertex # Loop through vertices to create the hexagon for plotting
-            (ustrip(vertex.lat), ustrip(vertexlon))
+            (ustrip(vertex.lat), ustrip(vertex.lon))
         end
-        push!(meshTrace, [thisNgon..., (NaN, NaN)]...)
+        push!(polygonsTrace, [thisNgon..., (NaN, NaN)]...)
     end
 
     return scattergeo(;
-        lat=map(x -> first(x), meshTrace),
-        lon=map(x -> last(x), meshTrace),
+        lat=map(x -> first(x), polygonsTrace),
+        lon=map(x -> last(x), polygonsTrace),
         defaultScatterCellContour...,
         kwargs...
     )
@@ -235,10 +235,11 @@ function GeoGrids.plot_geo_points(points::Array{<:Union{SimpleLatLon,AbstractVec
 
     plotly_plot([scatterpoints], layout)
 end
+GeoGrids.plot_geo_points(point<:Union{SimpleLatLon,AbstractVector,Tuple}; kwargs...) = GeoGrids.plot_geo_points([point]; kwargs...)
 
 """
     plot_geo_cells(cellCenters::Array{<:Union{SimpleLatLon, AbstractVector, Tuple}}; title::String="Cell Layout GEO Map", camera::Symbol=:twodim, kwargs_scatter::NamedTuple=(), kwargs_layout::NamedTuple=()) -> PlotlyJS.Plot
-    plot_geo_cells(cellCenters::Array{<:Union{SimpleLatLon, AbstractVector, Tuple}}, cellContours::AbstractVector{<:Ngon}; title::String="Cell Layout GEO Map", camera::Symbol=:twodim, kwargs_centers::NamedTuple=(), kwargs_contours::NamedTuple=(), kwargs_layout::NamedTuple=()) -> PlotlyJS.Plot
+    plot_geo_cells(cellCenters::Array{<:Union{SimpleLatLon, AbstractVector, Tuple}}, cellContours::AbstractVector{<:AbstractVector{<:SimpleLatLon}}; title::String="Cell Layout GEO Map", camera::Symbol=:twodim, kwargs_centers::NamedTuple=(), kwargs_contours::NamedTuple=(), kwargs_layout::NamedTuple=()) -> PlotlyJS.Plot
 
 This function generates geographic plots for cell layouts with three methods:
 1. Plotting only the cell centers.
@@ -268,7 +269,7 @@ the plot layout. These arguments are passed directly to the \
 - `cellCenters::Array{<:Union{SimpleLatLon, AbstractVector, Tuple}}`: An array \
 of points representing the centers of cells. Each point can be of type \
 `SimpleLatLon`, `AbstractVector`, or `Tuple`.
-- `cellContours::AbstractVector{<:Ngon}`: An array of `Ngon` objects \
+- `cellContours::AbstractVector{<:AbstractVector{<:SimpleLatLon}}`: An array of `Ngon` objects \
 representing the contours of the cells.
 - `title::String="Cell Layout GEO Map"`: The title of the plot. Defaults to \
 "Cell Layout GEO Map".
@@ -296,8 +297,9 @@ function GeoGrids.plot_geo_cells(cellCenters::Array{<:Union{SimpleLatLon,Abstrac
     k = (; defaultScatterCellCenters..., text=map(x -> string(x), 1:length(cellCenters)), kwargs_centers...) # Default for text mode for cellCenters
     GeoGrids.plot_geo_points(cellCenters; title, camera, kwargs_scatter=k, kwargs_layout)
 end
+GeoGrids.plot_geo_cells(cellCenter<:Union{SimpleLatLon,AbstractVector,Tuple}; kwargs...) = GeoGrids.plot_geo_points([cellCenter]; kwargs...)
 
-function GeoGrids.plot_geo_cells(cellCenters::Array{<:Union{SimpleLatLon,AbstractVector,Tuple}}, cellContours::AbstractVector{<:Ngon}; title="Cell Layout GEO Map", camera::Symbol=:twodim, kwargs_centers=(;), kwargs_contours=(;), kwargs_layout=(;))
+function GeoGrids.plot_geo_cells(cellCenters::Array{<:Union{SimpleLatLon,AbstractVector,Tuple}}, cellContours::AbstractVector{<:AbstractVector{<:SimpleLatLon}}; title="Cell Layout GEO Map", camera::Symbol=:twodim, kwargs_centers=(;), kwargs_contours=(;), kwargs_layout=(;))
     # Create scatter plot for the cells contours.
     scatterContours = _get_scatter_cellcontour(cellContours; kwargs_contours...)
 
@@ -310,6 +312,7 @@ function GeoGrids.plot_geo_cells(cellCenters::Array{<:Union{SimpleLatLon,Abstrac
 
     plotly_plot([scatterContours, scatterCenters], layout)
 end
+GeoGrids.plot_geo_cells(cellCenter<:Union{SimpleLatLon,AbstractVector,Tuple}, cellContour::AbstractVector{<:SimpleLatLon}; kwargs...) = GeoGrids.plot_geo_cells([cellCenter], [cellContour]; kwargs...)
 
 """
     plot_unitarysphere(points_cart)

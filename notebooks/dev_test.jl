@@ -33,19 +33,9 @@ md"""
 # Test Tessellation
 """
 
-# ╔═╡ 80bf3c17-9c65-4004-8a94-b5b7b869ee7b
-begin
-	abstract type EO end
-	struct CircleTax <: EO end
-	struct HexagonTax <:EO end
-end
-
-# ╔═╡ dcf30440-d189-45da-a29e-d5eb64d3def1
-typeof(CircleTax())
-
 # ╔═╡ 80fef4bb-eec0-4256-a88a-b8fe9d117c1c
 md"""
-## Cell Plot Layout Ngon
+## Cell Plot Layout Ngon-Circle
 """
 
 # ╔═╡ b35b3f5e-03a3-413f-a5be-576bc9e9ceaa
@@ -131,11 +121,27 @@ md"""
 end
 
 # ╔═╡ e0b2c99d-c689-48fb-91d5-6a3b4ee4d044
-begin 
+let 
 	reg = GeoRegion(; regionName="Tassellation", admin="Spain")
-	centers,ngon = generate_tesselation(reg, 40000, HEX(), ExtraOutput())
+	centers, ngon = generate_tesselation(reg, 40000, HEX(), ExtraOutput())
 	plot_geo_cells(centers, ngon)
 end
+
+# ╔═╡ ad9016de-1cce-4dc8-bdbf-2a2d65a4319f
+let 
+	reg = GeoRegion(; regionName="Tassellation", admin="Spain")
+	centers, ngon = generate_tesselation(reg, 40000, HEX(;pattern=:circle), ExtraOutput())
+	plot_geo_cells(centers, ngon)
+end
+
+# ╔═╡ 25de1df4-6148-4cbd-bac9-2cf573145e41
+centers isa Array{<:Union{SimpleLatLon,AbstractVector,Tuple}}
+
+# ╔═╡ 3abc7364-4a40-459b-b44b-c0473b33582a
+PointSet([Point(0,0), Point(0,0)])
+
+# ╔═╡ 5fa20b05-4917-489d-ba73-bb02356cf536
+ngon isa AbstractVector{AbstractVector{<:SimpleLatLon}}
 
 # ╔═╡ a0f1257d-467a-4875-aad7-1b763d608ab4
 let 
@@ -1537,10 +1543,12 @@ version = "17.4.0+2"
 # ╔═╡ Cell order:
 # ╠═069444e1-4e89-4f4f-ae2f-f5fb3131e398
 # ╟─222fb774-1693-4b3c-b2ef-5fd38eca773c
-# ╠═80bf3c17-9c65-4004-8a94-b5b7b869ee7b
-# ╠═dcf30440-d189-45da-a29e-d5eb64d3def1
 # ╟─80fef4bb-eec0-4256-a88a-b8fe9d117c1c
 # ╠═e0b2c99d-c689-48fb-91d5-6a3b4ee4d044
+# ╠═ad9016de-1cce-4dc8-bdbf-2a2d65a4319f
+# ╠═25de1df4-6148-4cbd-bac9-2cf573145e41
+# ╠═3abc7364-4a40-459b-b44b-c0473b33582a
+# ╠═5fa20b05-4917-489d-ba73-bb02356cf536
 # ╠═a0f1257d-467a-4875-aad7-1b763d608ab4
 # ╠═efe29293-38f2-49c1-a426-25cdbe0d78c3
 # ╠═80574382-a954-4f8d-a5c4-da4260b14ba7
