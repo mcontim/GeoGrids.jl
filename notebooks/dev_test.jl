@@ -59,6 +59,29 @@ md"""
 # ╔═╡ fec07e73-815b-4090-a414-b02d922682d4
 test_country = "Norway"
 
+# ╔═╡ fbd88f4a-3696-41c4-9c4f-52fdbd4cbbf9
+bb=(;a=1,b=2,c=3)
+
+# ╔═╡ ee45c6f9-7aae-4cf3-a89a-260902fa14b2
+(;a,c,d) = bb
+
+# ╔═╡ 7107e2d3-104e-4a5a-adc6-e3246e44baba
+cc=(;)
+
+# ╔═╡ fdeb86a1-9ec4-43f8-9ff0-25be1da9b25a
+hasproperty(bb,:c)
+
+# ╔═╡ ea46d5c2-fdc7-48f3-9772-b0f18c68c514
+isempty(propertynames(bb))
+
+# ╔═╡ d844b84d-7433-4f88-a844-c17b3600eef8
+map(propertynames(cc)) do p
+	@info p
+end
+
+# ╔═╡ d4d2518d-20f7-4a78-abb1-496b6a3e8570
+getproperty(bb,:a)
+
 # ╔═╡ a61d9a85-bbd6-499e-aa5e-5630ebc2464c
 (68858.69245840429/2)*(2/√3)
 
@@ -174,18 +197,6 @@ let
 	my_tesselate_circle(centers,40000)
 	# min_dist(centers)
 end
-
-# ╔═╡ a540d67e-1423-48fc-83b9-91735899c104
-a = [fill(SimpleLatLon(0,0),10) for i in 1:10]
-
-# ╔═╡ 6f60f6e0-1c46-4d5f-81d0-e07128516eb0
-typeof(a)
-
-# ╔═╡ 6c40479c-e339-49de-9c1a-525cc3f95bb5
-a
-
-# ╔═╡ 41b64171-4acb-49d9-b923-8475f196f022
-a[1][1] = SimpleLatLon(10,10)
 
 # ╔═╡ 27325150-8f6f-4c42-832f-b47aa139f72a
 let 
@@ -1559,11 +1570,14 @@ version = "17.4.0+2"
 # ╠═fec07e73-815b-4090-a414-b02d922682d4
 # ╠═a33d7400-64c2-47df-add5-f6603221210d
 # ╠═25358326-2845-495c-a960-593b53caacd9
-# ╠═a540d67e-1423-48fc-83b9-91735899c104
-# ╠═6f60f6e0-1c46-4d5f-81d0-e07128516eb0
-# ╠═41b64171-4acb-49d9-b923-8475f196f022
-# ╠═6c40479c-e339-49de-9c1a-525cc3f95bb5
 # ╠═bbbb895e-a571-4265-b5c3-99b5eff85faf
+# ╠═fbd88f4a-3696-41c4-9c4f-52fdbd4cbbf9
+# ╠═ee45c6f9-7aae-4cf3-a89a-260902fa14b2
+# ╠═7107e2d3-104e-4a5a-adc6-e3246e44baba
+# ╠═fdeb86a1-9ec4-43f8-9ff0-25be1da9b25a
+# ╠═ea46d5c2-fdc7-48f3-9772-b0f18c68c514
+# ╠═d844b84d-7433-4f88-a844-c17b3600eef8
+# ╠═d4d2518d-20f7-4a78-abb1-496b6a3e8570
 # ╠═a61d9a85-bbd6-499e-aa5e-5630ebc2464c
 # ╠═27325150-8f6f-4c42-832f-b47aa139f72a
 # ╠═cbda1f01-66ab-4bf3-bff3-7c15a6033bf2
