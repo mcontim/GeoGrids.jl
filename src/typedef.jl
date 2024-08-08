@@ -66,13 +66,13 @@ LatBeltRegion(; regionName::String="region_name", latLim) = LatBeltRegion(region
 abstract type AbstractTiling end
 struct ICO <: AbstractTiling 
     "Default correction factor for the icosahedral cell grid partial overlap"
-    correction::Number = 6/5
+    correction::Number
     "Default pattern shape to be used with this type of tiling"
-    pattern::Symbol = :circ
+    pattern::Symbol
 
     function ICO(correction::Number=6/5, pattern::Symbol=:circ)
         # Input validation
-        pattern in (:circ, :hex) || error("pattern must be :circ or :hex...")
+        pattern in (:circ, :hex) || error("Pattern must be :circ or :hex...")
 
         new(correction, pattern)
     end
@@ -80,14 +80,14 @@ end
 ICO(; correction::Number=6/5, pattern::Symbol=:circ) = ICO(correction, pattern)
 struct HEX <: AbstractTiling 
     "Default direction of hexagons in the tiling"
-    direction::Symbol = :pointy
+    direction::Symbol
     "Default pattern shape to be used with this type of tiling"
-    pattern::Symbol = :hex
+    pattern::Symbol
 
     function HEX(direction::Symbol=:pointy, pattern::Symbol=:hex)
         # Input validation
-        direction in (:pointy, :flat) || error("direction must be :pointy or :flat...")
-        pattern in (:circ, :hex) || error("pattern must be :circ or :hex...")
+        direction in (:pointy, :flat) || error("Direction must be :pointy or :flat...")
+        pattern in (:circ, :hex) || error("Pattern must be :circ or :hex...")
 
         new(direction, pattern)
     end

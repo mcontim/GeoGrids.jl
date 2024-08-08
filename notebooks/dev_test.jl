@@ -1,8 +1,6 @@
 ### A Pluto.jl notebook ###
 # v0.19.45
 
-#> custom_attrs = ["hide-enabled"]
-
 using Markdown
 using InteractiveUtils
 
@@ -28,14 +26,29 @@ end
 # ╔═╡ 069444e1-4e89-4f4f-ae2f-f5fb3131e398
 ExtendedTableOfContents()
 
-# ╔═╡ 222fb774-1693-4b3c-b2ef-5fd38eca773c
+# ╔═╡ 3ce21344-e0ea-4e41-b78e-cf92dc9ac2e7
 md"""
-# Test Tessellation
+# Definitions
 """
 
-# ╔═╡ 80fef4bb-eec0-4256-a88a-b8fe9d117c1c
+# ╔═╡ 222fb774-1693-4b3c-b2ef-5fd38eca773c
 md"""
-## Cell Plot Layout Ngon-Circle
+# HEX Tessellation
+"""
+
+# ╔═╡ ca4efc79-7cf3-46de-b03e-643c29254818
+md"""
+## GeoRegion
+"""
+
+# ╔═╡ b12ae026-8fbb-4687-98df-f7a2fe9672b6
+md"""
+## PolyRegion
+"""
+
+# ╔═╡ 8f4f76bb-261f-412e-8b5f-005c0f469204
+md"""
+# ICO Tesselation
 """
 
 # ╔═╡ b35b3f5e-03a3-413f-a5be-576bc9e9ceaa
@@ -44,7 +57,10 @@ md"""
 """
 
 # ╔═╡ fec07e73-815b-4090-a414-b02d922682d4
+# ╠═╡ disabled = true
+#=╠═╡
 test_country = "Norway"
+  ╠═╡ =#
 
 # ╔═╡ a61d9a85-bbd6-499e-aa5e-5630ebc2464c
 (68858.69245840429/2)*(2/√3)
@@ -62,53 +78,6 @@ md"""
 # Additional Functions
 """
 
-# ╔═╡ d12aece5-8625-4667-9f65-6588f63849c4
-function min_dist(dd)
-	mindist = Inf
-	np = length(dd)
-	res = []
-	for i in 1:np
-		for j in i+1:np
-			p1 = dd[i]
-			p2 = dd[j]
-			lla1 = LLA(p1.lat, p1.lon)
-			lla2 = LLA(p2.lat, p2.lon)
-			push!(res,get_distance_on_earth(lla1, lla2))
-		end
-	end
-	return minimum(res)
-end
-
-# ╔═╡ ce49e8d1-539c-446e-9443-24238593a611
-
-# Function to plot hexagonal grid
-function plot_hexagonal_grid(latlon_centers, radius)
-    traces = []
-    for (lat, lon) in latlon_centers
-        vertices = hexagon_vertices(lat, lon, radius)
-        lats, lons = map(x -> x[1], vertices), map(x -> x[2], vertices)
-        trace = scattergeo(
-            lat = lats,
-            lon = lons,
-            mode = "lines",
-            fill = "toself",
-            fillcolor = "rgba(0, 100, 255, 0.3)",
-            line = attr(color = "blue")
-        )
-        push!(traces, trace)
-    end
-    layout = Layout(
-        title = "Hexagonal Grid on Sphere",
-        geo = attr(
-            scope = "world",
-            showland = true,
-            landcolor = "rgb(243, 243, 243)",
-            countrycolor = "rgb(204, 204, 204)"
-        )
-    )
-    plot([traces...], layout)
-end
-
 # ╔═╡ b94c71b6-0601-4a4c-ac92-417f0c372334
 md"""
 # Packages
@@ -118,6 +87,16 @@ md"""
 @fromparent begin
 	import ^: * # to eport all functions from parent package
 	import >.CoordRefSystems
+end
+
+# ╔═╡ a34e4ff6-51f9-4d6b-af28-5e856adea1ed
+begin
+	const test_pair = (;admin="Spain")
+	polyVec = [
+		PolyRegion(;domain=[SimpleLatLon(-5,-5), SimpleLatLon(5,-5), SimpleLatLon(5,10), SimpleLatLon(-5,10)]),
+		PolyRegion(;domain=[SimpleLatLon(60,-5), SimpleLatLon(80,0), SimpleLatLon(80,10), SimpleLatLon(60,15)])
+	]
+	const polyReg = polyVec[2]
 end
 
 # ╔═╡ e0b2c99d-c689-48fb-91d5-6a3b4ee4d044
@@ -130,18 +109,23 @@ end
 # ╔═╡ ad9016de-1cce-4dc8-bdbf-2a2d65a4319f
 let 
 	reg = GeoRegion(; regionName="Tassellation", admin="Spain")
-	centers, ngon = generate_tesselation(reg, 40000, HEX(;pattern=:circle), ExtraOutput())
+	centers, ngon = generate_tesselation(reg, 40000, HEX(;pattern=:circ), ExtraOutput())
 	plot_geo_cells(centers, ngon)
 end
 
-# ╔═╡ 25de1df4-6148-4cbd-bac9-2cf573145e41
-centers isa Array{<:Union{SimpleLatLon,AbstractVector,Tuple}}
+# ╔═╡ f6c86dbf-a076-4905-8b34-d0587f153e3c
+let 
+	reg = polyReg
+	centers, ngon = generate_tesselation(reg, 40000, HEX(), ExtraOutput())
+	plot_geo_cells(centers, ngon)
+end
 
-# ╔═╡ 3abc7364-4a40-459b-b44b-c0473b33582a
-PointSet([Point(0,0), Point(0,0)])
-
-# ╔═╡ 5fa20b05-4917-489d-ba73-bb02356cf536
-ngon isa AbstractVector{AbstractVector{<:SimpleLatLon}}
+# ╔═╡ 0d67eaf0-5f74-43a0-8832-0b270334d3bc
+let 
+	reg = polyReg
+	centers, ngon = generate_tesselation(reg, 40000, HEX(;pattern=:circ), ExtraOutput())
+	plot_geo_cells(centers, ngon)
+end
 
 # ╔═╡ a0f1257d-467a-4875-aad7-1b763d608ab4
 let 
@@ -167,28 +151,34 @@ typeof(hh)
 hh isa AbstractVector{<:AbstractVector{<:SimpleLatLon}}
 
 # ╔═╡ a33d7400-64c2-47df-add5-f6603221210d
+#=╠═╡
 let 
 	reg = GeoRegion(; regionName="Tassellation", admin=test_country)
 	centers = generate_tesselation(reg, 40000, HEX())
 	plot_geo_cells(centers,40000)
 	# min_dist(centers)
 end
+  ╠═╡ =#
 
 # ╔═╡ 25358326-2845-495c-a960-593b53caacd9
+#=╠═╡
 let 
 	reg = GeoRegion(; regionName="Tassellation", admin=test_country)
 	centers = generate_tesselation(reg, 40000, HEX())
 	my_tesselate_circle(centers,40000)
 	# min_dist(centers)
 end
+  ╠═╡ =#
 
 # ╔═╡ 27325150-8f6f-4c42-832f-b47aa139f72a
+#=╠═╡
 let 
 	reg = GeoRegion(; regionName="Tassellation", admin=test_country)	
 	centers = generate_tesselation(reg, 40000, ICO())
 	# plot_geo_cells(centers,40000)
 	min_dist(centers)
 end
+  ╠═╡ =#
 
 # ╔═╡ 02e8d382-8de1-46a0-a540-f95d0683ef8c
 let 
@@ -216,6 +206,70 @@ let
 	reg = LatBeltRegion(latLim=(-10,10))
 	centers = generate_tesselation(reg, 400000, ICO())
 	my_tesselate_circle(centers, 400000)
+end
+
+# ╔═╡ d12aece5-8625-4667-9f65-6588f63849c4
+function pattern_distance(pattern::AbstractVector{<:SimpleLatLon})
+	mindist = []
+	avgdist = []
+	np = length(pattern)
+	
+	for i in 1:np
+		p1 = pattern[i]
+		lla1 = LLA(p1.lat, p1.lon)
+		list = collect(1:np)
+		popat!(list,i)
+		vecDist = map(pattern[list]) do p2
+			lla2 = LLA(p2.lat, p2.lon)
+			get_distance_on_earth(lla1, lla2)
+		end
+		sort!(vecDist)
+		push!(mindist, vecDist[1])
+		push!(avgdist, sum(vecDist[1:6]) / 6)		
+	end
+
+	# avgMin = mindist
+	# avgAvg = avgdist
+	avgMin = sum(mindist) / length(mindist)
+	avgAvg = sum(avgdist) / length(avgdist)
+	
+	return (; avgMin=avgMin, avgAvg=avgAvg)
+end
+
+# ╔═╡ 0365783a-36b7-4338-b629-4f754953986e
+function testcenters(c)
+	coeff = 1 / 2 * (2/√3)
+	check = pattern_distance(c)
+	@info check
+	@info (hexNormMin=check.avgMin*coeff, hexNormAvg=check.avgAvg*coeff)
+end
+
+# ╔═╡ 7df04689-55fd-4659-b251-2100bf565580
+let
+	reg = GeoRegion(; regionName="Tassellation", test_pair...)
+	centers = generate_tesselation(reg, 40000, HEX())
+	testcenters(centers)
+end
+
+# ╔═╡ 3603a9e3-03cd-4861-a9af-b9d5657be13e
+let 
+	reg = GeoRegion(; regionName="Tassellation", test_pair...)
+	centers = generate_tesselation(reg, 40000, HEX(;pattern=:circ))
+	testcenters(centers)
+end
+
+# ╔═╡ 5068883b-686e-42f4-a209-9a49027145f3
+let
+	reg = polyReg
+	centers = generate_tesselation(reg, 40000, HEX())
+	testcenters(centers)
+end
+
+# ╔═╡ 3028363d-c4a4-4ead-9a41-3cd057f5f1d5
+let 
+	reg = polyReg
+	centers = generate_tesselation(reg, 40000, HEX(;pattern=:circ))
+	testcenters(centers)
 end
 
 # ╔═╡ 00000000-0000-0000-0000-000000000001
@@ -1542,13 +1596,20 @@ version = "17.4.0+2"
 
 # ╔═╡ Cell order:
 # ╠═069444e1-4e89-4f4f-ae2f-f5fb3131e398
+# ╠═3ce21344-e0ea-4e41-b78e-cf92dc9ac2e7
+# ╠═a34e4ff6-51f9-4d6b-af28-5e856adea1ed
 # ╟─222fb774-1693-4b3c-b2ef-5fd38eca773c
-# ╟─80fef4bb-eec0-4256-a88a-b8fe9d117c1c
+# ╟─ca4efc79-7cf3-46de-b03e-643c29254818
 # ╠═e0b2c99d-c689-48fb-91d5-6a3b4ee4d044
+# ╠═7df04689-55fd-4659-b251-2100bf565580
 # ╠═ad9016de-1cce-4dc8-bdbf-2a2d65a4319f
-# ╠═25de1df4-6148-4cbd-bac9-2cf573145e41
-# ╠═3abc7364-4a40-459b-b44b-c0473b33582a
-# ╠═5fa20b05-4917-489d-ba73-bb02356cf536
+# ╠═3603a9e3-03cd-4861-a9af-b9d5657be13e
+# ╟─b12ae026-8fbb-4687-98df-f7a2fe9672b6
+# ╠═f6c86dbf-a076-4905-8b34-d0587f153e3c
+# ╠═5068883b-686e-42f4-a209-9a49027145f3
+# ╠═0d67eaf0-5f74-43a0-8832-0b270334d3bc
+# ╠═3028363d-c4a4-4ead-9a41-3cd057f5f1d5
+# ╟─8f4f76bb-261f-412e-8b5f-005c0f469204
 # ╠═a0f1257d-467a-4875-aad7-1b763d608ab4
 # ╠═efe29293-38f2-49c1-a426-25cdbe0d78c3
 # ╠═80574382-a954-4f8d-a5c4-da4260b14ba7
@@ -1568,7 +1629,7 @@ version = "17.4.0+2"
 # ╠═31cfc91f-00b7-432f-a54d-077d34756536
 # ╟─d272905a-dfd4-4ade-88bd-ca10abf86f77
 # ╠═d12aece5-8625-4667-9f65-6588f63849c4
-# ╠═ce49e8d1-539c-446e-9443-24238593a611
+# ╠═0365783a-36b7-4338-b629-4f754953986e
 # ╟─b94c71b6-0601-4a4c-ac92-417f0c372334
 # ╠═bf20cace-b64b-4155-90c1-1ec3644510d7
 # ╠═0e3793aa-13d2-4aeb-ad60-b98927932dc6

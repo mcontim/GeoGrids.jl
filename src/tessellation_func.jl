@@ -518,7 +518,7 @@ function my_tesselate_circle(centers::AbstractVector{<:SimpleLatLon}, radius::Nu
 
     return circles
 end
-my_tesselate_circle(centers<:SimpleLatLon, radius::Number; kwargs...) = my_tesselate_circle([centers], radius; kwargs...)
+my_tesselate_circle(centers::SimpleLatLon, radius::Number; kwargs...) = my_tesselate_circle([centers], radius; kwargs...)
 
 """
     my_tesselate_hexagon(filtered::AbstractVector{<:SimpleLatLon}, idxs::AbstractVector{Int}, mesh::SimpleMesh)
@@ -545,10 +545,14 @@ vector of `SimpleLatLon` points forming the vertices of a hexagon. Each \
 hexagon corresponds to an element in the `filtered` vector.
 """
 function my_tesselate_hexagon(filtered::AbstractVector{<:SimpleLatLon}, idxs::AbstractVector{<:Number}, mesh::SimpleMesh)
-    hexagons = [fill(SimpleLatLon(0, 0), 7) for i in 1:length(filtered)]
+    # hexagons = [fill(SimpleLatLon(0, 0), 7) for i in 1:length(filtered)]
+    hexagons = [SimpleLatLon[] for i in 1:length(filtered)] # Allow to have different polygons from hexagons only (depending on Voronoi tesselation)
     for (p, poly) in enumerate(mesh[idxs])
-        for (v, vertex) in enumerate([poly.vertices..., poly.vertices[1]]) # Loop through vertices to create the hexagon for plotting)
-            hexagons[p][v] = SimpleLatLon(ustrip(vertex.coords.y), ustrip(vertex.coords.x))
+        # for (v, vertex) in enumerate([poly.vertices..., poly.vertices[1]]) # Loop through vertices to create the hexagon for plotting)
+        #     hexagons[p][v] = SimpleLatLon(ustrip(vertex.coords.y), ustrip(vertex.coords.x))
+        # end
+        hexagons[p] = map([poly.vertices..., poly.vertices[1]]) do vertex # Loop through vertices to create the hexagon for plotting)
+            SimpleLatLon(ustrip(vertex.coords.y), ustrip(vertex.coords.x))
         end
     end
 

@@ -235,7 +235,7 @@ function GeoGrids.plot_geo_points(points::Array{<:Union{SimpleLatLon,AbstractVec
 
     plotly_plot([scatterpoints], layout)
 end
-GeoGrids.plot_geo_points(point<:Union{SimpleLatLon,AbstractVector,Tuple}; kwargs...) = GeoGrids.plot_geo_points([point]; kwargs...)
+GeoGrids.plot_geo_points(point::Union{SimpleLatLon,AbstractVector,Tuple}; kwargs...) = GeoGrids.plot_geo_points([point]; kwargs...)
 
 """
     plot_geo_cells(cellCenters::Array{<:Union{SimpleLatLon, AbstractVector, Tuple}}; title::String="Cell Layout GEO Map", camera::Symbol=:twodim, kwargs_scatter::NamedTuple=(), kwargs_layout::NamedTuple=()) -> PlotlyJS.Plot
@@ -297,7 +297,7 @@ function GeoGrids.plot_geo_cells(cellCenters::Array{<:Union{SimpleLatLon,Abstrac
     k = (; defaultScatterCellCenters..., text=map(x -> string(x), 1:length(cellCenters)), kwargs_centers...) # Default for text mode for cellCenters
     GeoGrids.plot_geo_points(cellCenters; title, camera, kwargs_scatter=k, kwargs_layout)
 end
-GeoGrids.plot_geo_cells(cellCenter<:Union{SimpleLatLon,AbstractVector,Tuple}; kwargs...) = GeoGrids.plot_geo_points([cellCenter]; kwargs...)
+GeoGrids.plot_geo_cells(cellCenter::Union{SimpleLatLon,AbstractVector,Tuple}; kwargs...) = GeoGrids.plot_geo_points([cellCenter]; kwargs...)
 
 function GeoGrids.plot_geo_cells(cellCenters::Array{<:Union{SimpleLatLon,AbstractVector,Tuple}}, cellContours::AbstractVector{<:AbstractVector{<:SimpleLatLon}}; title="Cell Layout GEO Map", camera::Symbol=:twodim, kwargs_centers=(;), kwargs_contours=(;), kwargs_layout=(;))
     # Create scatter plot for the cells contours.
@@ -312,7 +312,7 @@ function GeoGrids.plot_geo_cells(cellCenters::Array{<:Union{SimpleLatLon,Abstrac
 
     plotly_plot([scatterContours, scatterCenters], layout)
 end
-GeoGrids.plot_geo_cells(cellCenter<:Union{SimpleLatLon,AbstractVector,Tuple}, cellContour::AbstractVector{<:SimpleLatLon}; kwargs...) = GeoGrids.plot_geo_cells([cellCenter], [cellContour]; kwargs...)
+GeoGrids.plot_geo_cells(cellCenter::Union{SimpleLatLon,AbstractVector,Tuple}, cellContour::AbstractVector{<:SimpleLatLon}; kwargs...) = GeoGrids.plot_geo_cells([cellCenter], [cellContour]; kwargs...)
 
 """
     plot_unitarysphere(points_cart)
