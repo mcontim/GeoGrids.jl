@@ -65,10 +65,16 @@ LatBeltRegion(; regionName::String="region_name", latLim) = LatBeltRegion(region
 ## Define Tessellation Types
 abstract type AbstractTiling end
 @kwdef struct ICO <: AbstractTiling 
-    correction::Number = 6/5 # Default correction factor for the icosahedral cell grid partial overlap
+    "Default correction factor for the icosahedral cell grid partial overlap"
+    correction::Number = 6/5
+    "Default pattern shape to be used with this type of tiling"
+    pattern::Symbol = :circ
 end
 @kwdef struct HEX <: AbstractTiling 
+    "Default direction of hexagons in the tiling"
     direction::Symbol = :pointy
+    "Default pattern shape to be used with this type of tiling"
+    pattern::Symbol = :hex
 end
 struct H3 <: AbstractTiling end
 

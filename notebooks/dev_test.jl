@@ -33,6 +33,16 @@ md"""
 # Test Tessellation
 """
 
+# ╔═╡ 80bf3c17-9c65-4004-8a94-b5b7b869ee7b
+begin
+	abstract type EO end
+	struct CircleTax <: EO end
+	struct HexagonTax <:EO end
+end
+
+# ╔═╡ dcf30440-d189-45da-a29e-d5eb64d3def1
+typeof(CircleTax())
+
 # ╔═╡ 80fef4bb-eec0-4256-a88a-b8fe9d117c1c
 md"""
 ## Cell Layout Ngon
@@ -1505,6 +1515,8 @@ version = "17.4.0+2"
 # ╔═╡ Cell order:
 # ╠═069444e1-4e89-4f4f-ae2f-f5fb3131e398
 # ╟─222fb774-1693-4b3c-b2ef-5fd38eca773c
+# ╠═80bf3c17-9c65-4004-8a94-b5b7b869ee7b
+# ╠═dcf30440-d189-45da-a29e-d5eb64d3def1
 # ╟─80fef4bb-eec0-4256-a88a-b8fe9d117c1c
 # ╠═e0b2c99d-c689-48fb-91d5-6a3b4ee4d044
 # ╠═a0f1257d-467a-4875-aad7-1b763d608ab4
