@@ -166,7 +166,7 @@ See also: [`_cast_geopoint`](@ref), [`_gen_circle`](@ref)
 function _get_scatter_cellcontour(cellCenters::Array{<:Union{SimpleLatLon,AbstractVector,Tuple}}, radius::Number; circ_res=100, kwargs...)
     vec_c = map(x -> _cast_geopoint(x), cellCenters[:]) # Convert in a vector of SimpleLatLon
 
-    circ_vec = GeoGrids.circle_tessellation(vec_c, radius; earth_local_radius=GeoGrids.constants.Re_mean, n=circ_res)
+    circ_vec = GeoGrids.my_tesselate_circle(vec_c, radius; earth_local_radius=GeoGrids.constants.Re_mean, n=circ_res)
 
     lat=[]
     lon=[]

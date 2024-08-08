@@ -45,7 +45,15 @@ typeof(CircleTax())
 
 # ╔═╡ 80fef4bb-eec0-4256-a88a-b8fe9d117c1c
 md"""
-## Cell Layout Ngon
+## Cell Plot Layout Ngon
+"""
+
+# ╔═╡ 80574382-a954-4f8d-a5c4-da4260b14ba7
+[collect(0:2π/10:2π)...,0.0]
+
+# ╔═╡ b35b3f5e-03a3-413f-a5be-576bc9e9ceaa
+md"""
+# Cell Plot Layout Circles
 """
 
 # ╔═╡ fec07e73-815b-4090-a414-b02d922682d4
@@ -126,10 +134,15 @@ md"""
 end
 
 # ╔═╡ e0b2c99d-c689-48fb-91d5-6a3b4ee4d044
-let 
+begin 
 	reg = GeoRegion(; regionName="Tassellation", admin="Spain")
 	centers,ngon = generate_tesselation(reg, 40000, HEX(), ExtraOutput())
 	plot_geo_cells(centers, ngon)
+end
+
+# ╔═╡ bbbb895e-a571-4265-b5c3-99b5eff85faf
+map(enumerate(ngon[1].vertices)) do (idx,val)
+	@info idx,val
 end
 
 # ╔═╡ a0f1257d-467a-4875-aad7-1b763d608ab4
@@ -150,14 +163,34 @@ end
 let 
 	reg = GeoRegion(; regionName="Tassellation", admin=test_country)
 	centers = generate_tesselation(reg, 40000, HEX())
-	# plot_geo_cells(centers,40000)
-	min_dist(centers)
+	plot_geo_cells(centers,40000)
+	# min_dist(centers)
 end
+
+# ╔═╡ 25358326-2845-495c-a960-593b53caacd9
+let 
+	reg = GeoRegion(; regionName="Tassellation", admin=test_country)
+	centers = generate_tesselation(reg, 40000, HEX())
+	my_tesselate_circle(centers,40000)
+	# min_dist(centers)
+end
+
+# ╔═╡ a540d67e-1423-48fc-83b9-91735899c104
+a = [fill(SimpleLatLon(0,0),10) for i in 1:10]
+
+# ╔═╡ 6f60f6e0-1c46-4d5f-81d0-e07128516eb0
+typeof(a)
+
+# ╔═╡ 6c40479c-e339-49de-9c1a-525cc3f95bb5
+a
+
+# ╔═╡ 41b64171-4acb-49d9-b923-8475f196f022
+a[1][1] = SimpleLatLon(10,10)
 
 # ╔═╡ 27325150-8f6f-4c42-832f-b47aa139f72a
 let 
 	reg = GeoRegion(; regionName="Tassellation", admin=test_country)	
-	centers = generate_tesselation(reg, 40000, ICO(1))
+	centers = generate_tesselation(reg, 40000, ICO())
 	# plot_geo_cells(centers,40000)
 	min_dist(centers)
 end
@@ -187,7 +220,7 @@ end
 let
 	reg = LatBeltRegion(latLim=(-10,10))
 	centers = generate_tesselation(reg, 400000, ICO())
-	circle_tessellation(centers, 400000)
+	my_tesselate_circle(centers, 400000)
 end
 
 # ╔═╡ 00000000-0000-0000-0000-000000000001
@@ -1521,8 +1554,16 @@ version = "17.4.0+2"
 # ╠═e0b2c99d-c689-48fb-91d5-6a3b4ee4d044
 # ╠═a0f1257d-467a-4875-aad7-1b763d608ab4
 # ╠═efe29293-38f2-49c1-a426-25cdbe0d78c3
+# ╠═80574382-a954-4f8d-a5c4-da4260b14ba7
+# ╠═b35b3f5e-03a3-413f-a5be-576bc9e9ceaa
 # ╠═fec07e73-815b-4090-a414-b02d922682d4
 # ╠═a33d7400-64c2-47df-add5-f6603221210d
+# ╠═25358326-2845-495c-a960-593b53caacd9
+# ╠═a540d67e-1423-48fc-83b9-91735899c104
+# ╠═6f60f6e0-1c46-4d5f-81d0-e07128516eb0
+# ╠═41b64171-4acb-49d9-b923-8475f196f022
+# ╠═6c40479c-e339-49de-9c1a-525cc3f95bb5
+# ╠═bbbb895e-a571-4265-b5c3-99b5eff85faf
 # ╠═a61d9a85-bbd6-499e-aa5e-5630ebc2464c
 # ╠═27325150-8f6f-4c42-832f-b47aa139f72a
 # ╠═cbda1f01-66ab-4bf3-bff3-7c15a6033bf2

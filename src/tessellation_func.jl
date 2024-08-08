@@ -214,6 +214,9 @@ The `generate_tesselation` function generates a hexagonal cell layout for a give
 geographical region. It calculates the cell grid layout centered around the
 centroid of the main area of the region and returns the points within the
 specified region.
+A method for using hexagonal tesselation for GlobalRegion and LatBeltRegion is
+not provided because of the large size of surface to be covered, the local
+hexagonal tasellation would be inaccurate.
 
 ## Arguments
 - `region::Union{GeoRegion, PolyRegion}`: The geographical region for which the
@@ -251,11 +254,25 @@ function generate_tesselation(region::Union{GeoRegion,PolyRegion}, radius::Numbe
     # Generate the tassellation centroids.
     centroids = _generate_tesselation(region, radius, type; refRadius, kwargs_lattice...)
 
-    # Create the tasselation from all the centroids.
-    mesh = my_tesselate(centroids)
+    if type.pattern == :hex
+        # Create the tasselation from all the centroids.
+        mesh = my_tesselate(centroids)
+        # Filter centroids in the region.
+        filtered, idxs = filter_points(centroids, region, ExtraOutput())
 
-    # Filter centroids in the region.
-    filtered, idxs = filter_points(centroids, region, ExtraOutput())
+
+        a = [fill(SimpleLatLon(0,0),10) for i in 1:10]
+
+        meshTrace = []
+        for poly in mesh
+            thisNgon = map([poly.vertices..., poly.vertices[1]]) do vertex # Loop through vertices to create the hexagon for plotting
+                (ustrip(vertex.coords.x), ustrip(vertex.coords.y))
+            end
+            push!(meshTrace, [thisNgon..., (NaN, NaN)]...)
+        end
+    else
+
+    end
 
     return filtered, mesh[idxs]
 end
@@ -437,22 +454,21 @@ function _gen_circle(center::SimpleLatLon, r::Number; earth_local_radius=constan
     return _gen_circle(cx, cy, r; f=rad2deg, n=n)
 end
 
-function circle_tessellation(centers::AbstractVector{<:SimpleLatLon}, radius::Number; earth_local_radius=constants.Re_mean, n::Int=100)
-    circles = []
-    for c in centers 
-        θ = 90 - (c.lat |> ustrip) |> deg2rad
-        ϕ = c.lon |> ustrip |> deg2rad
+function my_tesselate_circle(centers::AbstractVector{<:SimpleLatLon}, radius::Number; earth_local_radius=constants.Re_mean, n::Int=100)
+    Δϕ = [collect(0:2π/n:2π)..., 0.0] # [rad]
+    circles = [fill(SimpleLatLon(0,0), length(Δϕ)) for i in 1:length(centers)] # Each element of the vector is a vector of SimpleLatLon points composing a circle.
+    for c in eachindex(centers) 
+        θ = 90 - (centers[c].lat |> ustrip) |> deg2rad
+        ϕ = centers[c].lon |> ustrip |> deg2rad
         centreθφ = (; θ=θ, ϕ=ϕ) # [rad] Convert lat-lon in theta-phi (shperical approximation)
-
         Δθ = radius / earth_local_radius # [rad]
-        Δϕ = 0:2π/n:2π # [rad]
-        thisCircle = map(Δϕ) do dϕ
-            offsetθφ = (; θ=Δθ, ϕ=dϕ) # [rad]
+        
+        for (i,v) in enumerate(Δϕ)
+            offsetθφ = (; θ=Δθ, ϕ=v) # [rad]
             new = _add_angular_offset(centreθφ, offsetθφ)
             lat, lon = _wrap_latlon(π / 2 - new.θ |> rad2deg, new.ϕ |> rad2deg)
-            SimpleLatLon(lat, lon)
+            circles[c][i] = SimpleLatLon(lat, lon)
         end
-        push!(circles, thisCircle)
     end        
 
     return circles
