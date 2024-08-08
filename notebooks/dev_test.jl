@@ -48,9 +48,6 @@ md"""
 ## Cell Plot Layout Ngon
 """
 
-# ╔═╡ 80574382-a954-4f8d-a5c4-da4260b14ba7
-[collect(0:2π/10:2π)...,0.0]
-
 # ╔═╡ b35b3f5e-03a3-413f-a5be-576bc9e9ceaa
 md"""
 # Cell Plot Layout Circles
@@ -58,29 +55,6 @@ md"""
 
 # ╔═╡ fec07e73-815b-4090-a414-b02d922682d4
 test_country = "Norway"
-
-# ╔═╡ fbd88f4a-3696-41c4-9c4f-52fdbd4cbbf9
-bb=(;a=1,b=2,c=3)
-
-# ╔═╡ ee45c6f9-7aae-4cf3-a89a-260902fa14b2
-(;a,c,d) = bb
-
-# ╔═╡ 7107e2d3-104e-4a5a-adc6-e3246e44baba
-cc=(;)
-
-# ╔═╡ fdeb86a1-9ec4-43f8-9ff0-25be1da9b25a
-hasproperty(bb,:c)
-
-# ╔═╡ ea46d5c2-fdc7-48f3-9772-b0f18c68c514
-isempty(propertynames(bb))
-
-# ╔═╡ d844b84d-7433-4f88-a844-c17b3600eef8
-map(propertynames(cc)) do p
-	@info p
-end
-
-# ╔═╡ d4d2518d-20f7-4a78-abb1-496b6a3e8570
-getproperty(bb,:a)
 
 # ╔═╡ a61d9a85-bbd6-499e-aa5e-5630ebc2464c
 (68858.69245840429/2)*(2/√3)
@@ -163,11 +137,6 @@ begin
 	plot_geo_cells(centers, ngon)
 end
 
-# ╔═╡ bbbb895e-a571-4265-b5c3-99b5eff85faf
-map(enumerate(ngon[1].vertices)) do (idx,val)
-	@info idx,val
-end
-
 # ╔═╡ a0f1257d-467a-4875-aad7-1b763d608ab4
 let 
 	reg = LatBeltRegion(latLim=(-10,10))
@@ -181,6 +150,15 @@ let
 	centers,ngon = generate_tesselation(reg, 1000000, ICO(), ExtraOutput())
 	plot_geo_cells(centers,ngon)
 end
+
+# ╔═╡ 80574382-a954-4f8d-a5c4-da4260b14ba7
+hh = [fill(SimpleLatLon(0,0),7) for i in 1:10]
+
+# ╔═╡ 94dbaa2d-a7c9-45c9-a83f-53b771b8c4e6
+typeof(hh)
+
+# ╔═╡ afc2c370-87bc-4124-a415-37a5fba1c194
+hh isa AbstractVector{<:AbstractVector{<:SimpleLatLon}}
 
 # ╔═╡ a33d7400-64c2-47df-add5-f6603221210d
 let 
@@ -1566,18 +1544,12 @@ version = "17.4.0+2"
 # ╠═a0f1257d-467a-4875-aad7-1b763d608ab4
 # ╠═efe29293-38f2-49c1-a426-25cdbe0d78c3
 # ╠═80574382-a954-4f8d-a5c4-da4260b14ba7
+# ╠═94dbaa2d-a7c9-45c9-a83f-53b771b8c4e6
+# ╠═afc2c370-87bc-4124-a415-37a5fba1c194
 # ╠═b35b3f5e-03a3-413f-a5be-576bc9e9ceaa
 # ╠═fec07e73-815b-4090-a414-b02d922682d4
 # ╠═a33d7400-64c2-47df-add5-f6603221210d
 # ╠═25358326-2845-495c-a960-593b53caacd9
-# ╠═bbbb895e-a571-4265-b5c3-99b5eff85faf
-# ╠═fbd88f4a-3696-41c4-9c4f-52fdbd4cbbf9
-# ╠═ee45c6f9-7aae-4cf3-a89a-260902fa14b2
-# ╠═7107e2d3-104e-4a5a-adc6-e3246e44baba
-# ╠═fdeb86a1-9ec4-43f8-9ff0-25be1da9b25a
-# ╠═ea46d5c2-fdc7-48f3-9772-b0f18c68c514
-# ╠═d844b84d-7433-4f88-a844-c17b3600eef8
-# ╠═d4d2518d-20f7-4a78-abb1-496b6a3e8570
 # ╠═a61d9a85-bbd6-499e-aa5e-5630ebc2464c
 # ╠═27325150-8f6f-4c42-832f-b47aa139f72a
 # ╠═cbda1f01-66ab-4bf3-bff3-7c15a6033bf2
