@@ -76,7 +76,7 @@ function gen_hex_lattice(spacing, direction=:pointy, f::Function=identity; kwarg
 end
 
 """
-    _adapted_icogrid(radius::Number; correctionFactor=6/5)
+    _adapted_icogrid(radius::Number; correctionFactor=3/2)
 
 The `_adapted_icogrid` function generates an icosahedral grid with a specified
 radius. It defines the separation angle for the icosahedral grid using a
@@ -102,8 +102,7 @@ function _adapted_icogrid(radius::Number; refRadius=constants.Re_mean, correctio
     # for the hexagonal grid using a correction factor 1.2 to adapt the cell
     # centers distances (from old MATLAB grid). The correction factor would be
     # √3 if the original hex grid approach was used.
-    # sepAng = radius * correctionFactor / refRadius |> rad2deg
-    sepAng = radius * 1.4 / refRadius |> rad2deg # //FIX: define the right packing and maybe allow circle plot also for HEX() tesselation as alternative
+    sepAng = radius * correctionFactor / refRadius |> rad2deg
 
     return icogrid(; sepAng)
 end

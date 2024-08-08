@@ -51,6 +51,19 @@ md"""
 # ICO Tesselation
 """
 
+# ╔═╡ 51c10eff-64a3-4883-a426-178edd3ec90e
+md"""
+## LatBeltRegion
+"""
+
+# ╔═╡ 62c46d72-8698-4e06-85a0-f2a5040a0c48
+val=3/2
+
+# ╔═╡ 0c539be0-ebed-4f8f-bbd8-7efd206d1bac
+md"""
+## GlobalRegion
+"""
+
 # ╔═╡ b35b3f5e-03a3-413f-a5be-576bc9e9ceaa
 md"""
 # Cell Plot Layout Circles
@@ -127,10 +140,17 @@ let
 	plot_geo_cells(centers, ngon)
 end
 
+# ╔═╡ 3d6cfaea-c17e-4008-a0f8-ba262b1e7408
+let 
+	reg = LatBeltRegion(latLim=(-10,10))
+	centers,ngon = generate_tesselation(reg, 400000, ICO(;correction=val), ExtraOutput())
+	plot_geo_cells(centers,ngon)
+end
+
 # ╔═╡ a0f1257d-467a-4875-aad7-1b763d608ab4
 let 
 	reg = LatBeltRegion(latLim=(-10,10))
-	centers,ngon = generate_tesselation(reg, 400000, ICO(), ExtraOutput())
+	centers,ngon = generate_tesselation(reg, 400000, ICO(;pattern=:hex), ExtraOutput())
 	plot_geo_cells(centers,ngon)
 end
 
@@ -269,6 +289,20 @@ end
 let 
 	reg = polyReg
 	centers = generate_tesselation(reg, 40000, HEX(;pattern=:circ))
+	testcenters(centers)
+end
+
+# ╔═╡ f66c2264-8477-47ab-819f-7f956e7dfb5b
+let 
+	reg = LatBeltRegion(latLim=(-10,10))
+	centers = generate_tesselation(reg, 400000, ICO(;correction=val))
+	testcenters(centers)
+end
+
+# ╔═╡ 6e67a703-4aca-42b6-9bbe-e05a6b3d59d5
+let 
+	reg = LatBeltRegion(latLim=(-10,10))
+	centers = generate_tesselation(reg, 400000, ICO())
 	testcenters(centers)
 end
 
@@ -1610,7 +1644,13 @@ version = "17.4.0+2"
 # ╠═0d67eaf0-5f74-43a0-8832-0b270334d3bc
 # ╠═3028363d-c4a4-4ead-9a41-3cd057f5f1d5
 # ╟─8f4f76bb-261f-412e-8b5f-005c0f469204
+# ╟─51c10eff-64a3-4883-a426-178edd3ec90e
+# ╠═62c46d72-8698-4e06-85a0-f2a5040a0c48
+# ╠═3d6cfaea-c17e-4008-a0f8-ba262b1e7408
+# ╠═f66c2264-8477-47ab-819f-7f956e7dfb5b
 # ╠═a0f1257d-467a-4875-aad7-1b763d608ab4
+# ╠═6e67a703-4aca-42b6-9bbe-e05a6b3d59d5
+# ╟─0c539be0-ebed-4f8f-bbd8-7efd206d1bac
 # ╠═efe29293-38f2-49c1-a426-25cdbe0d78c3
 # ╠═80574382-a954-4f8d-a5c4-da4260b14ba7
 # ╠═94dbaa2d-a7c9-45c9-a83f-53b771b8c4e6

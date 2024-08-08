@@ -70,14 +70,14 @@ struct ICO <: AbstractTiling
     "Default pattern shape to be used with this type of tiling"
     pattern::Symbol
 
-    function ICO(correction::Number=6/5, pattern::Symbol=:circ)
+    function ICO(correction::Number=3/2, pattern::Symbol=:circ)
         # Input validation
         pattern in (:circ, :hex) || error("Pattern must be :circ or :hex...")
 
         new(correction, pattern)
     end
 end
-ICO(; correction::Number=6/5, pattern::Symbol=:circ) = ICO(correction, pattern)
+ICO(; correction::Number=3/2, pattern::Symbol=:circ) = ICO(correction, pattern)
 struct HEX <: AbstractTiling 
     "Default direction of hexagons in the tiling"
     direction::Symbol
