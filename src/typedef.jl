@@ -70,7 +70,7 @@ struct ICO <: AbstractTiling
     "Default pattern shape to be used with this type of tiling"
     pattern::Symbol
 
-    function ICO(correction::Number=3/2, pattern::Symbol=:circ)
+    function ICO(correction::Number, pattern::Symbol)
         # Input validation
         pattern in (:circ, :hex) || error("Pattern must be :circ or :hex...")
 
@@ -84,7 +84,7 @@ struct HEX <: AbstractTiling
     "Default pattern shape to be used with this type of tiling"
     pattern::Symbol
 
-    function HEX(direction::Symbol=:pointy, pattern::Symbol=:hex)
+    function HEX(direction::Symbol, pattern::Symbol)
         # Input validation
         direction in (:pointy, :flat) || error("Direction must be :pointy or :flat...")
         pattern in (:circ, :hex) || error("Pattern must be :circ or :hex...")

@@ -163,7 +163,6 @@ let
 	reg = GeoRegion(; regionName="Tassellation", admin="Spain")
 	centers, ngon = generate_tesselation(reg, 40000, ICO(), ExtraOutput())
 	plot_geo_cells(centers,ngon)
-	ngon
 end
 
 # ╔═╡ d12aece5-8625-4667-9f65-6588f63849c4
