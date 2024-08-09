@@ -1,6 +1,8 @@
 ### A Pluto.jl notebook ###
 # v0.19.45
 
+#> custom_attrs = ["hide-enabled"]
+
 using Markdown
 using InteractiveUtils
 
@@ -64,28 +66,6 @@ md"""
 ## GlobalRegion
 """
 
-# ╔═╡ b35b3f5e-03a3-413f-a5be-576bc9e9ceaa
-md"""
-# Cell Plot Layout Circles
-"""
-
-# ╔═╡ fec07e73-815b-4090-a414-b02d922682d4
-# ╠═╡ disabled = true
-#=╠═╡
-test_country = "Norway"
-  ╠═╡ =#
-
-# ╔═╡ a61d9a85-bbd6-499e-aa5e-5630ebc2464c
-(68858.69245840429/2)*(2/√3)
-
-# ╔═╡ cbda1f01-66ab-4bf3-bff3-7c15a6033bf2
-sqrt(3)
-
-# ╔═╡ 9f15a742-d191-4b31-a0c3-95e31e7cd4b8
-md"""
-## Cell Layout Points
-"""
-
 # ╔═╡ d272905a-dfd4-4ade-88bd-ca10abf86f77
 md"""
 # Additional Functions
@@ -112,11 +92,19 @@ begin
 	const polyReg = polyVec[2]
 end
 
+# ╔═╡ ee98e0f2-8690-41cb-9ea0-3be37f67500a
+let
+	reg = GeoRegion(; regionName="Tassellation", test_pair...)
+	centers = generate_tesselation(reg, 40000, HEX(;direction=:flat))
+	# testcenters(centers)
+end
+
 # ╔═╡ e0b2c99d-c689-48fb-91d5-6a3b4ee4d044
 let 
 	reg = GeoRegion(; regionName="Tassellation", admin="Spain")
-	centers, ngon = generate_tesselation(reg, 40000, HEX(), ExtraOutput())
+	centers, ngon = generate_tesselation(reg, 40000, HEX(;pattern=:circ), ExtraOutput())
 	plot_geo_cells(centers, ngon)
+	ngon
 end
 
 # ╔═╡ ad9016de-1cce-4dc8-bdbf-2a2d65a4319f
@@ -157,75 +145,8 @@ end
 # ╔═╡ efe29293-38f2-49c1-a426-25cdbe0d78c3
 let 
 	reg = GlobalRegion()
-	centers,ngon = generate_tesselation(reg, 1000000, ICO(), ExtraOutput())
+	centers,ngon = generate_tesselation(reg, 1000000, ICO(;pattern=:hex), ExtraOutput())
 	plot_geo_cells(centers,ngon)
-end
-
-# ╔═╡ 80574382-a954-4f8d-a5c4-da4260b14ba7
-hh = [fill(SimpleLatLon(0,0),7) for i in 1:10]
-
-# ╔═╡ 94dbaa2d-a7c9-45c9-a83f-53b771b8c4e6
-typeof(hh)
-
-# ╔═╡ afc2c370-87bc-4124-a415-37a5fba1c194
-hh isa AbstractVector{<:AbstractVector{<:SimpleLatLon}}
-
-# ╔═╡ a33d7400-64c2-47df-add5-f6603221210d
-#=╠═╡
-let 
-	reg = GeoRegion(; regionName="Tassellation", admin=test_country)
-	centers = generate_tesselation(reg, 40000, HEX())
-	plot_geo_cells(centers,40000)
-	# min_dist(centers)
-end
-  ╠═╡ =#
-
-# ╔═╡ 25358326-2845-495c-a960-593b53caacd9
-#=╠═╡
-let 
-	reg = GeoRegion(; regionName="Tassellation", admin=test_country)
-	centers = generate_tesselation(reg, 40000, HEX())
-	my_tesselate_circle(centers,40000)
-	# min_dist(centers)
-end
-  ╠═╡ =#
-
-# ╔═╡ 27325150-8f6f-4c42-832f-b47aa139f72a
-#=╠═╡
-let 
-	reg = GeoRegion(; regionName="Tassellation", admin=test_country)	
-	centers = generate_tesselation(reg, 40000, ICO())
-	# plot_geo_cells(centers,40000)
-	min_dist(centers)
-end
-  ╠═╡ =#
-
-# ╔═╡ 02e8d382-8de1-46a0-a540-f95d0683ef8c
-let 
-	reg = GeoRegion(; regionName="Tassellation", admin="Spain")
-	centers = generate_tesselation(reg, 40000, HEX())
-	plot_geo_cells(centers)
-end
-
-# ╔═╡ 900cd46a-89fe-471e-b6da-f643e9dcc689
-let 
-	reg = GlobalRegion()
-	centers = generate_tesselation(reg, 400000, ICO())
-	plot_geo_cells(centers)
-end
-
-# ╔═╡ ee000447-7d89-4069-91fb-5262a2f2925d
-let 
-	reg = LatBeltRegion(latLim=(-10,10))
-	centers = generate_tesselation(reg, 400000, ICO())
-	plot_geo_cells(centers)
-end
-
-# ╔═╡ 31cfc91f-00b7-432f-a54d-077d34756536
-let
-	reg = LatBeltRegion(latLim=(-10,10))
-	centers = generate_tesselation(reg, 400000, ICO())
-	my_tesselate_circle(centers, 400000)
 end
 
 # ╔═╡ d12aece5-8625-4667-9f65-6588f63849c4
@@ -1633,6 +1554,7 @@ version = "17.4.0+2"
 # ╠═3ce21344-e0ea-4e41-b78e-cf92dc9ac2e7
 # ╠═a34e4ff6-51f9-4d6b-af28-5e856adea1ed
 # ╟─222fb774-1693-4b3c-b2ef-5fd38eca773c
+# ╠═ee98e0f2-8690-41cb-9ea0-3be37f67500a
 # ╟─ca4efc79-7cf3-46de-b03e-643c29254818
 # ╠═e0b2c99d-c689-48fb-91d5-6a3b4ee4d044
 # ╠═7df04689-55fd-4659-b251-2100bf565580
@@ -1652,21 +1574,6 @@ version = "17.4.0+2"
 # ╠═6e67a703-4aca-42b6-9bbe-e05a6b3d59d5
 # ╟─0c539be0-ebed-4f8f-bbd8-7efd206d1bac
 # ╠═efe29293-38f2-49c1-a426-25cdbe0d78c3
-# ╠═80574382-a954-4f8d-a5c4-da4260b14ba7
-# ╠═94dbaa2d-a7c9-45c9-a83f-53b771b8c4e6
-# ╠═afc2c370-87bc-4124-a415-37a5fba1c194
-# ╠═b35b3f5e-03a3-413f-a5be-576bc9e9ceaa
-# ╠═fec07e73-815b-4090-a414-b02d922682d4
-# ╠═a33d7400-64c2-47df-add5-f6603221210d
-# ╠═25358326-2845-495c-a960-593b53caacd9
-# ╠═a61d9a85-bbd6-499e-aa5e-5630ebc2464c
-# ╠═27325150-8f6f-4c42-832f-b47aa139f72a
-# ╠═cbda1f01-66ab-4bf3-bff3-7c15a6033bf2
-# ╟─9f15a742-d191-4b31-a0c3-95e31e7cd4b8
-# ╠═02e8d382-8de1-46a0-a540-f95d0683ef8c
-# ╠═900cd46a-89fe-471e-b6da-f643e9dcc689
-# ╠═ee000447-7d89-4069-91fb-5262a2f2925d
-# ╠═31cfc91f-00b7-432f-a54d-077d34756536
 # ╟─d272905a-dfd4-4ade-88bd-ca10abf86f77
 # ╠═d12aece5-8625-4667-9f65-6588f63849c4
 # ╠═0365783a-36b7-4338-b629-4f754953986e
