@@ -1,3 +1,4 @@
+## HEX
 @testitem "GeoRegion HEX Layout Tesselation and :hex Pattern (no ExtraOutput)" tags = [:tesselation] begin
     samples = [SimpleLatLon(43.2693, -8.83691), SimpleLatLon(43.6057, -8.11563), SimpleLatLon(36.808, -5.06421), SimpleLatLon(36.792, -2.3703)] # SimpleLatLon{WGS84Latest} coordinates
     corresponding_idxs = [1, 2, 121, 122]
@@ -96,6 +97,7 @@ end
     end
 end
 
+## ICO
 @testitem "GlobalRegion ICO Layout Tesselation and :circ Pattern (no ExtraOutput)" tags = [:tesselation] begin
     samples = [SimpleLatLon(83.991,0.0),SimpleLatLon(79.5826,-137.508),SimpleLatLon(-79.5826,88.6025),SimpleLatLon(-83.991,-48.9053)]
     corresponding_idxs = [1, 2, 181, 182]
@@ -125,6 +127,115 @@ end
     end
 
     @test length(ngon) == 182
+    for i in eachindex(sampleNgons)
+        for v in eachindex(sampleNgons[i])
+            @test ngon[corresponding_idxs_ngon[i]][v] ≈ sampleNgons[i][v]
+        end
+    end
+end
+
+@testitem "LatBeltRegion ICO Layout Tesselation and :circ Pattern (no ExtraOutput)" tags = [:tesselation] begin
+    samples = [SimpleLatLon(9.89685,41.5062), SimpleLatLon(9.78996,-96.0016), SimpleLatLon(-9.78996,25.0621), SimpleLatLon(-9.89685,-112.446)]
+    corresponding_idxs = [1, 2, 187, 188]
+
+    reg = LatBeltRegion(latLim=(-10,10))
+	centers = generate_tesselation(reg, 400000, ICO())
+    
+    @test length(centers) == 188
+    for i in eachindex(samples) 
+        @test centers[corresponding_idxs[i]] ≈ samples[i]
+    end
+end
+
+@testitem "LatBeltRegion ICO Layout Tesselation and :hex Pattern (with ExtraOutput)" tags = [:tesselation] begin
+    samplePoints = [SimpleLatLon(9.89685,41.5062), SimpleLatLon(9.78996,-96.0016), SimpleLatLon(-9.78996,25.0621), SimpleLatLon(-9.89685,-112.446)]
+    corresponding_idxs_points = [1, 2, 187, 188]
+
+    sampleNgons = [[SimpleLatLon(11.8183,45.104),SimpleLatLon(13.921,40.8336),SimpleLatLon(9.54199,37.4515),SimpleLatLon(8.05959,37.8844),SimpleLatLon(5.89612,42.1999),SimpleLatLon(10.2875,45.5542),SimpleLatLon(11.8183,45.104)],
+    [SimpleLatLon(-11.8183,-116.044),SimpleLatLon(-13.921,-111.773),SimpleLatLon(-9.54199,-108.391),SimpleLatLon(-8.05959,-108.824),SimpleLatLon(-5.89611,-113.139),SimpleLatLon(-10.2875,-116.494),SimpleLatLon(-11.8183,-116.044)]]
+    corresponding_idxs_ngon = [1, 188]
+
+    reg = LatBeltRegion(latLim=(-10,10))
+	centers,ngon = generate_tesselation(reg, 400000, ICO(;pattern=:hex), ExtraOutput())
+
+    @test length(centers) == 188
+    for i in eachindex(samplePoints) 
+        @test centers[corresponding_idxs_points[i]] ≈ samplePoints[i]
+    end
+
+    @test length(ngon) == 188
+    for i in eachindex(sampleNgons)
+        for v in eachindex(sampleNgons[i])
+            @test ngon[corresponding_idxs_ngon[i]][v] ≈ sampleNgons[i][v]
+        end
+    end
+end
+
+@testitem "PolyRegion ICO Layout Tesselation and :circ Pattern (no ExtraOutput)" tags = [:tesselation] begin
+    samples = [SimpleLatLon(79.9456,4.99995), SimpleLatLon(79.6831,9.73597), SimpleLatLon(60.0598,-3.47868), SimpleLatLon(60.0243,8.92039)]
+    corresponding_idxs = [1, 2, 218, 219]
+
+    reg = PolyRegion(;domain=[SimpleLatLon(60,-5), SimpleLatLon(80,0), SimpleLatLon(80,10), SimpleLatLon(60,15)])
+	centers = generate_tesselation(reg, 40000, ICO(;correction=1.7))
+    
+    @test length(centers) == 219
+    for i in eachindex(samples) 
+        @test centers[corresponding_idxs[i]] ≈ samples[i]
+    end
+end
+
+@testitem "PolyRegion ICO Layout Tesselation and :hex Pattern (with ExtraOutput)" tags = [:tesselation] begin
+    samplePoints = [SimpleLatLon(79.9456,4.99995), SimpleLatLon(79.6831,9.73597), SimpleLatLon(60.0598,-3.47868), SimpleLatLon(60.0243,8.92039)]
+    corresponding_idxs_points = [1, 2, 218, 219]
+    sampleNgons = [[SimpleLatLon(79.2839,5.7835),SimpleLatLon(80.0631,6.07365),SimpleLatLon(81.0731,4.99257),SimpleLatLon(80.8394,4.30809),SimpleLatLon(79.929,3.94491),SimpleLatLon(78.9239,4.90667),SimpleLatLon(79.2839,5.7835)],
+        [SimpleLatLon(60.0209,9.55066),SimpleLatLon(60.4379,9.40303),SimpleLatLon(60.6574,8.86491),SimpleLatLon(60.0377,8.28825),SimpleLatLon(59.6336,8.42962),SimpleLatLon(59.4002,8.98413),SimpleLatLon(60.0209,9.55066)]]
+    corresponding_idxs_ngon = [1, 219]
+    
+    reg = PolyRegion(;domain=[SimpleLatLon(60,-5), SimpleLatLon(80,0), SimpleLatLon(80,10), SimpleLatLon(60,15)])
+	centers, ngon = generate_tesselation(reg, 40000, ICO(;correction=1.7, pattern=:hex), ExtraOutput())
+
+    @test length(centers) == 219
+    for i in eachindex(samplePoints) 
+        @test centers[corresponding_idxs_points[i]] ≈ samplePoints[i]
+    end
+
+    @test length(ngon) == 219
+    for i in eachindex(sampleNgons)
+        for v in eachindex(sampleNgons[i])
+            @test ngon[corresponding_idxs_ngon[i]][v] ≈ sampleNgons[i][v]
+        end
+    end
+end
+
+@testitem "GeoRegion ICO Layout Tesselation and :circ Pattern (no ExtraOutput)" tags = [:tesselation] begin
+    samples = [SimpleLatLon(43.5772,-7.50902),SimpleLatLon(43.4468,-5.70002),SimpleLatLon(36.6657,-3.58858),SimpleLatLon(36.285,-5.82463)]
+    corresponding_idxs = [1, 2, 103, 104]
+
+    reg = GeoRegion(; regionName="Tassellation", admin="Spain")
+	centers = generate_tesselation(reg, 40000, ICO())
+    
+    @test length(centers) == 104
+    for i in eachindex(samples) 
+        @test centers[corresponding_idxs[i]] ≈ samples[i]
+    end
+end
+
+@testitem "GeoRegion ICO Layout Tesselation and :hex Pattern (with ExtraOutput)" tags = [:tesselation] begin
+    samplePoints = [SimpleLatLon(43.5772,-7.50902),SimpleLatLon(43.4468,-5.70002),SimpleLatLon(36.6657,-3.58858),SimpleLatLon(36.285,-5.82463)]
+    corresponding_idxs_points = [1, 2, 103, 104]
+    sampleNgons = [[SimpleLatLon(43.2175,-7.50902), SimpleLatLon(43.235,-7.35644), SimpleLatLon(43.2858,-7.21855), SimpleLatLon(43.3651,-7.1087), SimpleLatLon(43.4651,-7.03764), SimpleLatLon(43.5761,-7.01247), SimpleLatLon(43.6874,-7.03589), SimpleLatLon(43.7879,-7.10588), SimpleLatLon(43.8679,-7.21573), SimpleLatLon(43.9192,-7.35469), SimpleLatLon(43.9369,-7.50902), SimpleLatLon(43.9192,-7.66334), SimpleLatLon(43.8679,-7.8023), SimpleLatLon(43.7879,-7.91215), SimpleLatLon(43.6874,-7.98214), SimpleLatLon(43.5761,-8.00557), SimpleLatLon(43.4651,-7.9804), SimpleLatLon(43.3651,-7.90933), SimpleLatLon(43.2858,-7.79948), SimpleLatLon(43.235,-7.6616), SimpleLatLon(43.2175,-7.50902), SimpleLatLon(43.2175,-7.50902)],
+    [SimpleLatLon(35.9252,-5.82463),SimpleLatLon(35.9428,-5.68733),SimpleLatLon(35.9937,-5.56329),SimpleLatLon(36.073,-5.46457),SimpleLatLon(36.1731,-5.40081),SimpleLatLon(36.2841,-5.37836),SimpleLatLon(36.3954,-5.3996),SimpleLatLon(36.4959,-5.46261),SimpleLatLon(36.5757,-5.56134),SimpleLatLon(36.627,-5.68612),SimpleLatLon(36.6447,-5.82463),SimpleLatLon(36.627,-5.96314),SimpleLatLon(36.5757,-6.08792),SimpleLatLon(36.4959,-6.18665),SimpleLatLon(36.3954,-6.24966),SimpleLatLon(36.2841,-6.27089),SimpleLatLon(36.1731,-6.24845),SimpleLatLon(36.073,-6.18469),SimpleLatLon(35.9937,-6.08597),SimpleLatLon(35.9428,-5.96193),SimpleLatLon(35.9252,-5.82463),SimpleLatLon(35.9252,-5.82463)]]
+    corresponding_idxs_ngon = [1, 104]
+    
+    reg = GeoRegion(; regionName="Tassellation", admin="Spain")
+	centers, ngon = generate_tesselation(reg, 40000, ICO(), ExtraOutput())
+
+    @test length(centers) == 104
+    for i in eachindex(samplePoints) 
+        @test centers[corresponding_idxs_points[i]] ≈ samplePoints[i]
+    end
+
+    @test length(ngon) == 104
     for i in eachindex(sampleNgons)
         for v in eachindex(sampleNgons[i])
             @test ngon[corresponding_idxs_ngon[i]][v] ≈ sampleNgons[i][v]

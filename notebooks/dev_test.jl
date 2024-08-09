@@ -53,6 +53,11 @@ md"""
 # ICO Tesselation
 """
 
+# ╔═╡ 0c539be0-ebed-4f8f-bbd8-7efd206d1bac
+md"""
+## GlobalRegion
+"""
+
 # ╔═╡ 51c10eff-64a3-4883-a426-178edd3ec90e
 md"""
 ## LatBeltRegion
@@ -61,9 +66,14 @@ md"""
 # ╔═╡ 62c46d72-8698-4e06-85a0-f2a5040a0c48
 val=3/2
 
-# ╔═╡ 0c539be0-ebed-4f8f-bbd8-7efd206d1bac
+# ╔═╡ 23ce7f6e-4629-453b-9b7d-783a4620df7e
 md"""
-## GlobalRegion
+## PolyRegion
+"""
+
+# ╔═╡ e6860038-91c3-4fd9-b39e-4622963fa7a0
+md"""
+## GeoRegion
 """
 
 # ╔═╡ d272905a-dfd4-4ade-88bd-ca10abf86f77
@@ -120,6 +130,13 @@ let
 	plot_geo_cells(centers, ngon)
 end
 
+# ╔═╡ efe29293-38f2-49c1-a426-25cdbe0d78c3
+let 
+	reg = GlobalRegion()
+	centers,ngon = generate_tesselation(reg, 1000000, ICO(;pattern=:hex), ExtraOutput())
+	plot_geo_cells(centers,ngon)
+end
+
 # ╔═╡ 3d6cfaea-c17e-4008-a0f8-ba262b1e7408
 let 
 	reg = LatBeltRegion(latLim=(-10,10))
@@ -131,13 +148,20 @@ end
 let 
 	reg = LatBeltRegion(latLim=(-10,10))
 	centers,ngon = generate_tesselation(reg, 400000, ICO(;pattern=:hex), ExtraOutput())
+	plot_geo_cells(centers,ngon)	
+end
+
+# ╔═╡ f55e4340-0cb6-4fc5-9685-ccbbc3fedd15
+let 
+	reg = polyReg	
+	centers,ngon = generate_tesselation(reg, 40000, ICO(;correction=1.7), ExtraOutput())
 	plot_geo_cells(centers,ngon)
 end
 
-# ╔═╡ efe29293-38f2-49c1-a426-25cdbe0d78c3
+# ╔═╡ c0cbcd3e-183d-425a-a534-06b2d52f1819
 let 
-	reg = GlobalRegion()
-	centers,ngon = generate_tesselation(reg, 1000000, ICO(;pattern=:hex), ExtraOutput())
+	reg = GeoRegion(; regionName="Tassellation", admin="Spain")
+	centers, ngon = generate_tesselation(reg, 40000, ICO(), ExtraOutput())
 	plot_geo_cells(centers,ngon)
 	ngon
 end
@@ -206,6 +230,13 @@ let
 	testcenters(centers)
 end
 
+# ╔═╡ 166ae596-02d5-40ac-a0c8-548a4f2f2954
+let 
+	reg = GlobalRegion()
+	centers = generate_tesselation(reg, 1000000, ICO())
+	testcenters(centers)
+end
+
 # ╔═╡ f66c2264-8477-47ab-819f-7f956e7dfb5b
 let 
 	reg = LatBeltRegion(latLim=(-10,10))
@@ -220,10 +251,17 @@ let
 	testcenters(centers)
 end
 
-# ╔═╡ 166ae596-02d5-40ac-a0c8-548a4f2f2954
+# ╔═╡ 3c5ef22a-21ba-4fa4-ba23-6cb0808c62e4
 let 
-	reg = GlobalRegion()
-	centers = generate_tesselation(reg, 1000000, ICO())
+	reg=polyReg
+	centers = generate_tesselation(reg, 40000, ICO(;correction=1.7))
+	testcenters(centers)
+end
+
+# ╔═╡ dc7902d2-c46f-4afd-831b-92d5d4c3bc93
+let 
+	reg = GeoRegion(; regionName="Tassellation", admin="Spain")
+	centers = generate_tesselation(reg, 40000, ICO())
 	testcenters(centers)
 end
 
@@ -1565,15 +1603,21 @@ version = "17.4.0+2"
 # ╠═0d67eaf0-5f74-43a0-8832-0b270334d3bc
 # ╠═3028363d-c4a4-4ead-9a41-3cd057f5f1d5
 # ╟─8f4f76bb-261f-412e-8b5f-005c0f469204
+# ╟─0c539be0-ebed-4f8f-bbd8-7efd206d1bac
+# ╠═efe29293-38f2-49c1-a426-25cdbe0d78c3
+# ╠═166ae596-02d5-40ac-a0c8-548a4f2f2954
 # ╟─51c10eff-64a3-4883-a426-178edd3ec90e
 # ╠═62c46d72-8698-4e06-85a0-f2a5040a0c48
 # ╠═3d6cfaea-c17e-4008-a0f8-ba262b1e7408
 # ╠═f66c2264-8477-47ab-819f-7f956e7dfb5b
 # ╠═a0f1257d-467a-4875-aad7-1b763d608ab4
 # ╠═6e67a703-4aca-42b6-9bbe-e05a6b3d59d5
-# ╟─0c539be0-ebed-4f8f-bbd8-7efd206d1bac
-# ╠═efe29293-38f2-49c1-a426-25cdbe0d78c3
-# ╠═166ae596-02d5-40ac-a0c8-548a4f2f2954
+# ╟─23ce7f6e-4629-453b-9b7d-783a4620df7e
+# ╠═f55e4340-0cb6-4fc5-9685-ccbbc3fedd15
+# ╠═3c5ef22a-21ba-4fa4-ba23-6cb0808c62e4
+# ╠═e6860038-91c3-4fd9-b39e-4622963fa7a0
+# ╠═c0cbcd3e-183d-425a-a534-06b2d52f1819
+# ╠═dc7902d2-c46f-4afd-831b-92d5d4c3bc93
 # ╟─d272905a-dfd4-4ade-88bd-ca10abf86f77
 # ╠═d12aece5-8625-4667-9f65-6588f63849c4
 # ╠═0365783a-36b7-4338-b629-4f754953986e
