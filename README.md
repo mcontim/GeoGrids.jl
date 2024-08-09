@@ -2,8 +2,12 @@
 
 [![Docs Stable](https://img.shields.io/badge/docs-stable-blue.svg)](https://tec-esc-tools.io.esa.int/GeoGrids.jl/stable)
 [![Docs Dev](https://img.shields.io/badge/docs-dev-blue.svg)](https://tec-esc-tools.io.esa.int/GeoGrids.jl/dev)
-[![Build Status](https://gitlab.esa.int/tec-esc-tools/GeoGrids.jl/badges/main/pipeline.svg)](https://gitlab.esa.int/tec-esc-tools/GeoGrids.jl/pipelines)
-[![Coverage](https://gitlab.esa.int/tec-esc-tools/GeoGrids.jl/badges/main/coverage.svg)](https://gitlab.esa.int/tec-esc-tools/GeoGrids.jl/commits/main)
+<!-- [![Build Status](https://gitlab.esa.int/tec-esc-tools/GeoGrids.jl/badges/main/pipeline.svg)](https://gitlab.esa.int/tec-esc-tools/GeoGrids.jl/pipelines)
+[![Coverage](https://gitlab.esa.int/tec-esc-tools/GeoGrids.jl/badges/main/coverage.svg)](https://gitlab.esa.int/tec-esc-tools/GeoGrids.jl/commits/main) -->
+
+[![Build Status](https://github.com/mcontim/GeoGrids.jl/actions/workflows/CI.yml/badge.svg?branch=main)](https://github.com/mcontim/GeoGrids.jl/actions/workflows/CI.yml?query=branch%3Amain)
+[![Coverage](https://codecov.io/gh/mcontim/GeoGrids.jl/branch/main/graph/badge.svg)](https://codecov.io/gh/mcontim/GeoGrids.jl)
+
 [![Aqua QA](https://raw.githubusercontent.com/JuliaTesting/Aqua.jl/master/badge.svg)](https://github.com/JuliaTesting/Aqua.jl)
 [![](https://img.shields.io/badge/%F0%9F%9B%A9%EF%B8%8F_tested_with-JET.jl-233f9a)](https://github.com/aviatesk/JET.jl)
 
@@ -79,9 +83,9 @@ Returns the list of of points based on whether they fall within a specified geog
 
 Extracts the countries from a given region. The output represents the field `domain` of `GeoRegion`.
 
-It first gets the field names of the `GeoRegion` type, excluding the `:regionName`, then maps these field names to their corresponding values in the `GeoRegion` instance `r`, creating a collection of pairs. It filters out any pairs where the value is empty. It converts this collection of pairs into a `NamedTuple`, finally, it calls `CountriesBorders.extract_countries` with the `NamedTuple` as keyword arguments.
+It first gets the field names of the `GeoRegion` type, excluding the `:regionName`, then maps these field names to their corresponding values in the `GeoRegion` instance `r`, creating a collection of pairs. It filters out any pairs where the value is empty. It converts this collection of pairs into a `NamedTuple`, finally, it calls `GeoGrids.extract_countries` with the `NamedTuple` as keyword arguments.
 
-This function is an overload of `CountriesBorders.extract_countries` that takes a `GeoRegion` object as input. It extracts the countries from the given region and returns them.    
+This function is an overload of `GeoGrids.extract_countries` that takes a `GeoRegion` object as input. It extracts the countries from the given region and returns them.    
 
 ---
 
