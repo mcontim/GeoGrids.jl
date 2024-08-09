@@ -92,19 +92,11 @@ begin
 	const polyReg = polyVec[2]
 end
 
-# ╔═╡ ee98e0f2-8690-41cb-9ea0-3be37f67500a
-let
-	reg = GeoRegion(; regionName="Tassellation", test_pair...)
-	centers = generate_tesselation(reg, 40000, HEX(;direction=:flat))
-	# testcenters(centers)
-end
-
 # ╔═╡ e0b2c99d-c689-48fb-91d5-6a3b4ee4d044
 let 
 	reg = GeoRegion(; regionName="Tassellation", admin="Spain")
 	centers, ngon = generate_tesselation(reg, 40000, HEX(;pattern=:circ), ExtraOutput())
 	plot_geo_cells(centers, ngon)
-	ngon
 end
 
 # ╔═╡ ad9016de-1cce-4dc8-bdbf-2a2d65a4319f
@@ -147,6 +139,7 @@ let
 	reg = GlobalRegion()
 	centers,ngon = generate_tesselation(reg, 1000000, ICO(;pattern=:hex), ExtraOutput())
 	plot_geo_cells(centers,ngon)
+	ngon
 end
 
 # ╔═╡ d12aece5-8625-4667-9f65-6588f63849c4
@@ -224,6 +217,13 @@ end
 let 
 	reg = LatBeltRegion(latLim=(-10,10))
 	centers = generate_tesselation(reg, 400000, ICO())
+	testcenters(centers)
+end
+
+# ╔═╡ 166ae596-02d5-40ac-a0c8-548a4f2f2954
+let 
+	reg = GlobalRegion()
+	centers = generate_tesselation(reg, 1000000, ICO())
 	testcenters(centers)
 end
 
@@ -1554,7 +1554,6 @@ version = "17.4.0+2"
 # ╠═3ce21344-e0ea-4e41-b78e-cf92dc9ac2e7
 # ╠═a34e4ff6-51f9-4d6b-af28-5e856adea1ed
 # ╟─222fb774-1693-4b3c-b2ef-5fd38eca773c
-# ╠═ee98e0f2-8690-41cb-9ea0-3be37f67500a
 # ╟─ca4efc79-7cf3-46de-b03e-643c29254818
 # ╠═e0b2c99d-c689-48fb-91d5-6a3b4ee4d044
 # ╠═7df04689-55fd-4659-b251-2100bf565580
@@ -1574,6 +1573,7 @@ version = "17.4.0+2"
 # ╠═6e67a703-4aca-42b6-9bbe-e05a6b3d59d5
 # ╟─0c539be0-ebed-4f8f-bbd8-7efd206d1bac
 # ╠═efe29293-38f2-49c1-a426-25cdbe0d78c3
+# ╠═166ae596-02d5-40ac-a0c8-548a4f2f2954
 # ╟─d272905a-dfd4-4ade-88bd-ca10abf86f77
 # ╠═d12aece5-8625-4667-9f65-6588f63849c4
 # ╠═0365783a-36b7-4338-b629-4f754953986e

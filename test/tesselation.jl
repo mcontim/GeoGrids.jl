@@ -1,4 +1,4 @@
-@testitem "GeoRegion HEX Layout Tesselation and :hex Pattern (no ExtraOutput)" tags = [:general] begin
+@testitem "GeoRegion HEX Layout Tesselation and :hex Pattern (no ExtraOutput)" tags = [:tesselation] begin
     samples = [SimpleLatLon(43.2693, -8.83691), SimpleLatLon(43.6057, -8.11563), SimpleLatLon(36.808, -5.06421), SimpleLatLon(36.792, -2.3703)] # SimpleLatLon{WGS84Latest} coordinates
     corresponding_idxs = [1, 2, 121, 122]
     
@@ -11,7 +11,7 @@
     end
 end
 
-@testitem "GeoRegion HEX Layout Tesselation and :circ Pattern (no ExtraOutput)" tags = [:general] begin
+@testitem "GeoRegion HEX Layout Tesselation and :circ Pattern (no ExtraOutput)" tags = [:tesselation] begin
     samples = [SimpleLatLon(43.2693, -8.83691), SimpleLatLon(43.6057, -8.11563), SimpleLatLon(36.808, -5.06421), SimpleLatLon(36.792, -2.3703)] # SimpleLatLon{WGS84Latest} coordinates
     corresponding_idxs = [1, 2, 121, 122]
     
@@ -24,7 +24,7 @@ end
     end
 end
 
-@testitem "GeoRegion HEX Layout Tesselation and :hex Pattern (with ExtraOutput)" tags = [:general] begin
+@testitem "GeoRegion HEX Layout Tesselation and :hex Pattern (with ExtraOutput)" tags = [:tesselation] begin
     samplePoints = [SimpleLatLon(43.2693, -8.83691), SimpleLatLon(43.6057, -8.11563), SimpleLatLon(36.808, -5.06421), SimpleLatLon(36.792, -2.3703)] # SimpleLatLon{WGS84Latest} coordinates
     corresponding_idxs_points = [1, 2, 121, 122]
     sampleNgons = [[SimpleLatLon(43.558,-9.1653), SimpleLatLon(43.2648,-9.27284), SimpleLatLon(42.937,-9.11636), SimpleLatLon(42.9797,-8.51291), SimpleLatLon(43.2764,-8.40112), SimpleLatLon(43.6025,-8.55324), SimpleLatLon(43.558,-9.1653)],
@@ -38,6 +38,7 @@ end
     for i in eachindex(samplePoints) 
         @test centers[corresponding_idxs_points[i]] ≈ samplePoints[i]
     end
+
     @test length(ngon) == 122
     for i in eachindex(sampleNgons)
         for v in eachindex(sampleNgons[i])
@@ -46,7 +47,7 @@ end
     end
 end
 
-@testitem "GeoRegion HEX Layout Tesselation and :circ Pattern (with ExtraOutput)" tags = [:general] begin
+@testitem "GeoRegion HEX Layout Tesselation and :circ Pattern (with ExtraOutput)" tags = [:tesselation] begin
     samplePoints = [SimpleLatLon(43.2693, -8.83691), SimpleLatLon(43.6057, -8.11563), SimpleLatLon(36.808, -5.06421), SimpleLatLon(36.792, -2.3703)] # SimpleLatLon{WGS84Latest} coordinates
     corresponding_idxs_points = [1, 2, 121, 122]
     sampleNgons = [[SimpleLatLon(42.9096,-8.83691), SimpleLatLon(42.9271,-8.68509), SimpleLatLon(42.9779,-8.5479), SimpleLatLon(43.0572,-8.43861), SimpleLatLon(43.1572,-8.36791), SimpleLatLon(43.2682,-8.34287), SimpleLatLon(43.3795,-8.36619), SimpleLatLon(43.48,-8.43583), SimpleLatLon(43.56,-8.54512), SimpleLatLon(43.6113,-8.68338), SimpleLatLon(43.629,-8.83691), SimpleLatLon(43.6113,-8.99044), SimpleLatLon(43.56,-9.12869), SimpleLatLon(43.48,-9.23798), SimpleLatLon(43.3795,-9.30762), SimpleLatLon(43.2682,-9.33094), SimpleLatLon(43.1572,-9.3059), SimpleLatLon(43.0572,-9.23521), SimpleLatLon(42.9779,-9.12591), SimpleLatLon(42.9271,-8.98872), SimpleLatLon(42.9096,-8.83691), SimpleLatLon(42.9096,-8.83691)],
@@ -60,6 +61,7 @@ end
     for i in eachindex(samplePoints) 
         @test centers[corresponding_idxs_points[i]] ≈ samplePoints[i]
     end
+
     @test length(ngon) == 122
     for i in eachindex(sampleNgons)
         for v in eachindex(sampleNgons[i])
@@ -68,7 +70,7 @@ end
     end
 end
 
-@testitem "GeoRegion HEX Layout Tesselation and :hex Pattern :flat (no ExtraOutput)" tags = [:general] begin
+@testitem "GeoRegion HEX Layout Tesselation and :hex Pattern :flat (no ExtraOutput)" tags = [:tesselation] begin
     samples = [SimpleLatLon(42.8428,-9.06506), SimpleLatLon(43.4251,-7.82139), SimpleLatLon(37.5057,-1.64231), SimpleLatLon(36.459,-4.77773),]
     corresponding_idxs = [1, 2, 117, 118]
 
@@ -78,5 +80,54 @@ end
     @test length(centers) == 118
     for i in eachindex(samples) 
         @test centers[corresponding_idxs[i]] ≈ samples[i]
+    end
+end
+
+@testitem "PolyRegion HEX Layout Tesselation and :hex Pattern (no ExtraOutput)" tags = [:tesselation] begin
+    samples = [SimpleLatLon(79.9691,5.0),SimpleLatLon(79.6441,7.98881),SimpleLatLon(60.0123,7.14867),SimpleLatLon(60.3001,8.25311)]
+    corresponding_idxs = [1, 2, 318, 319]
+
+    reg = PolyRegion(;domain=[SimpleLatLon(60,-5), SimpleLatLon(80,0), SimpleLatLon(80,10), SimpleLatLon(60,15)])
+	centers = generate_tesselation(reg, 40000, HEX())
+    
+    @test length(centers) == 319
+    for i in eachindex(samples) 
+        @test centers[corresponding_idxs[i]] ≈ samples[i]
+    end
+end
+
+@testitem "GlobalRegion ICO Layout Tesselation and :circ Pattern (no ExtraOutput)" tags = [:tesselation] begin
+    samples = [SimpleLatLon(83.991,0.0),SimpleLatLon(79.5826,-137.508),SimpleLatLon(-79.5826,88.6025),SimpleLatLon(-83.991,-48.9053)]
+    corresponding_idxs = [1, 2, 181, 182]
+
+    reg = GlobalRegion()
+	centers = generate_tesselation(reg, 1000000, ICO())
+    
+    @test length(centers) == 182
+    for i in eachindex(samples) 
+        @test centers[corresponding_idxs[i]] ≈ samples[i]
+    end
+end
+
+@testitem "GlobalRegion ICO Layout Tesselation and :hex Pattern (with ExtraOutput)" tags = [:tesselation] begin
+    samplePoints = [SimpleLatLon(83.991,0.0),SimpleLatLon(79.5826,-137.508),SimpleLatLon(-79.5826,88.6025),SimpleLatLon(-83.991,-48.9053)]
+    corresponding_idxs_points = [1, 2, 181, 182]
+    sampleNgons = [[SimpleLatLon(66.8411,-2.78182), SimpleLatLon(75.8026,15.7204), SimpleLatLon(82.6627,18.6819), SimpleLatLon(83.991,0.0), SimpleLatLon(83.4003,-18.4249), SimpleLatLon(66.8411,-2.78182)],
+    [SimpleLatLon(-82.3641,-67.4582), SimpleLatLon(-83.991,-48.9053), SimpleLatLon(-83.4003,-30.4803), SimpleLatLon(-66.8411,-46.1235), SimpleLatLon(-75.8026,-64.6257), SimpleLatLon(-82.3641,-67.4582)]]
+    corresponding_idxs_ngon = [1, 182]
+
+    reg = GlobalRegion()
+	centers,ngon = generate_tesselation(reg, 1000000, ICO(;pattern=:hex), ExtraOutput())
+    
+    @test length(centers) == 182
+    for i in eachindex(samplePoints) 
+        @test centers[corresponding_idxs_points[i]] ≈ samplePoints[i]
+    end
+
+    @test length(ngon) == 182
+    for i in eachindex(sampleNgons)
+        for v in eachindex(sampleNgons[i])
+            @test ngon[corresponding_idxs_ngon[i]][v] ≈ sampleNgons[i][v]
+        end
     end
 end
