@@ -2,6 +2,8 @@ using TestItemRunner
 
 include("general.jl")
 include("filtering.jl")
+include("tesselation.jl")
+include("plots.jl")
 
 @testitem "Aqua" begin
     using Aqua

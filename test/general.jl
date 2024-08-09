@@ -98,21 +98,7 @@ end
     @test abs(a[1].lat - a[2].lat) ≈ 5°
 end
 
-@testitem "Plots Plotly Base" tags = [:general] begin
-    using PlotlyBase
-    @test plot_unitarysphere(GeoGrids._icogrid(100; coord=:cart)) isa Plot
-    @test plot_geo(icogrid(sepAng=5°)) isa Plot
-    @test plot_geo(icogrid(sepAng=deg2rad(4) * rad); camera=:threedim) isa Plot
-    @test plot_geo(rectgrid(5)) isa Plot
-    @test plot_geo(rectgrid(5°); camera=:threedim) isa Plot
-end
-
 @testitem "Helper Functions" tags = [:general] begin
-    @test GeoGrids._cast_geopoint((10, 55)) == SimpleLatLon(10, 55)
-    @test GeoGrids._cast_geopoint([10, 55]) == SimpleLatLon(10, 55)
-
-    @test_throws "The input must be a 2D point..." GeoGrids._cast_geopoint([10, 30, 40])
-
     r = GeoRegion(regionName="ITA", admin="Italy")
     @test extract_countries(r) == r.domain
 end

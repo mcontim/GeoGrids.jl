@@ -1,5 +1,5 @@
 ### A Pluto.jl notebook ###
-# v0.19.41
+# v0.19.45
 
 #> custom_attrs = ["hide-enabled"]
 
@@ -16,16 +16,6 @@ macro bind(def, element)
     end
 end
 
-# ╔═╡ 1aab6599-3b14-422d-acf6-3cbd953c555e
-@fromparent begin
-	import ^: * # to eport all functions from parent package
-	using >. AngleBetweenVectors
-	using >. CountriesBorders
-    using >. LinearAlgebra
-	using >. PlotlyExtensionsHelper
-	using >. StaticArrays
-end
-
 # ╔═╡ ca17905e-687a-4603-ab2f-d651123a12d1
 begin
 	using PlutoUI
@@ -35,6 +25,16 @@ begin
 	using PlutoPlotly
 	using PlotlyBase
 	using MAT	
+end
+
+# ╔═╡ 1aab6599-3b14-422d-acf6-3cbd953c555e
+@fromparent begin
+	import ^: * # to eport all functions from parent package
+	using >. AngleBetweenVectors
+	using >. CountriesBorders
+    using >. LinearAlgebra
+	using >. PlotlyExtensionsHelper
+	using >. StaticArrays
 end
 
 # ╔═╡ ac88e13f-73dc-451c-b3f3-2a4b4a422f19
@@ -82,7 +82,7 @@ This mapping has 2 main problems:
 
 # ╔═╡ 4457e406-3b1b-4237-b02d-767f76a0d6e2
 md"""
-The main source can be found at this [link](http://extremelearning.com.au/how-to-evenly-distribute-points-on-a-sphere-more-effectively-than-the-canonical-fibonacci-lattice/).
+The main source can be found at this [link](http://extremelearning.com.au/how-to-evenly-distribute-points-on-a-sph  ere-more-effectively-than-the-canonical-fibonacci-lattice/).
 """
 
 # ╔═╡ e7e7a9d5-6f6c-45ab-b1cd-5a20a4569176
@@ -231,33 +231,33 @@ plot_unitarysphere(fibonaccisphere_optimization1(tableVal.n))
 plot_unitarysphere(fibonaccisphere_alternative1(tableVal.n))
 
 # ╔═╡ ec3c88ba-972f-4b0f-ac25-75e779b1c33a
-plot_geo(icogrid(N=tableVal.n;unit=:deg))
+plot_geo_points(icogrid(N=tableVal.n;unit=:deg))
 
 # ╔═╡ f97a8555-086b-48f6-950e-fc583d0afa11
-plot_geo(icogrid(N=tableVal.n;unit=:deg);camera=:threedim)
+plot_geo_points(icogrid(N=tableVal.n;unit=:deg);camera=:threedim)
 
 # ╔═╡ 900cc195-8c5a-47c0-a48b-e04baa15fc61
 # Check for the growing of points in Fibonacci spiral
-plot_geo(icogrid(N=tableVal.n;unit=:deg)[1:50])
+plot_geo_points(icogrid(N=tableVal.n;unit=:deg)[1:50])
 
 # ╔═╡ d005be58-3be7-4b2a-a3f7-edf0fd095259
 # Check for the growing of points in Fibonacci spiral
-plot_geo(icogrid(N=tableVal.n;unit=:deg)[1:50];camera=:threedim)
+plot_geo_points(icogrid(N=tableVal.n;unit=:deg)[1:50];camera=:threedim)
 
 # ╔═╡ 6b1c8079-bab5-4951-b564-500bba378781
-plot_geo(icogrid(sepAng=deg2rad(tableVal.ang);unit=:deg))
+plot_geo_points(icogrid(sepAng=deg2rad(tableVal.ang);unit=:deg))
 
 # ╔═╡ 88704126-cdc6-486f-bd68-e8fee558eac4
-plot_geo(icogrid(sepAng=deg2rad(tableVal.ang);unit=:deg);camera=:threedim)
+plot_geo_points(icogrid(sepAng=deg2rad(tableVal.ang);unit=:deg);camera=:threedim)
 
 # ╔═╡ f1d6ee2f-01d2-4b79-b326-cb202c58d74d
 meshGrid = rectgrid(deg2rad(tableVal.ang); unit=:deg)
 
 # ╔═╡ 3eeeffc0-3ba5-427b-b75b-0bf5f6286c9b
-plot_geo(vec(meshGrid))
+plot_geo_points(vec(meshGrid))
 
 # ╔═╡ 00055125-7c7e-459e-b79e-f22e3d74866d
-plot_geo(vec(meshGrid); camera=:threedim)
+plot_geo_points(vec(meshGrid); camera=:threedim)
 
 # ╔═╡ 8ed3bf0f-534e-4b12-a905-2b25b8c8e13a
 BondTable([
@@ -288,7 +288,7 @@ PlutoUI = "~0.7.59"
 PLUTO_MANIFEST_TOML_CONTENTS = """
 # This file is machine-generated - editing it directly is not advised
 
-julia_version = "1.10.3"
+julia_version = "1.10.4"
 manifest_format = "2.0"
 project_hash = "e9000912970992ae44f2ff7b66ce0d09cd24afbf"
 

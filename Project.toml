@@ -5,6 +5,7 @@ version = "0.4.0"
 
 [deps]
 AngleBetweenVectors = "ec570357-d46e-52ed-9726-18773498274d"
+CoordRefSystems = "b46f11dc-f210-4604-bfba-323c1ec968cb"
 CountriesBorders = "ee40d4b5-31c3-4fe2-b6cc-5ac7adf7f414"
 Dictionaries = "85a47980-9c8c-11e8-2b9f-f7ca1fa99fb4"
 LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
@@ -21,6 +22,7 @@ PlotlyBaseExt = "PlotlyBase"
 
 [compat]
 AngleBetweenVectors = "0.3.0"
+CoordRefSystems = "0.9"
 CountriesBorders = "0.3.4"
 Dictionaries = "0.4.2"
 julia = "1.9"
