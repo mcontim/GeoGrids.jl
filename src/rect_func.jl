@@ -1,5 +1,5 @@
 """
-    rectgrid(xRes::ValidAngle; yRes::ValidAngle=xRes) -> Array{SimpleLatLon, 2}
+    rectgrid(xRes::ValidAngle; yRes::ValidAngle=xRes) -> Array{LatLon, 2}
 
 Create a rectangular grid of latitude and longitude points with a specified grid
 resolutions. The function validates the input resolutions to ensure they are
@@ -16,7 +16,7 @@ optional and defaults to `xRes` if not provided. This can be a real number \
 (interpreted as degrees) or a `ValidAngle`.
 
 ## Returns
-- A 2D array of `SimpleLatLon` objects representing the grid of latitude and \
+- A 2D array of `LatLon` objects representing the grid of latitude and \
 longitude points.
 """
 function rectgrid(xRes::ValidAngle; yRes::ValidAngle=xRes)
@@ -43,21 +43,21 @@ function rectgrid(xRes::ValidAngle; yRes::ValidAngle=xRes)
         end
     end
 
-    # Create the rectangular grid of elements SimpleLatLon
-    mat = [SimpleLatLon(x, y) for x in -90°:_xRes:90°, y in -180°:_yRes:(180°-_yRes+1e-10*°)]
+    # Create the rectangular grid of elements LatLon
+    mat = [LatLon(x, y) for x in -90°:_xRes:90°, y in -180°:_yRes:(180°-_yRes+1e-10*°)]
 
     return mat
 end
 
 """
-    vecgrid(gridRes::ValidAngle) -> Vector{SimpleLatLon}
+    vecgrid(gridRes::ValidAngle) -> Vector{LatLon}
 
 Generate a vector of latitude points from the equator to the North Pole with a
 specified resolution. The function validates the input resolution to ensure it
 is within the range of `-90°` to `90°`. If a negative resolution is provided, it
 is converted to a positive value with a warning. The resolution value is then
 used to create a vector of latitude points ranging from `0°` to `90°` (the North
-Pole). Each latitude point is represented as a `SimpleLatLon` object with a
+Pole). Each latitude point is represented as a `LatLon` object with a
 fixed longitude of `0°`.
 
 ## Arguments
@@ -65,7 +65,7 @@ fixed longitude of `0°`.
 be a real number (interpreted as degrees) or a `ValidAngle`.
 
 ## Returns
-- A vector of `SimpleLatLon` objects representing latitude points from the \
+- A vector of `LatLon` objects representing latitude points from the \
 equator (0°) to the North Pole (90°) with the specified resolution.
 """
 function vecgrid(gridRes::ValidAngle)
@@ -81,7 +81,7 @@ function vecgrid(gridRes::ValidAngle)
         end
     end
     # Create LAT vector
-    vec = map(x -> SimpleLatLon(x, 0°), 0°:_gridRes:90°) # LAT vector from 0° to 90°
+    vec = map(x -> LatLon(x, 0°), 0°:_gridRes:90°) # LAT vector from 0° to 90°
 
     return vec
 end

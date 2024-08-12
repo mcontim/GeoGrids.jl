@@ -36,9 +36,9 @@ function CountriesBorders.extract_countries(r::GeoRegion)
 end
 
 """
-    _wrap_latlon(lat::Number, lon::Number)
+    _wrap_LatLon(lat::Number, lon::Number)
 
-The `_wrap_latlon` function normalizes and wraps geographic coordinates,
+The `_wrap_LatLon` function normalizes and wraps geographic coordinates,
 latitude (`lat`) and longitude (`lon`). It ensures that the latitude is within
 the range [-90, 90] degrees and the longitude is within the range [-180, 180)
 degrees. This function is useful for handling geographic data where coordinates
@@ -54,7 +54,7 @@ in degrees.
 - `Tuple{Number, Number}`: A tuple `(lat, lon)` in degrees where `lat` is in the \
 range [-90, 90] and `lon` is in the range [-180, 180).
 """
-function _wrap_latlon(lat::Number, lon::Number)
+function _wrap_LatLon(lat::Number, lon::Number)
     # Normalize lat to the range [-180, 180)
     lat = rem(lat, 360, RoundNearest)
     lon = rem(lon, 360, RoundNearest)
@@ -126,7 +126,7 @@ function _add_angular_offset(inputθϕ, offsetθϕ)
     θ = acos(v[3]/r)
     ϕ = atan(v[2], v[1])
     
-    return (θ=θ, ϕ=ϕ) # [deg]
+    return (θ=θ, ϕ=ϕ) # [deg] ALBERTO: ?? Is it deg though? as the acos and atan return values in radians
 end
 
 # """

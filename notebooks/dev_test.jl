@@ -96,8 +96,8 @@ end
 begin
 	const test_pair = (;admin="Spain")
 	polyVec = [
-		PolyRegion(;domain=[SimpleLatLon(-5,-5), SimpleLatLon(5,-5), SimpleLatLon(5,10), SimpleLatLon(-5,10)]),
-		PolyRegion(;domain=[SimpleLatLon(60,-5), SimpleLatLon(80,0), SimpleLatLon(80,10), SimpleLatLon(60,15)])
+		PolyRegion(;domain=[LatLon(-5,-5), LatLon(5,-5), LatLon(5,10), LatLon(-5,10)]),
+		PolyRegion(;domain=[LatLon(60,-5), LatLon(80,0), LatLon(80,10), LatLon(60,15)])
 	]
 	const polyReg = polyVec[2]
 end
@@ -166,7 +166,7 @@ let
 end
 
 # ╔═╡ d12aece5-8625-4667-9f65-6588f63849c4
-function pattern_distance(pattern::AbstractVector{<:SimpleLatLon})
+function pattern_distance(pattern::AbstractVector{<:LatLon})
 	mindist = []
 	avgdist = []
 	np = length(pattern)

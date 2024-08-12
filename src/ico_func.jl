@@ -11,7 +11,7 @@ built with the Fibonacci Spiral method.
 - `type`: `:lla` or `:point`. Output type either `LLA` or `Point2`
 
 ## Output:
-- `out`: an Array{SimpleLatLon} of points in the icosahedral grid.
+- `out`: an Array{LatLon} of points in the icosahedral grid.
 """
 function icogrid(; N::Union{Int,Nothing}=nothing, sepAng::Union{ValidAngle,Nothing}=nothing)
     if isnothing(sepAng) && !isnothing(N)
@@ -40,7 +40,7 @@ Consider using `°` (or `rad`) from `Unitful` if you want to pass numbers in deg
     end
 
     # Unit Conversion	
-	out = map(x -> SimpleLatLon(rad2deg.(x)...), vec)
+	out = map(x -> LatLon(rad2deg.(x)...), vec)
 
     return out
 end

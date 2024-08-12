@@ -3,6 +3,7 @@ module GeoGrids
 using AngleBetweenVectors
 using CoordRefSystems
 using CountriesBorders
+using CountriesBorders: borders, polyareas
 using Dictionaries
 using LinearAlgebra
 using Meshes
@@ -27,6 +28,6 @@ export icogrid, rectgrid, vecgrid,
 extract_countries, in, filter_points, group_by_domain,
 gen_hex_lattice, generate_tesselation, my_tesselate, my_tesselate_circle, my_tesselate_hexagon
 
-export °, rad, SimpleLatLon, PolyArea, SVector
+export °, rad, LatLon, PolyArea, SVector
 
 end # module GeoGrids 

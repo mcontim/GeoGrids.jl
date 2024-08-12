@@ -7,15 +7,15 @@ end
     @test GeoGrids._icogrid(100; coord=:cart) isa Vector{SVector{3,Float64}}
     @test GeoGrids._icogrid(100; coord=:sphe) isa Vector{SVector{2,Float64}}
 
-    @test icogrid(N=100) isa Vector{<:SimpleLatLon}
+    @test icogrid(N=100) isa Vector{<:LatLon}
 
     a = icogrid(sepAng=5)
     b = icogrid(sepAng=5°)
     c = icogrid(sepAng=deg2rad(5) * rad)
 
-    @test a isa Vector{<:SimpleLatLon}
-    @test b isa Vector{<:SimpleLatLon}
-    @test c isa Vector{<:SimpleLatLon}
+    @test a isa Vector{<:LatLon}
+    @test b isa Vector{<:LatLon}
+    @test c isa Vector{<:LatLon}
     @test length(a) == 1260
     @test length(b) == 1260
     @test length(c) == 1260
@@ -39,12 +39,12 @@ Consider using `°` (or `rad`) from `Unitful` if you want to pass numbers in deg
 end
 
 @testitem "Mesh Grid Functions" tags = [:general] begin
-    @test rectgrid(5) isa Matrix{<:SimpleLatLon}
-    @test rectgrid(5°) isa Matrix{<:SimpleLatLon}
-    @test rectgrid(deg2rad(5) * rad) isa Matrix{<:SimpleLatLon}
-    @test rectgrid(5; yRes=3) isa Matrix{<:SimpleLatLon}
-    @test rectgrid(5°; yRes=3°) isa Matrix{<:SimpleLatLon}
-    @test rectgrid(deg2rad(5) * rad; yRes=deg2rad(3) * rad) isa Matrix{<:SimpleLatLon}
+    @test rectgrid(5) isa Matrix{<:LatLon}
+    @test rectgrid(5°) isa Matrix{<:LatLon}
+    @test rectgrid(deg2rad(5) * rad) isa Matrix{<:LatLon}
+    @test rectgrid(5; yRes=3) isa Matrix{<:LatLon}
+    @test rectgrid(5°; yRes=3°) isa Matrix{<:LatLon}
+    @test rectgrid(deg2rad(5) * rad; yRes=deg2rad(3) * rad) isa Matrix{<:LatLon}
 
     @test_throws "Resolution of x is too large, it must be smaller than 180°..." rectgrid(181°)
     @test_throws "Resolution of y is too large, it must be smaller than 180°..." rectgrid(5°; yRes=181°)
@@ -86,9 +86,9 @@ end
 end
 
 @testitem "Vec Grid Functions" tags = [:general] begin
-    @test vecgrid(5) isa Vector{<:SimpleLatLon}
-    @test vecgrid(5°) isa Vector{<:SimpleLatLon}
-    @test vecgrid(deg2rad(5) * rad) isa Vector{<:SimpleLatLon}
+    @test vecgrid(5) isa Vector{<:LatLon}
+    @test vecgrid(5°) isa Vector{<:LatLon}
+    @test vecgrid(deg2rad(5) * rad) isa Vector{<:LatLon}
 
     @test_throws "Resolution of grid is too large, it must be smaller than 90°..." vecgrid(91)
     @test_logs (:warn, "Input gridRes is negative, it will be converted to positive...") vecgrid(-deg2rad(5) * rad)

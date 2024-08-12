@@ -1,29 +1,29 @@
 """
-    Base.in(point::SimpleLatLon, domain::Union{GeoRegion, PolyRegion}) -> Bool
-    Base.in(point::SimpleLatLon, domain::LatBeltRegion) -> Bool
-    Base.in(point::SimpleLatLon, domain::Array{<:AbstractRegion}) -> Bool
+    Base.in(point::LatLon, domain::Union{GeoRegion, PolyRegion}) -> Bool
+    Base.in(point::LatLon, domain::LatBeltRegion) -> Bool
+    Base.in(point::LatLon, domain::Array{<:AbstractRegion}) -> Bool
 
 Check if a geographical point is within a specified region.
 
 ## Arguments
-- `point::SimpleLatLon`: The geographical point to be checked.
+- `point::LatLon`: The geographical point to be checked.
 - `domain::Union{GeoRegion, PolyRegion}`: The region in which the point is to be \
 checked. The region is represented by the `domain` attribute.
 
 ## Returns
 - `Bool`: Returns `true` if the point is within the region, `false` otherwise.
 """
-Base.in(point::SimpleLatLon, domain::Union{GeoRegion,PolyRegion}) = Base.in(point, domain.domain)
-Base.in(point::SimpleLatLon, domain::LatBeltRegion) = domain.latLim[1] < point.lat < domain.latLim[2]
+Base.in(point::LatLon, domain::Union{GeoRegion,PolyRegion}) = Base.in(point, domain.domain)
+Base.in(point::LatLon, domain::LatBeltRegion) = domain.latLim[1] < point.lat < domain.latLim[2]
 
 """
-    filter_points(points::Array{<:SimpleLatLon}, domain::Union{GeoRegion, PolyRegion, LatBeltRegion}) -> Vector{Input Type}
+    filter_points(points::Array{<:LatLon}, domain::Union{GeoRegion, PolyRegion, LatBeltRegion}) -> Vector{Input Type}
     
 Filters a list of points based on whether they fall within a specified
 geographical domain.
 
 ## Arguments
-- `points`: An array of points. The points are `SimpleLatLon`.
+- `points`: An array of points. The points are `LatLon`.
 - `domain`: A geographical domain which can be of type `GeoRegion` or \
 `PolyRegion`, in alternative a `Meshes.Domain` of type `GeometrySet` or \
 `PolyArea`.
@@ -34,13 +34,13 @@ indices of the filtered points (wrt the input).
 - A vector of points that fall within the specified domain, subsection of the \
 input vector.
 """
-function filter_points(points::Array{<:SimpleLatLon}, domain::Union{GeoRegion,PolyRegion,LatBeltRegion})
+function filter_points(points::Array{<:LatLon}, domain::Union{GeoRegion,PolyRegion,LatBeltRegion})
     filtered = filter(x -> in(x, domain), points)
 
     return filtered
 end
 
-function filter_points(points::Array{<:SimpleLatLon}, domain::Union{GeoRegion,PolyRegion,LatBeltRegion}, ::ExtraOutput)
+function filter_points(points::Array{<:LatLon}, domain::Union{GeoRegion,PolyRegion,LatBeltRegion}, ::ExtraOutput)
     # filt = filter(x -> in(x, domain), points)
     indices = findall(x -> in(x, domain), points)
 
@@ -48,12 +48,12 @@ function filter_points(points::Array{<:SimpleLatLon}, domain::Union{GeoRegion,Po
 end
 
 """
-    group_by_domain(points::Array{<:SimpleLatLon}, domains::Array; flagUnique=true)
+    group_by_domain(points::Array{<:LatLon}, domains::Array; flagUnique=true)
 
 Group points by regions defined in the `domains` array.
 
 ## Arguments
-- `points`: An array of points. Points are of type `SimpleLatLon`.
+- `points`: An array of points. Points are of type `LatLon`.
 - `domains`: An array of domains which can contain `GeoRegion`, `PolyRegion`, \
 `LatBeltRegion` or a mix of the three. Each domain should have a `regionName` \
 attribute.
@@ -74,7 +74,7 @@ assigned to regions in the order they appear in the `domains` array.
 - The function uses the `in` function to determine if a point belongs to a \
 region.
 """
-function group_by_domain(points::Array{<:SimpleLatLon}, domains::Array; flagUnique=true)
+function group_by_domain(points::Array{<:LatLon}, domains::Array; flagUnique=true)
     # Check region names validity
     names = map(x -> x.regionName, domains)
     length(unique(names)) == length(names) || error("The region names passed to group_by must be unique...")

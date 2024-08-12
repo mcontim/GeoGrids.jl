@@ -10,7 +10,7 @@
     @test plot_geo_points(rectgrid(5°); camera=:threedim) isa Plot
     
     # Single Point
-    @test plot_geo_points(SimpleLatLon(10,10); camera=:threedim) isa Plot
+    @test plot_geo_points(LatLon(10,10); camera=:threedim) isa Plot
     @test plot_geo_points((10,10)) isa Plot
     @test plot_geo_points([10,10]) isa Plot
 end
