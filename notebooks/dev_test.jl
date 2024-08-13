@@ -1,8 +1,6 @@
 ### A Pluto.jl notebook ###
 # v0.19.42
 
-#> custom_attrs = ["hide-enabled"]
-
 using Markdown
 using InteractiveUtils
 
@@ -27,6 +25,11 @@ end
 
 # ╔═╡ 069444e1-4e89-4f4f-ae2f-f5fb3131e398
 ExtendedTableOfContents()
+
+# ╔═╡ 0db4a84d-f4cf-4cea-8e6b-5b0480d3f6ff
+md"""
+# New Tests
+"""
 
 # ╔═╡ 3ce21344-e0ea-4e41-b78e-cf92dc9ac2e7
 md"""
@@ -90,6 +93,18 @@ md"""
 @fromparent begin
 	import ^: * # to eport all functions from parent package
 	import >.CoordRefSystems
+end
+
+# ╔═╡ 84eb4761-4d4f-455d-9cea-22da784bbacd
+aa=CountriesBorders.extract_countries(;admin="Italy")
+
+# ╔═╡ 8b87358e-e3ec-4972-a13b-c7025b75332c
+aa.domain[aa.inds]
+
+# ╔═╡ 527bd30f-09e8-4b71-bfd0-321a8473d38b
+let
+	reg = GeoRegion(; regionName="Tassellation", admin="Spain")
+	extract_countries(reg)
 end
 
 # ╔═╡ a34e4ff6-51f9-4d6b-af28-5e856adea1ed
@@ -1572,7 +1587,11 @@ version = "17.4.0+2"
 
 # ╔═╡ Cell order:
 # ╠═069444e1-4e89-4f4f-ae2f-f5fb3131e398
-# ╠═3ce21344-e0ea-4e41-b78e-cf92dc9ac2e7
+# ╟─0db4a84d-f4cf-4cea-8e6b-5b0480d3f6ff
+# ╠═84eb4761-4d4f-455d-9cea-22da784bbacd
+# ╠═8b87358e-e3ec-4972-a13b-c7025b75332c
+# ╠═527bd30f-09e8-4b71-bfd0-321a8473d38b
+# ╟─3ce21344-e0ea-4e41-b78e-cf92dc9ac2e7
 # ╠═a34e4ff6-51f9-4d6b-af28-5e856adea1ed
 # ╟─222fb774-1693-4b3c-b2ef-5fd38eca773c
 # ╟─ca4efc79-7cf3-46de-b03e-643c29254818

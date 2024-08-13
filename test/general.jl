@@ -60,25 +60,25 @@ end
     @test length(c) == 2664
 
     @test a[1, 1].lat ≈ -90°
-    @test a[1, 1].lon ≈ -180°
+    @test a[1, 1].lon ≈ -175°
     @test a[end, end].lat ≈ 90°
-    @test a[end, end].lon ≈ 175°
+    @test a[end, end].lon ≈ 180°
     @test abs(a[1, 2].lon - a[1, 1].lon) ≈ 5°
     @test abs(a[1, 2].lat - a[1, 1].lat) ≈ 0°
     @test abs(a[2, 1].lon - a[1, 1].lon) ≈ 0°
     @test abs(a[2, 1].lat - a[1, 1].lat) ≈ 5°
     @test b[1, 1].lat ≈ -90°
-    @test b[1, 1].lon ≈ -180°
+    @test b[1, 1].lon ≈ -175°
     @test b[end, end].lat ≈ 90°
-    @test b[end, end].lon ≈ 175°
+    @test b[end, end].lon ≈ 180°
     @test abs(b[1, 2].lon - b[1, 1].lon) ≈ 5°
     @test abs(b[1, 2].lat - b[1, 1].lat) ≈ 0°
     @test abs(b[2, 1].lon - b[1, 1].lon) ≈ 0°
     @test abs(b[2, 1].lat - b[1, 1].lat) ≈ 5°
     @test c[1, 1].lat ≈ -90°
-    @test c[1, 1].lon ≈ -180°
+    @test c[1, 1].lon ≈ -175°
     @test c[end, end].lat ≈ 90°
-    @test c[end, end].lon ≈ 175°
+    @test c[end, end].lon ≈ 180°
     @test abs(c[1, 2].lon - c[1, 1].lon) ≈ 5°
     @test abs(c[1, 2].lat - c[1, 1].lat) ≈ 0°
     @test abs(c[2, 1].lon - c[1, 1].lon) ≈ 0°

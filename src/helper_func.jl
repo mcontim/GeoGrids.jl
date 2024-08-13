@@ -22,18 +22,19 @@ an instance of the `GeoRegion` type.
 - The function returns the result of \
 `CountriesBorders.extract_countries(;kwargs...)`.
 """
-function CountriesBorders.extract_countries(r::GeoRegion)
-    # Overload of CountriesBorders.extract_countries taking GeoRegion as input
-    names = setdiff(fieldnames(GeoRegion), (:regionName, :domain))
+# function CountriesBorders.extract_countries(r::GeoRegion)
+#     # Overload of CountriesBorders.extract_countries taking GeoRegion as input
+#     names = setdiff(fieldnames(GeoRegion), (:regionName, :domain))
 
-    all_pairs = map(names) do n
-        n => getfield(r, n)
-    end
+#     all_pairs = map(names) do n
+#         n => getfield(r, n)
+#     end
 
-    kwargs = NamedTuple(filter(x -> !isempty(x[2]), all_pairs))
+#     kwargs = NamedTuple(filter(x -> !isempty(x[2]), all_pairs))
 
-    return CountriesBorders.extract_countries(; kwargs...)
-end
+#     return CountriesBorders.extract_countries(; kwargs...)
+# end
+CountriesBorders.extract_countries(r::GeoRegion) = r.domain
 
 """
     _wrap_LatLon(lat::Number, lon::Number)
