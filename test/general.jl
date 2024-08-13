@@ -20,18 +20,18 @@ end
     @test length(b) == 1260
     @test length(c) == 1260
 
-    @test a[1].lat ≈ 87.7171f0°
-    @test a[1].lon ≈ 0.0f0°
-    @test a[end].lat ≈ -87.7171f0°
-    @test a[end].lon ≈ 37.7251f0°
-    @test b[1].lat ≈ 87.7171f0°
-    @test b[1].lon ≈ 0.0f0°
-    @test b[end].lat ≈ -87.7171f0°
-    @test b[end].lon ≈ 37.7251f0°
-    @test c[1].lat ≈ 87.7171f0°
-    @test c[1].lon ≈ 0.0f0°
-    @test c[end].lat ≈ -87.7171f0°
-    @test c[end].lon ≈ 37.7251f0°
+    @test abs(a[1].lat - 87.7171°) < 1e-4
+    @test abs(a[1].lon - 0.0°) < 1e-4
+    @test abs(a[end].lat - -87.7171°) < 1e-4
+    @test abs(a[end].lon - 37.7251°) < 1e-4
+    @test abs(b[1].lat - 87.7171°) < 1e-4
+    @test abs(b[1].lon - 0.0°) < 1e-4
+    @test abs(b[end].lat - -87.7171°) < 1e-4
+    @test abs(b[end].lon - 37.7251°) < 1e-4
+    @test abs(c[1].lat - 87.7171°) < 1e-4
+    @test abs(c[1].lon - 0.0°) < 1e-4
+    @test abs(c[end].lat - -87.7171°) < 1e-4
+    @test abs(c[end].lon - 37.7251°) < 1e-4
 
     @test_logs (:warn, "Input sepAng is negative, it will be converted to positive...") icogrid(sepAng=-5°)
     @test_throws "The sepAng provided as numbers must be expressed in radians and satisfy -360° ≤ x ≤ 360°. 

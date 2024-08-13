@@ -44,7 +44,7 @@ function rectgrid(xRes::ValidAngle; yRes::ValidAngle=xRes)
     end
 
     # Create the rectangular grid of elements LatLon
-    mat = [LatLon(x, y) for x in -90°:_xRes:90°, y in -180°:_yRes:(180°-_yRes+1e-10*°)]
+    mat = [LatLon(x, y) for x in -90°:_xRes:90°, y in (-180°:_yRes:180°)[2:end]]
 
     return mat
 end
