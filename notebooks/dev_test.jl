@@ -1,6 +1,8 @@
 ### A Pluto.jl notebook ###
 # v0.19.42
 
+#> custom_attrs = ["hide-enabled"]
+
 using Markdown
 using InteractiveUtils
 
