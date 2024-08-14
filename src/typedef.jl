@@ -27,12 +27,24 @@ function GeoRegion(; regionName="region_name", continent="", subregion="", admin
     GeoRegion(regionName, continent, subregion, admin, domain)
 end
 
-"Type of polygonal region based on PolyArea."
-mutable struct PolyRegion <: AbstractRegion
-    regionName::String
-    domain::PolyArea
+struct PolyBorder{T} <: Geometry{🌐,LATLON{T}}
+    "The borders in LatLon CRS"
+    latlon::POLY_LATLON{T}
+    "The borders in Cartesian2D CRS"
+    cart::POLY_CART{T}
+
+    function PolyBorder(latlon::POLY_LATLON{T}) where {T}
+        cart = cartesian_geometry(latlon)
+        new{T}(latlon, cart)
+    end
 end
-PolyRegion(regionName, domain::Vector{<:LatLon}) = PolyRegion(regionName, PolyArea(map(Point, domain)))
+
+"Type of polygonal region based on PolyArea."
+mutable struct PolyRegion{T} <: AbstractRegion
+    regionName::String
+    domain::PolyBorder{T}
+end
+PolyRegion(regionName, domain::Vector{<:LatLon}) = PolyRegion(regionName, PolyBorder(PolyArea(map(Point, domain))))
 PolyRegion(; regionName::String="region_name", domain) = PolyRegion(regionName, domain)
 
 "Type of region representinga a latitude belt region."

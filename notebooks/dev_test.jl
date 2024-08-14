@@ -1,5 +1,5 @@
 ### A Pluto.jl notebook ###
-# v0.19.42
+# v0.19.45
 
 #> custom_attrs = ["hide-enabled"]
 
@@ -97,17 +97,20 @@ md"""
 	import >.CoordRefSystems
 end
 
-# ╔═╡ 84eb4761-4d4f-455d-9cea-22da784bbacd
-aa=CountriesBorders.extract_countries(;admin="Italy")
+# ╔═╡ a53f762a-97ea-4f56-aa26-fa8aecb95ab8
+poly = PolyRegion("POLY", [LatLon(10°, -5°), LatLon(10°, 15°), LatLon(27°, 15°), LatLon(27°, -5°)])
 
-# ╔═╡ 8b87358e-e3ec-4972-a13b-c7025b75332c
-aa.domain[aa.inds]
+# ╔═╡ 107cb01c-de44-4347-a4b3-c8095d35e908
+sample_in = [LatLon(14°, 1°), LatLon(26.9°, -4.9°), LatLon(10.1°, 14.9°)]
 
-# ╔═╡ 527bd30f-09e8-4b71-bfd0-321a8473d38b
-let
-	reg = GeoRegion(; regionName="Tassellation", admin="Spain")
-	extract_countries(reg)
-end
+# ╔═╡ 881eb9a1-6f64-48d2-8fd3-55358d5ecbad
+in(sample_in[1],poly)
+
+# ╔═╡ 624cdf06-91fd-4b2b-80a0-94e7d05a8a79
+borders(poly.domain)
+
+# ╔═╡ a69b03c1-e33e-4744-a8dc-c743e3c1b0de
+borders(poly)
 
 # ╔═╡ a34e4ff6-51f9-4d6b-af28-5e856adea1ed
 begin
@@ -1590,9 +1593,11 @@ version = "17.4.0+2"
 # ╔═╡ Cell order:
 # ╠═069444e1-4e89-4f4f-ae2f-f5fb3131e398
 # ╟─0db4a84d-f4cf-4cea-8e6b-5b0480d3f6ff
-# ╠═84eb4761-4d4f-455d-9cea-22da784bbacd
-# ╠═8b87358e-e3ec-4972-a13b-c7025b75332c
-# ╠═527bd30f-09e8-4b71-bfd0-321a8473d38b
+# ╠═a53f762a-97ea-4f56-aa26-fa8aecb95ab8
+# ╠═107cb01c-de44-4347-a4b3-c8095d35e908
+# ╠═881eb9a1-6f64-48d2-8fd3-55358d5ecbad
+# ╠═624cdf06-91fd-4b2b-80a0-94e7d05a8a79
+# ╠═a69b03c1-e33e-4744-a8dc-c743e3c1b0de
 # ╟─3ce21344-e0ea-4e41-b78e-cf92dc9ac2e7
 # ╠═a34e4ff6-51f9-4d6b-af28-5e856adea1ed
 # ╟─222fb774-1693-4b3c-b2ef-5fd38eca773c

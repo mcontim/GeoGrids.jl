@@ -1,22 +1,4 @@
 """
-    Base.in(point::LatLon, domain::Union{GeoRegion, PolyRegion}) -> Bool
-    Base.in(point::LatLon, domain::LatBeltRegion) -> Bool
-    Base.in(point::LatLon, domain::Array{<:AbstractRegion}) -> Bool
-
-Check if a geographical point is within a specified region.
-
-## Arguments
-- `point::LatLon`: The geographical point to be checked.
-- `domain::Union{GeoRegion, PolyRegion}`: The region in which the point is to be \
-checked. The region is represented by the `domain` attribute.
-
-## Returns
-- `Bool`: Returns `true` if the point is within the region, `false` otherwise.
-"""
-Base.in(point::LatLon, domain::Union{GeoRegion,PolyRegion}) = Base.in(point, domain.domain)
-Base.in(point::LatLon, domain::LatBeltRegion) = domain.latLim[1] < point.lat < domain.latLim[2]
-
-"""
     filter_points(points::Array{<:LatLon}, domain::Union{GeoRegion, PolyRegion, LatBeltRegion}) -> Vector{Input Type}
     
 Filters a list of points based on whether they fall within a specified
