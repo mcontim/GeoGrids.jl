@@ -38,3 +38,19 @@ Base.in(p::LatLon, pb::PolyBorder) = in(Point(LatLon{WGS84Latest,Deg{Float32}}(p
 Base.in(p::LatLon, pr::PolyRegion) = in(p, pr.domain)
 
 Base.in(point::LatLon, domain::LatBeltRegion) = domain.latLim[1] < point.lat < domain.latLim[2]
+
+
+## Centroid
+# Define ad-hoc methods for GeoRegion - using centroid definition of CountriesBorders.jl
+Meshes.centroid(crs::Type{<:Union{LatLon, Cartesian}}, d::GeoRegion) = centroid(crs, d.domain) # Fallback on all the definitions in CountriesBorders.jl for CountryBorder
+Meshes.centroid(d::GeoRegion) = centroid(Cartesian, d)
+
+# Define ad-hoc methods for PolyRegion - using centroid definition of Meshes.jl
+Meshes.centroid(::Type{Cartesian}, d::PolyRegion) = centroid(d.domain.cart)
+function Meshes.centroid(::Type{LatLon}, d::PolyRegion)
+    c = centroid(d.domain.cart)
+    lat = ustrip(c.coords.y) |> Deg # lat is Y
+    lon = ustrip(c.coords.x) |> Deg # lon is X
+    LatLon{WGS84Latest}(lat, lon) |> Point
+end
+Meshes.centroid(d::PolyRegion) = centroid(Cartesian, d)

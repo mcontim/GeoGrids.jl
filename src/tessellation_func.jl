@@ -210,11 +210,6 @@ end
 #     return _hex_tesselation_centroids(origin, radius; direction=type.direction, refRadius, kwargs_lattice...)
 # end
 
-function _generate_tesselation(region::PolyRegion, radius::Number, type::HEX; refRadius::Number=constants.Re_mean, kwargs_lattice...)
-    origin = centroid(region.domain)
-    return _hex_tesselation_centroids(origin, radius; direction=type.direction, refRadius, kwargs_lattice...)
-end
-
 """
     generate_tesselation(region::Union{GeoRegion, PolyRegion}, radius::Number, type::HEX; refRadius::Number=constants.Re_mean, kwargs_lattice...) -> AbstractVector{<:LatLon}
     generate_tesselation(region::Union{GeoRegion, PolyRegion}, radius::Number, type::HEX, ::ExtraOutput; refRadius::Number=constants.Re_mean, kwargs_lattice...) -> AbstractVector{<:LatLon}, AbstractVector{<:AbstractVector{<:LatLon}}
@@ -253,7 +248,8 @@ See also: [`gen_hex_lattice`](@ref), [`_generate_tesselation`](@ref),
 """
 function generate_tesselation(region::Union{GeoRegion,PolyRegion}, radius::Number, type::HEX; refRadius::Number=constants.Re_mean, kwargs_lattice...)
     # Generate the tassellation centroids.
-    centroids = _generate_tesselation(region, radius, type; refRadius, kwargs_lattice...)
+    origin = centroid(region.domain)
+    centroids = _hex_tesselation_centroids(origin, radius; direction=type.direction, refRadius, kwargs_lattice...)
 
     # Filter centroids in the region.
     return filter_points(centroids, region)
@@ -261,7 +257,8 @@ end
 
 function generate_tesselation(region::Union{GeoRegion,PolyRegion}, radius::Number, type::HEX, ::ExtraOutput; refRadius::Number=constants.Re_mean, kwargs_lattice...)
     # Generate the tassellation centroids.
-    centroids = _generate_tesselation(region, radius, type; refRadius, kwargs_lattice...)
+    origin = centroid(region.domain)
+    centroids = _hex_tesselation_centroids(origin, radius; direction=type.direction, refRadius, kwargs_lattice...)
 
     if type.pattern == :hex # Hexagonal pattern
         # Create the tasselation from all the centroids.

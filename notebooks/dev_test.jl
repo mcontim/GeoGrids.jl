@@ -97,26 +97,41 @@ md"""
 	import >.CoordRefSystems
 end
 
-# ╔═╡ ea9e975f-39f1-40f8-b05b-78dfa2ab2367
-sample_ita = [LatLon(43.727878°, 12.843441°), LatLon(43.714933°, 10.399326°), LatLon(37.485829°, 14.328285°), LatLon(39.330460°, 8.430780°), LatLon(45.918388°, 10.886654°)]
+# ╔═╡ c4efb059-4e1a-4ae0-841a-2081e0c3c3f3
+plot_geo_points(icogrid(sepAng=5°))
 
-# ╔═╡ 2b7a5605-3273-475f-8a08-410526c84f32
-ita = GeoRegion(regionName="ITA", admin="Italy;Spain")
+# ╔═╡ 9ff196bb-07db-46b3-af6a-741fe9384258
+reg = GeoRegion(; regionName="Tassellation", admin="Spain")
 
-# ╔═╡ a21ccd1a-ccab-4cae-881f-525b7970e753
-sample_ita[1] in ita
+# ╔═╡ b466ccfd-5904-48aa-ac50-6eefb537277c
+reg.domain[1].cart
 
-# ╔═╡ fb8eb0c3-a0b8-4e3e-a472-968c46c44744
-map(x -> x.latlon, ita.domain)
+# ╔═╡ 0eb8344e-7096-4a07-b833-32c935116c1a
+centroid(reg.domain)
 
-# ╔═╡ db1c873b-a459-4cff-b317-01f731de97b1
-map(x -> CountriesBorders.borders(x), ita.domain)
+# ╔═╡ 1f594fab-f434-4857-a47e-7cee1a97137a
+centroid(Cartesian,reg.domain)
 
-# ╔═╡ bf809465-48ef-4d49-8eca-0431a912d257
-borders(ita)
+# ╔═╡ 1fcbb70d-6f1a-42da-b177-7d76b0f390c0
+centroid(reg)
 
-# ╔═╡ 47b62b08-679f-4eba-ba8b-89c10e9cae8a
+# ╔═╡ 1c2f3790-3c25-4e7b-85b9-0c17a413dd86
+centroid(reg)
+
+# ╔═╡ 9509dd71-78c8-4698-a6d0-5d150f9558dd
 poly = PolyRegion("POLY", [LatLon(10°, -5°), LatLon(10°, 15°), LatLon(27°, 15°), LatLon(27°, -5°)])
+
+# ╔═╡ 240bdbe4-a0a5-4a8e-a572-6b58baa6f171
+poly.domain
+
+# ╔═╡ 32ef09fc-0c2c-4db0-a22a-f93478f010a7
+centroid(poly.domain.cart)
+
+# ╔═╡ d1f5c281-e320-4a28-a580-b194332b2b79
+centroid(LatLon, poly)
+
+# ╔═╡ ecdb3833-6497-4de2-ba20-63b56cbd8991
+centroid(Cartesian, poly)
 
 # ╔═╡ a34e4ff6-51f9-4d6b-af28-5e856adea1ed
 begin
@@ -1599,13 +1614,18 @@ version = "17.4.0+2"
 # ╔═╡ Cell order:
 # ╠═069444e1-4e89-4f4f-ae2f-f5fb3131e398
 # ╟─0db4a84d-f4cf-4cea-8e6b-5b0480d3f6ff
-# ╠═ea9e975f-39f1-40f8-b05b-78dfa2ab2367
-# ╠═2b7a5605-3273-475f-8a08-410526c84f32
-# ╠═a21ccd1a-ccab-4cae-881f-525b7970e753
-# ╠═db1c873b-a459-4cff-b317-01f731de97b1
-# ╠═bf809465-48ef-4d49-8eca-0431a912d257
-# ╠═fb8eb0c3-a0b8-4e3e-a472-968c46c44744
-# ╠═47b62b08-679f-4eba-ba8b-89c10e9cae8a
+# ╠═c4efb059-4e1a-4ae0-841a-2081e0c3c3f3
+# ╠═9ff196bb-07db-46b3-af6a-741fe9384258
+# ╠═0eb8344e-7096-4a07-b833-32c935116c1a
+# ╠═1f594fab-f434-4857-a47e-7cee1a97137a
+# ╠═1fcbb70d-6f1a-42da-b177-7d76b0f390c0
+# ╠═1c2f3790-3c25-4e7b-85b9-0c17a413dd86
+# ╠═b466ccfd-5904-48aa-ac50-6eefb537277c
+# ╠═9509dd71-78c8-4698-a6d0-5d150f9558dd
+# ╠═32ef09fc-0c2c-4db0-a22a-f93478f010a7
+# ╠═d1f5c281-e320-4a28-a580-b194332b2b79
+# ╠═ecdb3833-6497-4de2-ba20-63b56cbd8991
+# ╠═240bdbe4-a0a5-4a8e-a572-6b58baa6f171
 # ╟─3ce21344-e0ea-4e41-b78e-cf92dc9ac2e7
 # ╠═a34e4ff6-51f9-4d6b-af28-5e856adea1ed
 # ╟─222fb774-1693-4b3c-b2ef-5fd38eca773c
