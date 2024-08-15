@@ -22,14 +22,15 @@ include("ico_func.jl")
 include("rect_func.jl")
 include("tessellation_func.jl")
 
-export GlobalRegion, GeoRegion, PolyRegion, LatBeltRegion, 
-ICO, HEX, H3
+export AbstractRegion, GlobalRegion, GeoRegion, PolyRegion, LatBeltRegion,
+    AbstractTiling, ICO, HEX, H3
 # UnitfulAngleType, UnitfulAngleQuantity, ValidAngle,
 
 export icogrid, rectgrid, vecgrid,
-extract_countries, in, filter_points, group_by_domain,
-gen_hex_lattice, generate_tesselation, my_tesselate, my_tesselate_circle, my_tesselate_hexagon
+    extract_countries, in, filter_points, group_by_domain,
+    gen_hex_lattice, generate_tesselation, my_tesselate, my_tesselate_circle, my_tesselate_hexagon,
+    borders
 
-export °, rad, LatLon, PolyArea, SVector
+export °, rad, LatLon, Cartesian, PolyArea, SVector
 
 end # module GeoGrids 

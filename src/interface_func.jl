@@ -1,4 +1,5 @@
 
+# Define borders for PolyRegion
 borders(::Type{LatLon}, pb::PolyBorder) = pb.latlon
 borders(::Type{Cartesian}, pb::PolyBorder) = pb.cart
 borders(pb::PolyBorder) = borders(LatLon, pb)

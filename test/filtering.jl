@@ -47,6 +47,13 @@ end
     @test filter_points(vcat(sample_in, sample_out), poly) == sample_in
 end
 
+@testitem "Test borders for PolyRegion" begin
+    poly = PolyRegion("POLY", [LatLon(10°, -5°), LatLon(10°, 15°), LatLon(27°, 15°), LatLon(27°, -5°)])
+    @test borders(poly) == poly.domain.latlon
+    @test borders(LatLon, poly) == poly.domain.latlon
+    @test borders(Cartesian, poly) == poly.domain.cart
+end
+
 @testitem "LatBeltRegion Test" tags = [:filtering] begin
     belt = LatBeltRegion(; regionName="test", latLim=(-60°, 60°))
     sample_in = [LatLon(14°, 1°), LatLon(26.9°, -65°), LatLon(10.1°, 70°)]
