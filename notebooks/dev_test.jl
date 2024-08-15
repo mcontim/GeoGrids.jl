@@ -97,35 +97,26 @@ md"""
 	import >.CoordRefSystems
 end
 
-# ╔═╡ a53f762a-97ea-4f56-aa26-fa8aecb95ab8
-poly = PolyRegion("POLY", [LatLon(10°, -5°), LatLon(10°, 15°), LatLon(27°, 15°), LatLon(27°, -5°)])
-
-# ╔═╡ 107cb01c-de44-4347-a4b3-c8095d35e908
-sample_in = [LatLon(14°, 1°), LatLon(26.9°, -4.9°), LatLon(10.1°, 14.9°)]
-
-# ╔═╡ 881eb9a1-6f64-48d2-8fd3-55358d5ecbad
-in(sample_in[1],poly)
-
-# ╔═╡ 624cdf06-91fd-4b2b-80a0-94e7d05a8a79
-borders(poly.domain)
-
-# ╔═╡ a69b03c1-e33e-4744-a8dc-c743e3c1b0de
-vertices(borders(poly))
-
-# ╔═╡ 061424c2-0291-4f6b-a1e1-f9eaffdb9fb1
-vertices(poly.domain.latlon)
-
-# ╔═╡ b92ed889-a6b2-4fd5-a518-4c0ad8786de3
-Point(LatLon(10,-5))
-
 # ╔═╡ ea9e975f-39f1-40f8-b05b-78dfa2ab2367
 sample_ita = [LatLon(43.727878°, 12.843441°), LatLon(43.714933°, 10.399326°), LatLon(37.485829°, 14.328285°), LatLon(39.330460°, 8.430780°), LatLon(45.918388°, 10.886654°)]
 
 # ╔═╡ 2b7a5605-3273-475f-8a08-410526c84f32
-ita = GeoRegion(regionName="ITA", admin="Italy")
+ita = GeoRegion(regionName="ITA", admin="Italy;Spain")
 
 # ╔═╡ a21ccd1a-ccab-4cae-881f-525b7970e753
 sample_ita[1] in ita
+
+# ╔═╡ fb8eb0c3-a0b8-4e3e-a472-968c46c44744
+map(x -> x.latlon, ita.domain)
+
+# ╔═╡ db1c873b-a459-4cff-b317-01f731de97b1
+map(x -> CountriesBorders.borders(x), ita.domain)
+
+# ╔═╡ bf809465-48ef-4d49-8eca-0431a912d257
+borders(ita)
+
+# ╔═╡ 47b62b08-679f-4eba-ba8b-89c10e9cae8a
+poly = PolyRegion("POLY", [LatLon(10°, -5°), LatLon(10°, 15°), LatLon(27°, 15°), LatLon(27°, -5°)])
 
 # ╔═╡ a34e4ff6-51f9-4d6b-af28-5e856adea1ed
 begin
@@ -1608,16 +1599,13 @@ version = "17.4.0+2"
 # ╔═╡ Cell order:
 # ╠═069444e1-4e89-4f4f-ae2f-f5fb3131e398
 # ╟─0db4a84d-f4cf-4cea-8e6b-5b0480d3f6ff
-# ╠═a53f762a-97ea-4f56-aa26-fa8aecb95ab8
-# ╠═107cb01c-de44-4347-a4b3-c8095d35e908
-# ╠═881eb9a1-6f64-48d2-8fd3-55358d5ecbad
-# ╠═624cdf06-91fd-4b2b-80a0-94e7d05a8a79
-# ╠═a69b03c1-e33e-4744-a8dc-c743e3c1b0de
-# ╠═061424c2-0291-4f6b-a1e1-f9eaffdb9fb1
-# ╠═b92ed889-a6b2-4fd5-a518-4c0ad8786de3
 # ╠═ea9e975f-39f1-40f8-b05b-78dfa2ab2367
 # ╠═2b7a5605-3273-475f-8a08-410526c84f32
 # ╠═a21ccd1a-ccab-4cae-881f-525b7970e753
+# ╠═db1c873b-a459-4cff-b317-01f731de97b1
+# ╠═bf809465-48ef-4d49-8eca-0431a912d257
+# ╠═fb8eb0c3-a0b8-4e3e-a472-968c46c44744
+# ╠═47b62b08-679f-4eba-ba8b-89c10e9cae8a
 # ╟─3ce21344-e0ea-4e41-b78e-cf92dc9ac2e7
 # ╠═a34e4ff6-51f9-4d6b-af28-5e856adea1ed
 # ╟─222fb774-1693-4b3c-b2ef-5fd38eca773c

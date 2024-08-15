@@ -25,6 +25,13 @@
     @test filter_points([LatLon(52.218550°, 4.420621°), LatLon(43.727878°, 12.843441°), LatLon(41.353144°, 2.167639°), LatLon(43.714933°, 10.399326°)], ita) == [LatLon(43.727878°, 12.843441°), LatLon(43.714933°, 10.399326°)]
 end
 
+@testitem "Test borders for GeoRegion" begin
+    reg = GeoRegion(regionName="ITA", admin="Italy;Spain")    
+    @test borders(reg) == map(x -> x.latlon, reg.domain)
+    @test borders(LatLon, reg) == map(x -> x.latlon, reg.domain)
+    @test borders(Cartesian, reg) == map(x -> x.cart, reg.domain)
+end
+
 @testitem "PolyRegion Test" tags = [:filtering] begin
     sample_in = [LatLon(14°, 1°), LatLon(26.9°, -4.9°), LatLon(10.1°, 14.9°)]
     sample_out = [LatLon(0°, 0°), LatLon(10°, -5.2°), LatLon(27°, 15.3°)]

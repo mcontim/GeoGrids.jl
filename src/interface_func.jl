@@ -9,6 +9,12 @@ function borders(::Type{T}, pr::PolyRegion) where {T}
 end
 borders(pr::PolyRegion) = borders(LatLon, pr)
 
+# Define borders for GeoRegion
+function borders(::Type{T}, gr::GeoRegion) where {T}
+    map(x -> CountriesBorders.borders(T, x), gr.domain)
+end
+borders(gr::GeoRegion) = map(x -> CountriesBorders.borders(LatLon, x), gr.domain)
+
 """
     Base.in(point::LatLon, domain::GeoRegion) -> Bool
     Base.in(point::LatLon, domain::PolyRegion) -> Bool
@@ -24,7 +30,7 @@ point is to be checked. The region is represented by the `domain` attribute.
 ## Returns
 - `Bool`: Returns `true` if the point is within the region, `false` otherwise.
 """
-Base.in(point::LatLon, domain::GeoRegion) = in(point, domain) # Fallback on Base.in for CountryBorder defined in CountriesBorders
+Base.in(point::LatLon, domain::GeoRegion) = in(point, domain.domain) # Fallback on Base.in for CountryBorder defined in CountriesBorders
 
 Base.in(p::Point{𝔼{2},<:Cartesian2D{WGS84Latest}}, pb::PolyBorder) = in(p, borders(Cartesian, pb))
 Base.in(p::Point{🌐,<:LatLon{WGS84Latest}}, pb::PolyBorder) = in(Meshes.flat(p), pb)
