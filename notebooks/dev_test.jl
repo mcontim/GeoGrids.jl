@@ -33,6 +33,12 @@ md"""
 # New Tests
 """
 
+# ╔═╡ b042041c-fa11-4e76-824f-8d5f57522c4b
+
+
+# ╔═╡ 0e5faffb-772f-4326-b81d-8912196147f9
+# testcenters(centers)
+
 # ╔═╡ 3ce21344-e0ea-4e41-b78e-cf92dc9ac2e7
 md"""
 # Definitions
@@ -109,15 +115,36 @@ end
 
 # ╔═╡ ce5dd648-6491-49a0-b63b-f749deffa613
 reg = GeoRegion(; regionName="Tassellation", test_pair...)
-	
-# centers = generate_tesselation(reg, 40000, HEX())
-# testcenters(centers)
+
+# ╔═╡ cee0416f-ffb8-4b97-9b53-32084c9e405f
+centers = generate_tesselation(reg, 40000, HEX())
+
+# ╔═╡ 7f4cfb5a-157a-46cb-a904-d6fce10ab607
+typeof(centers)
+
+# ╔═╡ 144da2f3-b8e3-4c6c-90bf-0c981babdacf
+centers isa Array{<:Union{LatLon, Point{🌐,<:LatLon{WGS84Latest}}}}
+
+# ╔═╡ 14c72b10-18c8-4dbb-ad9a-44c34d8c8c23
+Point(LatLon{WGS84Latest}(52.218550, 4.420621)) in reg 
+
+# ╔═╡ 02b770dd-1548-4f89-98cc-77fedc27c318
+centers[1] in reg
+
+# ╔═╡ d4076bee-3bb9-4222-839d-7e488ba75843
+map(x -> in(x, reg), centers)
+
+# ╔═╡ f541b096-2800-416e-b724-9b4864ef3a04
+in(centers[1], reg)
 
 # ╔═╡ 92b098e2-107b-44ce-a48e-16edfc6bb96b
 centroid(LatLon,reg)
 
 # ╔═╡ e1581b65-aead-49f9-9a7c-cd0a0eb3c11e
 centroid(Cartesian,reg)
+
+# ╔═╡ cff46667-3a45-4bea-8151-571db23e8a32
+ddd=coords(centroid(LatLon,reg))
 
 # ╔═╡ 3e38213c-0dcd-4737-b82d-e97103cb8e1d
 typeof(centroid(LatLon, polyReg))
@@ -1609,8 +1636,18 @@ version = "17.4.0+2"
 # ╠═069444e1-4e89-4f4f-ae2f-f5fb3131e398
 # ╟─0db4a84d-f4cf-4cea-8e6b-5b0480d3f6ff
 # ╠═ce5dd648-6491-49a0-b63b-f749deffa613
+# ╠═cee0416f-ffb8-4b97-9b53-32084c9e405f
+# ╠═14c72b10-18c8-4dbb-ad9a-44c34d8c8c23
+# ╠═02b770dd-1548-4f89-98cc-77fedc27c318
+# ╠═d4076bee-3bb9-4222-839d-7e488ba75843
+# ╠═f541b096-2800-416e-b724-9b4864ef3a04
+# ╠═7f4cfb5a-157a-46cb-a904-d6fce10ab607
+# ╠═144da2f3-b8e3-4c6c-90bf-0c981babdacf
+# ╠═b042041c-fa11-4e76-824f-8d5f57522c4b
+# ╠═0e5faffb-772f-4326-b81d-8912196147f9
 # ╠═92b098e2-107b-44ce-a48e-16edfc6bb96b
 # ╠═e1581b65-aead-49f9-9a7c-cd0a0eb3c11e
+# ╠═cff46667-3a45-4bea-8151-571db23e8a32
 # ╠═3e38213c-0dcd-4737-b82d-e97103cb8e1d
 # ╠═0a4f89b4-7cd9-46c2-96f5-767b00e27647
 # ╠═26ae5f4e-ddb5-4e4d-b92d-42ed89619162

@@ -1,3 +1,12 @@
+## Define Getters
+get_lat(p::Point{𝔼{2},<:Cartesian2D{WGS84Latest}}) = p.coords.lat
+get_lat(p::Point{🌐,<:LatLon{WGS84Latest}}) = p.coords.y |> ustrip |> Deg # LAT is Y
+get_lat(p::LatLon) = p.lat
+
+get_lon(p::Point{𝔼{2},<:Cartesian2D{WGS84Latest}}) = p.coords.lon
+get_lon(p::Point{🌐,<:LatLon{WGS84Latest}}) = p.coords.x |> ustrip |> Deg # LON is X
+get_lon(p::LatLon) = p.lon
+
 ## boders()
 # Define borders for PolyRegion
 borders(::Type{LatLon}, pb::PolyBorder) = pb.latlon
@@ -16,28 +25,21 @@ end
 borders(gr::GeoRegion) = map(x -> CountriesBorders.borders(LatLon, x), gr.domain)
 
 ## Base.in()
-"""
-    Base.in(point::LatLon, domain::GeoRegion) -> Bool
-    Base.in(point::LatLon, domain::PolyRegion) -> Bool
-    Base.in(point::LatLon, domain::LatBeltRegion) -> Bool
-
-Check if a geographical point is within a specified region.
-
-## Arguments
-- `point::LatLon`: The geographical point to be checked.
-- `domain::Union{GeoRegion, PolyRegion, LatBeltRegion}`: The region in which the \
-point is to be checked. The region is represented by the `domain` attribute.
-
-## Returns
-- `Bool`: Returns `true` if the point is within the region, `false` otherwise.
-"""
-Base.in(point::LatLon, domain::GeoRegion) = in(point, domain.domain) # Fallback on Base.in for CountryBorder defined in CountriesBorders
+# Fallback on Base.in for CountryBorder defined in CountriesBorders
+Base.in(p::Point{𝔼{2},<:Cartesian2D{WGS84Latest}}, gr::GeoRegion) = in(p, gr.domain)
+Base.in(p::Point{🌐,<:LatLon{WGS84Latest}}, gr::GeoRegion) = in(p, gr.domain)
+Base.in(p::LatLon, gr::GeoRegion) = in(p, gr.domain)
 
 Base.in(p::Point{𝔼{2},<:Cartesian2D{WGS84Latest}}, pb::PolyBorder) = in(p, borders(Cartesian, pb))
 Base.in(p::Point{🌐,<:LatLon{WGS84Latest}}, pb::PolyBorder) = in(Meshes.flat(p), pb)
 Base.in(p::LatLon, pb::PolyBorder) = in(Point(LatLon{WGS84Latest,Deg{Float32}}(p.lat, p.lon)), pb)
+
+Base.in(p::Point{𝔼{2},<:Cartesian2D{WGS84Latest}}, pr::PolyRegion) = in(p, pr.domain)
+Base.in(p::Point{🌐,<:LatLon{WGS84Latest}}, pr::PolyRegion) = in(p, pr.domain)
 Base.in(p::LatLon, pr::PolyRegion) = in(p, pr.domain)
 
+# //TODO: add method to in LatBeltRegion to support Point
+# //TODO: add new tests for Base.in and getters
 Base.in(point::LatLon, domain::LatBeltRegion) = domain.latLim[1] < point.lat < domain.latLim[2]
 
 ## centroid()
@@ -49,9 +51,7 @@ Meshes.centroid(d::GeoRegion) = centroid(Cartesian, d)
 Meshes.centroid(::Type{Cartesian}, d::PolyBorder) = centroid(d.cart)
 function Meshes.centroid(::Type{LatLon}, d::PolyBorder)
     c = centroid(d.cart)
-    lat = ustrip(c.coords.y) |> Deg # lat is Y
-    lon = ustrip(c.coords.x) |> Deg # lon is X
-    LatLon{WGS84Latest}(lat, lon) |> Point
+    LatLon{WGS84Latest}(get_lat(c), get_lon(c)) |> Point
 end
 Meshes.centroid(crs::Type{<:Union{LatLon, Cartesian}}, d::PolyRegion) = centroid(crs, d.domain)
 Meshes.centroid(d::PolyRegion) = centroid(Cartesian, d.domain)

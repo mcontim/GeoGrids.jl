@@ -16,13 +16,13 @@ indices of the filtered points (wrt the input).
 - A vector of points that fall within the specified domain, subsection of the \
 input vector.
 """
-function filter_points(points::Array{<:LatLon}, domain::Union{GeoRegion,PolyRegion,LatBeltRegion})
+function filter_points(points::Array{<:Union{LatLon, Point{🌐,<:LatLon{WGS84Latest}}}}, domain::Union{GeoRegion,PolyRegion,LatBeltRegion})
     filtered = filter(x -> in(x, domain), points)
 
     return filtered
 end
 
-function filter_points(points::Array{<:LatLon}, domain::Union{GeoRegion,PolyRegion,LatBeltRegion}, ::ExtraOutput)
+function filter_points(points::Array{<:Union{LatLon, Point{🌐,<:LatLon{WGS84Latest}}}}, domain::Union{GeoRegion,PolyRegion,LatBeltRegion}, ::ExtraOutput)
     # filt = filter(x -> in(x, domain), points)
     indices = findall(x -> in(x, domain), points)
 
@@ -56,7 +56,7 @@ assigned to regions in the order they appear in the `domains` array.
 - The function uses the `in` function to determine if a point belongs to a \
 region.
 """
-function group_by_domain(points::Array{<:LatLon}, domains::Array; flagUnique=true)
+function group_by_domain(points::Array{<:Union{LatLon, Point{🌐,<:LatLon{WGS84Latest}}}}, domains::Array; flagUnique=true)
     # Check region names validity
     names = map(x -> x.regionName, domains)
     length(unique(names)) == length(names) || error("The region names passed to group_by must be unique...")
