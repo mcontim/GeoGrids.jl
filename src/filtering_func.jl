@@ -9,7 +9,7 @@ geographical domain.
 - `domain`: A geographical domain which can be of type `GeoRegion` or \
 `PolyRegion`, in alternative a `Meshes.Domain` of type `GeometrySet` or \
 `PolyArea`.
-- `::ExtraOutput`: An `ExtraOutput` object for additional output containing the \
+- `::EO`: An `EO` object for additional output containing the \
 indices of the filtered points (wrt the input).
 
 ## Returns
@@ -22,7 +22,7 @@ function filter_points(points::Array{<:Union{LatLon, Point{🌐,<:LatLon{WGS84La
     return filtered
 end
 
-function filter_points(points::Array{<:Union{LatLon, Point{🌐,<:LatLon{WGS84Latest}}}}, domain::Union{GeoRegion,PolyRegion,LatBeltRegion}, ::ExtraOutput)
+function filter_points(points::Array{<:Union{LatLon, Point{🌐,<:LatLon{WGS84Latest}}}}, domain::Union{GeoRegion,PolyRegion,LatBeltRegion}, ::EO)
     # filt = filter(x -> in(x, domain), points)
     indices = findall(x -> in(x, domain), points)
 

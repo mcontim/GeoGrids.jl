@@ -100,6 +100,9 @@ md"""
 	import >.CoordRefSystems
 end
 
+# ╔═╡ 5b9fdcff-2bc1-473c-b0ef-903dcfb948e2
+methods(generate_tesselation)
+
 # ╔═╡ b042041c-fa11-4e76-824f-8d5f57522c4b
 Array{<:LatLon, Point{🌐,<:LatLon{WGS84Latest}}}
 
@@ -124,6 +127,12 @@ typeof(centers)
 
 # ╔═╡ 144da2f3-b8e3-4c6c-90bf-0c981babdacf
 centers isa Array{<:Union{LatLon, Point{🌐,<:LatLon{WGS84Latest}}}}
+
+# ╔═╡ dfac1d27-a63e-426d-b2eb-13edf10eb0b7
+generate_tesselation(reg, 40000, HEX(), EO())
+
+# ╔═╡ 4ac14511-e6c6-492a-b2a6-56081c2e6a01
+typeof(reg)
 
 # ╔═╡ 02b770dd-1548-4f89-98cc-77fedc27c318
 centers[1] in reg
@@ -155,7 +164,7 @@ centroid(LatLon, polyReg) isa Point{🌐,<:LatLon{WGS84Latest}}
 # ╔═╡ e0b2c99d-c689-48fb-91d5-6a3b4ee4d044
 let 
 	reg = GeoRegion(; regionName="Tassellation", admin="Spain")
-	centers, ngon = generate_tesselation(reg, 40000, HEX(;pattern=:circ), ExtraOutput())
+	centers, ngon = generate_tesselation(reg, 40000, HEX(;pattern=:circ), EO())
 	plot_geo_cells(centers, ngon)
 end
 
@@ -178,56 +187,56 @@ aaa.coords.lat
 # ╔═╡ ad9016de-1cce-4dc8-bdbf-2a2d65a4319f
 let 
 	reg = GeoRegion(; regionName="Tassellation", admin="Spain")
-	centers, ngon = generate_tesselation(reg, 40000, HEX(;pattern=:circ), ExtraOutput())
+	centers, ngon = generate_tesselation(reg, 40000, HEX(;pattern=:circ), EO())
 	plot_geo_cells(centers, ngon)
 end
 
 # ╔═╡ f6c86dbf-a076-4905-8b34-d0587f153e3c
 let 
 	reg = polyReg
-	centers, ngon = generate_tesselation(reg, 40000, HEX(), ExtraOutput())
+	centers, ngon = generate_tesselation(reg, 40000, HEX(), EO())
 	plot_geo_cells(centers, ngon)
 end
 
 # ╔═╡ 0d67eaf0-5f74-43a0-8832-0b270334d3bc
 let 
 	reg = polyReg
-	centers, ngon = generate_tesselation(reg, 40000, HEX(;pattern=:circ), ExtraOutput())
+	centers, ngon = generate_tesselation(reg, 40000, HEX(;pattern=:circ), EO())
 	plot_geo_cells(centers, ngon)
 end
 
 # ╔═╡ efe29293-38f2-49c1-a426-25cdbe0d78c3
 let 
 	reg = GlobalRegion()
-	centers,ngon = generate_tesselation(reg, 1000000, ICO(;pattern=:hex), ExtraOutput())
+	centers,ngon = generate_tesselation(reg, 1000000, ICO(;pattern=:hex), EO())
 	plot_geo_cells(centers,ngon)
 end
 
 # ╔═╡ 3d6cfaea-c17e-4008-a0f8-ba262b1e7408
 let 
 	reg = LatBeltRegion(latLim=(-10,10))
-	centers,ngon = generate_tesselation(reg, 400000, ICO(;correction=val), ExtraOutput())
+	centers,ngon = generate_tesselation(reg, 400000, ICO(;correction=val), EO())
 	plot_geo_cells(centers,ngon)
 end
 
 # ╔═╡ a0f1257d-467a-4875-aad7-1b763d608ab4
 let 
 	reg = LatBeltRegion(latLim=(-10,10))
-	centers,ngon = generate_tesselation(reg, 400000, ICO(;pattern=:hex), ExtraOutput())
+	centers,ngon = generate_tesselation(reg, 400000, ICO(;pattern=:hex), EO())
 	plot_geo_cells(centers,ngon)	
 end
 
 # ╔═╡ f55e4340-0cb6-4fc5-9685-ccbbc3fedd15
 let 
 	reg = polyReg	
-	centers,ngon = generate_tesselation(reg, 40000, ICO(;correction=1.7), ExtraOutput())
+	centers,ngon = generate_tesselation(reg, 40000, ICO(;correction=1.7), EO())
 	plot_geo_cells(centers,ngon)
 end
 
 # ╔═╡ c0cbcd3e-183d-425a-a534-06b2d52f1819
 let 
 	reg = GeoRegion(; regionName="Tassellation", admin="Spain")
-	centers, ngon = generate_tesselation(reg, 40000, ICO(), ExtraOutput())
+	centers, ngon = generate_tesselation(reg, 40000, ICO(), EO())
 	plot_geo_cells(centers,ngon)
 end
 
@@ -1634,6 +1643,9 @@ version = "17.4.0+2"
 # ╟─0db4a84d-f4cf-4cea-8e6b-5b0480d3f6ff
 # ╠═ce5dd648-6491-49a0-b63b-f749deffa613
 # ╠═cee0416f-ffb8-4b97-9b53-32084c9e405f
+# ╠═dfac1d27-a63e-426d-b2eb-13edf10eb0b7
+# ╠═4ac14511-e6c6-492a-b2a6-56081c2e6a01
+# ╠═5b9fdcff-2bc1-473c-b0ef-903dcfb948e2
 # ╠═02b770dd-1548-4f89-98cc-77fedc27c318
 # ╠═d4076bee-3bb9-4222-839d-7e488ba75843
 # ╠═f541b096-2800-416e-b724-9b4864ef3a04

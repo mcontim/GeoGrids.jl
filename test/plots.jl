@@ -21,13 +21,13 @@ end
     reg = GeoRegion(; regionName="Tassellation", admin="Spain")
 	
     # Multi Point
-    centers, ngon = generate_tesselation(reg, 40000, HEX(;pattern=:circ), ExtraOutput())
+    centers, ngon = generate_tesselation(reg, 40000, HEX(;pattern=:circ), EO())
     @test plot_geo_cells(centers, ngon) isa Plot
     @test plot_geo_cells(centers[1], ngon[1]) isa Plot
     # Single Point
     @test plot_geo_cells(centers) isa Plot
     @test plot_geo_cells(centers[1]) isa Plot
-	centers, ngon = generate_tesselation(reg, 40000, HEX(), ExtraOutput())
+	centers, ngon = generate_tesselation(reg, 40000, HEX(), EO())
     # Multi Point
     @test plot_geo_cells(centers, ngon) isa Plot
     @test plot_geo_cells(centers[1], ngon[1]) isa Plot
