@@ -46,21 +46,42 @@ end
     @test borders(Cartesian, reg) == map(x -> x.cart, reg.domain)
 end
 
-@testitem "Test borders for PolyRegion" begin
+@testitem "Test borders for PolyRegion" tags = [:interface] begin
     poly = PolyRegion("POLY", [LatLon(10°, -5°), LatLon(10°, 15°), LatLon(27°, 15°), LatLon(27°, -5°)])
     @test borders(poly) == poly.domain.latlon
     @test borders(LatLon, poly) == poly.domain.latlon
     @test borders(Cartesian, poly) == poly.domain.cart
 end
 
+## centroid()
+@testitem "Test centroid for GeoRegion" tags = [:interface] begin
+    reg = GeoRegion(; regionName="Tassellation", admin="Spain;Italy")
+    testPoint_cart = Point(Cartesian{WGS84Latest}(1.914719f0, 40.225365f0))
+    testPoint_latlon = Point(LatLon{WGS84Latest}(40.225365f0, 1.914719f0))
 
+    @test centroid(reg) == testPoint_cart
+    @test centroid(Cartesian, reg) == testPoint_cart
+    @test centroid(reg.domain) == testPoint_cart
+    @test centroid(Cartesian, reg.domain) == testPoint_cart
 
+    @test centroid(LatLon, reg) == testPoint_latlon
+    @test centroid(LatLon, reg.domain) == testPoint_latlon
+end 
 
+@testitem "Test centroid for PolyRegion" tags = [:interface] begin
+    poly = PolyRegion("POLY", [LatLon(10°, -5°), LatLon(10°, 15°), LatLon(27°, 15°), LatLon(27°, -5°)])
+    testPoint_cart = Point(Cartesian{WGS84Latest}(5.0, 18.5))
+    testPoint_latlon = Point(LatLon{WGS84Latest}(18.5, 5.0))
 
+    @test centroid(poly) == testPoint_cart
+    @test centroid(Cartesian, poly) == testPoint_cart
+    @test centroid(Cartesian, poly.domain) == testPoint_cart
+    @test centroid(Cartesian, poly.domain) == testPoint_cart
+    @test centroid(poly.domain.cart) == testPoint_cart
 
-
-
-
+    @test centroid(LatLon, poly) == testPoint_latlon
+    @test centroid(LatLon, poly.domain) == testPoint_latlon
+end
 
 ## Helpers
 @testitem "Helper Functions" tags = [:general] begin

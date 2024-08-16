@@ -46,11 +46,12 @@ Meshes.centroid(crs::Type{<:Union{LatLon, Cartesian}}, d::GeoRegion) = centroid(
 Meshes.centroid(d::GeoRegion) = centroid(Cartesian, d)
 
 # Define ad-hoc methods for PolyRegion - using centroid definition of Meshes.jl
-Meshes.centroid(::Type{Cartesian}, d::PolyRegion) = centroid(d.domain.cart)
-function Meshes.centroid(::Type{LatLon}, d::PolyRegion)
-    c = centroid(d.domain.cart)
+Meshes.centroid(::Type{Cartesian}, d::PolyBorder) = centroid(d.cart)
+function Meshes.centroid(::Type{LatLon}, d::PolyBorder)
+    c = centroid(d.cart)
     lat = ustrip(c.coords.y) |> Deg # lat is Y
     lon = ustrip(c.coords.x) |> Deg # lon is X
     LatLon{WGS84Latest}(lat, lon) |> Point
 end
-Meshes.centroid(d::PolyRegion) = centroid(Cartesian, d)
+Meshes.centroid(crs::Type{<:Union{LatLon, Cartesian}}, d::PolyRegion) = centroid(crs, d.domain)
+Meshes.centroid(d::PolyRegion) = centroid(Cartesian, d.domain)
