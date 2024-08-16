@@ -1,13 +1,17 @@
 ## Base.in()
 @testitem "Test Base.in GeoRegion" tags = [:interface] begin
-    sample_ita = [LatLon(43.727878°, 12.843441°), LatLon(43.714933°, 10.399326°), LatLon(37.485829°, 14.328285°), LatLon(39.330460°, 8.430780°), LatLon(45.918388°, 10.886654°)]
-    sample_eu = [LatLon(52.218550°, 4.420621°), LatLon(41.353144°, 2.167639°), LatLon(42.670341°, 23.322592°)]
+    sample_ita = [Point(LatLon{WGS84Latest}(43.727878°, 12.843441°)), Point(LatLon{WGS84Latest}(43.714933°, 10.399326°)), Point(LatLon{WGS84Latest}(37.485829°, 14.328285°)), Point(LatLon{WGS84Latest}(39.330460°, 8.430780°)), Point(LatLon{WGS84Latest}(45.918388°, 10.886654°))]
+    sample_eu = [Point(LatLon{WGS84Latest}(52.218550°, 4.420621°)), Point(LatLon{WGS84Latest}(41.353144°, 2.167639°)), Point(LatLon{WGS84Latest}(42.670341°, 23.322592°))]
 
     ita = GeoRegion(regionName="ITA", admin="Italy")
     eu = GeoRegion(; continent="Europe")
 
-    @test all(map(x -> in(x, ita), sample_ita))
-    @test all(map(x -> in(x, eu), sample_eu))
+    @test all(map(x -> in(x, ita), sample_ita)) # Test Poin(LatLon())
+    @test all(map(x -> in(coords(x), ita), sample_ita)) # Test LatLon()
+    @test all(map(x -> in(Cartesian2D{WGS84Latest}(coords(x).lon |> ustrip, coords(x).lat |> ustrip), ita), sample_ita)) # Test Cartesian2D()
+
+    @test all(map(x -> in(x, eu), sample_eu)) # Test Poin(LatLon())
+    @test all(map(x -> in(coords(x), eu), sample_eu)) # Test LatLon()
     
     @test in(LatLon(0.7631954460103929rad, 0.22416033273563304rad), ita)
     @test in(LatLon(0.7631954460103929rad, 0.22416033273563304rad), eu)

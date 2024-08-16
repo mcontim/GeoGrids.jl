@@ -8,7 +8,7 @@ using CountriesBorders.GeoTablesConversion: LATLON, POLY_LATLON, POLY_CART, cart
 using Dictionaries
 using LinearAlgebra
 using Meshes
-using Meshes: 🌐, WGS84Latest
+using Meshes: 🌐, WGS84Latest, coords
 using PlotlyExtensionsHelper
 using StaticArrays
 using Unitful: °, rad, Quantity, @u_str, ustrip
@@ -32,6 +32,8 @@ export icogrid, rectgrid, vecgrid,
     ExtraOutput,
     borders, centroid
 
-export °, rad, LatLon, Cartesian, WGS84Latest, PolyArea, SVector, Point
+export °, rad, ustrip,
+    LatLon, Cartesian2D, WGS84Latest, coords, PolyArea, Point,
+    SVector
 
 end # module GeoGrids 

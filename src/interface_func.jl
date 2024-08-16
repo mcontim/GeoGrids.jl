@@ -25,21 +25,21 @@ end
 borders(gr::GeoRegion) = map(x -> CountriesBorders.borders(LatLon, x), gr.domain)
 
 ## Base.in()
+# Interface choice: no possbility to call Base.in on GeoRegion, PolyRegion, or LatBeltRegion with a Cartesian2D point.
+# This is a safe choice of interface of users.
+# GeoRegion()
 # Fallback on Base.in for CountryBorder defined in CountriesBorders
-Base.in(p::Point{𝔼{2},<:Cartesian2D{WGS84Latest}}, gr::GeoRegion) = in(p, gr.domain)
 Base.in(p::Point{🌐,<:LatLon{WGS84Latest}}, gr::GeoRegion) = in(p, gr.domain)
 Base.in(p::LatLon, gr::GeoRegion) = in(p, gr.domain)
-
+# PolyRegion()
 Base.in(p::Point{𝔼{2},<:Cartesian2D{WGS84Latest}}, pb::PolyBorder) = in(p, borders(Cartesian, pb))
-Base.in(p::Point{🌐,<:LatLon{WGS84Latest}}, pb::PolyBorder) = in(Meshes.flat(p), pb)
+Base.in(p::Point{🌐,<:LatLon{WGS84Latest}}, pb::PolyBorder) = in(Meshes.flat(p), pb) # Flatten the point in Cartesian2D and call the method above
 Base.in(p::LatLon, pb::PolyBorder) = in(Point(LatLon{WGS84Latest,Deg{Float32}}(p.lat, p.lon)), pb)
 
-Base.in(p::Point{𝔼{2},<:Cartesian2D{WGS84Latest}}, pr::PolyRegion) = in(p, pr.domain)
 Base.in(p::Point{🌐,<:LatLon{WGS84Latest}}, pr::PolyRegion) = in(p, pr.domain)
 Base.in(p::LatLon, pr::PolyRegion) = in(p, pr.domain)
-
+# LatBeltRegion()
 # //TODO: add new tests for Base.in and getters
-Base.in(p::Point{𝔼{2},<:Cartesian2D{WGS84Latest}}, lbr::LatBeltRegion) = lbr.latLim[1] < get_lat(p) < lbr.latLim[2]
 Base.in(p::Point{🌐,<:LatLon{WGS84Latest}}, lbr::LatBeltRegion) = lbr.latLim[1] < get_lat(p) < lbr.latLim[2]
 Base.in(p::LatLon, lbr::LatBeltRegion) = lbr.latLim[1] < p.lat < lbr.latLim[2]
 
