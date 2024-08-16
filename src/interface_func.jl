@@ -25,8 +25,7 @@ end
 borders(gr::GeoRegion) = map(x -> CountriesBorders.borders(LatLon, x), gr.domain)
 
 ## Base.in()
-# Interface choice: no possbility to call Base.in on GeoRegion, PolyRegion, or LatBeltRegion with a Cartesian2D point.
-# This is a safe choice of interface of users.
+# //NOTE: Interface choice: no possbility to call Base.in on GeoRegion, PolyRegion, or LatBeltRegion with a Cartesian2D point. This is a safe choice of interface of users.
 # GeoRegion()
 # Fallback on Base.in for CountryBorder defined in CountriesBorders
 Base.in(p::Point{🌐,<:LatLon{WGS84Latest}}, gr::GeoRegion) = in(p, gr.domain)
@@ -45,7 +44,7 @@ Base.in(p::LatLon, lbr::LatBeltRegion) = lbr.latLim[1] < p.lat < lbr.latLim[2]
 
 ## centroid()
 # Define ad-hoc methods for GeoRegion - using centroid definition of CountriesBorders.jl
-Meshes.centroid(crs::Type{<:Union{LatLon, Cartesian}}, d::GeoRegion) = centroid(crs, d.domain) # Fallback on all the definitions in CountriesBorders.jl for CountryBorder
+Meshes.centroid(crs::Type{<:Union{LatLon,Cartesian}}, d::GeoRegion) = centroid(crs, d.domain) # Fallback on all the definitions in CountriesBorders.jl for CountryBorder
 Meshes.centroid(d::GeoRegion) = centroid(Cartesian, d)
 
 # Define ad-hoc methods for PolyRegion - using centroid definition of Meshes.jl
@@ -54,5 +53,5 @@ function Meshes.centroid(::Type{LatLon}, d::PolyBorder)
     c = centroid(d.cart)
     LatLon{WGS84Latest}(get_lat(c), get_lon(c)) |> Point
 end
-Meshes.centroid(crs::Type{<:Union{LatLon, Cartesian}}, d::PolyRegion) = centroid(crs, d.domain)
+Meshes.centroid(crs::Type{<:Union{LatLon,Cartesian}}, d::PolyRegion) = centroid(crs, d.domain)
 Meshes.centroid(d::PolyRegion) = centroid(Cartesian, d.domain)

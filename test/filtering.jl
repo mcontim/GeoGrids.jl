@@ -15,6 +15,8 @@
     @test filter_points(sample_ita, ita) == sample_ita
     @test filter_points(sample_eu, eu) == sample_eu
     @test filter_points([LatLon(52.218550°, 4.420621°), LatLon(43.727878°, 12.843441°), LatLon(41.353144°, 2.167639°), LatLon(43.714933°, 10.399326°)], ita) == [LatLon(43.727878°, 12.843441°), LatLon(43.714933°, 10.399326°)]
+    
+    @test filter_points(map(x -> Point(x), sample_ita), ita) == map(x -> Point(x), sample_ita) # Additional test for type Point(LatLon())
 end
 
 @testitem "PolyRegion Test" tags = [:filtering] begin
@@ -31,6 +33,7 @@ end
     @test_throws "UndefKeywordError: keyword argument `domain` not assigned" PolyRegion()
     
     @test filter_points(vcat(sample_in, sample_out), poly) == sample_in
+    @test filter_points(map(x -> Point(x), vcat(sample_in, sample_out)), poly) == map(x -> Point(x), sample_in) # Additional test for type Point(LatLon())
 end
 
 @testitem "LatBeltRegion Test" tags = [:filtering] begin
@@ -62,4 +65,5 @@ Consider using `°` (or `rad`) from `Unitful` if you want to pass numbers in deg
     @test_throws "The first LAT limit must be different than the second one..." LatBeltRegion(; latLim=(90, 90))
     
     @test filter_points([LatLon(14°, 1°), LatLon(90°, 1°), LatLon(60.1°, 1°), LatLon(26.9°, -65°), LatLon(-62°, -4.9°), LatLon(-60.1°, 14.9°), LatLon(10.1°, 70°)], belt) == sample_in
+    @test filter_points(map(x -> Point(x), [LatLon(14°, 1°), LatLon(90°, 1°), LatLon(60.1°, 1°), LatLon(26.9°, -65°), LatLon(-62°, -4.9°), LatLon(-60.1°, 14.9°), LatLon(10.1°, 70°)]), belt) == map(x -> Point(x), sample_in) # Additional test for type Point(LatLon())
 end

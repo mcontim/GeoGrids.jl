@@ -100,27 +100,6 @@ md"""
 	import >.CoordRefSystems
 end
 
-# ╔═╡ 14c72b10-18c8-4dbb-ad9a-44c34d8c8c23
-p = Point(LatLon{WGS84Latest}(52.218550, 4.420621))
-
-# ╔═╡ e03fe025-6ed5-44df-b22d-9eb446a21562
-p.coords
-
-# ╔═╡ aae16a82-3c2c-4e90-9ed9-c6481c9a1916
-coords(p) isa LatLon{WGS84Latest}
-
-# ╔═╡ 8e1695a5-3227-4a23-a205-e7c6b7363c66
-coords(p) == p.coords
-
-# ╔═╡ 0fa6c489-deb3-4366-a680-60b5f560a0f8
-coords(p).lat
-
-# ╔═╡ c6742a60-8066-4d3b-9fdf-261aa25699d4
-Point(Cartesian2D{WGS84Latest}(p.coords.lon |> ustrip, p.coords.lat |> ustrip))
-
-# ╔═╡ 6061e417-30b7-442f-9d51-ff9a374e766c
-Meshes.flat(p)
-
 # ╔═╡ b042041c-fa11-4e76-824f-8d5f57522c4b
 Array{<:LatLon, Point{🌐,<:LatLon{WGS84Latest}}}
 
@@ -145,9 +124,6 @@ typeof(centers)
 
 # ╔═╡ 144da2f3-b8e3-4c6c-90bf-0c981babdacf
 centers isa Array{<:Union{LatLon, Point{🌐,<:LatLon{WGS84Latest}}}}
-
-# ╔═╡ 64465e30-c49d-4b6b-b5f5-4ba1086f884d
-coords(p) in reg
 
 # ╔═╡ 02b770dd-1548-4f89-98cc-77fedc27c318
 centers[1] in reg
@@ -1658,14 +1634,6 @@ version = "17.4.0+2"
 # ╟─0db4a84d-f4cf-4cea-8e6b-5b0480d3f6ff
 # ╠═ce5dd648-6491-49a0-b63b-f749deffa613
 # ╠═cee0416f-ffb8-4b97-9b53-32084c9e405f
-# ╠═14c72b10-18c8-4dbb-ad9a-44c34d8c8c23
-# ╠═aae16a82-3c2c-4e90-9ed9-c6481c9a1916
-# ╠═8e1695a5-3227-4a23-a205-e7c6b7363c66
-# ╠═e03fe025-6ed5-44df-b22d-9eb446a21562
-# ╠═0fa6c489-deb3-4366-a680-60b5f560a0f8
-# ╠═c6742a60-8066-4d3b-9fdf-261aa25699d4
-# ╠═6061e417-30b7-442f-9d51-ff9a374e766c
-# ╠═64465e30-c49d-4b6b-b5f5-4ba1086f884d
 # ╠═02b770dd-1548-4f89-98cc-77fedc27c318
 # ╠═d4076bee-3bb9-4222-839d-7e488ba75843
 # ╠═f541b096-2800-416e-b724-9b4864ef3a04

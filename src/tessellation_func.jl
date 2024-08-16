@@ -254,8 +254,7 @@ function generate_tesselation(region::Union{GeoRegion,PolyRegion}, radius::Numbe
     centroids = _hex_tesselation_centroids(origin, radius; direction=type.direction, refRadius, kwargs_lattice...)
 
     # Filter centroids in the region.
-    # return filter_points(centroids, region)
-    return centroids
+    return filter_points(centroids, region)
 end
 
 function generate_tesselation(region::Union{GeoRegion,PolyRegion}, radius::Number, type::HEX, ::ExtraOutput; refRadius::Number=constants.Re_mean, kwargs_lattice...)

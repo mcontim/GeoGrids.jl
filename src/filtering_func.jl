@@ -14,7 +14,7 @@ indices of the filtered points (wrt the input).
 
 ## Returns
 - A vector of points that fall within the specified domain, subsection of the \
-input vector.
+input vector. The output is of the same type as the input.
 """
 function filter_points(points::Array{<:Union{LatLon, Point{🌐,<:LatLon{WGS84Latest}}}}, domain::Union{GeoRegion,PolyRegion,LatBeltRegion})
     filtered = filter(x -> in(x, domain), points)
@@ -45,7 +45,7 @@ it belongs to and is not considered for subsequent regions. If `false`, a \
 
 ## Returns
 - A dictionary where keys are region names and values are arrays of points \
-belonging to that region.
+belonging to that region. The output is of the same type as the input.
 
 ## Errors
 - Throws an error if the region names in `domains` are not unique.
