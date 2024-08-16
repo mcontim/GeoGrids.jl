@@ -168,7 +168,7 @@ function _hex_tesselation_centroids(origin::Point{🌐,<:LatLon{WGS84Latest}}, r
         offsetθφ = (; θ, ϕ) # [rad]
         new = _add_angular_offset(centreθφ, offsetθφ)
 
-        lat, lon = _wrap_LatLon(π / 2 - new.θ |> rad2deg, new.ϕ |> rad2deg)
+        lat, lon = _wrap_latlon(π / 2 - new.θ |> rad2deg, new.ϕ |> rad2deg)
         LatLon{WGS84Latest}(lat, lon) |> Point
     end
 
@@ -245,11 +245,10 @@ each cell. The mesh originating these contours is obtained using \
 cell centers within the specified region.
 
 See also: [`gen_hex_lattice`](@ref), [`_generate_tesselation`](@ref),
-[`_hex_tesselation_centroids`](@ref), [`my_tesselate`](@ref), [`HEX`](@ref),
+[`_hex_tesselation_centroids`](@ref), [`_tesselate`](@ref), [`HEX`](@ref),
 [`GeoRegion`](@ref), [`PolyRegion`](@ref)
 """
 function generate_tesselation(region::Union{GeoRegion,PolyRegion}, radius::Number, type::HEX; refRadius::Number=constants.Re_mean, kwargs_lattice...)
-    @info "dio"
     # Generate the tassellation centroids.
     origin = centroid(LatLon, region)
     centroids = _hex_tesselation_centroids(origin, radius; direction=type.direction, refRadius, kwargs_lattice...)
@@ -259,15 +258,14 @@ function generate_tesselation(region::Union{GeoRegion,PolyRegion}, radius::Numbe
 end
 
 function generate_tesselation(region::Union{GeoRegion,PolyRegion}, radius::Number, type::HEX, ::EO; refRadius::Number=constants.Re_mean, kwargs_lattice...)
-    @info "dio"
     # Generate the tassellation centroids.
     origin = centroid(LatLon, region)
     centroids = _hex_tesselation_centroids(origin, radius; direction=type.direction, refRadius, kwargs_lattice...)
 
     if type.pattern == :hex # Hexagonal pattern
         # Create the tasselation from all the centroids.
-        # mesh = my_tesselate(centroids)
-        mesh = tesselate(centroids, VoronoiTesselation())
+        mesh = _tesselate(centroids)
+        # mesh = tesselate(centroids, VoronoiTesselation())
         # Filter centroids in the region.
         filtered, idxs = filter_points(centroids, region, EO())
         # Create the hexagonal pattern from the filtered centroids.
@@ -325,7 +323,7 @@ function generate_tesselation(region::GlobalRegion, radius::Number, type::ICO, :
 
     if type.pattern == :hex # Hexagonal pattern
         # Create the tasselation from all the centroids.
-        mesh = my_tesselate(centroids)
+        mesh = _tesselate(centroids)
         # Create the hexagonal pattern from all centroids.
         hexagons = my_tesselate_hexagon(centroids, collect(1:length(centroids)), mesh)
         return centroids, hexagons
@@ -348,7 +346,7 @@ function generate_tesselation(region::Union{LatBeltRegion,GeoRegion,PolyRegion},
 
     if type.pattern == :hex # Hexagonal pattern
         # Create the tasselation from all the centroids.
-        mesh = my_tesselate(centroids)
+        mesh = _tesselate(centroids)
         # Filter centroids in the region.
         filtered, idxs = filter_points(centroids, region, EO())
         # Create the hexagonal pattern from the filtered centroids.
@@ -368,8 +366,8 @@ function generate_tesselation(region::Union{GlobalRegion,LatBeltRegion,GeoRegion
 end
 
 """
-    my_tesselate(pset::PointSet, method::VoronoiTesselation; sorted=true) -> SimpleMesh
-    my_tesselate(points::AbstractVector{<:Point}, method::TesselationMethod) -> SimpleMesh
+    _tesselate(pset::PointSet, method::VoronoiTesselation; sorted=true) -> SimpleMesh
+    _tesselate(points::AbstractVector{<:Point}, method::TesselationMethod) -> SimpleMesh
 
 This function performs a Voronoi tessellation on a given set of 2D points. The
 tessellation divides the plane into polygons such that each polygon contains
@@ -389,7 +387,7 @@ match the original order of points (default: `true`).
 ## Returns
 - `SimpleMesh`: A mesh object representing the tessellated polygons.
 """
-function my_tesselate(pset::PointSet; method::VoronoiTesselation=VoronoiTesselation(), sorted=true)
+function _tesselate(pset::PointSet; method::VoronoiTesselation=VoronoiTesselation(), sorted=true)
     C = crs(pset)
     T = Meshes.numtype(Meshes.lentype(pset))
     Meshes.assertion(CoordRefSystems.ncoords(C) == 2, "points must have 2 coordinates")
@@ -420,18 +418,18 @@ function my_tesselate(pset::PointSet; method::VoronoiTesselation=VoronoiTesselat
     mesh |> Repair{1}()
 end
 
-my_tesselate(points::AbstractVector{<:Point}; kwargs...) = my_tesselate(PointSet(points); kwargs...)
-my_tesselate(point::Point; kwargs...) = my_tesselate([point]; kwargs...)
+_tesselate(points::AbstractVector{<:Point}; kwargs...) = _tesselate(PointSet(points); kwargs...)
+_tesselate(point::Point; kwargs...) = _tesselate([point]; kwargs...)
 
-function my_tesselate(points::AbstractVector{<:LatLon}; kwargs...)
+function _tesselate(points::AbstractVector{<:Point{🌐,<:LatLon{WGS84Latest}}}, method::TesselationMethod=VoronoiTesselation())
     # Convert the input points in a PointSet. Rememeber that in Meshes.jl we
     # must consider lat=y and lon=x (that's why we invert the order when
     # creating the converted point).
-    converted = map(x -> Point(ustrip(x.lon), ustrip(x.lat)), points)
+    converted = map(x -> Meshes.flat(x), points)
 
-    my_tesselate(PointSet(converted); kwargs...)
+    tesselate(PointSet(converted), method)
 end
-my_tesselate(point::LatLon; kwargs...) = my_tesselate([point]; kwargs...)
+_tesselate(point::LatLon; kwargs...) = _tesselate([point]; kwargs...)
 
 # Cirle cella contour.
 """
@@ -519,7 +517,7 @@ function my_tesselate_circle(centers::AbstractVector{<:LatLon}, radius::Number; 
         for (i, v) in enumerate(Δϕ)
             offsetθφ = (; θ=Δθ, ϕ=v) # [rad]
             new = _add_angular_offset(centreθφ, offsetθφ)
-            lat, lon = _wrap_LatLon(π / 2 - new.θ |> rad2deg, new.ϕ |> rad2deg)
+            lat, lon = _wrap_latlon(π / 2 - new.θ |> rad2deg, new.ϕ |> rad2deg)
             circles[c][i] = LatLon(lat, lon)
         end
     end
@@ -552,7 +550,7 @@ associated coordinates (latitude and longitude).
 vector of `LatLon` points forming the vertices of a hexagon. Each \
 hexagon corresponds to an element in the `filtered` vector.
 """
-function my_tesselate_hexagon(filtered::AbstractVector{<:LatLon}, idxs::AbstractVector{<:Number}, mesh::SimpleMesh)
+function my_tesselate_hexagon(filtered::AbstractVector{<:Union{LatLon, Point{🌐,<:LatLon{WGS84Latest}}}}, idxs::AbstractVector{<:Number}, mesh::SimpleMesh)
     # hexagons = [fill(LatLon(0, 0), 7) for i in 1:length(filtered)]
     hexagons = [LatLon[] for i in 1:length(filtered)] # Allow to have different polygons from hexagons only (depending on Voronoi tesselation)
     for (p, poly) in enumerate(mesh[idxs])
@@ -567,3 +565,5 @@ function my_tesselate_hexagon(filtered::AbstractVector{<:LatLon}, idxs::Abstract
     return hexagons
 end
 my_tesselate_hexagon(filtered::LatLon, idxs::Number, mesh::SimpleMesh) = my_tesselate_hexagon([filtered], [idxs], mesh)
+
+# //TODO: Keep fixing my_tesselate_hexagon, my_tesselate_circle and generate_tesselation

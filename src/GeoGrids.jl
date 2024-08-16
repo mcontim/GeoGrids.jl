@@ -28,7 +28,7 @@ export AbstractRegion, GlobalRegion, GeoRegion, PolyRegion, LatBeltRegion,
 
 export icogrid, rectgrid, vecgrid,
     extract_countries, in, filter_points, group_by_domain,
-    gen_hex_lattice, generate_tesselation, my_tesselate, my_tesselate_circle, my_tesselate_hexagon,
+    gen_hex_lattice, generate_tesselation, _tesselate, my_tesselate_circle, my_tesselate_hexagon,
     EO,
     borders, centroid
 

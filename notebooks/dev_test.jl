@@ -33,9 +33,6 @@ md"""
 # New Tests
 """
 
-# ╔═╡ 0e5faffb-772f-4326-b81d-8912196147f9
-# testcenters(centers)
-
 # ╔═╡ 3ce21344-e0ea-4e41-b78e-cf92dc9ac2e7
 md"""
 # Definitions
@@ -50,6 +47,22 @@ md"""
 md"""
 ## GeoRegion
 """
+
+# ╔═╡ 7df04689-55fd-4659-b251-2100bf565580
+# ╠═╡ disabled = true
+#=╠═╡
+aaa=let
+	reg = GeoRegion(; regionName="Tassellation", test_pair...)
+	centroid(LatLon,reg)
+	# centers = generate_tesselation(reg, 40000, HEX())
+	# testcenters(centers)
+end
+  ╠═╡ =#
+
+# ╔═╡ b34086c0-d58a-41e4-8fd0-fc915fa49440
+#=╠═╡
+aaa.coords.lat
+  ╠═╡ =#
 
 # ╔═╡ b12ae026-8fbb-4687-98df-f7a2fe9672b6
 md"""
@@ -100,15 +113,12 @@ md"""
 	import >.CoordRefSystems
 end
 
-# ╔═╡ 5b9fdcff-2bc1-473c-b0ef-903dcfb948e2
-methods(generate_tesselation)
-
-# ╔═╡ b042041c-fa11-4e76-824f-8d5f57522c4b
-Array{<:LatLon, Point{🌐,<:LatLon{WGS84Latest}}}
+# ╔═╡ 1663771c-5661-4c21-ae67-39cbef3a0c73
+maximum(map(x -> get_lat(x), gesu))
 
 # ╔═╡ a34e4ff6-51f9-4d6b-af28-5e856adea1ed
 begin
-	const test_pair = (;admin="Spain")
+	const test_pair = (;admin="Greenland")
 	polyVec = [
 		PolyRegion(;domain=[LatLon(-5,-5), LatLon(5,-5), LatLon(5,10), LatLon(-5,10)]),
 		PolyRegion(;domain=[LatLon(60,-5), LatLon(80,0), LatLon(80,10), LatLon(60,15)])
@@ -122,44 +132,8 @@ reg = GeoRegion(; regionName="Tassellation", test_pair...)
 # ╔═╡ cee0416f-ffb8-4b97-9b53-32084c9e405f
 centers = generate_tesselation(reg, 40000, HEX())
 
-# ╔═╡ 7f4cfb5a-157a-46cb-a904-d6fce10ab607
-typeof(centers)
-
-# ╔═╡ 144da2f3-b8e3-4c6c-90bf-0c981babdacf
-centers isa Array{<:Union{LatLon, Point{🌐,<:LatLon{WGS84Latest}}}}
-
 # ╔═╡ dfac1d27-a63e-426d-b2eb-13edf10eb0b7
 generate_tesselation(reg, 40000, HEX(), EO())
-
-# ╔═╡ 4ac14511-e6c6-492a-b2a6-56081c2e6a01
-typeof(reg)
-
-# ╔═╡ 02b770dd-1548-4f89-98cc-77fedc27c318
-centers[1] in reg
-
-# ╔═╡ d4076bee-3bb9-4222-839d-7e488ba75843
-map(x -> in(x, reg), centers)
-
-# ╔═╡ f541b096-2800-416e-b724-9b4864ef3a04
-in(centers[1], reg)
-
-# ╔═╡ 92b098e2-107b-44ce-a48e-16edfc6bb96b
-centroid(LatLon,reg)
-
-# ╔═╡ e1581b65-aead-49f9-9a7c-cd0a0eb3c11e
-centroid(Cartesian,reg)
-
-# ╔═╡ cff46667-3a45-4bea-8151-571db23e8a32
-ddd=coords(centroid(LatLon,reg))
-
-# ╔═╡ 3e38213c-0dcd-4737-b82d-e97103cb8e1d
-typeof(centroid(LatLon, polyReg))
-
-# ╔═╡ 0a4f89b4-7cd9-46c2-96f5-767b00e27647
-centroid(Cartesian, polyReg)
-
-# ╔═╡ 26ae5f4e-ddb5-4e4d-b92d-42ed89619162
-centroid(LatLon, polyReg) isa Point{🌐,<:LatLon{WGS84Latest}}
 
 # ╔═╡ e0b2c99d-c689-48fb-91d5-6a3b4ee4d044
 let 
@@ -167,22 +141,6 @@ let
 	centers, ngon = generate_tesselation(reg, 40000, HEX(;pattern=:circ), EO())
 	plot_geo_cells(centers, ngon)
 end
-
-# ╔═╡ 7df04689-55fd-4659-b251-2100bf565580
-# ╠═╡ disabled = true
-#=╠═╡
-aaa=let
-	reg = GeoRegion(; regionName="Tassellation", test_pair...)
-	centroid(LatLon,reg)
-	# centers = generate_tesselation(reg, 40000, HEX())
-	# testcenters(centers)
-end
-  ╠═╡ =#
-
-# ╔═╡ b34086c0-d58a-41e4-8fd0-fc915fa49440
-#=╠═╡
-aaa.coords.lat
-  ╠═╡ =#
 
 # ╔═╡ ad9016de-1cce-4dc8-bdbf-2a2d65a4319f
 let 
@@ -1644,21 +1602,7 @@ version = "17.4.0+2"
 # ╠═ce5dd648-6491-49a0-b63b-f749deffa613
 # ╠═cee0416f-ffb8-4b97-9b53-32084c9e405f
 # ╠═dfac1d27-a63e-426d-b2eb-13edf10eb0b7
-# ╠═4ac14511-e6c6-492a-b2a6-56081c2e6a01
-# ╠═5b9fdcff-2bc1-473c-b0ef-903dcfb948e2
-# ╠═02b770dd-1548-4f89-98cc-77fedc27c318
-# ╠═d4076bee-3bb9-4222-839d-7e488ba75843
-# ╠═f541b096-2800-416e-b724-9b4864ef3a04
-# ╠═7f4cfb5a-157a-46cb-a904-d6fce10ab607
-# ╠═144da2f3-b8e3-4c6c-90bf-0c981babdacf
-# ╠═b042041c-fa11-4e76-824f-8d5f57522c4b
-# ╠═0e5faffb-772f-4326-b81d-8912196147f9
-# ╠═92b098e2-107b-44ce-a48e-16edfc6bb96b
-# ╠═e1581b65-aead-49f9-9a7c-cd0a0eb3c11e
-# ╠═cff46667-3a45-4bea-8151-571db23e8a32
-# ╠═3e38213c-0dcd-4737-b82d-e97103cb8e1d
-# ╠═0a4f89b4-7cd9-46c2-96f5-767b00e27647
-# ╠═26ae5f4e-ddb5-4e4d-b92d-42ed89619162
+# ╠═1663771c-5661-4c21-ae67-39cbef3a0c73
 # ╟─3ce21344-e0ea-4e41-b78e-cf92dc9ac2e7
 # ╠═a34e4ff6-51f9-4d6b-af28-5e856adea1ed
 # ╟─222fb774-1693-4b3c-b2ef-5fd38eca773c
