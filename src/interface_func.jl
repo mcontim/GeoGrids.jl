@@ -1,10 +1,10 @@
 ## Define Getters
-get_lat(p::Point{𝔼{2},<:Cartesian2D{WGS84Latest}}) = p.coords.lat
-get_lat(p::Point{🌐,<:LatLon{WGS84Latest}}) = p.coords.y |> ustrip |> Deg # LAT is Y
+get_lat(p::Point{𝔼{2},<:Cartesian2D{WGS84Latest}}) = coords(p).y |> ustrip |> Deg # LAT is Y
+get_lat(p::Point{🌐,<:LatLon{WGS84Latest}}) = coords(p).lat
 get_lat(p::LatLon) = p.lat
 
-get_lon(p::Point{𝔼{2},<:Cartesian2D{WGS84Latest}}) = p.coords.lon
-get_lon(p::Point{🌐,<:LatLon{WGS84Latest}}) = p.coords.x |> ustrip |> Deg # LON is X
+get_lon(p::Point{𝔼{2},<:Cartesian2D{WGS84Latest}}) = coords(p).x |> ustrip |> Deg # LON is X
+get_lon(p::Point{🌐,<:LatLon{WGS84Latest}}) = coords(p).lon
 get_lon(p::LatLon) = p.lon
 
 ## boders()

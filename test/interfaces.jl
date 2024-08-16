@@ -1,18 +1,17 @@
 ## Base.in()
 @testitem "Test Base.in GeoRegion" tags = [:interface] begin
-    sample_ita = [Point(LatLon{WGS84Latest}(43.727878°, 12.843441°)), Point(LatLon{WGS84Latest}(43.714933°, 10.399326°)), Point(LatLon{WGS84Latest}(37.485829°, 14.328285°)), Point(LatLon{WGS84Latest}(39.330460°, 8.430780°)), Point(LatLon{WGS84Latest}(45.918388°, 10.886654°))]
-    sample_eu = [Point(LatLon{WGS84Latest}(52.218550°, 4.420621°)), Point(LatLon{WGS84Latest}(41.353144°, 2.167639°)), Point(LatLon{WGS84Latest}(42.670341°, 23.322592°))]
+    sample_ita = [LatLon{WGS84Latest}(43.727878°, 12.843441°), LatLon{WGS84Latest}(43.714933°, 10.399326°), LatLon{WGS84Latest}(37.485829°, 14.328285°), LatLon{WGS84Latest}(39.330460°, 8.430780°), LatLon{WGS84Latest}(45.918388°, 10.886654°)]
+    sample_eu = [LatLon{WGS84Latest}(52.218550°, 4.420621°), LatLon{WGS84Latest}(41.353144°, 2.167639°), LatLon{WGS84Latest}(42.670341°, 23.322592°)]
 
     ita = GeoRegion(regionName="ITA", admin="Italy")
     eu = GeoRegion(; continent="Europe")
 
-    @test all(map(x -> in(x, ita), sample_ita)) # Test Poin(LatLon())
-    @test all(map(x -> in(coords(x), ita), sample_ita)) # Test LatLon()
-    @test all(map(x -> in(Cartesian2D{WGS84Latest}(coords(x).lon |> ustrip, coords(x).lat |> ustrip), ita), sample_ita)) # Test Cartesian2D()
+    @test all(map(x -> in(x, ita), sample_ita)) # Test LatLon()
+    @test all(map(x -> in(Point(x), ita), sample_ita)) # Test Point(LatLon())
 
-    @test all(map(x -> in(x, eu), sample_eu)) # Test Poin(LatLon())
-    @test all(map(x -> in(coords(x), eu), sample_eu)) # Test LatLon()
-    
+    @test all(map(x -> in(x, eu), sample_eu)) # Test LatLon()
+    @test all(map(x -> in(Point(x), eu), sample_eu)) # Test Point(LatLon())
+
     @test in(LatLon(0.7631954460103929rad, 0.22416033273563304rad), ita)
     @test in(LatLon(0.7631954460103929rad, 0.22416033273563304rad), eu)
     @test !in(LatLon(0.7085271959818754rad, -0.2072522112608427rad), eu)
@@ -25,9 +24,14 @@ end
     sample_border = [LatLon(10°, -5°), LatLon(10.1°, 10°), LatLon(27°, 15°)] # Due to the Predicates of Meshes the countour is not exact (acceptable)
     poly = PolyRegion("POLY", [LatLon(10°, -5°), LatLon(10°, 15°), LatLon(27°, 15°), LatLon(27°, -5°)])
 
-    @test all(map(x -> in(x, poly),sample_in))
-    @test all(map(x -> in(x, poly),sample_border))
-    @test !all(map(x -> in(x, poly),sample_out))
+    @test all(map(x -> in(x, poly), sample_in))
+    @test all(map(x -> in(Point(x), poly), sample_in))
+
+    @test all(map(x -> in(x, poly), sample_border))
+    @test all(map(x -> in(Point(x), poly), sample_border))
+
+    @test !all(map(x -> in(x, poly), sample_out))
+    @test !all(map(x -> in(Point(x), poly), sample_out))
 
     @test in(LatLon(0.24434609527920614rad, 0.017453292519943295rad), poly)
 end
@@ -36,15 +40,20 @@ end
     belt = LatBeltRegion(; regionName="test", latLim=(-60°, 60°))
     sample_in = [LatLon(14°, 1°), LatLon(26.9°, -65°), LatLon(10.1°, 70°)]
     sample_out = [LatLon(90°, 1°), LatLon(60.1°, 1°), LatLon(-62°, -4.9°), LatLon(-60.1°, 14.9°)]
-    
+
     @test all(map(x -> in(x, belt), sample_in))
+    @test all(map(x -> in(Point(x), belt), sample_in))
+
     @test !all(map(x -> in(x, belt), sample_out))
+    @test !all(map(x -> in(Point(x), belt), sample_out))
+
     @test in(LatLon(0.24434609527920614, 0.017453292519943295), belt)
 end
 
 ## borders()
 @testitem "Test borders for GeoRegion" tags = [:interface] begin
-    reg = GeoRegion(regionName="ITA", admin="Italy;Spain")    
+    reg = GeoRegion(regionName="ITA", admin="Italy;Spain")
+
     @test borders(reg) == map(x -> x.latlon, reg.domain)
     @test borders(LatLon, reg) == map(x -> x.latlon, reg.domain)
     @test borders(Cartesian, reg) == map(x -> x.cart, reg.domain)
@@ -52,6 +61,7 @@ end
 
 @testitem "Test borders for PolyRegion" tags = [:interface] begin
     poly = PolyRegion("POLY", [LatLon(10°, -5°), LatLon(10°, 15°), LatLon(27°, 15°), LatLon(27°, -5°)])
+
     @test borders(poly) == poly.domain.latlon
     @test borders(LatLon, poly) == poly.domain.latlon
     @test borders(Cartesian, poly) == poly.domain.cart
@@ -70,7 +80,7 @@ end
 
     @test centroid(LatLon, reg) == testPoint_latlon
     @test centroid(LatLon, reg.domain) == testPoint_latlon
-end 
+end
 
 @testitem "Test centroid for PolyRegion" tags = [:interface] begin
     poly = PolyRegion("POLY", [LatLon(10°, -5°), LatLon(10°, 15°), LatLon(27°, 15°), LatLon(27°, -5°)])
