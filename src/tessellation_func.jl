@@ -108,7 +108,7 @@ function _adapted_icogrid(radius::Number; refRadius=constants.Re_mean, correctio
 end
 
 """
-    _hex_tesselation_centroids(origin::LatLon, radius::Number; direction::Symbol=:pointy, Re::Number=constants.Re_mean, kwargs_lattice...)
+    _hex_tesselation_centroids(origin::Point{🌐,<:LatLon{WGS84Latest}}, radius::Number; direction::Symbol=:pointy, Re::Number=constants.Re_mean, kwargs_lattice...)
 
 This function generates the centroids of a hexagonal tessellation on the Earth's
 surface, centered at the origin. The tessellation is created based on a given
@@ -116,7 +116,8 @@ radius and direction. The function converts the offsets of the hexagonal grid to
 latitude and longitude coordinates.
 
 ## Arguments
-- `origin::LatLon`: The lat-lon coordinates of the center of the tessellation. 
+- `origin::Point{🌐,<:LatLon{WGS84Latest}}`: The lat-lon coordinates of the \
+center of the tessellation. 
 - `radius::Number`: The radius of the hexagons in the tessellation in meters.
 - `direction::Symbol`: The direction of the hexagons, either `:pointy` (default) \
 or `:flat`.
@@ -126,10 +127,11 @@ or `:flat`.
 generation.
 
 ## Returns
-- `Vector{LatLon}`: A vector of `LatLon` objects representing the \
-centroids of the hexagonal tessellation in latitude and longitude.
+- `Vector{Point{🌐,<:LatLon{WGS84Latest}}}`: A vector of \
+`Point{🌐,<:LatLon{WGS84Latest}}` objects representing the centroids of the \
+hexagonal tessellation in latitude and longitude.
 """
-function _hex_tesselation_centroids(origin::LatLon, radius::Number; direction::Symbol=:pointy, refRadius::Number=constants.Re_mean, kwargs_lattice...)
+function _hex_tesselation_centroids(origin::Point{🌐,<:LatLon{WGS84Latest}}, radius::Number; direction::Symbol=:pointy, refRadius::Number=constants.Re_mean, kwargs_lattice...)
     ## Generate the lattice centered in 0,0.
     # Angular spacing [rad] between lattice points considering a triple-point
     # overlap. This spacing represents the angle of the arc of length radius, on
@@ -138,8 +140,8 @@ function _hex_tesselation_centroids(origin::LatLon, radius::Number; direction::S
     offsetLattice = gen_hex_lattice(spacing, direction; kwargs_lattice...) # [rad]
 
     ## Re-center the lattice around the seed point.
-    θ = 90 - (origin.lat |> ustrip) |> deg2rad
-    ϕ = origin.lon |> ustrip |> deg2rad
+    θ = 90 - (origin.coords.lat |> ustrip) |> deg2rad
+    ϕ = origin.coords.lon |> ustrip |> deg2rad
     centreθφ = (; θ=θ, ϕ=ϕ) # [rad] Convert lat-lon in theta-phi (shperical approximation)
     newLattice = map(offsetLattice) do offset
         # 1 - Convert the lat-lon of the grid seed in spherical (ISO). 2 - The
@@ -167,7 +169,7 @@ function _hex_tesselation_centroids(origin::LatLon, radius::Number; direction::S
         new = _add_angular_offset(centreθφ, offsetθφ)
 
         lat, lon = _wrap_LatLon(π / 2 - new.θ |> rad2deg, new.ϕ |> rad2deg)
-        LatLon(lat, lon)
+        LatLon{WGS84Latest}(lat, lon) |> Point
     end
 
     return newLattice[:]
@@ -248,7 +250,7 @@ See also: [`gen_hex_lattice`](@ref), [`_generate_tesselation`](@ref),
 """
 function generate_tesselation(region::Union{GeoRegion,PolyRegion}, radius::Number, type::HEX; refRadius::Number=constants.Re_mean, kwargs_lattice...)
     # Generate the tassellation centroids.
-    origin = centroid(region.domain)
+    origin = centroid(LatLon, region)
     centroids = _hex_tesselation_centroids(origin, radius; direction=type.direction, refRadius, kwargs_lattice...)
 
     # Filter centroids in the region.
@@ -257,7 +259,7 @@ end
 
 function generate_tesselation(region::Union{GeoRegion,PolyRegion}, radius::Number, type::HEX, ::ExtraOutput; refRadius::Number=constants.Re_mean, kwargs_lattice...)
     # Generate the tassellation centroids.
-    origin = centroid(region.domain)
+    origin = centroid(LatLon, region)
     centroids = _hex_tesselation_centroids(origin, radius; direction=type.direction, refRadius, kwargs_lattice...)
 
     if type.pattern == :hex # Hexagonal pattern

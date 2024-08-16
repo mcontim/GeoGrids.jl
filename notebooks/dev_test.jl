@@ -107,12 +107,49 @@ begin
 	const polyReg = polyVec[2]
 end
 
+# ╔═╡ ce5dd648-6491-49a0-b63b-f749deffa613
+reg = GeoRegion(; regionName="Tassellation", test_pair...)
+	
+# centers = generate_tesselation(reg, 40000, HEX())
+# testcenters(centers)
+
+# ╔═╡ 92b098e2-107b-44ce-a48e-16edfc6bb96b
+centroid(LatLon,reg)
+
+# ╔═╡ e1581b65-aead-49f9-9a7c-cd0a0eb3c11e
+centroid(Cartesian,reg)
+
+# ╔═╡ 3e38213c-0dcd-4737-b82d-e97103cb8e1d
+typeof(centroid(LatLon, polyReg))
+
+# ╔═╡ 0a4f89b4-7cd9-46c2-96f5-767b00e27647
+centroid(Cartesian, polyReg)
+
+# ╔═╡ 26ae5f4e-ddb5-4e4d-b92d-42ed89619162
+centroid(LatLon, polyReg) isa Point{🌐,<:LatLon{WGS84Latest}}
+
 # ╔═╡ e0b2c99d-c689-48fb-91d5-6a3b4ee4d044
 let 
 	reg = GeoRegion(; regionName="Tassellation", admin="Spain")
 	centers, ngon = generate_tesselation(reg, 40000, HEX(;pattern=:circ), ExtraOutput())
 	plot_geo_cells(centers, ngon)
 end
+
+# ╔═╡ 7df04689-55fd-4659-b251-2100bf565580
+# ╠═╡ disabled = true
+#=╠═╡
+aaa=let
+	reg = GeoRegion(; regionName="Tassellation", test_pair...)
+	centroid(LatLon,reg)
+	# centers = generate_tesselation(reg, 40000, HEX())
+	# testcenters(centers)
+end
+  ╠═╡ =#
+
+# ╔═╡ b34086c0-d58a-41e4-8fd0-fc915fa49440
+#=╠═╡
+aaa.coords.lat
+  ╠═╡ =#
 
 # ╔═╡ ad9016de-1cce-4dc8-bdbf-2a2d65a4319f
 let 
@@ -204,13 +241,6 @@ function testcenters(c)
 	check = pattern_distance(c)
 	@info check
 	@info (hexNormMin=check.avgMin*coeff, hexNormAvg=check.avgAvg*coeff)
-end
-
-# ╔═╡ 7df04689-55fd-4659-b251-2100bf565580
-let
-	reg = GeoRegion(; regionName="Tassellation", test_pair...)
-	centers = generate_tesselation(reg, 40000, HEX())
-	testcenters(centers)
 end
 
 # ╔═╡ 3603a9e3-03cd-4861-a9af-b9d5657be13e
@@ -1578,12 +1608,19 @@ version = "17.4.0+2"
 # ╔═╡ Cell order:
 # ╠═069444e1-4e89-4f4f-ae2f-f5fb3131e398
 # ╟─0db4a84d-f4cf-4cea-8e6b-5b0480d3f6ff
+# ╠═ce5dd648-6491-49a0-b63b-f749deffa613
+# ╠═92b098e2-107b-44ce-a48e-16edfc6bb96b
+# ╠═e1581b65-aead-49f9-9a7c-cd0a0eb3c11e
+# ╠═3e38213c-0dcd-4737-b82d-e97103cb8e1d
+# ╠═0a4f89b4-7cd9-46c2-96f5-767b00e27647
+# ╠═26ae5f4e-ddb5-4e4d-b92d-42ed89619162
 # ╟─3ce21344-e0ea-4e41-b78e-cf92dc9ac2e7
 # ╠═a34e4ff6-51f9-4d6b-af28-5e856adea1ed
 # ╟─222fb774-1693-4b3c-b2ef-5fd38eca773c
 # ╟─ca4efc79-7cf3-46de-b03e-643c29254818
 # ╠═e0b2c99d-c689-48fb-91d5-6a3b4ee4d044
 # ╠═7df04689-55fd-4659-b251-2100bf565580
+# ╠═b34086c0-d58a-41e4-8fd0-fc915fa49440
 # ╠═ad9016de-1cce-4dc8-bdbf-2a2d65a4319f
 # ╠═3603a9e3-03cd-4861-a9af-b9d5657be13e
 # ╟─b12ae026-8fbb-4687-98df-f7a2fe9672b6
