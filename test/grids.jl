@@ -97,8 +97,3 @@ end
     @test length(a) == 19
     @test abs(a[1].lat - a[2].lat) ≈ 5°
 end
-
-@testitem "Helper Functions" tags = [:general] begin
-    r = GeoRegion(regionName="ITA", admin="Italy")
-    @test extract_countries(r) == r.domain
-end

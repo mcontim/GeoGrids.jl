@@ -1,4 +1,4 @@
-
+## boders()
 # Define borders for PolyRegion
 borders(::Type{LatLon}, pb::PolyBorder) = pb.latlon
 borders(::Type{Cartesian}, pb::PolyBorder) = pb.cart
@@ -15,6 +15,7 @@ function borders(::Type{T}, gr::GeoRegion) where {T}
 end
 borders(gr::GeoRegion) = map(x -> CountriesBorders.borders(LatLon, x), gr.domain)
 
+## Base.in()
 """
     Base.in(point::LatLon, domain::GeoRegion) -> Bool
     Base.in(point::LatLon, domain::PolyRegion) -> Bool
@@ -39,8 +40,7 @@ Base.in(p::LatLon, pr::PolyRegion) = in(p, pr.domain)
 
 Base.in(point::LatLon, domain::LatBeltRegion) = domain.latLim[1] < point.lat < domain.latLim[2]
 
-
-## Centroid
+## centroid()
 # Define ad-hoc methods for GeoRegion - using centroid definition of CountriesBorders.jl
 Meshes.centroid(crs::Type{<:Union{LatLon, Cartesian}}, d::GeoRegion) = centroid(crs, d.domain) # Fallback on all the definitions in CountriesBorders.jl for CountryBorder
 Meshes.centroid(d::GeoRegion) = centroid(Cartesian, d)
