@@ -1,5 +1,5 @@
 """
-    filter_points(points::Array{<:LatLon}, domain::Union{GeoRegion, PolyRegion, LatBeltRegion}) -> Vector{Input Type}
+    filter_points(points::AbstractVector{<:LatLon}, domain::Union{GeoRegion, PolyRegion, LatBeltRegion}) -> Vector{Input Type}
     
 Filters a list of points based on whether they fall within a specified
 geographical domain.
@@ -16,13 +16,13 @@ indices of the filtered points (wrt the input).
 - A vector of points that fall within the specified domain, subsection of the \
 input vector. The output is of the same type as the input.
 """
-function filter_points(points::Array{<:Union{LatLon, Point{🌐,<:LatLon{WGS84Latest}}}}, domain::Union{GeoRegion,PolyRegion,LatBeltRegion})
+function filter_points(points::AbstractVector{<:Union{LatLon, Point{🌐,<:LatLon{WGS84Latest}}}}, domain::Union{GeoRegion,PolyRegion,LatBeltRegion})
     filtered = filter(x -> in(x, domain), points)
 
     return filtered
 end
 
-function filter_points(points::Array{<:Union{LatLon, Point{🌐,<:LatLon{WGS84Latest}}}}, domain::Union{GeoRegion,PolyRegion,LatBeltRegion}, ::EO)
+function filter_points(points::AbstractVector{<:Union{LatLon, Point{🌐,<:LatLon{WGS84Latest}}}}, domain::Union{GeoRegion,PolyRegion,LatBeltRegion}, ::EO)
     # filt = filter(x -> in(x, domain), points)
     indices = findall(x -> in(x, domain), points)
 
@@ -30,7 +30,7 @@ function filter_points(points::Array{<:Union{LatLon, Point{🌐,<:LatLon{WGS84La
 end
 
 """
-    group_by_domain(points::Array{<:LatLon}, domains::Array; flagUnique=true)
+    group_by_domain(points::AbstractVector{<:LatLon}, domains::AbstractVector; flagUnique=true)
 
 Group points by regions defined in the `domains` array.
 
@@ -56,7 +56,7 @@ assigned to regions in the order they appear in the `domains` array.
 - The function uses the `in` function to determine if a point belongs to a \
 region.
 """
-function group_by_domain(points::Array{<:Union{LatLon, Point{🌐,<:LatLon{WGS84Latest}}}}, domains::Array; flagUnique=true)
+function group_by_domain(points::AbstractVector{<:Union{LatLon, Point{🌐,<:LatLon{WGS84Latest}}}}, domains::AbstractVector; flagUnique=true)
     # Check region names validity
     names = map(x -> x.regionName, domains)
     length(unique(names)) == length(names) || error("The region names passed to group_by must be unique...")

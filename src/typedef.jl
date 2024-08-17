@@ -3,6 +3,12 @@ const UnitfulAngleType = Union{typeof(°),typeof(rad)}
 const UnitfulAngleQuantity = Quantity{<:Real,<:Any,<:UnitfulAngleType}
 const ValidAngle = Union{UnitfulAngleQuantity,Real}
 
+const constants = (
+    Re_mean = 6371e3, # Mean Earth Radius [m]
+    a = 6378137, # [m] WGS84 semi-major axis
+    b = 6356752.315 # [m] WGS84 semi-minor axis
+)
+
 ## Define Region Types
 abstract type AbstractRegion end
 
@@ -113,9 +119,3 @@ Struct used to create function methods that return more than one output.
 Used within multiple methods of the GeoGrids API, usually given as last optional argument.
 """
 struct EO end
-
-const constants = (
-    Re_mean = 6371e3, # Mean Earth Radius [m]
-    a = 6378137, # [m] WGS84 semi-major axis
-    b = 6356752.315 # [m] WGS84 semi-minor axis
-)

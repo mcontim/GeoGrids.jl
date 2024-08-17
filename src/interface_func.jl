@@ -54,3 +54,6 @@ function Meshes.centroid(::Type{LatLon}, d::PolyBorder)
 end
 Meshes.centroid(crs::Type{<:Union{LatLon,Cartesian}}, d::PolyRegion) = centroid(crs, d.domain)
 Meshes.centroid(d::PolyRegion) = centroid(Cartesian, d.domain)
+
+## CountriesBorders.extract_countries()
+CountriesBorders.extract_countries(r::GeoRegion) = r.domain
