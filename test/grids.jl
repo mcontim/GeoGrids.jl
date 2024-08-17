@@ -41,12 +41,14 @@ Consider using `°` (or `rad`) from `Unitful` if you want to pass numbers in deg
 end
 
 @testitem "Mesh Grid Functions" tags = [:general] begin
-    @test rectgrid(5) isa Matrix{<:LatLon}
-    @test rectgrid(5°) isa Matrix{<:LatLon}
-    @test rectgrid(deg2rad(5) * rad) isa Matrix{<:LatLon}
-    @test rectgrid(5; yRes=3) isa Matrix{<:LatLon}
-    @test rectgrid(5°; yRes=3°) isa Matrix{<:LatLon}
-    @test rectgrid(deg2rad(5) * rad; yRes=deg2rad(3) * rad) isa Matrix{<:LatLon}
+    using Meshes: 🌐, WGS84Latest
+    
+    @test rectgrid(5) isa Matrix{<:Point{🌐,<:LatLon{WGS84Latest}}}
+    @test rectgrid(5°) isa Matrix{<:Point{🌐,<:LatLon{WGS84Latest}}}
+    @test rectgrid(deg2rad(5) * rad) isa Matrix{<:Point{🌐,<:LatLon{WGS84Latest}}}
+    @test rectgrid(5; yRes=3) isa Matrix{<:Point{🌐,<:LatLon{WGS84Latest}}}
+    @test rectgrid(5°; yRes=3°) isa Matrix{<:Point{🌐,<:LatLon{WGS84Latest}}}
+    @test rectgrid(deg2rad(5) * rad; yRes=deg2rad(3) * rad) isa Matrix{<:Point{🌐,<:LatLon{WGS84Latest}}}
 
     @test_throws "Resolution of x is too large, it must be smaller than 180°..." rectgrid(181°)
     @test_throws "Resolution of y is too large, it must be smaller than 180°..." rectgrid(5°; yRes=181°)
@@ -61,41 +63,43 @@ end
     @test length(b) == 2664
     @test length(c) == 2664
 
-    @test a[1, 1].lat ≈ -90°
-    @test a[1, 1].lon ≈ -175°
-    @test a[end, end].lat ≈ 90°
-    @test a[end, end].lon ≈ 180°
-    @test abs(a[1, 2].lon - a[1, 1].lon) ≈ 5°
-    @test abs(a[1, 2].lat - a[1, 1].lat) ≈ 0°
-    @test abs(a[2, 1].lon - a[1, 1].lon) ≈ 0°
-    @test abs(a[2, 1].lat - a[1, 1].lat) ≈ 5°
-    @test b[1, 1].lat ≈ -90°
-    @test b[1, 1].lon ≈ -175°
-    @test b[end, end].lat ≈ 90°
-    @test b[end, end].lon ≈ 180°
-    @test abs(b[1, 2].lon - b[1, 1].lon) ≈ 5°
-    @test abs(b[1, 2].lat - b[1, 1].lat) ≈ 0°
-    @test abs(b[2, 1].lon - b[1, 1].lon) ≈ 0°
-    @test abs(b[2, 1].lat - b[1, 1].lat) ≈ 5°
-    @test c[1, 1].lat ≈ -90°
-    @test c[1, 1].lon ≈ -175°
-    @test c[end, end].lat ≈ 90°
-    @test c[end, end].lon ≈ 180°
-    @test abs(c[1, 2].lon - c[1, 1].lon) ≈ 5°
-    @test abs(c[1, 2].lat - c[1, 1].lat) ≈ 0°
-    @test abs(c[2, 1].lon - c[1, 1].lon) ≈ 0°
-    @test abs(c[2, 1].lat - c[1, 1].lat) ≈ 5°
+    @test get_lat(a[1, 1]) ≈ -90°
+    @test get_lon(a[1, 1]) ≈ -175°
+    @test get_lat(a[end, end]) ≈ 90°
+    @test get_lon(a[end, end]) ≈ 180°
+    @test abs(get_lon(a[1, 2]) - get_lon(a[1, 1])) ≈ 5°
+    @test abs(get_lat(a[1, 2]) - get_lat(a[1, 1])) ≈ 0°
+    @test abs(get_lon(a[2, 1]) - get_lon(a[1, 1])) ≈ 0°
+    @test abs(get_lat(a[2, 1]) - get_lat(a[1, 1])) ≈ 5°
+    @test get_lat(b[1, 1]) ≈ -90°
+    @test get_lon(b[1, 1]) ≈ -175°
+    @test get_lat(b[end, end]) ≈ 90°
+    @test get_lon(b[end, end]) ≈ 180°
+    @test abs(get_lon(b[1, 2]) - get_lon(b[1, 1])) ≈ 5°
+    @test abs(get_lat(b[1, 2]) - get_lat(b[1, 1])) ≈ 0°
+    @test abs(get_lon(b[2, 1]) - get_lon(b[1, 1])) ≈ 0°
+    @test abs(get_lat(b[2, 1]) - get_lat(b[1, 1])) ≈ 5°
+    @test get_lat(c[1, 1]) ≈ -90°
+    @test get_lon(c[1, 1]) ≈ -175°
+    @test get_lat(c[end, end]) ≈ 90°
+    @test get_lon(c[end, end]) ≈ 180°
+    @test abs(get_lon(c[1, 2]) - get_lon(c[1, 1])) ≈ 5°
+    @test abs(get_lat(c[1, 2]) - get_lat(c[1, 1])) ≈ 0°
+    @test abs(get_lon(c[2, 1]) - get_lon(c[1, 1])) ≈ 0°
+    @test abs(get_lat(c[2, 1]) - get_lat(c[1, 1])) ≈ 5°
 end
 
 @testitem "Vec Grid Functions" tags = [:general] begin
-    @test vecgrid(5) isa Vector{<:LatLon}
-    @test vecgrid(5°) isa Vector{<:LatLon}
-    @test vecgrid(deg2rad(5) * rad) isa Vector{<:LatLon}
+    using Meshes: 🌐, WGS84Latest
+
+    @test vecgrid(5) isa Vector{<:Point{🌐,<:LatLon{WGS84Latest}}}
+    @test vecgrid(5°) isa Vector{<:Point{🌐,<:LatLon{WGS84Latest}}}
+    @test vecgrid(deg2rad(5) * rad) isa Vector{<:Point{🌐,<:LatLon{WGS84Latest}}}
 
     @test_throws "Resolution of grid is too large, it must be smaller than 90°..." vecgrid(91)
     @test_logs (:warn, "Input gridRes is negative, it will be converted to positive...") vecgrid(-deg2rad(5) * rad)
 
     a = vecgrid(5)
     @test length(a) == 19
-    @test abs(a[1].lat - a[2].lat) ≈ 5°
+    @test abs(get_lat(a[1]) - get_lat(a[2])) ≈ 5°
 end

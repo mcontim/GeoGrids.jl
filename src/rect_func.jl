@@ -44,7 +44,7 @@ function rectgrid(xRes::ValidAngle; yRes::ValidAngle=xRes)
     end
 
     # Create the rectangular grid of elements LatLon
-    mat = [LatLon(x, y) for x in -90°:_xRes:90°, y in (-180°:_yRes:180°)[2:end]]
+    mat = [LatLon{WGS84Latest}(x, y) |> Point for x in -90°:_xRes:90°, y in (-180°:_yRes:180°)[2:end]]
 
     return mat
 end
@@ -65,7 +65,7 @@ fixed longitude of `0°`.
 be a real number (interpreted as degrees) or a `ValidAngle`.
 
 ## Returns
-- A vector of `LatLon` objects representing latitude points from the \
+- A vector of `Point{🌐,<:LatLon{WGS84Latest}}` objects representing latitude points from the \
 equator (0°) to the North Pole (90°) with the specified resolution.
 """
 function vecgrid(gridRes::ValidAngle)
@@ -81,7 +81,7 @@ function vecgrid(gridRes::ValidAngle)
         end
     end
     # Create LAT vector
-    vec = map(x -> LatLon(x, 0°), 0°:_gridRes:90°) # LAT vector from 0° to 90°
+    vec = map(x -> LatLon{WGS84Latest}(x, 0°) |> Point, 0°:_gridRes:90°) # LAT vector from 0° to 90°
 
     return vec
 end

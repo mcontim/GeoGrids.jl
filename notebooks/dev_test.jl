@@ -116,8 +116,29 @@ end
 # ╔═╡ c5c83d2c-a124-49ab-a4ae-9b6a258a3388
 ico = icogrid(sepAng=5)
 
+# ╔═╡ 4a9dcc19-dd52-49fa-b54b-8b9d02acd76f
+ico[1].coords.lat
+
+# ╔═╡ 7ba10baa-463d-4f9b-a770-e5886b661bdc
+rec = rectgrid(5)
+
+# ╔═╡ 547fdf96-5933-4092-a335-c23bf506b001
+typeof(rec)
+
+# ╔═╡ 7096fe53-e9dc-49a3-b556-f78b20694557
+rec[1,1]
+
+# ╔═╡ 38b2b97d-d327-4f17-95f6-dd9f7c461768
+rec[1,1].coords.lat
+
+# ╔═╡ 2d13930e-db69-457b-b45d-70169e73a907
+rec isa Array{<:Point{🌐,<:LatLon{WGS84Latest}}}
+
 # ╔═╡ ee865927-c12a-41d9-a6b9-dadaf3ec3c5a
 typeof(get_lat(ico[1]))
+
+# ╔═╡ 830d53f7-0543-4dd6-aafc-216d3b9e659d
+LatLon(10,10)
 
 # ╔═╡ 1663771c-5661-4c21-ae67-39cbef3a0c73
 maximum(map(x -> get_lat(x), gesu))
@@ -1606,7 +1627,14 @@ version = "17.4.0+2"
 # ╠═069444e1-4e89-4f4f-ae2f-f5fb3131e398
 # ╟─0db4a84d-f4cf-4cea-8e6b-5b0480d3f6ff
 # ╠═c5c83d2c-a124-49ab-a4ae-9b6a258a3388
+# ╠═7ba10baa-463d-4f9b-a770-e5886b661bdc
+# ╠═547fdf96-5933-4092-a335-c23bf506b001
+# ╠═7096fe53-e9dc-49a3-b556-f78b20694557
+# ╠═38b2b97d-d327-4f17-95f6-dd9f7c461768
+# ╠═4a9dcc19-dd52-49fa-b54b-8b9d02acd76f
+# ╠═2d13930e-db69-457b-b45d-70169e73a907
 # ╠═ee865927-c12a-41d9-a6b9-dadaf3ec3c5a
+# ╠═830d53f7-0543-4dd6-aafc-216d3b9e659d
 # ╠═ce5dd648-6491-49a0-b63b-f749deffa613
 # ╠═cee0416f-ffb8-4b97-9b53-32084c9e405f
 # ╠═dfac1d27-a63e-426d-b2eb-13edf10eb0b7
