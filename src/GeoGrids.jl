@@ -27,10 +27,10 @@ export AbstractRegion, GlobalRegion, GeoRegion, PolyRegion, LatBeltRegion,
 # UnitfulAngleType, UnitfulAngleQuantity, ValidAngle,
 
 export icogrid, rectgrid, vecgrid,
-    extract_countries, in, filter_points, group_by_domain,
+    extract_countries, filter_points, group_by_domain,
     gen_hex_lattice, generate_tesselation, _tesselate, gen_circle_pattern, gen_hex_pattern,
-    EO,
-    borders, centroid
+    borders, centroid, in, get_lat, get_lon,
+    EO
 
 export °, rad, ustrip,
     LatLon, Cartesian2D, WGS84Latest, coords, PolyArea, Point,

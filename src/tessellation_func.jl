@@ -450,7 +450,7 @@ function gen_circle_pattern(centers::AbstractVector{Point{🌐,<:LatLon{WGS84Lat
 
     return circles
 end
-gen_circle_pattern(c::Point{🌐,<:LatLon{WGS84Latest}}, radius::Number; kwargs...) = function gen_circle_pattern([c], radius; kwargs...)
+gen_circle_pattern(c::Point{🌐,<:LatLon{WGS84Latest}}, radius::Number; kwargs...) = gen_circle_pattern([c], radius; kwargs...)
 # Utility for the user which can call the function using directly centers expressed in LatLon.
 gen_circle_pattern(centers::AbstractVector{<:LatLon}, radius::Number; kwargs...) = gen_circle_pattern(map(x -> Point(x), centers), radius; kwargs...) 
 gen_circle_pattern(c::LatLon, radius::Number; kwargs...) = gen_circle_pattern([c], radius; kwargs...)

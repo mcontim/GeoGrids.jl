@@ -16,7 +16,7 @@ optional and defaults to `xRes` if not provided. This can be a real number \
 (interpreted as degrees) or a `ValidAngle`.
 
 ## Returns
-- A 2D array of `LatLon` objects representing the grid of latitude and \
+- A 2D array of `Point{🌐,<:LatLon{WGS84Latest}}` objects representing the grid of latitude and \
 longitude points.
 """
 function rectgrid(xRes::ValidAngle; yRes::ValidAngle=xRes)

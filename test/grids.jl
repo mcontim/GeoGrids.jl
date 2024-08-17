@@ -4,10 +4,12 @@
 end
 
 @testitem "Icogrid Functions" tags = [:general] begin
+    using Meshes: 🌐, WGS84Latest
+    
     @test GeoGrids._icogrid(100; coord=:cart) isa Vector{SVector{3,Float64}}
     @test GeoGrids._icogrid(100; coord=:sphe) isa Vector{SVector{2,Float64}}
 
-    @test icogrid(N=100) isa Vector{<:LatLon}
+    @test icogrid(N=100) isa Vector{<:Point{🌐,<:LatLon{WGS84Latest}}}
 
     a = icogrid(sepAng=5)
     b = icogrid(sepAng=5°)

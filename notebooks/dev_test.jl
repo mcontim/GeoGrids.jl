@@ -113,6 +113,12 @@ md"""
 	import >.CoordRefSystems
 end
 
+# ╔═╡ c5c83d2c-a124-49ab-a4ae-9b6a258a3388
+ico = icogrid(sepAng=5)
+
+# ╔═╡ ee865927-c12a-41d9-a6b9-dadaf3ec3c5a
+typeof(get_lat(ico[1]))
+
 # ╔═╡ 1663771c-5661-4c21-ae67-39cbef3a0c73
 maximum(map(x -> get_lat(x), gesu))
 
@@ -1599,6 +1605,8 @@ version = "17.4.0+2"
 # ╔═╡ Cell order:
 # ╠═069444e1-4e89-4f4f-ae2f-f5fb3131e398
 # ╟─0db4a84d-f4cf-4cea-8e6b-5b0480d3f6ff
+# ╠═c5c83d2c-a124-49ab-a4ae-9b6a258a3388
+# ╠═ee865927-c12a-41d9-a6b9-dadaf3ec3c5a
 # ╠═ce5dd648-6491-49a0-b63b-f749deffa613
 # ╠═cee0416f-ffb8-4b97-9b53-32084c9e405f
 # ╠═dfac1d27-a63e-426d-b2eb-13edf10eb0b7
