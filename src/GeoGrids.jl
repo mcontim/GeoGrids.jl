@@ -33,7 +33,7 @@ export icogrid, rectgrid, vecgrid,
     EO
 
 export °, rad, ustrip,
-    LatLon, Cartesian2D, WGS84Latest, coords, PolyArea, Point,
+    LatLon, Cartesian, WGS84Latest, coords, PolyArea, Point,
     SVector
 
 end # module GeoGrids 

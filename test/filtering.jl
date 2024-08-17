@@ -22,7 +22,7 @@ end
 @testitem "PolyRegion Test" tags = [:filtering] begin
     sample_in = [LatLon(14°, 1°), LatLon(26.9°, -4.9°), LatLon(10.1°, 14.9°)]
     sample_out = [LatLon(0°, 0°), LatLon(10°, -5.2°), LatLon(27°, 15.3°)]
-    sample_border = [LatLon(10°, -5°), LatLon(10.1°, 10°), LatLon(27°, 15°)] # Due to the Predicates of Meshes the countour is not exact (acceptable)
+
     poly = PolyRegion("POLY", [LatLon(10°, -5°), LatLon(10°, 15°), LatLon(27°, 15°), LatLon(27°, -5°)])
     vertex = [LatLon(10°, -5°), LatLon(10°, 15°), LatLon(27°, 15°), LatLon(27°, -5°)]
 
@@ -66,4 +66,61 @@ Consider using `°` (or `rad`) from `Unitful` if you want to pass numbers in deg
     
     @test filter_points([LatLon(14°, 1°), LatLon(90°, 1°), LatLon(60.1°, 1°), LatLon(26.9°, -65°), LatLon(-62°, -4.9°), LatLon(-60.1°, 14.9°), LatLon(10.1°, 70°)], belt) == sample_in
     @test filter_points(map(x -> Point(x), [LatLon(14°, 1°), LatLon(90°, 1°), LatLon(60.1°, 1°), LatLon(26.9°, -65°), LatLon(-62°, -4.9°), LatLon(-60.1°, 14.9°), LatLon(10.1°, 70°)]), belt) == map(x -> Point(x), sample_in) # Additional test for type Point(LatLon())
+end
+
+@testitem "Group By Test" tags = [:filtering] begin
+    using Meshes: 🌐, WGS84Latest
+
+    ita = GeoRegion(; regionName="ITA", admin="Italy")
+    eu = GeoRegion(; regionName="EU", continent="Europe")
+    poly = PolyRegion("POLY", [LatLon(10°, -5°), LatLon(10°, 15°), LatLon(27°, 15°), LatLon(27°, -5°)])
+    belt = LatBeltRegion(; regionName="BELT", latLim=(0°, 5°))
+    
+    sample_in_ita = [LatLon(43.727878°, 12.843441°), LatLon(43.714933°, 10.399326°), LatLon(37.485829°, 14.328285°), LatLon(39.330460°, 8.430780°), LatLon(45.918388°, 10.886654°)]
+    sample_in_poly = [LatLon(14°, 1°), LatLon(26.9°, -4.9°), LatLon(10.1°, 14.9°)]
+    sample_out_poly = [LatLon(0°, 0°), LatLon(10°, -5.2°), LatLon(27°, 15.3°)]
+    sample_in_belt = [LatLon(1°, 1°), LatLon(2.5°, -65°), LatLon(4.9°, 70°)]
+    sample_out_belt = [LatLon(90°, 1°), LatLon(60.1°, 1°), LatLon(-62°, -4.9°), LatLon(-60.1°, 14.9°)]
+
+    big_vec = [sample_in_ita..., sample_in_poly..., sample_out_poly..., sample_in_belt..., sample_out_belt...]
+
+    # Test with LatLon
+    # Unique test
+    groups_unique = group_by_domain(big_vec, [ita, eu, poly, belt])
+    @test groups_unique["ITA"] == sample_in_ita
+    @test groups_unique["POLY"] == sample_in_poly
+    @test groups_unique["BELT"] == sample_in_belt
+    @test isempty(groups_unique["EU"])
+    @test groups_unique["ITA"] isa Vector{<:LatLon}
+    @test groups_unique["POLY"] isa Vector{<:LatLon}
+    @test groups_unique["BELT"] isa Vector{<:LatLon}
+    # Repeated elements test
+    groups = group_by_domain(big_vec, [ita, eu, poly, belt]; flagUnique=false)
+    @test groups["ITA"] == sample_in_ita
+    @test groups["EU"] == sample_in_ita
+    @test groups["POLY"] == sample_in_poly
+    @test groups["BELT"] == sample_in_belt
+    @test groups["ITA"] isa Vector{<:LatLon}
+    @test groups["POLY"] isa Vector{<:LatLon}
+    @test groups["BELT"] isa Vector{<:LatLon}
+
+    # Test with Point(LatLon)
+    # Unique test
+    groups_unique = group_by_domain(map(x -> Point(x), big_vec), [ita, eu, poly, belt])
+    @test groups_unique["ITA"] == map(x -> Point(x), sample_in_ita)
+    @test groups_unique["POLY"] == map(x -> Point(x), sample_in_poly)
+    @test groups_unique["BELT"] == map(x -> Point(x), sample_in_belt)
+    @test isempty(groups_unique["EU"])
+    @test groups_unique["ITA"] isa Vector{<:Point{🌐,<:LatLon{WGS84Latest}}}
+    @test groups_unique["POLY"] isa Vector{<:Point{🌐,<:LatLon{WGS84Latest}}}
+    @test groups_unique["BELT"] isa Vector{<:Point{🌐,<:LatLon{WGS84Latest}}}
+    # Repeated elements test
+    groups = group_by_domain(map(x -> Point(x), big_vec), [ita, eu, poly, belt]; flagUnique=false)
+    @test groups["ITA"] == map(x -> Point(x), sample_in_ita)
+    @test groups["EU"] == map(x -> Point(x), sample_in_ita)
+    @test groups["POLY"] == map(x -> Point(x), sample_in_poly)
+    @test groups["BELT"] == map(x -> Point(x), sample_in_belt)
+    @test groups["ITA"] isa Vector{<:Point{🌐,<:LatLon{WGS84Latest}}}
+    @test groups["POLY"] isa Vector{<:Point{🌐,<:LatLon{WGS84Latest}}}
+    @test groups["BELT"] isa Vector{<:Point{🌐,<:LatLon{WGS84Latest}}}
 end

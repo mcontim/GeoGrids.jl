@@ -113,36 +113,6 @@ md"""
 	import >.CoordRefSystems
 end
 
-# ╔═╡ c5c83d2c-a124-49ab-a4ae-9b6a258a3388
-ico = icogrid(sepAng=5)
-
-# ╔═╡ 4a9dcc19-dd52-49fa-b54b-8b9d02acd76f
-ico[1].coords.lat
-
-# ╔═╡ 7ba10baa-463d-4f9b-a770-e5886b661bdc
-rec = rectgrid(5)
-
-# ╔═╡ 547fdf96-5933-4092-a335-c23bf506b001
-typeof(rec)
-
-# ╔═╡ 7096fe53-e9dc-49a3-b556-f78b20694557
-rec[1,1]
-
-# ╔═╡ 38b2b97d-d327-4f17-95f6-dd9f7c461768
-rec[1,1].coords.lat
-
-# ╔═╡ 2d13930e-db69-457b-b45d-70169e73a907
-rec isa Array{<:Point{🌐,<:LatLon{WGS84Latest}}}
-
-# ╔═╡ ee865927-c12a-41d9-a6b9-dadaf3ec3c5a
-typeof(get_lat(ico[1]))
-
-# ╔═╡ 830d53f7-0543-4dd6-aafc-216d3b9e659d
-LatLon(10,10)
-
-# ╔═╡ 1663771c-5661-4c21-ae67-39cbef3a0c73
-maximum(map(x -> get_lat(x), gesu))
-
 # ╔═╡ a34e4ff6-51f9-4d6b-af28-5e856adea1ed
 begin
 	const test_pair = (;admin="Greenland")
@@ -153,14 +123,30 @@ begin
 	const polyReg = polyVec[2]
 end
 
-# ╔═╡ ce5dd648-6491-49a0-b63b-f749deffa613
-reg = GeoRegion(; regionName="Tassellation", test_pair...)
+# ╔═╡ 56005d86-0377-4d40-b63b-d5597acddc32
+gr = let
+   ita = GeoRegion(; regionName="ITA", admin="Italy")
+    eu = GeoRegion(; regionName="EU", continent="Europe")
+    poly = PolyRegion("POLY", [LatLon(10°, -5°), LatLon(10°, 15°), LatLon(27°, 15°), LatLon(27°, -5°)])
+    belt = LatBeltRegion(; regionName="BELT", latLim=(-60°, 60°))
+    
+    sample_in_ita = [LatLon(43.727878°, 12.843441°), LatLon(43.714933°, 10.399326°), LatLon(37.485829°, 14.328285°), LatLon(39.330460°, 8.430780°), LatLon(45.918388°, 10.886654°)]
+    sample_in_poly = [LatLon(14°, 1°), LatLon(26.9°, -4.9°), LatLon(10.1°, 14.9°)]
+    sample_out_poly = [LatLon(0°, 0°), LatLon(10°, -5.2°), LatLon(27°, 15.3°)]
+    sample_in_belt = [LatLon(14°, 1°), LatLon(26.9°, -65°), LatLon(10.1°, 70°)]
+    sample_out_belt = [LatLon(90°, 1°), LatLon(60.1°, 1°), LatLon(-62°, -4.9°), LatLon(-60.1°, 14.9°)]
 
-# ╔═╡ cee0416f-ffb8-4b97-9b53-32084c9e405f
-centers = generate_tesselation(reg, 40000, HEX())
+    big_vec = [sample_in_ita..., sample_in_poly..., sample_out_poly..., sample_in_belt..., sample_out_belt...]
 
-# ╔═╡ dfac1d27-a63e-426d-b2eb-13edf10eb0b7
-generate_tesselation(reg, 40000, HEX(), EO())
+    groups_unique = group_by_domain(big_vec, [ita, eu, poly, belt])
+end
+
+# ╔═╡ c8d4cd0e-0876-4c16-9146-12ed16516ebe
+gr["ITA"]
+
+# ╔═╡ b2216550-1473-4062-8485-66af57f2fe37
+    sample_in_ita = [LatLon(43.727878°, 12.843441°), LatLon(43.714933°, 10.399326°), LatLon(37.485829°, 14.328285°), LatLon(39.330460°, 8.430780°), LatLon(45.918388°, 10.886654°)]
+
 
 # ╔═╡ e0b2c99d-c689-48fb-91d5-6a3b4ee4d044
 let 
@@ -1626,21 +1612,11 @@ version = "17.4.0+2"
 # ╔═╡ Cell order:
 # ╠═069444e1-4e89-4f4f-ae2f-f5fb3131e398
 # ╟─0db4a84d-f4cf-4cea-8e6b-5b0480d3f6ff
-# ╠═c5c83d2c-a124-49ab-a4ae-9b6a258a3388
-# ╠═7ba10baa-463d-4f9b-a770-e5886b661bdc
-# ╠═547fdf96-5933-4092-a335-c23bf506b001
-# ╠═7096fe53-e9dc-49a3-b556-f78b20694557
-# ╠═38b2b97d-d327-4f17-95f6-dd9f7c461768
-# ╠═4a9dcc19-dd52-49fa-b54b-8b9d02acd76f
-# ╠═2d13930e-db69-457b-b45d-70169e73a907
-# ╠═ee865927-c12a-41d9-a6b9-dadaf3ec3c5a
-# ╠═830d53f7-0543-4dd6-aafc-216d3b9e659d
-# ╠═ce5dd648-6491-49a0-b63b-f749deffa613
-# ╠═cee0416f-ffb8-4b97-9b53-32084c9e405f
-# ╠═dfac1d27-a63e-426d-b2eb-13edf10eb0b7
-# ╠═1663771c-5661-4c21-ae67-39cbef3a0c73
 # ╟─3ce21344-e0ea-4e41-b78e-cf92dc9ac2e7
 # ╠═a34e4ff6-51f9-4d6b-af28-5e856adea1ed
+# ╠═56005d86-0377-4d40-b63b-d5597acddc32
+# ╠═c8d4cd0e-0876-4c16-9146-12ed16516ebe
+# ╠═b2216550-1473-4062-8485-66af57f2fe37
 # ╟─222fb774-1693-4b3c-b2ef-5fd38eca773c
 # ╟─ca4efc79-7cf3-46de-b03e-643c29254818
 # ╠═e0b2c99d-c689-48fb-91d5-6a3b4ee4d044
