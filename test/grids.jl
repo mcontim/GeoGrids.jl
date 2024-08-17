@@ -13,25 +13,25 @@ end
     b = icogrid(sepAng=5°)
     c = icogrid(sepAng=deg2rad(5) * rad)
 
-    @test a isa Vector{<:LatLon}
-    @test b isa Vector{<:LatLon}
-    @test c isa Vector{<:LatLon}
+    @test a isa Vector{<:Point{🌐,<:LatLon{WGS84Latest}}}
+    @test b isa Vector{<:Point{🌐,<:LatLon{WGS84Latest}}}
+    @test c isa Vector{<:Point{🌐,<:LatLon{WGS84Latest}}}
     @test length(a) == 1260
     @test length(b) == 1260
     @test length(c) == 1260
 
-    @test abs(a[1].lat - 87.7171°) < 1e-4
-    @test abs(a[1].lon - 0.0°) < 1e-4
-    @test abs(a[end].lat - -87.7171°) < 1e-4
-    @test abs(a[end].lon - 37.7251°) < 1e-4
-    @test abs(b[1].lat - 87.7171°) < 1e-4
-    @test abs(b[1].lon - 0.0°) < 1e-4
-    @test abs(b[end].lat - -87.7171°) < 1e-4
-    @test abs(b[end].lon - 37.7251°) < 1e-4
-    @test abs(c[1].lat - 87.7171°) < 1e-4
-    @test abs(c[1].lon - 0.0°) < 1e-4
-    @test abs(c[end].lat - -87.7171°) < 1e-4
-    @test abs(c[end].lon - 37.7251°) < 1e-4
+    @test abs(get_lat(a[1]) - 87.7171°) < 1e-4
+    @test abs(get_lon(a[1]) - 0.0°) < 1e-4
+    @test abs(get_lat(a[end]) - -87.7171°) < 1e-4
+    @test abs(get_lon(a[end]) - 37.7251°) < 1e-4
+    @test abs(get_lat(b[1]) - 87.7171°) < 1e-4
+    @test abs(get_lon(b[1]) - 0.0°) < 1e-4
+    @test abs(get_lat(b[end]) - -87.7171°) < 1e-4
+    @test abs(get_lon(b[end]) - 37.7251°) < 1e-4
+    @test abs(get_lat(c[1]) - 87.7171°) < 1e-4
+    @test abs(get_lon(c[1]) - 0.0°) < 1e-4
+    @test abs(get_lat(c[end]) - -87.7171°) < 1e-4
+    @test abs(get_lon(c[end]) - 37.7251°) < 1e-4
 
     @test_logs (:warn, "Input sepAng is negative, it will be converted to positive...") icogrid(sepAng=-5°)
     @test_throws "The sepAng provided as numbers must be expressed in radians and satisfy -360° ≤ x ≤ 360°. 
