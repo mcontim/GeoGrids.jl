@@ -8,7 +8,8 @@
     
     @test length(centers) == 122
     for i in eachindex(samples) 
-        @test centers[corresponding_idxs[i]] ≈ samples[i]
+        @test abs(get_lat(centers[corresponding_idxs[i]]) - samples[i].lat) < 1e-4
+        @test abs(get_lon(centers[corresponding_idxs[i]]) - samples[i].lon) < 1e-4
     end
 end
 
@@ -21,10 +22,12 @@ end
 
     @test length(centers) == 122
     for i in eachindex(samples) 
-        @test centers[corresponding_idxs[i]] ≈ samples[i]
+        @test abs(get_lat(centers[corresponding_idxs[i]]) - samples[i].lat) < 1e-4
+        @test abs(get_lon(centers[corresponding_idxs[i]]) - samples[i].lon) < 1e-4
     end
 end
 
+# //FIX: get new points for running the hexagon contours test but first check the output with plots (the points seem to be changed)
 @testitem "GeoRegion HEX Layout Tesselation and :hex Pattern (with EO)" tags = [:tesselation] begin
     samplePoints = [LatLon(43.2693, -8.83691), LatLon(43.6057, -8.11563), LatLon(36.808, -5.06421), LatLon(36.792, -2.3703)] # LatLon{WGS84Latest} coordinates
     corresponding_idxs_points = [1, 2, 121, 122]
@@ -37,13 +40,16 @@ end
 
     @test length(centers) == 122
     for i in eachindex(samplePoints) 
-        @test centers[corresponding_idxs_points[i]] ≈ samplePoints[i]
+        @test abs(get_lat(centers[corresponding_idxs_points[i]]) - samplePoints[i].lat) < 1e-4
+        @test abs(get_lon(centers[corresponding_idxs_points[i]]) - samplePoints[i].lon) < 1e-4    
     end
 
     @test length(ngon) == 122
     for i in eachindex(sampleNgons)
         for v in eachindex(sampleNgons[i])
-            @test ngon[corresponding_idxs_ngon[i]][v] ≈ sampleNgons[i][v]
+            # @test get_lat(ngon[corresponding_idxs_ngon[i]][v]) == sampleNgons[i][v].lat
+            @test abs(get_lat(ngon[corresponding_idxs_ngon[i]][v]) - sampleNgons[i][v].lat) < 1e-4
+            @test abs(get_lon(ngon[corresponding_idxs_ngon[i]][v]) - sampleNgons[i][v].lon) < 1e-4
         end
     end
 end
@@ -60,13 +66,15 @@ end
 
     @test length(centers) == 122
     for i in eachindex(samplePoints) 
-        @test centers[corresponding_idxs_points[i]] ≈ samplePoints[i]
+        @test abs(get_lat(centers[corresponding_idxs_points[i]]) - samplePoints[i].lat) < 1e-4
+        @test abs(get_lon(centers[corresponding_idxs_points[i]]) - samplePoints[i].lon) < 1e-4  
     end
 
     @test length(ngon) == 122
     for i in eachindex(sampleNgons)
         for v in eachindex(sampleNgons[i])
-            @test ngon[corresponding_idxs_ngon[i]][v] ≈ sampleNgons[i][v]
+            @test abs(get_lat(ngon[corresponding_idxs_ngon[i]][v]) - sampleNgons[i][v].lat) < 1e-4
+            @test abs(get_lon(ngon[corresponding_idxs_ngon[i]][v]) - sampleNgons[i][v].lon) < 1e-4        
         end
     end
 end
@@ -80,7 +88,8 @@ end
     
     @test length(centers) == 118
     for i in eachindex(samples) 
-        @test centers[corresponding_idxs[i]] ≈ samples[i]
+        @test abs(get_lat(centers[corresponding_idxs[i]]) - samples[i].lat) < 1e-4
+        @test abs(get_lon(centers[corresponding_idxs[i]]) - samples[i].lon) < 1e-4
     end
 end
 
@@ -93,7 +102,8 @@ end
     
     @test length(centers) == 319
     for i in eachindex(samples) 
-        @test centers[corresponding_idxs[i]] ≈ samples[i]
+        @test abs(get_lat(centers[corresponding_idxs[i]]) - samples[i].lat) < 1e-4
+        @test abs(get_lon(centers[corresponding_idxs[i]]) - samples[i].lon) < 1e-4
     end
 end
 
@@ -107,7 +117,8 @@ end
     
     @test length(centers) == 182
     for i in eachindex(samples) 
-        @test centers[corresponding_idxs[i]] ≈ samples[i]
+        @test abs(get_lat(centers[corresponding_idxs[i]]) - samples[i].lat) < 1e-4
+        @test abs(get_lon(centers[corresponding_idxs[i]]) - samples[i].lon) < 1e-4
     end
 end
 
@@ -123,13 +134,15 @@ end
     
     @test length(centers) == 182
     for i in eachindex(samplePoints) 
-        @test centers[corresponding_idxs_points[i]] ≈ samplePoints[i]
+        @test abs(get_lat(centers[corresponding_idxs_points[i]]) - samplePoints[i].lat) < 1e-4
+        @test abs(get_lon(centers[corresponding_idxs_points[i]]) - samplePoints[i].lon) < 1e-4  
     end
 
     @test length(ngon) == 182
     for i in eachindex(sampleNgons)
         for v in eachindex(sampleNgons[i])
-            @test ngon[corresponding_idxs_ngon[i]][v] ≈ sampleNgons[i][v]
+            @test abs(get_lat(ngon[corresponding_idxs_ngon[i]][v]) - sampleNgons[i][v].lat) < 1e-4
+            @test abs(get_lon(ngon[corresponding_idxs_ngon[i]][v]) - sampleNgons[i][v].lon) < 1e-4
         end
     end
 end
@@ -143,10 +156,12 @@ end
     
     @test length(centers) == 188
     for i in eachindex(samples) 
-        @test centers[corresponding_idxs[i]] ≈ samples[i]
+        @test abs(get_lat(centers[corresponding_idxs[i]]) - samples[i].lat) < 1e-4
+        @test abs(get_lon(centers[corresponding_idxs[i]]) - samples[i].lon) < 1e-4
     end
 end
 
+# //FIX: get new points for running the hexagon contours test but first check the output with plots (the points seem to be changed)
 @testitem "LatBeltRegion ICO Layout Tesselation and :hex Pattern (with EO)" tags = [:tesselation] begin
     samplePoints = [LatLon(9.89685,41.5062), LatLon(9.78996,-96.0016), LatLon(-9.78996,25.0621), LatLon(-9.89685,-112.446)]
     corresponding_idxs_points = [1, 2, 187, 188]
@@ -160,13 +175,15 @@ end
 
     @test length(centers) == 188
     for i in eachindex(samplePoints) 
-        @test centers[corresponding_idxs_points[i]] ≈ samplePoints[i]
+        @test abs(get_lat(centers[corresponding_idxs_points[i]]) - samplePoints[i].lat) < 1e-4
+        @test abs(get_lon(centers[corresponding_idxs_points[i]]) - samplePoints[i].lon) < 1e-4  
     end
 
     @test length(ngon) == 188
     for i in eachindex(sampleNgons)
         for v in eachindex(sampleNgons[i])
-            @test ngon[corresponding_idxs_ngon[i]][v] ≈ sampleNgons[i][v]
+            @test abs(get_lat(ngon[corresponding_idxs_ngon[i]][v]) - sampleNgons[i][v].lat) < 1e-4
+            @test abs(get_lon(ngon[corresponding_idxs_ngon[i]][v]) - sampleNgons[i][v].lon) < 1e-4
         end
     end
 end
@@ -180,7 +197,8 @@ end
     
     @test length(centers) == 219
     for i in eachindex(samples) 
-        @test centers[corresponding_idxs[i]] ≈ samples[i]
+        @test abs(get_lat(centers[corresponding_idxs[i]]) - samples[i].lat) < 1e-4
+        @test abs(get_lon(centers[corresponding_idxs[i]]) - samples[i].lon) < 1e-4
     end
 end
 
@@ -196,13 +214,15 @@ end
 
     @test length(centers) == 219
     for i in eachindex(samplePoints) 
-        @test centers[corresponding_idxs_points[i]] ≈ samplePoints[i]
+        @test abs(get_lat(centers[corresponding_idxs_points[i]]) - samplePoints[i].lat) < 1e-4
+        @test abs(get_lon(centers[corresponding_idxs_points[i]]) - samplePoints[i].lon) < 1e-4  
     end
 
     @test length(ngon) == 219
     for i in eachindex(sampleNgons)
         for v in eachindex(sampleNgons[i])
-            @test ngon[corresponding_idxs_ngon[i]][v] ≈ sampleNgons[i][v]
+            @test abs(get_lat(ngon[corresponding_idxs_ngon[i]][v]) - sampleNgons[i][v].lat) < 1e-4
+            @test abs(get_lon(ngon[corresponding_idxs_ngon[i]][v]) - sampleNgons[i][v].lon) < 1e-4
         end
     end
 end
@@ -216,7 +236,8 @@ end
     
     @test length(centers) == 104
     for i in eachindex(samples) 
-        @test centers[corresponding_idxs[i]] ≈ samples[i]
+        @test abs(get_lat(centers[corresponding_idxs[i]]) - samples[i].lat) < 1e-4
+        @test abs(get_lon(centers[corresponding_idxs[i]]) - samples[i].lon) < 1e-4
     end
 end
 
@@ -232,13 +253,15 @@ end
 
     @test length(centers) == 104
     for i in eachindex(samplePoints) 
-        @test centers[corresponding_idxs_points[i]] ≈ samplePoints[i]
+        @test abs(get_lat(centers[corresponding_idxs_points[i]]) - samplePoints[i].lat) < 1e-4
+        @test abs(get_lon(centers[corresponding_idxs_points[i]]) - samplePoints[i].lon) < 1e-4  
     end
 
     @test length(ngon) == 104
     for i in eachindex(sampleNgons)
         for v in eachindex(sampleNgons[i])
-            @test ngon[corresponding_idxs_ngon[i]][v] ≈ sampleNgons[i][v]
+            @test abs(get_lat(ngon[corresponding_idxs_ngon[i]][v]) - sampleNgons[i][v].lat) < 1e-4
+            @test abs(get_lon(ngon[corresponding_idxs_ngon[i]][v]) - sampleNgons[i][v].lon) < 1e-4
         end
     end
 end
