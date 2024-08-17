@@ -19,8 +19,8 @@ include("interface_func.jl")
 include("ico_func.jl")
 include("rect_func.jl")
 include("filtering_func.jl")
-include("plot_func.jl")
 include("tessellation_func.jl") # //FIX: Lot of attention required
+include("plot_func.jl")
 
 export AbstractRegion, GlobalRegion, GeoRegion, PolyRegion, LatBeltRegion,
     AbstractTiling, ICO, HEX, H3
