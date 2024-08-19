@@ -48,17 +48,6 @@ md"""
 ## GeoRegion
 """
 
-# ╔═╡ 7df04689-55fd-4659-b251-2100bf565580
-# ╠═╡ disabled = true
-#=╠═╡
-aaa=let
-	reg = GeoRegion(; regionName="Tassellation", test_pair...)
-	centroid(LatLon,reg)
-	# centers = generate_tesselation(reg, 40000, HEX())
-	# testcenters(centers)
-end
-  ╠═╡ =#
-
 # ╔═╡ b34086c0-d58a-41e4-8fd0-fc915fa49440
 #=╠═╡
 aaa.coords.lat
@@ -113,35 +102,26 @@ md"""
 	import >.CoordRefSystems
 end
 
-# ╔═╡ eec1bd19-829b-41dd-a5ca-6573d79ee9b7
-reg = GeoRegion(; regionName="Tassellation", admin="Spain")
+# ╔═╡ 53302c64-c73f-4dca-8f23-be182ccabe8f
+reg = LatBeltRegion(latLim=(-10,10))
 
-# ╔═╡ 99b8544c-6a0b-40f9-9ae9-8981b001e23d
-centers, ngon = generate_tesselation(reg, 40000, HEX(), EO())
+# ╔═╡ 011c207e-864d-4c91-8acd-da7b6fd3f30a
+centers,ngon = generate_tesselation(reg, 400000, ICO(;pattern=:hex), EO())
 
-# ╔═╡ 5a96605c-feb7-40a6-9e38-af8edd97ce23
-typeof(ngon)
+# ╔═╡ 61a4d585-1eec-43c0-b083-fddd775a9335
+plot_geo_cells(centers, ngon)
 
-# ╔═╡ 547fc5ed-7f33-444f-bcb9-9dc5e74c873f
-ngon[1][1]
+# ╔═╡ f7d162a9-3ce7-48f4-a7ce-3a219839f1c6
+let
+	sampleNgons = [[LatLon(11.8183,45.104),LatLon(13.921,40.8336),LatLon(9.54199,37.4515),LatLon(8.05959,37.8844),LatLon(5.89612,42.1999),LatLon(10.2875,45.5542),LatLon(11.8183,45.104)],[LatLon(-11.8183,-116.044),LatLon(-13.921,-111.773),LatLon(-9.54199,-108.391),LatLon(-8.05959,-108.824),LatLon(-5.89611,-113.139),LatLon(-10.2875,-116.494),LatLon(-11.8183,-116.044)]]
+    corresponding_idxs_ngon = [1, 188]
 
-# ╔═╡ e2b6fe2c-2ca1-41a7-a3ec-b98773d753a1
-centers2, ngon2 = generate_tesselation(reg, 40000, HEX(;pattern=:circ), EO())
-
-# ╔═╡ 7b36c3a9-4667-4ab2-bd38-fdecdb1a055c
-typeof(ngon2)
-
-# ╔═╡ 8b0db005-8f60-4435-a1da-04d6cd8fedf3
-ngon2[1][1]
-
-# ╔═╡ 7c3f3e8c-06ca-48aa-a8df-ffdf794da3a4
-ngon isa AbstractVector{<:AbstractVector{<:Union{LatLon,Point{🌐,<:LatLon{WGS84Latest}}}}}
-
-# ╔═╡ cf30ce9a-f287-402d-b300-321f77a027bc
-p = Point(LatLon{WGS84Latest}(10,5))
-
-# ╔═╡ 6bc282e4-9d69-422d-8d53-7b252ed89774
-Point{🌐,LatLon{WGS84Latest}}[]
+	for i in eachindex(sampleNgons)
+        for v in eachindex(sampleNgons[i])
+            @info (get_lat(ngon[corresponding_idxs_ngon[i]][v]),sampleNgons[i][v].lat)
+        end
+    end
+end
 
 # ╔═╡ a34e4ff6-51f9-4d6b-af28-5e856adea1ed
 begin
@@ -185,7 +165,7 @@ Point[]
 let 
 	reg = GeoRegion(; regionName="Tassellation", admin="Spain")
 	centers, ngon = generate_tesselation(reg, 40000, HEX(;pattern=:circ), EO())
-	# plot_geo_cells(centers, ngon)
+	plot_geo_cells(centers, ngon)
 end
 
 # ╔═╡ ad9016de-1cce-4dc8-bdbf-2a2d65a4319f
@@ -245,18 +225,18 @@ let
 end
 
 # ╔═╡ d12aece5-8625-4667-9f65-6588f63849c4
-function pattern_distance(pattern::AbstractVector{<:LatLon})
+function pattern_distance(pattern)
 	mindist = []
 	avgdist = []
 	np = length(pattern)
 	
 	for i in 1:np
 		p1 = pattern[i]
-		lla1 = LLA(p1.lat, p1.lon)
+		lla1 = LLA(get_lat(p1), get_lon(p1))
 		list = collect(1:np)
 		popat!(list,i)
 		vecDist = map(pattern[list]) do p2
-			lla2 = LLA(p2.lat, p2.lon)
+			lla2 = LLA(get_lat(p2), get_lon(p2))
 			get_distance_on_earth(lla1, lla2)
 		end
 		sort!(vecDist)
@@ -278,6 +258,14 @@ function testcenters(c)
 	check = pattern_distance(c)
 	@info check
 	@info (hexNormMin=check.avgMin*coeff, hexNormAvg=check.avgAvg*coeff)
+end
+
+# ╔═╡ 7df04689-55fd-4659-b251-2100bf565580
+aaa=let
+	reg = GeoRegion(; regionName="Tassellation", test_pair...)
+	centroid(LatLon,reg)
+	centers = generate_tesselation(reg, 40000, HEX())
+	testcenters(centers)
 end
 
 # ╔═╡ 3603a9e3-03cd-4861-a9af-b9d5657be13e
@@ -1645,16 +1633,10 @@ version = "17.4.0+2"
 # ╔═╡ Cell order:
 # ╠═069444e1-4e89-4f4f-ae2f-f5fb3131e398
 # ╟─0db4a84d-f4cf-4cea-8e6b-5b0480d3f6ff
-# ╠═eec1bd19-829b-41dd-a5ca-6573d79ee9b7
-# ╠═99b8544c-6a0b-40f9-9ae9-8981b001e23d
-# ╠═e2b6fe2c-2ca1-41a7-a3ec-b98773d753a1
-# ╠═7c3f3e8c-06ca-48aa-a8df-ffdf794da3a4
-# ╠═5a96605c-feb7-40a6-9e38-af8edd97ce23
-# ╠═7b36c3a9-4667-4ab2-bd38-fdecdb1a055c
-# ╠═cf30ce9a-f287-402d-b300-321f77a027bc
-# ╠═547fc5ed-7f33-444f-bcb9-9dc5e74c873f
-# ╠═8b0db005-8f60-4435-a1da-04d6cd8fedf3
-# ╠═6bc282e4-9d69-422d-8d53-7b252ed89774
+# ╠═53302c64-c73f-4dca-8f23-be182ccabe8f
+# ╠═011c207e-864d-4c91-8acd-da7b6fd3f30a
+# ╠═61a4d585-1eec-43c0-b083-fddd775a9335
+# ╠═f7d162a9-3ce7-48f4-a7ce-3a219839f1c6
 # ╟─3ce21344-e0ea-4e41-b78e-cf92dc9ac2e7
 # ╠═a34e4ff6-51f9-4d6b-af28-5e856adea1ed
 # ╠═56005d86-0377-4d40-b63b-d5597acddc32
