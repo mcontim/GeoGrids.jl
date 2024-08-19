@@ -6,13 +6,11 @@
     # Multi Point
     @test plot_geo_points(icogrid(sepAng=5°)) isa Plot
     @test plot_geo_points(icogrid(sepAng=deg2rad(4) * rad); camera=:threedim) isa Plot
-    @test plot_geo_points(rectgrid(5)) isa Plot
-    @test plot_geo_points(rectgrid(5°); camera=:threedim) isa Plot
+    @test plot_geo_points([rectgrid(5)...]) isa Plot
+    @test plot_geo_points([rectgrid(5°)...]; camera=:threedim) isa Plot
     
     # Single Point
     @test plot_geo_points(LatLon(10,10); camera=:threedim) isa Plot
-    @test plot_geo_points((10,10)) isa Plot
-    @test plot_geo_points([10,10]) isa Plot
 end
 
 @testitem "plot_geo_points" tags = [:general] begin

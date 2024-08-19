@@ -450,14 +450,16 @@ center point.
 """
 function gen_hex_pattern(filtered::AbstractVector{<:Point{🌐,<:LatLon{WGS84Latest}}}, idxs::AbstractVector{<:Number}, mesh::SimpleMesh)
     # hexagons = [fill(LatLon(0, 0), 7) for i in 1:length(filtered)]
-    hexagons = [Point[] for i in 1:length(filtered)] # Allow to have different polygons from hexagons only (depending on Voronoi tesselation)
+    # hexagons = [Point[] for i in 1:length(filtered)] # Allow to have different polygons from hexagons only (depending on Voronoi tesselation)
+    hexagons = [Point{🌐,LatLon{WGS84Latest}}[] for i in 1:length(filtered)] # Allow to have different polygons from hexagons only (depending on Voronoi tesselation)
     
     for (p, poly) in enumerate(mesh[idxs])
         # for (v, vertex) in enumerate([poly.vertices..., poly.vertices[1]]) # Loop through vertices to create the hexagon for plotting)
         #     hexagons[p][v] = LatLon(ustrip(vertex.coords.y), ustrip(vertex.coords.x))
         # end
         hexagons[p] = map([poly.vertices..., poly.vertices[1]]) do vertex # Loop through vertices to create the hexagon for plotting)
-            LatLon{WGS84Latest}(ustrip(vertex.coords.y), ustrip(vertex.coords.x)) |> Point
+            # LatLon{WGS84Latest}(ustrip(vertex.coords.y), ustrip(vertex.coords.x)) |> Point
+            Point{🌐,LatLon{WGS84Latest}}(LatLon(ustrip(vertex.coords.y), ustrip(vertex.coords.x)))
         end
     end
 

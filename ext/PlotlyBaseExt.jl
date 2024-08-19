@@ -3,7 +3,7 @@ module PlotlyBaseExt
 using PlotlyExtensionsHelper
 using PlotlyBase
 using Unitful: ustrip
-using Meshes: Ngon
+using Meshes: Ngon, 🌐, WGS84Latest
 
 using GeoGrids
 
@@ -83,22 +83,22 @@ geographic points.
 function _get_scatter_points(points::AbstractVector{<:Union{LatLon,Point{🌐,<:LatLon{WGS84Latest}}}}; kwargs...)
     # Markers for the points
     return scattergeo(;
-        lat=map(x -> GeoGrids.get_lat(x), vec_p), # Vectorize such to be sure to avoid matrices.
-        lon=map(x -> GeoGrids.get_lon(x), vec_p), # Vectorize such to be sure to avoid matrices.
+        lat=map(x -> GeoGrids.get_lat(x), points), # Vectorize such to be sure to avoid matrices.
+        lon=map(x -> GeoGrids.get_lon(x), points), # Vectorize such to be sure to avoid matrices.
         defaultScatterPoints...,
         kwargs...
     )
 end
 
 """
-    _get_scatter_cellcontour(polygons::AbstractVector{<:AbstractVector{<:LatLon}}; kwargs...)
+    _get_scatter_cellcontour(polygons::AbstractVector{<:Union{LatLon,Point{🌐,<:LatLon{WGS84Latest}}}}; kwargs...)
 
 This function creates a geographic scatter plot of cell contours based on the
 input polygons. Each polygon is processed to extract its vertices' latitude and
 longitude, which are then used to plot the contours on a geographic map.
 
 ## Arguments
-- `polygons::AbstractVector{<:AbstractVector{<:LatLon}}`: A vector of \
+- `polygons::AbstractVector{<:Union{LatLon,Point{🌐,<:LatLon{WGS84Latest}}}}`: A vector of \
 polygons, where each polygon is represented by a vector of `LatLon` \
 objects. Each `LatLon` object holds latitude and longitude information.
 
@@ -208,8 +208,8 @@ GeoGrids.plot_geo_points(p::Union{LatLon,Point{🌐,<:LatLon{WGS84Latest}}}; kwa
 """
     plot_geo_cells(cellCenters::AbstractVector{<:Union{LatLon, Point{🌐,<:LatLon{WGS84Latest}}}}; title::String="Cell Layout GEO Map", camera::Symbol=:twodim, kwargs_centers::NamedTuple=(;), kwargs_layout::NamedTuple=(;))
     plot_geo_cells(cc::Union{LatLon, Point{🌐,<:LatLon{WGS84Latest}}}; kwargs...)
-    plot_geo_cells(cellCenters::Array{<:Union{LatLon, Point{🌐,<:LatLon{WGS84Latest}}}}, cellContours::AbstractVector{<:AbstractVector{<:LatLon}}; title::String="Cell Layout GEO Map", camera::Symbol=:twodim, kwargs_centers::NamedTuple=(;), kwargs_contours::NamedTuple=(;),kwargs_layout::NamedTuple=(;))
-    plot_geo_cells(cellCenter::Union{LatLon, Point{🌐,<:LatLon{WGS84Latest}}}, cellContour::AbstractVector{<:LatLon}; kwargs...)
+    plot_geo_cells(cellCenters::AbstractVector{<:Union{LatLon, Point{🌐,<:LatLon{WGS84Latest}}}}, cellContours::AbstractVector{<:AbstractVector{<:Union{LatLon,Point{🌐,<:LatLon{WGS84Latest}}}}}; title::String="Cell Layout GEO Map", camera::Symbol=:twodim, kwargs_centers::NamedTuple=(;), kwargs_contours::NamedTuple=(;),kwargs_layout::NamedTuple=(;))
+    plot_geo_cells(cellCenter::Union{LatLon, Point{🌐,<:LatLon{WGS84Latest}}}, cellContour::AbstractVector{<:Union{LatLon,Point{🌐,<:LatLon{WGS84Latest}}}}; kwargs...)
 
 Plot geographical cell centers and/or contours on a map using various input
 configurations.
@@ -220,11 +220,11 @@ Point{🌐,<:LatLon{WGS84Latest}}}}`: A vector of geographical coordinates \
 representing the centers of the cells.
 - `cc::Union{LatLon, Point{🌐,<:LatLon{WGS84Latest}}}`: A single geographical \
 coordinate representing the center of a cell.
-- `cellContours::AbstractVector{<:AbstractVector{<:LatLon}}`: A vector of \
-vectors containing the contours for each cell, represented as `LatLon` \
-coordinates.
-- `cellContour::AbstractVector{<:LatLon}`: A vector of `LatLon` objects \
-representing the contour of a single cell.
+- `cellContours::AbstractVector{<:Union{LatLon,Point{🌐,<:LatLon{WGS84Latest}}}}`: \
+A vector of vectors containing the contours for each cell, represented as \
+`LatLon` coordinates.
+- `cellContour::AbstractVector{<:Union{LatLon,Point{🌐,<:LatLon{WGS84Latest}}}}`: \
+A vector of `LatLon` objects representing the contour of a single cell.
 - `title::String`: Title of the plot. Default is `"Cell Layout GEO Map"`.
 - `camera::Symbol`: Camera view for the plot. Default is `:twodim`.
 - `kwargs_centers::NamedTuple`: Additional options for customizing the \
@@ -250,7 +250,7 @@ function GeoGrids.plot_geo_cells(cellCenters::AbstractVector{<:Union{LatLon,Poin
 end
 GeoGrids.plot_geo_cells(cc::Union{LatLon,Point{🌐,<:LatLon{WGS84Latest}}}; kwargs...) = GeoGrids.plot_geo_points([cc]; kwargs...)
 
-function GeoGrids.plot_geo_cells(cellCenters::Array{<:Union{LatLon,Point{🌐,<:LatLon{WGS84Latest}}}}, cellContours::AbstractVector{<:AbstractVector{<:LatLon}}; title="Cell Layout GEO Map", camera::Symbol=:twodim, kwargs_centers=(;), kwargs_contours=(;), kwargs_layout=(;))
+function GeoGrids.plot_geo_cells(cellCenters::AbstractVector{<:Union{LatLon,Point{🌐,<:LatLon{WGS84Latest}}}}, cellContours::AbstractVector{<:AbstractVector{<:Union{LatLon,Point{🌐,<:LatLon{WGS84Latest}}}}}; title="Cell Layout GEO Map", camera::Symbol=:twodim, kwargs_centers=(;), kwargs_contours=(;), kwargs_layout=(;))
     # Create scatter plot for the cells contours.
     scatterContours = _get_scatter_cellcontour(cellContours; kwargs_contours...)
 
@@ -263,7 +263,7 @@ function GeoGrids.plot_geo_cells(cellCenters::Array{<:Union{LatLon,Point{🌐,<:
 
     plotly_plot([scatterContours, scatterCenters], layout)
 end
-GeoGrids.plot_geo_cells(cellCenter::Union{LatLon,Point{🌐,<:LatLon{WGS84Latest}}}, cellContour::AbstractVector{<:LatLon}; kwargs...) = GeoGrids.plot_geo_cells([cellCenter], [cellContour]; kwargs...)
+GeoGrids.plot_geo_cells(cellCenter::Union{LatLon,Point{🌐,<:LatLon{WGS84Latest}}}, cellContour::AbstractVector{<:Union{LatLon,Point{🌐,<:LatLon{WGS84Latest}}}}; kwargs...) = GeoGrids.plot_geo_cells([cellCenter], [cellContour]; kwargs...)
 
 """
     plot_unitarysphere(points_cart)

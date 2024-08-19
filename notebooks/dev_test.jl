@@ -113,6 +113,36 @@ md"""
 	import >.CoordRefSystems
 end
 
+# ╔═╡ eec1bd19-829b-41dd-a5ca-6573d79ee9b7
+reg = GeoRegion(; regionName="Tassellation", admin="Spain")
+
+# ╔═╡ 99b8544c-6a0b-40f9-9ae9-8981b001e23d
+centers, ngon = generate_tesselation(reg, 40000, HEX(), EO())
+
+# ╔═╡ 5a96605c-feb7-40a6-9e38-af8edd97ce23
+typeof(ngon)
+
+# ╔═╡ 547fc5ed-7f33-444f-bcb9-9dc5e74c873f
+ngon[1][1]
+
+# ╔═╡ e2b6fe2c-2ca1-41a7-a3ec-b98773d753a1
+centers2, ngon2 = generate_tesselation(reg, 40000, HEX(;pattern=:circ), EO())
+
+# ╔═╡ 7b36c3a9-4667-4ab2-bd38-fdecdb1a055c
+typeof(ngon2)
+
+# ╔═╡ 8b0db005-8f60-4435-a1da-04d6cd8fedf3
+ngon2[1][1]
+
+# ╔═╡ 7c3f3e8c-06ca-48aa-a8df-ffdf794da3a4
+ngon isa AbstractVector{<:AbstractVector{<:Union{LatLon,Point{🌐,<:LatLon{WGS84Latest}}}}}
+
+# ╔═╡ cf30ce9a-f287-402d-b300-321f77a027bc
+p = Point(LatLon{WGS84Latest}(10,5))
+
+# ╔═╡ 6bc282e4-9d69-422d-8d53-7b252ed89774
+Point{🌐,LatLon{WGS84Latest}}[]
+
 # ╔═╡ a34e4ff6-51f9-4d6b-af28-5e856adea1ed
 begin
 	const test_pair = (;admin="Greenland")
@@ -144,9 +174,6 @@ end
 # ╔═╡ c8d4cd0e-0876-4c16-9146-12ed16516ebe
 gr["ITA"]
 
-# ╔═╡ 5b94ede4-321d-430d-83f2-e89493b4f15a
-Point(LatLon{WGS84Latest})[]
-
 # ╔═╡ 03485d5c-d7a3-475a-a9d4-8a43a101106c
 Point[]
 
@@ -158,7 +185,7 @@ Point[]
 let 
 	reg = GeoRegion(; regionName="Tassellation", admin="Spain")
 	centers, ngon = generate_tesselation(reg, 40000, HEX(;pattern=:circ), EO())
-	plot_geo_cells(centers, ngon)
+	# plot_geo_cells(centers, ngon)
 end
 
 # ╔═╡ ad9016de-1cce-4dc8-bdbf-2a2d65a4319f
@@ -1618,11 +1645,20 @@ version = "17.4.0+2"
 # ╔═╡ Cell order:
 # ╠═069444e1-4e89-4f4f-ae2f-f5fb3131e398
 # ╟─0db4a84d-f4cf-4cea-8e6b-5b0480d3f6ff
+# ╠═eec1bd19-829b-41dd-a5ca-6573d79ee9b7
+# ╠═99b8544c-6a0b-40f9-9ae9-8981b001e23d
+# ╠═e2b6fe2c-2ca1-41a7-a3ec-b98773d753a1
+# ╠═7c3f3e8c-06ca-48aa-a8df-ffdf794da3a4
+# ╠═5a96605c-feb7-40a6-9e38-af8edd97ce23
+# ╠═7b36c3a9-4667-4ab2-bd38-fdecdb1a055c
+# ╠═cf30ce9a-f287-402d-b300-321f77a027bc
+# ╠═547fc5ed-7f33-444f-bcb9-9dc5e74c873f
+# ╠═8b0db005-8f60-4435-a1da-04d6cd8fedf3
+# ╠═6bc282e4-9d69-422d-8d53-7b252ed89774
 # ╟─3ce21344-e0ea-4e41-b78e-cf92dc9ac2e7
 # ╠═a34e4ff6-51f9-4d6b-af28-5e856adea1ed
 # ╠═56005d86-0377-4d40-b63b-d5597acddc32
 # ╠═c8d4cd0e-0876-4c16-9146-12ed16516ebe
-# ╠═5b94ede4-321d-430d-83f2-e89493b4f15a
 # ╠═03485d5c-d7a3-475a-a9d4-8a43a101106c
 # ╠═b2216550-1473-4062-8485-66af57f2fe37
 # ╟─222fb774-1693-4b3c-b2ef-5fd38eca773c
