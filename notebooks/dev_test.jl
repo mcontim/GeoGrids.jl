@@ -28,6 +28,11 @@ end
 # ╔═╡ 069444e1-4e89-4f4f-ae2f-f5fb3131e398
 ExtendedTableOfContents()
 
+# ╔═╡ 0db4a84d-f4cf-4cea-8e6b-5b0480d3f6ff
+md"""
+# New Tests
+"""
+
 # ╔═╡ 3ce21344-e0ea-4e41-b78e-cf92dc9ac2e7
 md"""
 # Definitions
@@ -42,6 +47,11 @@ md"""
 md"""
 ## GeoRegion
 """
+
+# ╔═╡ b34086c0-d58a-41e4-8fd0-fc915fa49440
+#=╠═╡
+aaa.coords.lat
+  ╠═╡ =#
 
 # ╔═╡ b12ae026-8fbb-4687-98df-f7a2fe9672b6
 md"""
@@ -92,92 +102,141 @@ md"""
 	import >.CoordRefSystems
 end
 
+# ╔═╡ 53302c64-c73f-4dca-8f23-be182ccabe8f
+reg = LatBeltRegion(latLim=(-10,10))
+
+# ╔═╡ 011c207e-864d-4c91-8acd-da7b6fd3f30a
+centers,ngon = generate_tesselation(reg, 400000, ICO(;pattern=:hex), EO())
+
+# ╔═╡ 61a4d585-1eec-43c0-b083-fddd775a9335
+plot_geo_cells(centers, ngon)
+
+# ╔═╡ f7d162a9-3ce7-48f4-a7ce-3a219839f1c6
+let
+	sampleNgons = [[LatLon(11.8183,45.104),LatLon(13.921,40.8336),LatLon(9.54199,37.4515),LatLon(8.05959,37.8844),LatLon(5.89612,42.1999),LatLon(10.2875,45.5542),LatLon(11.8183,45.104)],[LatLon(-11.8183,-116.044),LatLon(-13.921,-111.773),LatLon(-9.54199,-108.391),LatLon(-8.05959,-108.824),LatLon(-5.89611,-113.139),LatLon(-10.2875,-116.494),LatLon(-11.8183,-116.044)]]
+    corresponding_idxs_ngon = [1, 188]
+
+	for i in eachindex(sampleNgons)
+        for v in eachindex(sampleNgons[i])
+            @info (get_lat(ngon[corresponding_idxs_ngon[i]][v]),sampleNgons[i][v].lat)
+        end
+    end
+end
+
 # ╔═╡ a34e4ff6-51f9-4d6b-af28-5e856adea1ed
 begin
-	const test_pair = (;admin="Spain")
+	const test_pair = (;admin="Greenland")
 	polyVec = [
-		PolyRegion(;domain=[SimpleLatLon(-5,-5), SimpleLatLon(5,-5), SimpleLatLon(5,10), SimpleLatLon(-5,10)]),
-		PolyRegion(;domain=[SimpleLatLon(60,-5), SimpleLatLon(80,0), SimpleLatLon(80,10), SimpleLatLon(60,15)])
+		PolyRegion(;domain=[LatLon(-5,-5), LatLon(5,-5), LatLon(5,10), LatLon(-5,10)]),
+		PolyRegion(;domain=[LatLon(60,-5), LatLon(80,0), LatLon(80,10), LatLon(60,15)])
 	]
 	const polyReg = polyVec[2]
 end
 
+# ╔═╡ 56005d86-0377-4d40-b63b-d5597acddc32
+gr = let
+   ita = GeoRegion(; regionName="ITA", admin="Italy")
+    eu = GeoRegion(; regionName="EU", continent="Europe")
+    poly = PolyRegion("POLY", [LatLon(10°, -5°), LatLon(10°, 15°), LatLon(27°, 15°), LatLon(27°, -5°)])
+    belt = LatBeltRegion(; regionName="BELT", latLim=(-60°, 60°))
+    
+    sample_in_ita = [LatLon(43.727878°, 12.843441°), LatLon(43.714933°, 10.399326°), LatLon(37.485829°, 14.328285°), LatLon(39.330460°, 8.430780°), LatLon(45.918388°, 10.886654°)]
+    sample_in_poly = [LatLon(14°, 1°), LatLon(26.9°, -4.9°), LatLon(10.1°, 14.9°)]
+    sample_out_poly = [LatLon(0°, 0°), LatLon(10°, -5.2°), LatLon(27°, 15.3°)]
+    sample_in_belt = [LatLon(14°, 1°), LatLon(26.9°, -65°), LatLon(10.1°, 70°)]
+    sample_out_belt = [LatLon(90°, 1°), LatLon(60.1°, 1°), LatLon(-62°, -4.9°), LatLon(-60.1°, 14.9°)]
+
+    big_vec = [sample_in_ita..., sample_in_poly..., sample_out_poly..., sample_in_belt..., sample_out_belt...]
+
+    groups_unique = group_by_domain(big_vec, [ita, eu, poly, belt])
+end
+
+# ╔═╡ c8d4cd0e-0876-4c16-9146-12ed16516ebe
+gr["ITA"]
+
+# ╔═╡ 03485d5c-d7a3-475a-a9d4-8a43a101106c
+Point[]
+
+# ╔═╡ b2216550-1473-4062-8485-66af57f2fe37
+    sample_in_ita = [LatLon(43.727878°, 12.843441°), LatLon(43.714933°, 10.399326°), LatLon(37.485829°, 14.328285°), LatLon(39.330460°, 8.430780°), LatLon(45.918388°, 10.886654°)]
+
+
 # ╔═╡ e0b2c99d-c689-48fb-91d5-6a3b4ee4d044
 let 
 	reg = GeoRegion(; regionName="Tassellation", admin="Spain")
-	centers, ngon = generate_tesselation(reg, 40000, HEX(;pattern=:circ), ExtraOutput())
+	centers, ngon = generate_tesselation(reg, 40000, HEX(;pattern=:circ), EO())
 	plot_geo_cells(centers, ngon)
 end
 
 # ╔═╡ ad9016de-1cce-4dc8-bdbf-2a2d65a4319f
 let 
 	reg = GeoRegion(; regionName="Tassellation", admin="Spain")
-	centers, ngon = generate_tesselation(reg, 40000, HEX(;pattern=:circ), ExtraOutput())
+	centers, ngon = generate_tesselation(reg, 40000, HEX(;pattern=:circ), EO())
 	plot_geo_cells(centers, ngon)
 end
 
 # ╔═╡ f6c86dbf-a076-4905-8b34-d0587f153e3c
 let 
 	reg = polyReg
-	centers, ngon = generate_tesselation(reg, 40000, HEX(), ExtraOutput())
+	centers, ngon = generate_tesselation(reg, 40000, HEX(), EO())
 	plot_geo_cells(centers, ngon)
 end
 
 # ╔═╡ 0d67eaf0-5f74-43a0-8832-0b270334d3bc
 let 
 	reg = polyReg
-	centers, ngon = generate_tesselation(reg, 40000, HEX(;pattern=:circ), ExtraOutput())
+	centers, ngon = generate_tesselation(reg, 40000, HEX(;pattern=:circ), EO())
 	plot_geo_cells(centers, ngon)
 end
 
 # ╔═╡ efe29293-38f2-49c1-a426-25cdbe0d78c3
 let 
 	reg = GlobalRegion()
-	centers,ngon = generate_tesselation(reg, 1000000, ICO(;pattern=:hex), ExtraOutput())
+	centers,ngon = generate_tesselation(reg, 1000000, ICO(;pattern=:hex), EO())
 	plot_geo_cells(centers,ngon)
 end
 
 # ╔═╡ 3d6cfaea-c17e-4008-a0f8-ba262b1e7408
 let 
 	reg = LatBeltRegion(latLim=(-10,10))
-	centers,ngon = generate_tesselation(reg, 400000, ICO(;correction=val), ExtraOutput())
+	centers,ngon = generate_tesselation(reg, 400000, ICO(;correction=val), EO())
 	plot_geo_cells(centers,ngon)
 end
 
 # ╔═╡ a0f1257d-467a-4875-aad7-1b763d608ab4
 let 
 	reg = LatBeltRegion(latLim=(-10,10))
-	centers,ngon = generate_tesselation(reg, 400000, ICO(;pattern=:hex), ExtraOutput())
+	centers,ngon = generate_tesselation(reg, 400000, ICO(;pattern=:hex), EO())
 	plot_geo_cells(centers,ngon)	
 end
 
 # ╔═╡ f55e4340-0cb6-4fc5-9685-ccbbc3fedd15
 let 
 	reg = polyReg	
-	centers,ngon = generate_tesselation(reg, 40000, ICO(;correction=1.7), ExtraOutput())
+	centers,ngon = generate_tesselation(reg, 40000, ICO(;correction=1.7), EO())
 	plot_geo_cells(centers,ngon)
 end
 
 # ╔═╡ c0cbcd3e-183d-425a-a534-06b2d52f1819
 let 
 	reg = GeoRegion(; regionName="Tassellation", admin="Spain")
-	centers, ngon = generate_tesselation(reg, 40000, ICO(), ExtraOutput())
+	centers, ngon = generate_tesselation(reg, 40000, ICO(), EO())
 	plot_geo_cells(centers,ngon)
 end
 
 # ╔═╡ d12aece5-8625-4667-9f65-6588f63849c4
-function pattern_distance(pattern::AbstractVector{<:SimpleLatLon})
+function pattern_distance(pattern)
 	mindist = []
 	avgdist = []
 	np = length(pattern)
 	
 	for i in 1:np
 		p1 = pattern[i]
-		lla1 = LLA(p1.lat, p1.lon)
+		lla1 = LLA(get_lat(p1), get_lon(p1))
 		list = collect(1:np)
 		popat!(list,i)
 		vecDist = map(pattern[list]) do p2
-			lla2 = LLA(p2.lat, p2.lon)
+			lla2 = LLA(get_lat(p2), get_lon(p2))
 			get_distance_on_earth(lla1, lla2)
 		end
 		sort!(vecDist)
@@ -202,8 +261,9 @@ function testcenters(c)
 end
 
 # ╔═╡ 7df04689-55fd-4659-b251-2100bf565580
-let
+aaa=let
 	reg = GeoRegion(; regionName="Tassellation", test_pair...)
+	centroid(LatLon,reg)
 	centers = generate_tesselation(reg, 40000, HEX())
 	testcenters(centers)
 end
@@ -274,15 +334,6 @@ PlutoExtras = "ed5d0301-4775-4676-b788-cf71e66ff8ed"
 PlutoPlotly = "8e989ff0-3d88-8e9f-f020-2b208a939ff0"
 PlutoUI = "7f904dfe-b85e-4ff6-b463-dae2292396a8"
 TelecomUtils = "0c499ce9-5070-43f6-85c8-6d9cb66e1eb8"
-
-[compat]
-BenchmarkTools = "~1.5.0"
-PlotlyBase = "~0.8.19"
-PlutoDevMacros = "~0.9.0"
-PlutoExtras = "~0.7.13"
-PlutoPlotly = "~0.4.6"
-PlutoUI = "~0.7.59"
-TelecomUtils = "~0.6.10"
 """
 
 # ╔═╡ 00000000-0000-0000-0000-000000000002
@@ -291,12 +342,12 @@ PLUTO_MANIFEST_TOML_CONTENTS = """
 
 julia_version = "1.10.4"
 manifest_format = "2.0"
-project_hash = "ce773dacfad0cfeefa5783526c26ec2142cc4cb3"
+project_hash = "14529099459e3991eeb395cb0361bda218f4cb60"
 
 [[deps.ADTypes]]
-git-tree-sha1 = "6778bcc27496dae5723ff37ee30af451db8b35fe"
+git-tree-sha1 = "99a6f5d0ce1c7c6afdb759daa30226f71c54f6b0"
 uuid = "47edcb42-4c32-4615-8424-f2b9edc5f35b"
-version = "1.6.2"
+version = "1.7.1"
 weakdeps = ["ChainRulesCore", "EnzymeCore"]
 
     [deps.ADTypes.extensions]
@@ -482,9 +533,9 @@ version = "1.0.0"
 
 [[deps.Compat]]
 deps = ["TOML", "UUIDs"]
-git-tree-sha1 = "b1c55339b7c6c350ee89f2c1604299660525b248"
+git-tree-sha1 = "8ae8d32e09f0dcf42a36b90d4e17f5dd2e4c4215"
 uuid = "34da2185-b29b-5c13-b0c7-acf172513d20"
-version = "4.15.0"
+version = "4.16.0"
 weakdeps = ["Dates", "LinearAlgebra"]
 
     [deps.Compat.extensions]
@@ -620,9 +671,9 @@ version = "1.15.1"
 
 [[deps.DifferentiationInterface]]
 deps = ["ADTypes", "Compat", "DocStringExtensions", "FillArrays", "LinearAlgebra", "PackageExtensionCompat", "SparseArrays", "SparseMatrixColorings"]
-git-tree-sha1 = "6bd550abccb7aa156141e10d5367c580af9128af"
+git-tree-sha1 = "5fd57942dde7449335f585b3a4236e1fa2de0fd5"
 uuid = "a0c0ee7d-e4b9-4e03-894e-1c5f64a51d63"
-version = "0.5.11"
+version = "0.5.12"
 
     [deps.DifferentiationInterface.extensions]
     DifferentiationInterfaceChainRulesCoreExt = "ChainRulesCore"
@@ -675,9 +726,9 @@ uuid = "4e289a0a-7415-4d19-859d-a7e5c4648b56"
 version = "1.0.4"
 
 [[deps.EnzymeCore]]
-git-tree-sha1 = "d445df66dd8761a4c27df950db89c6a3a0629fe7"
+git-tree-sha1 = "8f205a601760f4798a10f138c3940f0451d95188"
 uuid = "f151be2c-9106-41f4-ab19-57ee4f262869"
-version = "0.7.7"
+version = "0.7.8"
 weakdeps = ["Adapt"]
 
     [deps.EnzymeCore.extensions]
@@ -730,10 +781,10 @@ version = "1.11.0"
     Statistics = "10745b16-79ce-11e8-11f9-7d13ad32a3b2"
 
 [[deps.FiniteDiff]]
-deps = ["ArrayInterface", "LinearAlgebra", "Requires", "Setfield", "SparseArrays"]
-git-tree-sha1 = "2de436b72c3422940cbe1367611d137008af7ec3"
+deps = ["ArrayInterface", "LinearAlgebra", "Setfield", "SparseArrays"]
+git-tree-sha1 = "f9219347ebf700e77ca1d48ef84e4a82a6701882"
 uuid = "6a86dc24-6348-571c-b903-95158fe2bd41"
-version = "2.23.1"
+version = "2.24.0"
 
     [deps.FiniteDiff.extensions]
     FiniteDiffBandedMatricesExt = "BandedMatrices"
@@ -836,14 +887,14 @@ weakdeps = ["Unitful"]
     InterpolationsUnitfulExt = "Unitful"
 
 [[deps.InverseFunctions]]
-deps = ["Test"]
-git-tree-sha1 = "18c59411ece4838b18cd7f537e56cf5e41ce5bfd"
+git-tree-sha1 = "2787db24f4e03daf859c6509ff87764e4182f7d1"
 uuid = "3587e190-3f89-42d0-90ee-14403ec27112"
-version = "0.1.15"
-weakdeps = ["Dates"]
+version = "0.1.16"
+weakdeps = ["Dates", "Test"]
 
     [deps.InverseFunctions.extensions]
-    DatesExt = "Dates"
+    InverseFunctionsDatesExt = "Dates"
+    InverseFunctionsTestExt = "Test"
 
 [[deps.IrrationalConstants]]
 git-tree-sha1 = "630b497eafcc20001bba38a4651b327dcfc491d2"
@@ -875,9 +926,9 @@ version = "3.0.3+0"
 
 [[deps.JuliaInterpreter]]
 deps = ["CodeTracking", "InteractiveUtils", "Random", "UUIDs"]
-git-tree-sha1 = "5d3a5a206297af3868151bb4a2cf27ebce46f16d"
+git-tree-sha1 = "7ae67d8567853d367e3463719356b8989e236069"
 uuid = "aa1ae85d-cabe-5617-a682-6adf51b2e16a"
-version = "0.9.33"
+version = "0.9.34"
 
 [[deps.LERC_jll]]
 deps = ["Artifacts", "JLLWrappers", "Libdl", "Pkg"]
@@ -1093,10 +1144,10 @@ uuid = "ed5d0301-4775-4676-b788-cf71e66ff8ed"
 version = "0.7.13"
 
 [[deps.PlutoPlotly]]
-deps = ["AbstractPlutoDingetjes", "BaseDirs", "Colors", "Dates", "Downloads", "HypertextLiteral", "InteractiveUtils", "LaTeXStrings", "Markdown", "Pkg", "PlotlyBase", "Reexport", "TOML"]
-git-tree-sha1 = "1ae939782a5ce9a004484eab5416411c7190d3ce"
+deps = ["AbstractPlutoDingetjes", "Artifacts", "BaseDirs", "Colors", "Dates", "Downloads", "HypertextLiteral", "InteractiveUtils", "LaTeXStrings", "Markdown", "Pkg", "PlotlyBase", "Reexport", "TOML"]
+git-tree-sha1 = "653b48f9c4170343c43c2ea0267e451b68d69051"
 uuid = "8e989ff0-3d88-8e9f-f020-2b208a939ff0"
-version = "0.4.6"
+version = "0.5.0"
 
     [deps.PlutoPlotly.extensions]
     PlotlyKaleidoExt = "PlotlyKaleido"
@@ -1113,10 +1164,10 @@ uuid = "7f904dfe-b85e-4ff6-b463-dae2292396a8"
 version = "0.7.59"
 
 [[deps.Polyester]]
-deps = ["ArrayInterface", "BitTwiddlingConvenienceFunctions", "CPUSummary", "IfElse", "ManualMemory", "PolyesterWeave", "Requires", "Static", "StaticArrayInterface", "StrideArraysCore", "ThreadingUtilities"]
-git-tree-sha1 = "9ff799e8fb8ed6717710feee3be3bc20645daa97"
+deps = ["ArrayInterface", "BitTwiddlingConvenienceFunctions", "CPUSummary", "IfElse", "ManualMemory", "PolyesterWeave", "Static", "StaticArrayInterface", "StrideArraysCore", "ThreadingUtilities"]
+git-tree-sha1 = "6d38fea02d983051776a856b7df75b30cf9a3c1f"
 uuid = "f517fe37-dbe3-4b94-8317-1923a5111588"
-version = "0.7.15"
+version = "0.7.16"
 
 [[deps.PolyesterWeave]]
 deps = ["BitTwiddlingConvenienceFunctions", "CPUSummary", "IfElse", "Static", "ThreadingUtilities"]
@@ -1199,10 +1250,10 @@ uuid = "3cdcf5f2-1ef4-517c-9805-6587b60abb01"
 version = "1.3.4"
 
 [[deps.RecursiveArrayTools]]
-deps = ["Adapt", "ArrayInterface", "DocStringExtensions", "GPUArraysCore", "IteratorInterfaceExtensions", "LinearAlgebra", "RecipesBase", "SparseArrays", "StaticArraysCore", "Statistics", "SymbolicIndexingInterface", "Tables"]
-git-tree-sha1 = "b450d967a770fb13d0e26358f58375e20361cf9c"
+deps = ["Adapt", "ArrayInterface", "DocStringExtensions", "GPUArraysCore", "IteratorInterfaceExtensions", "LinearAlgebra", "RecipesBase", "StaticArraysCore", "Statistics", "SymbolicIndexingInterface", "Tables"]
+git-tree-sha1 = "b034171b93aebc81b3e1890a036d13a9c4a9e3e0"
 uuid = "731186ca-8d62-57ce-b412-fbd966d074cd"
-version = "3.26.0"
+version = "3.27.0"
 
     [deps.RecursiveArrayTools.extensions]
     RecursiveArrayToolsFastBroadcastExt = "FastBroadcast"
@@ -1210,6 +1261,7 @@ version = "3.26.0"
     RecursiveArrayToolsMeasurementsExt = "Measurements"
     RecursiveArrayToolsMonteCarloMeasurementsExt = "MonteCarloMeasurements"
     RecursiveArrayToolsReverseDiffExt = ["ReverseDiff", "Zygote"]
+    RecursiveArrayToolsSparseArraysExt = ["SparseArrays"]
     RecursiveArrayToolsTrackerExt = "Tracker"
     RecursiveArrayToolsZygoteExt = "Zygote"
 
@@ -1219,6 +1271,7 @@ version = "3.26.0"
     Measurements = "eff96d63-e80a-5855-80a2-b1b0885c5ab7"
     MonteCarloMeasurements = "0987c9cc-fe09-11e8-30f0-b96dd679fdca"
     ReverseDiff = "37e2e3b7-166d-5795-8a7a-e32c996b4267"
+    SparseArrays = "2f01184e-e22b-5df5-ae63-d93ebab69eaf"
     Tracker = "9f7883ad-71c0-57eb-9f7f-b5c9e6d3789c"
     Zygote = "e88e6eb3-aa80-5325-afca-941959d7151f"
 
@@ -1308,10 +1361,11 @@ version = "2.48.1"
     Zygote = "e88e6eb3-aa80-5325-afca-941959d7151f"
 
 [[deps.SciMLOperators]]
-deps = ["ArrayInterface", "DocStringExtensions", "LinearAlgebra", "MacroTools", "Setfield", "SparseArrays", "StaticArraysCore"]
-git-tree-sha1 = "10499f619ef6e890f3f4a38914481cc868689cd5"
+deps = ["ArrayInterface", "DocStringExtensions", "LinearAlgebra", "MacroTools", "Setfield", "StaticArraysCore"]
+git-tree-sha1 = "23b02c588ac9a17ecb276cc62ab37f3e4fe37b32"
 uuid = "c0aeaf25-5076-4817-a8d5-81caf7dfa961"
-version = "0.3.8"
+version = "0.3.9"
+weakdeps = ["SparseArrays"]
 
 [[deps.SciMLStructures]]
 deps = ["ArrayInterface"]
@@ -1340,9 +1394,9 @@ uuid = "1a1011a3-84de-559e-8e89-a11a2f7dc383"
 
 [[deps.SimpleNonlinearSolve]]
 deps = ["ADTypes", "ArrayInterface", "ConcreteStructs", "DiffEqBase", "DiffResults", "DifferentiationInterface", "FastClosures", "FiniteDiff", "ForwardDiff", "LinearAlgebra", "MaybeInplace", "PrecompileTools", "Reexport", "SciMLBase", "Setfield", "StaticArraysCore"]
-git-tree-sha1 = "03c21a4c373c7c3aa77611430068badaa073d740"
+git-tree-sha1 = "4d7a7c177bcb4c6dc465f09db91bfdb28c578919"
 uuid = "727e6d20-b764-4bd8-a329-72de5adea6c7"
-version = "1.11.0"
+version = "1.12.0"
 
     [deps.SimpleNonlinearSolve.extensions]
     SimpleNonlinearSolveChainRulesCoreExt = "ChainRulesCore"
@@ -1393,10 +1447,10 @@ uuid = "aedffcd0-7271-4cad-89d0-dc628f76c6d3"
 version = "1.1.1"
 
 [[deps.StaticArrayInterface]]
-deps = ["ArrayInterface", "Compat", "IfElse", "LinearAlgebra", "PrecompileTools", "Requires", "SparseArrays", "Static", "SuiteSparse"]
-git-tree-sha1 = "8963e5a083c837531298fc41599182a759a87a6d"
+deps = ["ArrayInterface", "Compat", "IfElse", "LinearAlgebra", "PrecompileTools", "Static"]
+git-tree-sha1 = "96381d50f1ce85f2663584c8e886a6ca97e60554"
 uuid = "0d7ed370-da01-4f52-bd93-41d350b8b718"
-version = "1.5.1"
+version = "1.8.0"
 weakdeps = ["OffsetArrays", "StaticArrays"]
 
     [deps.StaticArrayInterface.extensions]
@@ -1443,10 +1497,6 @@ weakdeps = ["Adapt", "GPUArraysCore", "SparseArrays", "StaticArrays"]
     StructArraysSparseArraysExt = "SparseArrays"
     StructArraysStaticArraysExt = "StaticArrays"
 
-[[deps.SuiteSparse]]
-deps = ["Libdl", "LinearAlgebra", "Serialization", "SparseArrays"]
-uuid = "4607b0f0-06f3-5cda-b6b1-a6196a1729e9"
-
 [[deps.SuiteSparse_jll]]
 deps = ["Artifacts", "Libdl", "libblastrampoline_jll"]
 uuid = "bea87d4a-7f5b-5778-9afe-8cc45184846c"
@@ -1454,9 +1504,9 @@ version = "7.2.1+1"
 
 [[deps.SymbolicIndexingInterface]]
 deps = ["Accessors", "ArrayInterface", "RuntimeGeneratedFunctions", "StaticArraysCore"]
-git-tree-sha1 = "2dd32da03adaf43fd91494e38ef3df0ab2e6c20e"
+git-tree-sha1 = "c9fce29fb41a10677e24f74421ebe31220b81ad0"
 uuid = "2efcf032-c050-4f8e-a9bb-153293bab1f5"
-version = "0.3.27"
+version = "0.3.28"
 
 [[deps.TOML]]
 deps = ["Dates"]
@@ -1482,15 +1532,9 @@ version = "1.10.0"
 
 [[deps.TelecomUtils]]
 deps = ["AbstractPlutoDingetjes", "CoordinateTransformations", "DocStringExtensions", "InteractiveUtils", "Interpolations", "LinearAlgebra", "Markdown", "NamedTupleTools", "Printf", "Proj", "Random", "Rotations", "SatelliteToolboxBase", "SatelliteToolboxTransformations", "SimpleNonlinearSolve", "SplitApplyCombine", "StaticArrays", "StructArrays", "Tricks", "Unitful"]
-git-tree-sha1 = "c9698e5f5ef528b8c66c357e2274b202703e7d50"
+git-tree-sha1 = "763a22c559e6652766aa555618e0134e3ae149a9"
 uuid = "0c499ce9-5070-43f6-85c8-6d9cb66e1eb8"
-version = "0.6.10"
-
-    [deps.TelecomUtils.extensions]
-    CountriesBordersExt = ["CountriesBorders"]
-
-    [deps.TelecomUtils.weakdeps]
-    CountriesBorders = "ee40d4b5-31c3-4fe2-b6cc-5ac7adf7f414"
+version = "0.6.9"
 
 [[deps.TensorCore]]
 deps = ["LinearAlgebra"]
@@ -1588,12 +1632,22 @@ version = "17.4.0+2"
 
 # ╔═╡ Cell order:
 # ╠═069444e1-4e89-4f4f-ae2f-f5fb3131e398
-# ╠═3ce21344-e0ea-4e41-b78e-cf92dc9ac2e7
+# ╟─0db4a84d-f4cf-4cea-8e6b-5b0480d3f6ff
+# ╠═53302c64-c73f-4dca-8f23-be182ccabe8f
+# ╠═011c207e-864d-4c91-8acd-da7b6fd3f30a
+# ╠═61a4d585-1eec-43c0-b083-fddd775a9335
+# ╠═f7d162a9-3ce7-48f4-a7ce-3a219839f1c6
+# ╟─3ce21344-e0ea-4e41-b78e-cf92dc9ac2e7
 # ╠═a34e4ff6-51f9-4d6b-af28-5e856adea1ed
+# ╠═56005d86-0377-4d40-b63b-d5597acddc32
+# ╠═c8d4cd0e-0876-4c16-9146-12ed16516ebe
+# ╠═03485d5c-d7a3-475a-a9d4-8a43a101106c
+# ╠═b2216550-1473-4062-8485-66af57f2fe37
 # ╟─222fb774-1693-4b3c-b2ef-5fd38eca773c
 # ╟─ca4efc79-7cf3-46de-b03e-643c29254818
 # ╠═e0b2c99d-c689-48fb-91d5-6a3b4ee4d044
 # ╠═7df04689-55fd-4659-b251-2100bf565580
+# ╠═b34086c0-d58a-41e4-8fd0-fc915fa49440
 # ╠═ad9016de-1cce-4dc8-bdbf-2a2d65a4319f
 # ╠═3603a9e3-03cd-4861-a9af-b9d5657be13e
 # ╟─b12ae026-8fbb-4687-98df-f7a2fe9672b6

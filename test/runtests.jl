@@ -1,9 +1,10 @@
 using TestItemRunner
 
-include("general.jl")
 include("filtering.jl")
-include("tesselation.jl")
+include("grids.jl")
+include("interfaces.jl")
 include("plots.jl")
+include("tesselation.jl")
 
 @testitem "Aqua" begin
     using Aqua

@@ -11,7 +11,7 @@ built with the Fibonacci Spiral method.
 - `type`: `:lla` or `:point`. Output type either `LLA` or `Point2`
 
 ## Output:
-- `out`: an Array{SimpleLatLon} of points in the icosahedral grid.
+- `out`: an Vector{Point{🌐,<:LatLon{WGS84Latest}}} of points in the icosahedral grid.
 """
 function icogrid(; N::Union{Int,Nothing}=nothing, sepAng::Union{ValidAngle,Nothing}=nothing)
     if isnothing(sepAng) && !isnothing(N)
@@ -40,7 +40,7 @@ Consider using `°` (or `rad`) from `Unitful` if you want to pass numbers in deg
     end
 
     # Unit Conversion	
-	out = map(x -> SimpleLatLon(rad2deg.(x)...), vec)
+    out = map(x -> LatLon{WGS84Latest}(rad2deg.(x)...) |> Point, vec)
 
     return out
 end
@@ -62,10 +62,10 @@ preserved quasi-constant.
 - `radius`: the sphere radius in meters (unitary as default)
 
 ## Output:
-- `pointsVec`: `N x 1` array containing the SVector of the generated points. \
-Each element corresponds to a point on the surface of the sphere, the SVector \
-contains either the x, y, and z (:cart) or lat, lon (:sphe) (LAT=x, LON=y) \
-in rad coordinates of the point.
+- `pointsVec`: a `Vector{SVector}` of the generated points. Each element \
+corresponds to a point on the surface of the sphere, the SVector contains \
+either the x, y, and z (:cart) or lat, lon (:sphe) (LAT=x, LON=y) in rad \
+coordinates of the point.
 
 ## References
 1. http://extremelearning.com.au/how-to-evenly-distribute-points-on-a-sphere-more-effectively-than-the-canonical-fibonacci-lattice/
@@ -78,10 +78,10 @@ function _icogrid(N::Int; coord::Symbol=:sphe, spheRadius=1.0)
         end
     else
         map(0:N-1) do k
-			θ, ϕ = _get_theta_phi(k, N)
-			sθ, cθ = sincos(θ)
-			sϕ, cϕ = sincos(ϕ)
-			spheRadius * SVector(sϕ * cθ, sϕ * sθ, cϕ) # Real, representing meters
+            θ, ϕ = _get_theta_phi(k, N)
+            sθ, cθ = sincos(θ)
+            sϕ, cϕ = sincos(ϕ)
+            spheRadius * SVector(sϕ * cθ, sϕ * sθ, cϕ) # Real, representing meters
         end
     end
 
@@ -208,9 +208,9 @@ SVector{3}.
 function _fibonaccisphere_classic_partial(N; spheRadius=1.0, pointsToCheck::Int=50)
     points = map(0:min(pointsToCheck, N)-1) do k
         θ, ϕ = _get_theta_phi(k, N)
-		sθ, cθ = sincos(θ)
-		sϕ, cϕ = sincos(ϕ)
-		spheRadius * SVector(sϕ * cθ, sϕ * sθ, cϕ)
+        sθ, cθ = sincos(θ)
+        sϕ, cϕ = sincos(ϕ)
+        spheRadius * SVector(sϕ * cθ, sϕ * sθ, cϕ)
     end
 
     return points

@@ -3,6 +3,12 @@ const UnitfulAngleType = Union{typeof(°),typeof(rad)}
 const UnitfulAngleQuantity = Quantity{<:Real,<:Any,<:UnitfulAngleType}
 const ValidAngle = Union{UnitfulAngleQuantity,Real}
 
+const constants = (
+    Re_mean = 6371e3, # Mean Earth Radius [m]
+    a = 6378137, # [m] WGS84 semi-major axis
+    b = 6356752.315 # [m] WGS84 semi-minor axis
+)
+
 ## Define Region Types
 abstract type AbstractRegion end
 
@@ -27,12 +33,24 @@ function GeoRegion(; regionName="region_name", continent="", subregion="", admin
     GeoRegion(regionName, continent, subregion, admin, domain)
 end
 
-"Type of polygonal region based on PolyArea."
-mutable struct PolyRegion <: AbstractRegion
-    regionName::String
-    domain::PolyArea
+struct PolyBorder{T} <: Geometry{🌐,LATLON{T}}
+    "The borders in LatLon CRS"
+    latlon::POLY_LATLON{T}
+    "The borders in Cartesian2D CRS"
+    cart::POLY_CART{T}
+
+    function PolyBorder(latlon::POLY_LATLON{T}) where {T}
+        cart = cartesian_geometry(latlon)
+        new{T}(latlon, cart)
+    end
 end
-PolyRegion(regionName, domain::Vector{<:SimpleLatLon}) = PolyRegion(regionName, PolyArea(map(Point, domain)))
+
+"Type of polygonal region based on PolyArea."
+mutable struct PolyRegion{T} <: AbstractRegion
+    regionName::String
+    domain::PolyBorder{T}
+end
+PolyRegion(regionName, domain::Vector{<:LatLon}) = PolyRegion(regionName, PolyBorder(PolyArea(map(Point, domain))))
 PolyRegion(; regionName::String="region_name", domain) = PolyRegion(regionName, domain)
 
 "Type of region representinga a latitude belt region."
@@ -100,10 +118,4 @@ struct H3 <: AbstractTiling end
 Struct used to create function methods that return more than one output.
 Used within multiple methods of the GeoGrids API, usually given as last optional argument.
 """
-struct ExtraOutput end
-
-const constants = (
-    Re_mean = 6371e3, # Mean Earth Radius [m]
-    a = 6378137, # [m] WGS84 semi-major axis
-    b = 6356752.315 # [m] WGS84 semi-minor axis
-)
+struct EO end

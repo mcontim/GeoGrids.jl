@@ -108,7 +108,7 @@ function _adapted_icogrid(radius::Number; refRadius=constants.Re_mean, correctio
 end
 
 """
-    _hex_tesselation_centroids(origin::SimpleLatLon, radius::Number; direction::Symbol=:pointy, Re::Number=constants.Re_mean, kwargs_lattice...)
+    _hex_tesselation_centroids(origin::Point{🌐,<:LatLon{WGS84Latest}}, radius::Number; direction::Symbol=:pointy, Re::Number=constants.Re_mean, kwargs_lattice...)
 
 This function generates the centroids of a hexagonal tessellation on the Earth's
 surface, centered at the origin. The tessellation is created based on a given
@@ -116,7 +116,8 @@ radius and direction. The function converts the offsets of the hexagonal grid to
 latitude and longitude coordinates.
 
 ## Arguments
-- `origin::SimpleLatLon`: The lat-lon coordinates of the center of the tessellation. 
+- `origin::Point{🌐,<:LatLon{WGS84Latest}}`: The lat-lon coordinates of the \
+center of the tessellation. 
 - `radius::Number`: The radius of the hexagons in the tessellation in meters.
 - `direction::Symbol`: The direction of the hexagons, either `:pointy` (default) \
 or `:flat`.
@@ -126,10 +127,11 @@ or `:flat`.
 generation.
 
 ## Returns
-- `Vector{SimpleLatLon}`: A vector of `SimpleLatLon` objects representing the \
-centroids of the hexagonal tessellation in latitude and longitude.
+- `Vector{Point{🌐,<:LatLon{WGS84Latest}}}`: A vector of \
+`Point{🌐,<:LatLon{WGS84Latest}}` objects representing the centroids of the \
+hexagonal tessellation in latitude and longitude.
 """
-function _hex_tesselation_centroids(origin::SimpleLatLon, radius::Number; direction::Symbol=:pointy, refRadius::Number=constants.Re_mean, kwargs_lattice...)
+function _hex_tesselation_centroids(origin::Point{🌐,<:LatLon{WGS84Latest}}, radius::Number; direction::Symbol=:pointy, refRadius::Number=constants.Re_mean, kwargs_lattice...)
     ## Generate the lattice centered in 0,0.
     # Angular spacing [rad] between lattice points considering a triple-point
     # overlap. This spacing represents the angle of the arc of length radius, on
@@ -138,8 +140,8 @@ function _hex_tesselation_centroids(origin::SimpleLatLon, radius::Number; direct
     offsetLattice = gen_hex_lattice(spacing, direction; kwargs_lattice...) # [rad]
 
     ## Re-center the lattice around the seed point.
-    θ = 90 - (origin.lat |> ustrip) |> deg2rad
-    ϕ = origin.lon |> ustrip |> deg2rad
+    θ = 90 - (origin.coords.lat |> ustrip) |> deg2rad
+    ϕ = origin.coords.lon |> ustrip |> deg2rad
     centreθφ = (; θ=θ, ϕ=ϕ) # [rad] Convert lat-lon in theta-phi (shperical approximation)
     newLattice = map(offsetLattice) do offset
         # 1 - Convert the lat-lon of the grid seed in spherical (ISO). 2 - The
@@ -167,47 +169,15 @@ function _hex_tesselation_centroids(origin::SimpleLatLon, radius::Number; direct
         new = _add_angular_offset(centreθφ, offsetθφ)
 
         lat, lon = _wrap_latlon(π / 2 - new.θ |> rad2deg, new.ϕ |> rad2deg)
-        SimpleLatLon(lat, lon)
+        LatLon{WGS84Latest}(lat, lon) |> Point
     end
 
     return newLattice[:]
 end
 
-function _generate_tesselation(region::GeoRegion, radius::Number, type::HEX; refRadius::Number=constants.Re_mean, kwargs_lattice...)
-    ## Find the domain center as seed for the cell grid layout.
-    domain = extract_countries(region)[1] # The indicization is used to extract directly the Multi or PolyArea from the view
-    origin = let
-        c = if domain isa Multi
-            idxMain = findmax(x -> length(vertices(x)), domain.geoms)[2] # Find the PolyArea with the most vertices. It is assumed also to be the largest one so the main area of that country to be considered for the centroid computation.
-            c = centroid(domain.geoms[idxMain]) # Find the centroid of the main PolyArea to be used as grid layout seed.
-        elseif domain isa PolyArea
-            centroid(domain)
-        else
-            error("Unrecognised type of GeoRegion domain...")
-        end
-        (; x, y) = c.coords
-        SimpleLatLon(y |> ustrip, x |> ustrip) # SimpleLatLon in deg
-    end
-
-    ## Generate the tassellation centroids and filter the ones in the region.
-    return _hex_tesselation_centroids(origin, radius; direction=type.direction, refRadius, kwargs_lattice...)
-end
-
-function _generate_tesselation(region::PolyRegion, radius::Number, type::HEX; refRadius::Number=constants.Re_mean, kwargs_lattice...)
-    # Find the domain center as seed for the cell grid layout.
-    origin = let
-        centre = centroid(region.domain)
-        (; x, y) = centre.coords
-        SimpleLatLon(y |> ustrip, x |> ustrip) # SimpleLatLon in deg
-    end
-
-    # Generate the tassellation centroids.
-    return _hex_tesselation_centroids(origin, radius; direction=type.direction, refRadius, kwargs_lattice...)
-end
-
 """
-    generate_tesselation(region::Union{GeoRegion, PolyRegion}, radius::Number, type::HEX; refRadius::Number=constants.Re_mean, kwargs_lattice...) -> AbstractVector{<:SimpleLatLon}
-    generate_tesselation(region::Union{GeoRegion, PolyRegion}, radius::Number, type::HEX, ::ExtraOutput; refRadius::Number=constants.Re_mean, kwargs_lattice...) -> AbstractVector{<:SimpleLatLon}, AbstractVector{<:AbstractVector{<:SimpleLatLon}}
+    generate_tesselation(region::Union{GeoRegion, PolyRegion}, radius::Number, type::HEX; refRadius::Number=constants.Re_mean, kwargs_lattice...) -> AbstractVector{<:Point{🌐,<:LatLon{WGS84Latest}}}
+    generate_tesselation(region::Union{GeoRegion, PolyRegion}, radius::Number, type::HEX, ::EO; refRadius::Number=constants.Re_mean, kwargs_lattice...) -> AbstractVector{<:Point{🌐,<:LatLon{WGS84Latest}}}, AbstractVector{<:AbstractVector{<:Point{🌐,<:LatLon{WGS84Latest}}}}
 
 The `generate_tesselation` function generates a hexagonal cell layout for a given
 geographical region. It calculates the cell grid layout centered around the
@@ -227,54 +197,56 @@ circumscribed circumference.
 supported).
 - `refRadius::Number`: The radius of the Earth in meters (default is \
 `constants.Re_mean`).
-- `::ExtraOutput`: an extra parameter enabling a `Vector{Ngon}` the contours of \
+- `::EO`: an extra parameter enabling a `Vector{Ngon}` the contours of \
 each cell. The mesh originating these contours is obtained using \
 `VoronoiTesselation`.
 - `kwargs_lattice...`: Additional keyword arguments passed to the \
 `gen_hex_lattice` function.
 
 ## Returns
-- `Array{SimpleLatLon,1}`: An array of points (`SimpleLatLon`) representing the \
-cell centers within the specified region.
+- `Vector{Point{🌐,<:LatLon{WGS84Latest}}}`: A Vecotr of points (`LatLon`) \
+representing the cell centers within the specified region.
 
 See also: [`gen_hex_lattice`](@ref), [`_generate_tesselation`](@ref),
-[`_hex_tesselation_centroids`](@ref), [`my_tesselate`](@ref), [`HEX`](@ref),
+[`_hex_tesselation_centroids`](@ref), [`_tesselate`](@ref), [`HEX`](@ref),
 [`GeoRegion`](@ref), [`PolyRegion`](@ref)
 """
 function generate_tesselation(region::Union{GeoRegion,PolyRegion}, radius::Number, type::HEX; refRadius::Number=constants.Re_mean, kwargs_lattice...)
     # Generate the tassellation centroids.
-    centroids = _generate_tesselation(region, radius, type; refRadius, kwargs_lattice...)
+    origin = centroid(LatLon, region)
+    centroids = _hex_tesselation_centroids(origin, radius; direction=type.direction, refRadius, kwargs_lattice...)
 
     # Filter centroids in the region.
     return filter_points(centroids, region)
 end
 
-function generate_tesselation(region::Union{GeoRegion,PolyRegion}, radius::Number, type::HEX, ::ExtraOutput; refRadius::Number=constants.Re_mean, kwargs_lattice...)
+function generate_tesselation(region::Union{GeoRegion,PolyRegion}, radius::Number, type::HEX, ::EO; refRadius::Number=constants.Re_mean, kwargs_lattice...)
     # Generate the tassellation centroids.
-    centroids = _generate_tesselation(region, radius, type; refRadius, kwargs_lattice...)
+    origin = centroid(LatLon, region)
+    centroids = _hex_tesselation_centroids(origin, radius; direction=type.direction, refRadius, kwargs_lattice...)
 
     if type.pattern == :hex # Hexagonal pattern
         # Create the tasselation from all the centroids.
-        mesh = my_tesselate(centroids)
+        mesh = _tesselate(centroids)
         # Filter centroids in the region.
-        filtered, idxs = filter_points(centroids, region, ExtraOutput())
+        filtered, idxs = filter_points(centroids, region, EO())
         # Create the hexagonal pattern from the filtered centroids.
-        hexagons = my_tesselate_hexagon(filtered, idxs, mesh)
+        hexagons = gen_hex_pattern(filtered, idxs, mesh)
         return filtered, hexagons
     else # Circular pattern
         # Filter centroids in the region.
         filtered = filter_points(centroids, region)
         # Create the circular pattern from the filtered centroids.
-        circles = my_tesselate_circle(filtered, radius; refRadius, n=20)
+        circles = gen_circle_pattern(filtered, radius; refRadius, n=20)
         return filtered, circles
     end
 end
 
 """
-    generate_tesselation(region::GlobalRegion, radius::Number, type::ICO; refRadius::Number=constants.Re_mean) -> AbstractVector{<:SimpleLatLon}
-    generate_tesselation(region::GlobalRegion, radius::Number, type::ICO, ::ExtraOutput; refRadius::Number=constants.Re_mean) -> AbstractVector{<:SimpleLatLon}, AbstractVector{<:AbstractVector{<:SimpleLatLon}}
-    generate_tesselation(region::Union{LatBeltRegion, GeoRegion, PolyRegion}, radius::Number, type::ICO; refRadius::Number=constants.Re_mean) -> AbstractVector{<:SimpleLatLon}
-    generate_tesselation(region::Union{LatBeltRegion, GeoRegion, PolyRegion}, radius::Number, type::ICO, ::ExtraOutput; refRadius::Number=constants.Re_mean) -> AbstractVector{<:SimpleLatLon}, AbstractVector{<:AbstractVector{<:SimpleLatLon}}
+    generate_tesselation(region::GlobalRegion, radius::Number, type::ICO; refRadius::Number=constants.Re_mean) -> AbstractVector{<:LatLon}
+    generate_tesselation(region::GlobalRegion, radius::Number, type::ICO, ::EO; refRadius::Number=constants.Re_mean) -> AbstractVector{<:LatLon}, AbstractVector{<:AbstractVector{<:LatLon}}
+    generate_tesselation(region::Union{LatBeltRegion, GeoRegion, PolyRegion}, radius::Number, type::ICO; refRadius::Number=constants.Re_mean) -> AbstractVector{<:LatLon}
+    generate_tesselation(region::Union{LatBeltRegion, GeoRegion, PolyRegion}, radius::Number, type::ICO, ::EO; refRadius::Number=constants.Re_mean) -> AbstractVector{<:LatLon}, AbstractVector{<:AbstractVector{<:LatLon}}
 
 The `generate_tesselation` function generates a cell layout using an icosahedral grid
 for a given geographical region. The function adapts the grid based on the
@@ -290,14 +262,13 @@ for which the cell layout is generated. This can be a `LatBeltRegion`, \
 - `radius::Number`: The radius used to adapt the icosahedral grid.
 - `type::ICO`: An object specifying the type of icosahedral grid and its \
 correction factor.
-- `::ExtraOutput`: an extra parameter enabling a `Vector{Ngon}` the contours of \
+- `::EO`: an extra parameter enabling a `Vector{Ngon}` the contours of \
 each cell. The mesh originating these contours is obtained using \
 `VoronoiTesselation`.
 
 ## Returns
-- `Array{PointType, 1}`: An array of points representing the cell centers within \
-the specified region. The exact type of `PointType` depends on the \
-implementation of the `_adapted_icogrid` and `filter_points` functions.
+- `Vector{Point{🌐,<:LatLon{WGS84Latest}}}`: A Vecotr of points (`LatLon`) \
+representing the cell centers within the specified region.
 
 See also: [`_adapted_icogrid()`](@ref), [`icogrid()`](@ref),
 [`filter_points()`](@ref), [`GeoRegion`](@ref), [`LatBeltRegion`](@ref),
@@ -307,19 +278,19 @@ function generate_tesselation(region::GlobalRegion, radius::Number, type::ICO; r
     return _adapted_icogrid(radius; refRadius, correctionFactor=type.correction)
 end
 
-function generate_tesselation(region::GlobalRegion, radius::Number, type::ICO, ::ExtraOutput; refRadius::Number=constants.Re_mean)
+function generate_tesselation(region::GlobalRegion, radius::Number, type::ICO, ::EO; refRadius::Number=constants.Re_mean)
     # Generate the tassellation centroids.
     centroids = _adapted_icogrid(radius; refRadius, correctionFactor=type.correction)
 
     if type.pattern == :hex # Hexagonal pattern
         # Create the tasselation from all the centroids.
-        mesh = my_tesselate(centroids)
+        mesh = _tesselate(centroids)
         # Create the hexagonal pattern from all centroids.
-        hexagons = my_tesselate_hexagon(centroids, collect(1:length(centroids)), mesh)
+        hexagons = gen_hex_pattern(centroids, collect(1:length(centroids)), mesh)
         return centroids, hexagons
     else # Circular pattern
         # Create the circular pattern from all the centroids.
-        circles = my_tesselate_circle(centroids, radius; refRadius, n=20)
+        circles = gen_circle_pattern(centroids, radius; refRadius, n=20)
         return centroids, circles
     end
 end
@@ -330,23 +301,23 @@ function generate_tesselation(region::Union{LatBeltRegion,GeoRegion,PolyRegion},
     return filter_points(centroids, region)
 end
 
-function generate_tesselation(region::Union{LatBeltRegion,GeoRegion,PolyRegion}, radius::Number, type::ICO, ::ExtraOutput; refRadius::Number=constants.Re_mean)
+function generate_tesselation(region::Union{LatBeltRegion,GeoRegion,PolyRegion}, radius::Number, type::ICO, ::EO; refRadius::Number=constants.Re_mean)
     # Generate the tassellation centroids.
     centroids = _adapted_icogrid(radius; refRadius, correctionFactor=type.correction)
 
     if type.pattern == :hex # Hexagonal pattern
         # Create the tasselation from all the centroids.
-        mesh = my_tesselate(centroids)
+        mesh = _tesselate(centroids)
         # Filter centroids in the region.
-        filtered, idxs = filter_points(centroids, region, ExtraOutput())
+        filtered, idxs = filter_points(centroids, region, EO())
         # Create the hexagonal pattern from the filtered centroids.
-        hexagons = my_tesselate_hexagon(filtered, idxs, mesh)
+        hexagons = gen_hex_pattern(filtered, idxs, mesh)
         return filtered, hexagons
     else # Circular pattern
         # Filter centroids in the region.
         filtered = filter_points(centroids, region)
         # Create the circular pattern from the filtered centroids.
-        circles = my_tesselate_circle(filtered, radius; refRadius, n=20)
+        circles = gen_circle_pattern(filtered, radius; refRadius, n=20)
         return filtered, circles
     end
 end
@@ -356,154 +327,72 @@ function generate_tesselation(region::Union{GlobalRegion,LatBeltRegion,GeoRegion
 end
 
 """
-    my_tesselate(pset::PointSet, method::VoronoiTesselation; sorted=true) -> SimpleMesh
-    my_tesselate(points::AbstractVector{<:Point}, method::TesselationMethod) -> SimpleMesh
+    _tesselate(points::AbstractVector{<:Point{🌐,<:LatLon{WGS84Latest}}}, method::TesselationMethod=VoronoiTesselation()) -> TesselationResult
+    _tesselate(point::Point{🌐,<:LatLon{WGS84Latest}}; kwargs...) -> TesselationResult
 
-This function performs a Voronoi tessellation on a given set of 2D points. The
-tessellation divides the plane into polygons such that each polygon contains
-exactly one generating point and every point in a given polygon is closer to its
-generating point than to any other. The function handles the conversion between
-coordinate systems and ensures that the resulting polygons are correctly sorted
-if specified.
+The function `_tesselate` uses tesselate from Meshes.jl is used to create a
+tasselation starting from a vector of geographical points (latitude and
+longitude) and tesselates them according to the specified tesselation method
+(default is `VoronoiTesselation()`). In this function, latitude is treated as
+the y-coordinate and longitude as the x-coordinate. The single point version of
+the function (`_tesselate(point::Point{🌐,<:LatLon{WGS84Latest}}; kwargs...)`)
+is a convenience method that allows you to tesselate a single point by
+internally converting it to a vector containing just that point.
 
 ## Arguments
-- `pset::PointSet`: The set of points to be tessellated. Must have 2 coordinates \
-per point.
-- `method::VoronoiTesselation`: The tessellation method containing parameters \
-for the Voronoi tessellation, including the random number generator (`rng`).
-- `sorted::Bool`: Whether to sort the polygons in the tessellation output to \
-match the original order of points (default: `true`).
+- `points::AbstractVector{<:Point{🌐,<:LatLon{WGS84Latest}}}`: A vector of \
+points defined in the WGS84 coordinate system. Each point represents a \
+geographical location with latitude and longitude.
+- `method::TesselationMethod=VoronoiTesselation()`: The method used for \
+tesselation. The default is `VoronoiTesselation()`, but other methods can be \
+specified.
+
+## Keyword Arguments (for the second method signature)
+- `kwargs...`: Additional keyword arguments that will be passed to the first \
+method.
 
 ## Returns
-- `SimpleMesh`: A mesh object representing the tessellated polygons.
+- `TesselationResult`: The result of the tesselation, which could be a set of \
+polygons or other geometrical structures, depending on the tesselation method \
+used.
 """
-function my_tesselate(pset::PointSet; method::VoronoiTesselation=VoronoiTesselation(), sorted=true)
-    C = crs(pset)
-    T = Meshes.numtype(Meshes.lentype(pset))
-    Meshes.assertion(CoordRefSystems.ncoords(C) == 2, "points must have 2 coordinates")
-
-    # Perform tesselation with raw coordinates
-    rawval = map(p -> CoordRefSystems.rawvalues(coords(p)), pset)
-
-    triang = Meshes.triangulate(rawval, randomise=false, rng=method.rng)
-    vorono = Meshes.voronoi(triang, clip=true) # Using the Dict we loose the correct sorting of elements (polygons), which can be recovered later.
-
-    # Mesh with all (possibly unused) points
-    points = map(Meshes.get_polygon_points(vorono)) do xy
-        coords = CoordRefSystems.reconstruct(C, T.(xy))
-        Point(coords)
-    end
-    polygs = Meshes.each_polygon(vorono)
-    tuples = [Tuple(inds[begin:(end-1)]) for inds in polygs]
-
-    if sorted # Recover correct sorting of polygons.
-        original_idxs = keys(vorono.polygons) |> collect
-        invpermute!(tuples, original_idxs)
-    end
-
-    connec = connect.(tuples)
-    mesh = SimpleMesh(points, connec)
-
-    # Remove unused points
-    mesh |> Repair{1}()
-end
-
-my_tesselate(points::AbstractVector{<:Point}; kwargs...) = my_tesselate(PointSet(points); kwargs...)
-my_tesselate(point::Point; kwargs...) = my_tesselate([point]; kwargs...)
-
-function my_tesselate(points::AbstractVector{<:SimpleLatLon}; kwargs...)
+function _tesselate(points::AbstractVector{<:Point{🌐,<:LatLon{WGS84Latest}}}, method::TesselationMethod=VoronoiTesselation())
     # Convert the input points in a PointSet. Rememeber that in Meshes.jl we
     # must consider lat=y and lon=x (that's why we invert the order when
     # creating the converted point).
-    converted = map(x -> Point(ustrip(x.lon), ustrip(x.lat)), points)
-
-    my_tesselate(PointSet(converted); kwargs...)
+    converted = map(x -> Meshes.flat(x), points)
+    return tesselate(PointSet(converted), method)
 end
-my_tesselate(point::SimpleLatLon; kwargs...) = my_tesselate([point]; kwargs...)
+_tesselate(point::Point{🌐,<:LatLon{WGS84Latest}}; kwargs...) = _tesselate([point]; kwargs...)
 
-# Cirle cella contour.
 """
-    _gen_circle(cx::Number, cy::Number, r::Number, f::Function=identity, n::Int=100)
-    _gen_circle(center::SimpleLatLon, r::Number, n::Int=100)
+    gen_circle_pattern(centers::AbstractVector{Point{🌐,<:LatLon{WGS84Latest}}}, radius::Number; refRadius::Number=constants.Re_mean, n::Int=20) -> Vector{Vector{Point{🌐,<:LatLon{WGS84Latest}}}
+    gen_circle_pattern(c::Point{🌐,<:LatLon{WGS84Latest}}, radius::Number; kwargs...) -> Vector{Point{🌐,<:LatLon{WGS84Latest}}
+    gen_circle_pattern(centers::AbstractVector{<:LatLon}, radius::Number; kwargs...) -> Vector{Vector{Point{🌐,<:LatLon{WGS84Latest}}}
+    gen_circle_pattern(c::LatLon, radius::Number; kwargs...) -> Vector{Point{🌐,<:LatLon{WGS84Latest}}
 
-The `_gen_circle` function generates a set of points representing a circle
-centered at `(cx, cy)` with a radius `r`. The points are calculated using the
-parametric equations for a circle. An optional function `f` can be applied to
-each point, and the number of points `n` can be specified to control the
-resolution of the circle.
+The `gen_circle_pattern` function generates circles of geographical points centered at each point in the `centers` vector. The points are generated on the Earth's surface using a spherical approximation, where latitude and longitude are converted to spherical coordinates (theta-phi), and then an angular offset is applied to generate the circle.
+The single point versions of the function (`gen_circle_pattern(c::Point{🌐,<:LatLon{WGS84Latest}}, radius::Number; kwargs...)` and `gen_circle_pattern(c::LatLon, radius::Number; kwargs...)`) are convenience methods that allow you to generate a circle pattern around a single center point.
+Tis function is used to create a plottable patter od the circles around a center point.
 
 ## Arguments
-- `cx::Number`: The x-coordinate of the circle's center.
-- `cy::Number`: The y-coordinate of the circle's center.
-- `r::Number`: The radius of the circle.
-- `f::Function=identity`: An optional function to be applied to each point of \
-the circle. The default function is `identity`, which returns the points \
-unchanged.
-- `n::Int=100`: The number of points to generate on the circle. The default \
-value is 100.
-
-## Returns
-- `Array`: An array of points `(x, y)` on the circle, after applying the \
-function `f` to each point.
-"""
-function _gen_circle(cx::Number, cy::Number, r::Number; f::Function=identity, n::Int=100)
-    # Calculate the angle step
-    angle = 0:2π/n:2π
-
-    circle_points = map(angle) do ang
-        (cx + r * cos(ang), cy + r * sin(ang))
-    end
-
-    return map(x -> f.(x), circle_points)
-end
-
-function _gen_circle(center::SimpleLatLon, r::Number; refRadius=constants.Re_mean, n::Int=100)
-    # Radius in meters. The output is a Vector of values in deg for the sake of
-    # simplicity of the plotting.
-    cx = center.lon |> ustrip |> deg2rad
-    cy = center.lat |> ustrip |> deg2rad
-    r = r / refRadius
-
-    return _gen_circle(cx, cy, r; f=rad2deg, n=n)
-end
-
-"""
-    my_tesselate_circle(centers::AbstractVector{<:SimpleLatLon}, radius::Number; refRadius=constants.Re_mean, n::Int=20)
-
-The function constructs a set of circles on a spherical surface (approximated as
-a sphere) around specified center points. Each circle is tessellated by
-converting the latitude and longitude coordinates of the center into spherical
-coordinates (θ, ϕ), and then calculating points on the circumference using
-angular offsets. The resulting points are converted back to latitude and
-longitude.
-
-## Arguments
-- `centers::AbstractVector{<:SimpleLatLon}`: A vector of `SimpleLatLon` objects \
-representing the centers of the circles. `SimpleLatLon` is expected to be a \
-type that holds latitude and longitude information.
-- `radius::Number`: The radius of each circle in the same units as `refRadius`. \
-This radius is the distance from the center to the circumference of the circle \
-on the sphere.
+- `centers::AbstractVector{Point{🌐,<:LatLon{WGS84Latest}}}`: A vector of geographical points in the WGS84 coordinate system. Each point represents the center of a circle.
+- `radius::Number`: The radius of the circles to generate, in the same units as the reference radius (`refRadius`).
+- `refRadius::Number=constants.Re_mean`: The reference radius for the spherical approximation, defaulting to the mean Earth radius (`Re_mean`).
+- `n::Int=20`: The number of points to generate along each circle's circumference.
 
 ## Keyword Arguments
-- `refRadius`: The reference radius of the sphere (default: \
-`constants.Re_mean`). This is typically the mean radius of Earth. The radius \
-of the circles is divided by this value to calculate angular offsets.
-- `n::Int`: The number of points to generate along the circumference of each \
-circle (default: 20). The higher the value, the more detailed the \
-tessellation.
+- `kwargs...`: Additional keyword arguments passed to other variations of the function.
 
 ## Returns
-- `circles::Vector{Vector{SimpleLatLon}}`: A vector where each element is a \
-vector of `SimpleLatLon` points forming the circumference of a circle. Each \
-circle corresponds to a center point from the input `centers` vector.
+- `Vector{Vector{Point{🌐,<:LatLon{WGS84Latest}}}}`: A vector where each element is a vector of `LatLon` points representing a circle.
 """
-function my_tesselate_circle(centers::AbstractVector{<:SimpleLatLon}, radius::Number; refRadius::Number=constants.Re_mean, n::Int=20)
+function gen_circle_pattern(centers::AbstractVector{<:Point{🌐,<:LatLon{WGS84Latest}}}, radius::Number; refRadius::Number=constants.Re_mean, n::Int=20)
     Δϕ = [collect(0:2π/n:2π)..., 0.0] # [rad]
-    circles = [fill(SimpleLatLon(0, 0), length(Δϕ)) for i in 1:length(centers)] # Each element of the vector is a vector of SimpleLatLon points composing a circle.
+    circles = [fill(Point(LatLon{WGS84Latest}(0, 0)), length(Δϕ)) for i in 1:length(centers)] # Each element of the vector is a vector of LatLon points composing a circle.
     for c in eachindex(centers)
-        θ = 90 - (centers[c].lat |> ustrip) |> deg2rad
-        ϕ = centers[c].lon |> ustrip |> deg2rad
+        θ = 90 - (get_lat(centers[c]) |> ustrip) |> deg2rad
+        ϕ = get_lon(centers[c]) |> ustrip |> deg2rad
         centreθφ = (; θ=θ, ϕ=ϕ) # [rad] Convert lat-lon in theta-phi (shperical approximation)
         Δθ = radius / refRadius # [rad]
 
@@ -511,50 +400,72 @@ function my_tesselate_circle(centers::AbstractVector{<:SimpleLatLon}, radius::Nu
             offsetθφ = (; θ=Δθ, ϕ=v) # [rad]
             new = _add_angular_offset(centreθφ, offsetθφ)
             lat, lon = _wrap_latlon(π / 2 - new.θ |> rad2deg, new.ϕ |> rad2deg)
-            circles[c][i] = SimpleLatLon(lat, lon)
+            circles[c][i] = LatLon{WGS84Latest}(lat, lon) |> Point
         end
     end
 
     return circles
 end
-my_tesselate_circle(centers::SimpleLatLon, radius::Number; kwargs...) = my_tesselate_circle([centers], radius; kwargs...)
+gen_circle_pattern(c::Point{🌐,<:LatLon{WGS84Latest}}, radius::Number; kwargs...) = gen_circle_pattern([c], radius; kwargs...)
+# Utility for the user which can call the function using directly centers expressed in LatLon.
+gen_circle_pattern(centers::AbstractVector{<:LatLon}, radius::Number; kwargs...) = gen_circle_pattern(map(x -> Point(x), centers), radius; kwargs...)
+gen_circle_pattern(c::LatLon, radius::Number; kwargs...) = gen_circle_pattern([c], radius; kwargs...)
 
 """
-    my_tesselate_hexagon(filtered::AbstractVector{<:SimpleLatLon}, idxs::AbstractVector{Int}, mesh::SimpleMesh)
+    gen_hex_pattern(filtered::AbstractVector{Point{🌐,<:LatLon{WGS84Latest}}}, idxs::AbstractVector{<:Number}, mesh::SimpleMesh) -> Vector{Vector{LatLon}}
+    gen_hex_pattern(p::Point{🌐,<:LatLon{WGS84Latest}}, idx::Number, mesh::SimpleMesh) -> Vector{LatLon}
+    gen_hex_pattern(filtered::AbstractVector{<:LatLon}, idxs::AbstractVector{<:Number}, mesh::SimpleMesh) -> Vector{Vector{LatLon}}
+    gen_hex_pattern(p::LatLon, idx::Number, mesh::SimpleMesh) -> Vector{LatLon}
 
-This function generates a set of hexagons by converting the vertices of polygons
-in the `mesh` to `SimpleLatLon` points. These hexagons are created around the
-points specified in the `filtered` vector, and the specific polygons to use are
-selected using the `idxs` vector.
+The `gen_hex_pattern` function generates patterns of hexagons (or other
+polygons) around a set of geographical points using a provided mesh. The mesh is
+expected to contain polygons that are indexed by the `idxs` argument, and each
+polygon is converted into a set of geographical points in latitude and
+longitude. The function iterates over each polygon in the mesh corresponding to
+the indices in `idxs`, converting the vertices of the polygon into `LatLon`
+points that represent the corners of the hexagon (or other polygon) around the
+corresponding center point. The single point versions of the function
+(`gen_hex_pattern(p::Point{🌐,<:LatLon{WGS84Latest}}, idx::Number,
+mesh::SimpleMesh)` and `gen_hex_pattern(p::LatLon, idx::Number,
+mesh::SimpleMesh)`) are convenience methods that allow you to generate a pattern
+around a single center point.
 
 ## Arguments
-- `filtered::AbstractVector{<:SimpleLatLon}`: A vector of `SimpleLatLon` objects \
-that represent specific points on the surface. These points are the ones you \
-want to tessellate around.
-- `idxs::AbstractVector{Int}`: A vector of integers indicating indices into the \
-`mesh` vector. These indices correspond to the hexagons in the `mesh` that \
-should be tessellated.
-- `mesh::SimpleMesh`: A vector of `Ngon` objects, where each `Ngon` \
-represents a polygon (in this case, a hexagon) with vertices. Each vertex has \
-associated coordinates (latitude and longitude).
+- `filtered::AbstractVector{Point{🌐,<:LatLon{WGS84Latest}}}`: A vector of \
+geographical points in the WGS84 coordinate system that represent the centers \
+of the hexagons or polygons.
+- `idxs::AbstractVector{<:Number}`: A vector of indices corresponding to the \
+polygons within the mesh.
+- `mesh::SimpleMesh`: A mesh object containing the polygons (typically hexagons) \
+used to generate the patterns.
+
+## Keyword Arguments
+- `kwargs...`: Additional keyword arguments passed to other variations of the \
+function.
 
 ## Returns
-- `hexagons::Vector{Vector{SimpleLatLon}}`: A vector where each element is a \
-vector of `SimpleLatLon` points forming the vertices of a hexagon. Each \
-hexagon corresponds to an element in the `filtered` vector.
+- `Vector{Vector{LatLon}}`: A vector where each element is a vector of `LatLon` \
+points representing the vertices of the polygons (typically hexagons) for each \
+center point.
 """
-function my_tesselate_hexagon(filtered::AbstractVector{<:SimpleLatLon}, idxs::AbstractVector{<:Number}, mesh::SimpleMesh)
-    # hexagons = [fill(SimpleLatLon(0, 0), 7) for i in 1:length(filtered)]
-    hexagons = [SimpleLatLon[] for i in 1:length(filtered)] # Allow to have different polygons from hexagons only (depending on Voronoi tesselation)
+function gen_hex_pattern(filtered::AbstractVector{<:Point{🌐,<:LatLon{WGS84Latest}}}, idxs::AbstractVector{<:Number}, mesh::SimpleMesh)
+    # hexagons = [fill(LatLon(0, 0), 7) for i in 1:length(filtered)]
+    # hexagons = [Point[] for i in 1:length(filtered)] # Allow to have different polygons from hexagons only (depending on Voronoi tesselation)
+    hexagons = [Point{🌐,LatLon{WGS84Latest}}[] for i in 1:length(filtered)] # Allow to have different polygons from hexagons only (depending on Voronoi tesselation)
+    
     for (p, poly) in enumerate(mesh[idxs])
         # for (v, vertex) in enumerate([poly.vertices..., poly.vertices[1]]) # Loop through vertices to create the hexagon for plotting)
-        #     hexagons[p][v] = SimpleLatLon(ustrip(vertex.coords.y), ustrip(vertex.coords.x))
+        #     hexagons[p][v] = LatLon(ustrip(vertex.coords.y), ustrip(vertex.coords.x))
         # end
         hexagons[p] = map([poly.vertices..., poly.vertices[1]]) do vertex # Loop through vertices to create the hexagon for plotting)
-            SimpleLatLon(ustrip(vertex.coords.y), ustrip(vertex.coords.x))
+            # LatLon{WGS84Latest}(ustrip(vertex.coords.y), ustrip(vertex.coords.x)) |> Point
+            Point{🌐,LatLon{WGS84Latest}}(LatLon(ustrip(vertex.coords.y), ustrip(vertex.coords.x)))
         end
     end
 
     return hexagons
 end
-my_tesselate_hexagon(filtered::SimpleLatLon, idxs::Number, mesh::SimpleMesh) = my_tesselate_hexagon([filtered], [idxs], mesh)
+gen_hex_pattern(p::Point{🌐,<:LatLon{WGS84Latest}}, idx::Number, mesh::SimpleMesh) = gen_hex_pattern([p], [idx], mesh)
+# Utility for the user which can call the function using directly centers expressed in LatLon.
+gen_hex_pattern(filtered::AbstractVector{<:LatLon}, idxs::AbstractVector{<:Number}, mesh::SimpleMesh) = gen_hex_pattern(map(x -> Point(x), filtered), idxs, mesh)
+gen_hex_pattern(p::LatLon, idx::Number, mesh::SimpleMesh) = gen_hex_pattern([p], [idx], mesh)

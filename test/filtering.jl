@@ -1,6 +1,6 @@
 @testitem "GeoRegion Test" tags = [:filtering] begin
-    sample_ita = [SimpleLatLon(43.727878°, 12.843441°), SimpleLatLon(43.714933°, 10.399326°), SimpleLatLon(37.485829°, 14.328285°), SimpleLatLon(39.330460°, 8.430780°), SimpleLatLon(45.918388°, 10.886654°)]
-    sample_eu = [SimpleLatLon(52.218550°, 4.420621°), SimpleLatLon(41.353144°, 2.167639°), SimpleLatLon(42.670341°, 23.322592°)]
+    sample_ita = [LatLon(43.727878°, 12.843441°), LatLon(43.714933°, 10.399326°), LatLon(37.485829°, 14.328285°), LatLon(39.330460°, 8.430780°), LatLon(45.918388°, 10.886654°)]
+    sample_eu = [LatLon(52.218550°, 4.420621°), LatLon(41.353144°, 2.167639°), LatLon(42.670341°, 23.322592°)]
 
     ita = GeoRegion(regionName="ITA", admin="Italy")
     eu = GeoRegion(; continent="Europe")
@@ -9,28 +9,22 @@
     @test eu isa GeoRegion
     @test ita isa AbstractRegion
     @test eu isa AbstractRegion
-
-    @test all(map(x -> in(x, ita), sample_ita))
-    @test all(map(x -> in(x, eu), sample_eu))
-    
-    @test in(SimpleLatLon(0.7631954460103929rad, 0.22416033273563304rad), ita)
-    @test in(SimpleLatLon(0.7631954460103929rad, 0.22416033273563304rad), eu)
-    @test !in(SimpleLatLon(0.7085271959818754rad, -0.2072522112608427rad), eu)
-    @test !in(SimpleLatLon(52.218550°, 4.420621°), ita)
     
     @test_throws "Input at least one argument between continent, subregion and admin..." GeoRegion()
 
     @test filter_points(sample_ita, ita) == sample_ita
     @test filter_points(sample_eu, eu) == sample_eu
-    @test filter_points([SimpleLatLon(52.218550°, 4.420621°), SimpleLatLon(43.727878°, 12.843441°), SimpleLatLon(41.353144°, 2.167639°), SimpleLatLon(43.714933°, 10.399326°)], ita) == [SimpleLatLon(43.727878°, 12.843441°), SimpleLatLon(43.714933°, 10.399326°)]
+    @test filter_points([LatLon(52.218550°, 4.420621°), LatLon(43.727878°, 12.843441°), LatLon(41.353144°, 2.167639°), LatLon(43.714933°, 10.399326°)], ita) == [LatLon(43.727878°, 12.843441°), LatLon(43.714933°, 10.399326°)]
+    
+    @test filter_points(map(x -> Point(x), sample_ita), ita) == map(x -> Point(x), sample_ita) # Additional test for type Point(LatLon())
 end
 
 @testitem "PolyRegion Test" tags = [:filtering] begin
-    sample_in = [SimpleLatLon(14°, 1°), SimpleLatLon(26.9°, -4.9°), SimpleLatLon(10.1°, 14.9°)]
-    sample_out = [SimpleLatLon(0°, 0°), SimpleLatLon(10°, -5.2°), SimpleLatLon(27°, 15.3°)]
-    sample_border = [SimpleLatLon(10°, -5°), SimpleLatLon(10.1°, 10°), SimpleLatLon(27°, 15°)] # Due to the Predicates of Meshes the countour is not exact (acceptable)
-    poly = PolyRegion("POLY", [SimpleLatLon(10°, -5°), SimpleLatLon(10°, 15°), SimpleLatLon(27°, 15°), SimpleLatLon(27°, -5°)])
-    vertex = [SimpleLatLon(10°, -5°), SimpleLatLon(10°, 15°), SimpleLatLon(27°, 15°), SimpleLatLon(27°, -5°)]
+    sample_in = [LatLon(14°, 1°), LatLon(26.9°, -4.9°), LatLon(10.1°, 14.9°)]
+    sample_out = [LatLon(0°, 0°), LatLon(10°, -5.2°), LatLon(27°, 15.3°)]
+
+    poly = PolyRegion("POLY", [LatLon(10°, -5°), LatLon(10°, 15°), LatLon(27°, 15°), LatLon(27°, -5°)])
+    vertex = [LatLon(10°, -5°), LatLon(10°, 15°), LatLon(27°, 15°), LatLon(27°, -5°)]
 
     @test poly isa PolyRegion
     @test PolyRegion(;domain=vertex) isa PolyRegion
@@ -38,19 +32,14 @@ end
     @test PolyRegion("Test", vertex) isa PolyRegion
     @test_throws "UndefKeywordError: keyword argument `domain` not assigned" PolyRegion()
     
-    @test all(map(x -> in(x, poly),sample_in))
-    @test all(map(x -> in(x, poly),sample_border))
-    @test !all(map(x -> in(x, poly),sample_out))
-
-    @test in(SimpleLatLon(0.24434609527920614rad, 0.017453292519943295rad), poly)
-    
     @test filter_points(vcat(sample_in, sample_out), poly) == sample_in
+    @test filter_points(map(x -> Point(x), vcat(sample_in, sample_out)), poly) == map(x -> Point(x), sample_in) # Additional test for type Point(LatLon())
 end
 
 @testitem "LatBeltRegion Test" tags = [:filtering] begin
     belt = LatBeltRegion(; regionName="test", latLim=(-60°, 60°))
-    sample_in = [SimpleLatLon(14°, 1°), SimpleLatLon(26.9°, -65°), SimpleLatLon(10.1°, 70°)]
-    sample_out = [SimpleLatLon(90°, 1°), SimpleLatLon(60.1°, 1°), SimpleLatLon(-62°, -4.9°), SimpleLatLon(-60.1°, 14.9°)]
+    sample_in = [LatLon(14°, 1°), LatLon(26.9°, -65°), LatLon(10.1°, 70°)]
+    sample_out = [LatLon(90°, 1°), LatLon(60.1°, 1°), LatLon(-62°, -4.9°), LatLon(-60.1°, 14.9°)]
 
     @test belt isa LatBeltRegion
     @test LatBeltRegion(; regionName="test", latLim=(0°,90°)) isa LatBeltRegion
@@ -75,9 +64,63 @@ Consider using `°` (or `rad`) from `Unitful` if you want to pass numbers in deg
     @test_throws "The first LAT limit must be lower than the second one..." LatBeltRegion(; latLim=((π/2)rad, 0rad))
     @test_throws "The first LAT limit must be different than the second one..." LatBeltRegion(; latLim=(90, 90))
     
-    @test all(map(x -> in(x, belt), sample_in))
-    @test !all(map(x -> in(x, belt), sample_out))
-    @test in(SimpleLatLon(0.24434609527920614, 0.017453292519943295), belt)
+    @test filter_points([LatLon(14°, 1°), LatLon(90°, 1°), LatLon(60.1°, 1°), LatLon(26.9°, -65°), LatLon(-62°, -4.9°), LatLon(-60.1°, 14.9°), LatLon(10.1°, 70°)], belt) == sample_in
+    @test filter_points(map(x -> Point(x), [LatLon(14°, 1°), LatLon(90°, 1°), LatLon(60.1°, 1°), LatLon(26.9°, -65°), LatLon(-62°, -4.9°), LatLon(-60.1°, 14.9°), LatLon(10.1°, 70°)]), belt) == map(x -> Point(x), sample_in) # Additional test for type Point(LatLon())
+end
+
+@testitem "Group By Test" tags = [:filtering] begin
+    using Meshes: 🌐, WGS84Latest
+
+    ita = GeoRegion(; regionName="ITA", admin="Italy")
+    eu = GeoRegion(; regionName="EU", continent="Europe")
+    poly = PolyRegion("POLY", [LatLon(10°, -5°), LatLon(10°, 15°), LatLon(27°, 15°), LatLon(27°, -5°)])
+    belt = LatBeltRegion(; regionName="BELT", latLim=(0°, 5°))
     
-    @test filter_points([SimpleLatLon(14°, 1°), SimpleLatLon(90°, 1°), SimpleLatLon(60.1°, 1°), SimpleLatLon(26.9°, -65°), SimpleLatLon(-62°, -4.9°), SimpleLatLon(-60.1°, 14.9°), SimpleLatLon(10.1°, 70°)], belt) == sample_in
+    sample_in_ita = [LatLon(43.727878°, 12.843441°), LatLon(43.714933°, 10.399326°), LatLon(37.485829°, 14.328285°), LatLon(39.330460°, 8.430780°), LatLon(45.918388°, 10.886654°)]
+    sample_in_poly = [LatLon(14°, 1°), LatLon(26.9°, -4.9°), LatLon(10.1°, 14.9°)]
+    sample_out_poly = [LatLon(0°, 0°), LatLon(10°, -5.2°), LatLon(27°, 15.3°)]
+    sample_in_belt = [LatLon(1°, 1°), LatLon(2.5°, -65°), LatLon(4.9°, 70°)]
+    sample_out_belt = [LatLon(90°, 1°), LatLon(60.1°, 1°), LatLon(-62°, -4.9°), LatLon(-60.1°, 14.9°)]
+
+    big_vec = [sample_in_ita..., sample_in_poly..., sample_out_poly..., sample_in_belt..., sample_out_belt...]
+
+    # Test with LatLon
+    # Unique test
+    groups_unique = group_by_domain(big_vec, [ita, eu, poly, belt])
+    @test groups_unique["ITA"] == sample_in_ita
+    @test groups_unique["POLY"] == sample_in_poly
+    @test groups_unique["BELT"] == sample_in_belt
+    @test isempty(groups_unique["EU"])
+    @test groups_unique["ITA"] isa Vector{<:LatLon}
+    @test groups_unique["POLY"] isa Vector{<:LatLon}
+    @test groups_unique["BELT"] isa Vector{<:LatLon}
+    # Repeated elements test
+    groups = group_by_domain(big_vec, [ita, eu, poly, belt]; flagUnique=false)
+    @test groups["ITA"] == sample_in_ita
+    @test groups["EU"] == sample_in_ita
+    @test groups["POLY"] == sample_in_poly
+    @test groups["BELT"] == sample_in_belt
+    @test groups["ITA"] isa Vector{<:LatLon}
+    @test groups["POLY"] isa Vector{<:LatLon}
+    @test groups["BELT"] isa Vector{<:LatLon}
+
+    # Test with Point(LatLon)
+    # Unique test
+    groups_unique = group_by_domain(map(x -> Point(x), big_vec), [ita, eu, poly, belt])
+    @test groups_unique["ITA"] == map(x -> Point(x), sample_in_ita)
+    @test groups_unique["POLY"] == map(x -> Point(x), sample_in_poly)
+    @test groups_unique["BELT"] == map(x -> Point(x), sample_in_belt)
+    @test isempty(groups_unique["EU"])
+    @test groups_unique["ITA"] isa Vector{<:Point{🌐,<:LatLon{WGS84Latest}}}
+    @test groups_unique["POLY"] isa Vector{<:Point{🌐,<:LatLon{WGS84Latest}}}
+    @test groups_unique["BELT"] isa Vector{<:Point{🌐,<:LatLon{WGS84Latest}}}
+    # Repeated elements test
+    groups = group_by_domain(map(x -> Point(x), big_vec), [ita, eu, poly, belt]; flagUnique=false)
+    @test groups["ITA"] == map(x -> Point(x), sample_in_ita)
+    @test groups["EU"] == map(x -> Point(x), sample_in_ita)
+    @test groups["POLY"] == map(x -> Point(x), sample_in_poly)
+    @test groups["BELT"] == map(x -> Point(x), sample_in_belt)
+    @test groups["ITA"] isa Vector{<:Point{🌐,<:LatLon{WGS84Latest}}}
+    @test groups["POLY"] isa Vector{<:Point{🌐,<:LatLon{WGS84Latest}}}
+    @test groups["BELT"] isa Vector{<:Point{🌐,<:LatLon{WGS84Latest}}}
 end
