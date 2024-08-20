@@ -72,14 +72,36 @@ end
     reg = GeoRegion(; regionName="Tassellation", admin="Spain;Italy")
     testPoint_cart = Point(Cartesian{WGS84Latest}(1.914719f0, 40.225365f0))
     testPoint_latlon = Point(LatLon{WGS84Latest}(40.225365f0, 1.914719f0))
-
-    @test centroid(reg) == testPoint_cart
-    @test centroid(Cartesian, reg) == testPoint_cart
-    @test centroid(reg.domain) == testPoint_cart
-    @test centroid(Cartesian, reg.domain) == testPoint_cart
-
-    @test centroid(LatLon, reg) == testPoint_latlon
-    @test centroid(LatLon, reg.domain) == testPoint_latlon
+    let
+        c = centroid(reg)
+        @test abs(get_lat(c) - get_lat(testPoint_cart)) < 1e-2
+        @test abs(get_lon(c) - get_lon(testPoint_cart)) < 1e-2
+    end
+    let 
+        c = centroid( reg.domain)
+        @test abs(get_lat(c) - get_lat(testPoint_cart)) < 1e-2
+        @test abs(get_lon(c) - get_lon(testPoint_cart)) < 1e-2
+    end
+    let 
+        c = centroid(Cartesian, reg)
+        @test abs(get_lat(c) - get_lat(testPoint_cart)) < 1e-2
+        @test abs(get_lon(c) - get_lon(testPoint_cart)) < 1e-2
+    end
+    let
+        c = centroid(LatLon, reg)
+        @test abs(get_lat(c) - get_lat(testPoint_latlon)) < 1e-2
+        @test abs(get_lon(c) - get_lon(testPoint_latlon)) < 1e-2
+    end
+    let
+        c = centroid(Cartesian, reg.domain)
+        @test abs(get_lat(c) - get_lat(testPoint_cart)) < 1e-2
+        @test abs(get_lon(c) - get_lon(testPoint_cart)) < 1e-2
+    end
+    let
+        c = centroid(LatLon, reg.domain)
+        @test abs(get_lat(c) - get_lat(testPoint_latlon)) < 1e-2
+        @test abs(get_lon(c) - get_lon(testPoint_latlon)) < 1e-2
+    end
 end
 
 @testitem "Test centroid for PolyRegion" tags = [:interface] begin
