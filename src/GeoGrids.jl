@@ -14,14 +14,14 @@ using PlotlyExtensionsHelper
 using StaticArrays
 using Unitful: °, rad, Quantity, @u_str, ustrip
 
-include("typedef.jl")
+include("basic_types.jl")
+include("poly_offsetting.jl")
 include("helper_func.jl")
 include("interface_func.jl")
 include("ico_func.jl")
 include("rect_func.jl")
 include("filtering_func.jl")
 include("tessellation_func.jl")
-include("offsetting_func.jl")
 include("plot_func.jl")
 
 export AbstractRegion, GlobalRegion, GeoRegion, PolyRegion, LatBeltRegion,
