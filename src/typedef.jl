@@ -33,6 +33,17 @@ function GeoRegion(; regionName="region_name", continent="", subregion="", admin
     GeoRegion(regionName, continent, subregion, admin, domain)
 end
 
+mutable struct GeoRegionEnlarged <: AbstractRegion
+    standardRegion::GeoRegion
+    enlargedRegion::GeoRegion
+
+    function GeoRegionEnlarged(standardRegion::GeoRegion, delta::Real)
+        # Add code for enlargement of the region
+
+        # new(standardRegion, enlargedRegion)
+    end
+end
+
 struct PolyBorder{T} <: Geometry{🌐,LATLON{T}}
     "The borders in LatLon CRS"
     latlon::POLY_LATLON{T}

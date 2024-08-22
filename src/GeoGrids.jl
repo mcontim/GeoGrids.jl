@@ -1,6 +1,7 @@
 module GeoGrids
 
 using AngleBetweenVectors
+using Clipper
 using CoordRefSystems
 using CoordRefSystems: Deg
 using CountriesBorders
@@ -19,7 +20,8 @@ include("interface_func.jl")
 include("ico_func.jl")
 include("rect_func.jl")
 include("filtering_func.jl")
-include("tessellation_func.jl") # //FIX: Lot of attention required
+include("tessellation_func.jl")
+include("offsetting_func.jl")
 include("plot_func.jl")
 
 export AbstractRegion, GlobalRegion, GeoRegion, PolyRegion, LatBeltRegion,
