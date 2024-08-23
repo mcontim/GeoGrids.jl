@@ -9,31 +9,30 @@ mutable struct GeoRegionEnlarged <: AbstractRegion
     end
 end
 
-function _offset_polygon(polygon, delta)
-    # co = ClipperOffset()
-    # add_path!(co, polygon, JoinTypeMiter, EndTypeClosedPolygon)
-    # offset_polygons = execute(co, delta)
-    # return offset_polygons
+function _offset_polygon(poly::PolyArea, delta; magnitude=3, precision=7)
+    intPoly = map(vertices(poly)) do vertex
+        y = get_lat(vertex) |> ustrip 
+        x = get_lon(vertex) |> ustrip
+        IntPoint(x, y, magnitude, precision) # Consider LON as X and LAT as Y
+    end
+    co = ClipperOffset()
+    add_path!(co, intPoly, JoinTypeMiter, EndTypeClosedPolygon) # We fix JoinTypeMiter, EndTypeClosedPolygon because it works well with complex polygons, look at Clipper documentation for details.
+    offset_polygons = execute(co, delta)
 
-    # get_lat(vertices(r.domain[1].latlon.geoms[2])[1])
-
-
-    # intPolygon = map(vertices(originalPolygon)) do vertex
-    #     IntPoint(vertex.x, vertex.y, 3, 6)
-    # end
-    # polygon = IntPoint[]
-	# push!(polygon, IntPoint(0.0,0.0,3,6)) # 3 integer, 6 total values preserved
-	# push!(polygon, IntPoint(0.0,1.0,3,6))
-	# push!(polygon, IntPoint(1.0,1.0,3,6))
-	# push!(polygon, IntPoint(1.0,0.0,3,6))
-	# push!(polygon, IntPoint(0.0,0.0,3,6))
-	
-	# co = ClipperOffset()
-	# add_path!(co, polygon, JoinTypeMiter, EndTypeClosedPolygon)
-	# # Need to use quite high number of digit to preserve in order to fine tune the sizing.
-	# # Use JoinTypeMiter for more accurate tipe of representation (less distortion of polygon shape, visible especially for simple polygons)
-	# # Convert back values using tofloat()
-	# offset_polygons = execute(co, 500.0)
+    # We can end up with multiple polygons even when starting from a single
+    # PolyArea. So we will return all the polygons for this country as a vector
+    # of PolyArea.
+    polyAreas = PolyArea[]
+    for i in eachindex(offset_polygons)
+        ring = map(offset_polygons[i]) do vertex
+            lat = tofloat(vertex.Y, magnitude, precision)
+            lon = tofloat(vertex.X, magnitude, precision)
+            LatLon{WGS84Latest}(lat, lon) |> Point
+        end
+        push!(polyAreas, PolyArea(ring))
+    end
+ 
+    return polyAreas
 end
 
 function offset_region(originalRegion::GeoRegion, delta_km; refRadius=constants.Re_mean, magnitude=3, precision=7)
@@ -46,22 +45,24 @@ function offset_region(originalRegion::GeoRegion, delta_km; refRadius=constants.
 
     # Compute the delta value to be used in the offsetting process
     delta = delta_km / refRadius
-    intDelta = IntPoint(delta, delta, magnitude, precision)
+    intDelta = IntPoint(delta, delta, magnitude, precision).X # We use IntPoint to exploit the conversion to IntPoint in Clipping, then we can use either X or Y as delta value.
 
     numCountries = length(originalRegion.domain) # Number of Countries in GeoRegion
     for idxCountry in 1:numCountries
         country = originalRegion.domain[idxCountry]
-        (; admin, latlon, resolution, table_idx, valid_polyareas) = country
+        # (; admin, latlon, resolution, table_idx, valid_polyareas) = country
 
         offsetPolyAreas = map(latlon.geoms) do geom
-            _offset_polygon(geom, intDelta)
+            # Get the offsetted version of each of the PolyArea composing the country
+            offsetPolyAreas_thisGeom = _offset_polygon(geom, intDelta; magnitude, precision)
+            # //TODO: Keep coding such to end up with a vector of PolyArea which will be used to build a Multi. The Multi will be then the new enlargedRegion. Avoid using CountryBorder and basic GeoRegion structure. However, since GeoRegion can take a parametric domain and we already defined all the filtering functions for GeoRegion, maube we cn use the Multi as domain for an enlarged GeoRegion
         end
     end
+
 
  
 
 end
-
 
 # //NOTE: NExt Step: 
 # [x] Use Clipping.jl for offsetting the polygon
