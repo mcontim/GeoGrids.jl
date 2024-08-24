@@ -1,10 +1,11 @@
-mutable struct GeoRegionEnlarged{D} <: GeoRegion
+mutable struct GeoRegionEnlarged{D} <: AbstractRegion
     original::GeoRegion{D}
     name::String
     domain::Multi
     convexhull::PolyArea
 end
-function GeoRegionEnlarged(delta_km; name="enlarged_rgion", continent="", subregion="", admin="", refRadius=constants.Re_mean, magnitude=3, precision=7)
+
+function GeoRegionEnlarged(delta_km; name="enlarged_region", continent="", subregion="", admin="", refRadius=constants.Re_mean, magnitude=3, precision=7)
     gr = GeoRegion(; name, continent, subregion, admin)
     offsetRegion = offset_region(gr, delta_km; refRadius, magnitude, precision)
     convexhull = convexhull(offsetRegion)

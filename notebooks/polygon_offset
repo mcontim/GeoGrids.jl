@@ -30,32 +30,6 @@ md"""
 # Initial Tests with Clipper
 """
 
-# ╔═╡ c432437c-2c21-4e92-b664-cb253ad77892
-md"""
-# Tests with GeoGrids
-"""
-
-# ╔═╡ e8694366-d5ac-4627-879f-b808a749adb1
-push!([1,2,3],[4,5,6])
-
-# ╔═╡ 31c93a18-3dd0-4b6b-9670-81bf2876f306
-append!([1,2,3],[4,5,6])
-
-# ╔═╡ 2745410e-d76d-426f-8316-fb4b269d013a
-md"""
-# Additional Functions
-"""
-
-# ╔═╡ 61a7aab7-3726-4027-ab5b-416ef57545c1
-md"""
-# Packages
-"""
-
-# ╔═╡ b58ca732-3892-415c-99e0-877befe7a26d
-@fromparent begin
-	import ^: * # to eport all functions from parent package
-end
-
 # ╔═╡ a7566eeb-1963-4589-9263-a56df864cd32
 begin
 	polygon = IntPoint[]
@@ -95,12 +69,6 @@ let
 	plot([original, enlarged...])
 end
 
-# ╔═╡ 4c756d1e-efb0-4941-82a5-554542cbb6f4
-_,id = findmax(x -> length(x), offset_polygons)
-
-# ╔═╡ 1e0e6150-57e7-40a2-aa7c-c2d43f4d9182
-offset_polygons[1][1].X
-
 # ╔═╡ 2247243a-2c06-47a3-bef8-de103ec78be9
 typeof(IntPoint(0.5,0.5,3,6).X)
 
@@ -120,6 +88,12 @@ w=let
 	# Convert back values using tofloat()
 	offset_polygons = execute(co, 500.0)
 end
+
+# ╔═╡ 4c756d1e-efb0-4941-82a5-554542cbb6f4
+_,id = findmax(x -> length(x), offset_polygons)
+
+# ╔═╡ 1e0e6150-57e7-40a2-aa7c-c2d43f4d9182
+offset_polygons[1][1].X
 
 # ╔═╡ cb64a9f6-d6b5-441b-a7ca-3ae918849e47
 e=let
@@ -180,6 +154,14 @@ e=let
 	# polygon
 end
 
+# ╔═╡ c432437c-2c21-4e92-b664-cb253ad77892
+md"""
+# Tests with GeoGrids
+"""
+
+# ╔═╡ 31c93a18-3dd0-4b6b-9670-81bf2876f306
+append!([1,2,3],[4,5,6])
+
 # ╔═╡ 73551bce-eaea-4a72-acc0-7e16d45ca840
 Multi([PolyArea([(60,-5), (80,0), (80,10), (60,15)]), PolyArea([(60,-5), (80,0), (80,10), (60,15)])])
 
@@ -189,17 +171,17 @@ r = GeoRegion(; admin="Italy;Spain")
 # ╔═╡ bcf0814b-f803-4c95-b426-431c02191859
 typeof(r.domain)
 
-# ╔═╡ 7e490595-bdb4-4edd-827e-b0db8daf95c8
-r.domain[2].latlon.geoms
-
-# ╔═╡ d2c00b5f-eed0-47e7-9ece-866e067978fd
-r.domain[1].latlon.geoms
-
 # ╔═╡ cee3b432-40f6-4477-ac7d-8479d787a814
 convexhull(r.domain)
 
 # ╔═╡ 381ce043-63c7-40f5-b640-57718db3eb33
 get_lat(vertices(r.domain[2].latlon.geoms[2])[1])
+
+# ╔═╡ 7e490595-bdb4-4edd-827e-b0db8daf95c8
+r.domain[2].latlon.geoms
+
+# ╔═╡ d2c00b5f-eed0-47e7-9ece-866e067978fd
+r.domain[1].latlon.geoms
 
 # ╔═╡ f2ce0357-fca8-4d42-93c4-27433d91c288
 get_lat(vertices(r.domain[1].latlon.geoms[1])[1]) |> ustrip
@@ -239,6 +221,21 @@ length(GeoRegion(; admin="Italy").domain)
 # ╔═╡ aaa6174e-d7c8-48c4-9d62-9fad93b9c773
 PolyRegion(;domain=[LatLon(60,-5), LatLon(80,0), LatLon(80,10), LatLon(60,15)]).domain
 
+
+# ╔═╡ 2745410e-d76d-426f-8316-fb4b269d013a
+md"""
+# Additional Functions
+"""
+
+# ╔═╡ 61a7aab7-3726-4027-ab5b-416ef57545c1
+md"""
+# Packages
+"""
+
+# ╔═╡ b58ca732-3892-415c-99e0-877befe7a26d
+@fromparent begin
+	import ^: * # to eport all functions from parent package
+end
 
 # ╔═╡ 00000000-0000-0000-0000-000000000001
 PLUTO_PROJECT_TOML_CONTENTS = """
@@ -696,7 +693,6 @@ version = "17.4.0+2"
 # ╠═1e0e6150-57e7-40a2-aa7c-c2d43f4d9182
 # ╠═cb64a9f6-d6b5-441b-a7ca-3ae918849e47
 # ╟─c432437c-2c21-4e92-b664-cb253ad77892
-# ╠═e8694366-d5ac-4627-879f-b808a749adb1
 # ╠═31c93a18-3dd0-4b6b-9670-81bf2876f306
 # ╠═73551bce-eaea-4a72-acc0-7e16d45ca840
 # ╠═7365e5ac-3a12-4b55-b356-47da19f14555
