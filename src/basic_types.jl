@@ -22,6 +22,7 @@ mutable struct GeoRegion{D} <: AbstractRegion
     subregion::String
     admin::String
     domain::D
+    convexhull::D
 end
 function GeoRegion(; regionName="region_name", continent="", subregion="", admin="")
     all(isempty(v) for v in (continent, subregion, admin)) && error("Input at least one argument between continent, subregion and admin...")
@@ -29,8 +30,9 @@ function GeoRegion(; regionName="region_name", continent="", subregion="", admin
     nt = (; continent, subregion, admin)
     kwargs = (k => v for (k, v) in pairs(nt) if !isempty(v))
     domain = CountriesBorders.extract_countries(; kwargs...)
+    convexhull = convexhull(domain)
 
-    GeoRegion(regionName, continent, subregion, admin, domain)
+    GeoRegion(regionName, continent, subregion, admin, domain, convexhull)
 end
 
 struct PolyBorder{T} <: Geometry{🌐,LATLON{T}}

@@ -186,6 +186,9 @@ r = GeoRegion(; admin="Italy")
 # ╔═╡ d2c00b5f-eed0-47e7-9ece-866e067978fd
 r.domain[1].latlon.geoms
 
+# ╔═╡ cee3b432-40f6-4477-ac7d-8479d787a814
+convexhull(r.domain)
+
 # ╔═╡ 381ce043-63c7-40f5-b640-57718db3eb33
 get_lat(vertices(r.domain[1].latlon.geoms[2])[1])
 
@@ -686,6 +689,7 @@ version = "17.4.0+2"
 # ╟─c432437c-2c21-4e92-b664-cb253ad77892
 # ╠═73551bce-eaea-4a72-acc0-7e16d45ca840
 # ╠═7365e5ac-3a12-4b55-b356-47da19f14555
+# ╠═cee3b432-40f6-4477-ac7d-8479d787a814
 # ╠═381ce043-63c7-40f5-b640-57718db3eb33
 # ╠═d2c00b5f-eed0-47e7-9ece-866e067978fd
 # ╠═feee8c7d-0c85-4215-ab11-c890884d2e60

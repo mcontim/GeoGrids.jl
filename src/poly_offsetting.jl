@@ -1,8 +1,19 @@
-mutable struct GeoRegionEnlarged <: AbstractRegion
-    standardRegion::GeoRegion
-    enlargedRegion::GeoRegion
+# mutable struct GeoRegionEnlarged <: AbstractRegion
+#     standardRegion::GeoRegion
+#     enlargedRegion::GeoRegion
 
-    function GeoRegionEnlarged(standardRegion::GeoRegion, delta::Real)
+#     function GeoRegionEnlarged(standardRegion::GeoRegion, delta::Real)
+#         # Add code for enlargement of the region
+
+#         # new(standardRegion, enlargedRegion)
+#     end
+# end
+# //NOTE: Alternative definition as a subtype of GeoRegion
+mutable struct GeoRegionEnlarged <: GeoRegion
+    original::GeoRegion
+    domain::Multi
+
+    function GeoRegionEnlarged(original::GeoRegion, delta::Real)
         # Add code for enlargement of the region
 
         # new(standardRegion, enlargedRegion)
@@ -55,7 +66,7 @@ function offset_region(originalRegion::GeoRegion, delta_km; refRadius=constants.
         offsetPolyAreas = map(latlon.geoms) do geom
             # Get the offsetted version of each of the PolyArea composing the country
             offsetPolyAreas_thisGeom = _offset_polygon(geom, intDelta; magnitude, precision)
-            # //TODO: Keep coding such to end up with a vector of PolyArea which will be used to build a Multi. The Multi will be then the new enlargedRegion. Avoid using CountryBorder and basic GeoRegion structure. However, since GeoRegion can take a parametric domain and we already defined all the filtering functions for GeoRegion, maube we cn use the Multi as domain for an enlarged GeoRegion
+            # //TODO: Keep coding such to end up with a vector of PolyArea which will be used to build a Multi. The Multi will be then the new enlargedRegion. Avoid using CountryBorder and basic GeoRegion structure. However, since GeoRegion can take a parametric domain and we already defined all the filtering functions for GeoRegion, maube we cn use the Multi as domain for an enlarged GeoRegion. Alternatively we can also build a subtype of GeoRegion which will have a unique field with the Multi representing the enlarged region. And the current functions working with GeoRegion will keep working as they are (almost).
         end
     end
 
