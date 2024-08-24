@@ -35,8 +35,11 @@ md"""
 # Tests with GeoGrids
 """
 
-# ╔═╡ feee8c7d-0c85-4215-ab11-c890884d2e60
+# ╔═╡ e8694366-d5ac-4627-879f-b808a749adb1
+push!([1,2,3],[4,5,6])
 
+# ╔═╡ 31c93a18-3dd0-4b6b-9670-81bf2876f306
+append!([1,2,3],[4,5,6])
 
 # ╔═╡ 2745410e-d76d-426f-8316-fb4b269d013a
 md"""
@@ -181,7 +184,13 @@ end
 Multi([PolyArea([(60,-5), (80,0), (80,10), (60,15)]), PolyArea([(60,-5), (80,0), (80,10), (60,15)])])
 
 # ╔═╡ 7365e5ac-3a12-4b55-b356-47da19f14555
-r = GeoRegion(; admin="Italy")
+r = GeoRegion(; admin="Italy;Spain")
+
+# ╔═╡ bcf0814b-f803-4c95-b426-431c02191859
+typeof(r.domain)
+
+# ╔═╡ 7e490595-bdb4-4edd-827e-b0db8daf95c8
+r.domain[2].latlon.geoms
 
 # ╔═╡ d2c00b5f-eed0-47e7-9ece-866e067978fd
 r.domain[1].latlon.geoms
@@ -190,7 +199,7 @@ r.domain[1].latlon.geoms
 convexhull(r.domain)
 
 # ╔═╡ 381ce043-63c7-40f5-b640-57718db3eb33
-get_lat(vertices(r.domain[1].latlon.geoms[2])[1])
+get_lat(vertices(r.domain[2].latlon.geoms[2])[1])
 
 # ╔═╡ f2ce0357-fca8-4d42-93c4-27433d91c288
 get_lat(vertices(r.domain[1].latlon.geoms[1])[1]) |> ustrip
@@ -687,12 +696,15 @@ version = "17.4.0+2"
 # ╠═1e0e6150-57e7-40a2-aa7c-c2d43f4d9182
 # ╠═cb64a9f6-d6b5-441b-a7ca-3ae918849e47
 # ╟─c432437c-2c21-4e92-b664-cb253ad77892
+# ╠═e8694366-d5ac-4627-879f-b808a749adb1
+# ╠═31c93a18-3dd0-4b6b-9670-81bf2876f306
 # ╠═73551bce-eaea-4a72-acc0-7e16d45ca840
 # ╠═7365e5ac-3a12-4b55-b356-47da19f14555
+# ╠═bcf0814b-f803-4c95-b426-431c02191859
 # ╠═cee3b432-40f6-4477-ac7d-8479d787a814
 # ╠═381ce043-63c7-40f5-b640-57718db3eb33
+# ╠═7e490595-bdb4-4edd-827e-b0db8daf95c8
 # ╠═d2c00b5f-eed0-47e7-9ece-866e067978fd
-# ╠═feee8c7d-0c85-4215-ab11-c890884d2e60
 # ╠═f2ce0357-fca8-4d42-93c4-27433d91c288
 # ╠═2e51773a-06e3-4f0a-b409-28f93846803c
 # ╠═68cda3b3-fb48-466e-b751-3387578a358d

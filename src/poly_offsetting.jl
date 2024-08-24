@@ -29,21 +29,21 @@ function _offset_polygon(poly::PolyArea, delta; magnitude=3, precision=7)
     co = ClipperOffset()
     add_path!(co, intPoly, JoinTypeMiter, EndTypeClosedPolygon) # We fix JoinTypeMiter, EndTypeClosedPolygon because it works well with complex polygons, look at Clipper documentation for details.
     offset_polygons = execute(co, delta)
-
     # We can end up with multiple polygons even when starting from a single
     # PolyArea. So we will return all the polygons for this country as a vector
     # of PolyArea.
-    polyAreas = PolyArea[]
+    geoms = PolyArea[]
     for i in eachindex(offset_polygons)
         ring = map(offset_polygons[i]) do vertex
             lat = tofloat(vertex.Y, magnitude, precision)
             lon = tofloat(vertex.X, magnitude, precision)
             LatLon{WGS84Latest}(lat, lon) |> Point
         end
-        push!(polyAreas, PolyArea(ring))
+        push!(geoms, PolyArea(ring))
     end
  
-    return polyAreas
+    # Return a vector of PolyArea.
+    return geoms
 end
 
 function offset_region(originalRegion::GeoRegion, delta_km; refRadius=constants.Re_mean, magnitude=3, precision=7)
@@ -59,20 +59,19 @@ function offset_region(originalRegion::GeoRegion, delta_km; refRadius=constants.
     intDelta = IntPoint(delta, delta, magnitude, precision).X # We use IntPoint to exploit the conversion to IntPoint in Clipping, then we can use either X or Y as delta value.
 
     numCountries = length(originalRegion.domain) # Number of Countries in GeoRegion
+    allGeoms = PolyArea[]
     for idxCountry in 1:numCountries
-        country = originalRegion.domain[idxCountry]
-        # (; admin, latlon, resolution, table_idx, valid_polyareas) = country
-
-        offsetPolyAreas = map(latlon.geoms) do geom
-            # Get the offsetted version of each of the PolyArea composing the country
-            offsetPolyAreas_thisGeom = _offset_polygon(geom, intDelta; magnitude, precision)
-            # //TODO: Keep coding such to end up with a vector of PolyArea which will be used to build a Multi. The Multi will be then the new enlargedRegion. Avoid using CountryBorder and basic GeoRegion structure. However, since GeoRegion can take a parametric domain and we already defined all the filtering functions for GeoRegion, maube we cn use the Multi as domain for an enlarged GeoRegion. Alternatively we can also build a subtype of GeoRegion which will have a unique field with the Multi representing the enlarged region. And the current functions working with GeoRegion will keep working as they are (almost).
+        # Perform the processing per CountryBorder.
+        thisCountryGeoms = originalRegion.domain[idxCountry].latlon.geoms
+        for idxGeom in eachindex(thisCountryGeoms)
+            # Get the offsetted version of each of the PolyArea composing this Country
+            # Perform processing per single PolyArea.
+            offsetGeom = _offset_polygon(thisCountryGeoms[idxGeom], intDelta; magnitude, precision)
+            append!(allGeoms, offsetGeom)
         end
     end
 
-
- 
-
+    return Multi(allGeoms)
 end
 
 # //NOTE: NExt Step: 

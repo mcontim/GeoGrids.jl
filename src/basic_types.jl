@@ -22,7 +22,7 @@ mutable struct GeoRegion{D} <: AbstractRegion
     subregion::String
     admin::String
     domain::D
-    convexhull::D
+    convexhull::PolyArea
 end
 function GeoRegion(; regionName="region_name", continent="", subregion="", admin="")
     all(isempty(v) for v in (continent, subregion, admin)) && error("Input at least one argument between continent, subregion and admin...")
