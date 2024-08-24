@@ -191,7 +191,7 @@ end
     samples = [LatLon(9.89685, 41.5062), LatLon(9.78996, -96.0016), LatLon(-9.78996, 25.0621), LatLon(-9.89685, -112.446)]
     corresponding_idxs = [1, 2, 187, 188]
 
-    reg = LatBeltRegion(latLim=(-10, 10))
+    reg = LatBeltRegion(lim=(-10, 10))
     centers = generate_tesselation(reg, 400000, ICO())
 
     @test length(centers) == 188
@@ -216,7 +216,7 @@ end
     [LatLon(-11.8183,-116.044),LatLon(-13.921,-111.773),LatLon(-9.54199,-108.391),LatLon(-8.05959,-108.824),LatLon(-5.89611,-113.139),LatLon(-10.2875,-116.494),LatLon(-11.8183,-116.044)]]
     corresponding_idxs_ngon = [1, 188]
 
-    reg = LatBeltRegion(latLim=(-10,10))
+    reg = LatBeltRegion(lim=(-10,10))
 	centers,ngon = generate_tesselation(reg, 400000, ICO(;pattern=:hex), EO())
 
     @test length(centers) == 188

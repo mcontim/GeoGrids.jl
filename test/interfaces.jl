@@ -37,7 +37,7 @@ end
 end
 
 @testitem "Test Base.in LatBeltRegion" tags = [:interface] begin
-    belt = LatBeltRegion(; name="test", latLim=(-60°, 60°))
+    belt = LatBeltRegion(; name="test", lim=(-60°, 60°))
     sample_in = [LatLon(14°, 1°), LatLon(26.9°, -65°), LatLon(10.1°, 70°)]
     sample_out = [LatLon(90°, 1°), LatLon(60.1°, 1°), LatLon(-62°, -4.9°), LatLon(-60.1°, 14.9°)]
 

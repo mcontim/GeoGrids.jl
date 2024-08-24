@@ -24,7 +24,7 @@ struct GlobalRegion <: AbstractRegion end
 
 Type representing a geographical region based on CountriesBorders.
 
-## Fields:
+Fields:
 - `name::String`: Name of the region
 - `continent::String`: Continent of the region
 - `subregion::String`: Subregion within the continent
@@ -40,18 +40,30 @@ mutable struct GeoRegion{D} <: AbstractRegion
     domain::D
     convexhull::PolyArea
 end
+function GeoRegion(; name="region_name", continent="", subregion="", admin="")
+    all(isempty(v) for v in (continent, subregion, admin)) && error("Input at least one argument between continent, subregion and admin...")
+
+    nt = (; continent, subregion, admin)
+    kwargs = (k => v for (k, v) in pairs(nt) if !isempty(v))
+    d = CountriesBorders.extract_countries(; kwargs...)
+    ch = convexhull(d) # Using convexhull() method from CountriesBorders
+
+    GeoRegion(name, continent, subregion, admin, d, ch)
+end
 
 """
     PolyBorder{T} <: Geometry{🌐,LATLON{T}}
 
-Type representing a polygonal border in both LatLon and Cartesian coordinates.
+Struct representing a polygon border in both LatLon and Cartesian coordinates.
 
-## Fields:
+Fields:
 - `latlon::POLY_LATLON{T}`: The borders in LatLon CRS
 - `cart::POLY_CART{T}`: The borders in Cartesian2D CRS
 """
 struct PolyBorder{T} <: Geometry{🌐,LATLON{T}}
+    "The borders in LatLon CRS"
     latlon::POLY_LATLON{T}
+    "The borders in Cartesian2D CRS"
     cart::POLY_CART{T}
 
     function PolyBorder(latlon::POLY_LATLON{T}) where {T}
@@ -65,7 +77,7 @@ end
 
 Type representing a polygonal region based on PolyArea.
 
-## Fields:
+Fields:
 - `name::String`: Name of the region
 - `domain::PolyBorder{T}`: Domain of the region as a PolyBorder
 """
@@ -73,27 +85,29 @@ mutable struct PolyRegion{T} <: AbstractRegion
     name::String
     domain::PolyBorder{T}
 end
+PolyRegion(name, domain::Vector{<:LatLon}) = PolyRegion(name, PolyBorder(PolyArea(map(Point, domain))))
+PolyRegion(; name::String="region_name", domain) = PolyRegion(name, domain)
 
 """
     LatBeltRegion <: AbstractRegion
 
 Type representing a latitude belt region.
 
-## Fields:
+Fields:
 - `name::String`: Name of the region
-- `latLim::Tuple{ValidAngle,ValidAngle}`: Latitude limits of the belt in radians
+- `lim::Tuple{ValidAngle,ValidAngle}`: Latitude limits of the belt in radians
 """
 mutable struct LatBeltRegion <: AbstractRegion
     name::String
-    latLim::Tuple{ValidAngle,ValidAngle} # [rad] 
+    lim::Tuple{ValidAngle,ValidAngle} # [rad] 
 
-    function LatBeltRegion(name::String, latLim::Tuple{ValidAngle,ValidAngle})
+    function LatBeltRegion(name::String, lim::Tuple{ValidAngle,ValidAngle})
         # Inputs validation    
-        _latLim = map(latLim) do l
+        _lim = map(lim) do l
             l isa Real ? l * ° : l |> u"°" # Convert to Uniful °
         end
 
-        for x in _latLim
+        for x in _lim
             abs(x) ≤ 90° || error(
 #! format: off
 "LAT provided as numbers must be expressed in radians and satisfy -90 ≤ x ≤ 90. 
@@ -101,12 +115,13 @@ Consider using `°` (or `rad`) from `Unitful` if you want to pass numbers in deg
 #! format: on   
             )
         end
-        _latLim[1] > _latLim[2] && error("The first LAT limit must be lower than the second one...")
-        _latLim[1] == _latLim[2] && error("The first LAT limit must be different than the second one...")
+        _lim[1] > _lim[2] && error("The first LAT limit must be lower than the second one...")
+        _lim[1] == _lim[2] && error("The first LAT limit must be different than the second one...")
 
-        new(name, _latLim)
+        new(name, _lim)
     end
 end
+LatBeltRegion(; name::String="region_name", lim) = LatBeltRegion(name, lim)
 
 ## Define Tessellation Types
 abstract type AbstractTiling end
@@ -114,14 +129,16 @@ abstract type AbstractTiling end
 """
     ICO <: AbstractTiling
 
-Type representing an icosahedral tiling.
+Struct representing an icosahedral tiling.
 
-## Fields:
+Fields:
 - `correction::Number`: Default correction factor for the icosahedral cell grid partial overlap
-- `pattern::Symbol`: Default pattern shape to be used with this type of tiling (:circ or :hex)
+- `pattern::Symbol`: Default pattern shape to be used with this type of tiling
 """
 struct ICO <: AbstractTiling 
+    "Default correction factor for the icosahedral cell grid partial overlap"
     correction::Number
+    "Default pattern shape to be used with this type of tiling"
     pattern::Symbol
 
     function ICO(correction::Number, pattern::Symbol)
@@ -131,18 +148,21 @@ struct ICO <: AbstractTiling
         new(correction, pattern)
     end
 end
+ICO(; correction::Number=3/2, pattern::Symbol=:circ) = ICO(correction, pattern)
 
 """
     HEX <: AbstractTiling
 
-Type representing a hexagonal tiling.
+Struct representing a hexagonal tiling.
 
-## Fields:
-- `direction::Symbol`: Default direction of hexagons in the tiling (:pointy or :flat)
-- `pattern::Symbol`: Default pattern shape to be used with this type of tiling (:circ or :hex)
+Fields:
+- `direction::Symbol`: Default direction of hexagons in the tiling
+- `pattern::Symbol`: Default pattern shape to be used with this type of tiling
 """
 struct HEX <: AbstractTiling 
+    "Default direction of hexagons in the tiling"
     direction::Symbol
+    "Default pattern shape to be used with this type of tiling"
     pattern::Symbol
 
     function HEX(direction::Symbol, pattern::Symbol)
@@ -153,11 +173,12 @@ struct HEX <: AbstractTiling
         new(direction, pattern)
     end
 end
+HEX(; direction::Symbol=:pointy, pattern::Symbol=:hex) = HEX(direction, pattern)
 
 """
     H3 <: AbstractTiling
 
-Type representing an H3 tiling.
+Struct representing an H3 tiling.
 """
 struct H3 <: AbstractTiling end
 

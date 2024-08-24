@@ -38,8 +38,8 @@ Base.in(p::LatLon, pb::PolyBorder) = in(Point(LatLon{WGS84Latest,Deg{Float32}}(p
 Base.in(p::Point{🌐,<:LatLon{WGS84Latest}}, pr::PolyRegion) = in(p, pr.domain)
 Base.in(p::LatLon, pr::PolyRegion) = in(p, pr.domain)
 # LatBeltRegion()
-Base.in(p::Point{🌐,<:LatLon{WGS84Latest}}, lbr::LatBeltRegion) = lbr.latLim[1] < get_lat(p) < lbr.latLim[2]
-Base.in(p::LatLon, lbr::LatBeltRegion) = lbr.latLim[1] < p.lat < lbr.latLim[2]
+Base.in(p::Point{🌐,<:LatLon{WGS84Latest}}, lbr::LatBeltRegion) = lbr.lim[1] < get_lat(p) < lbr.lim[2]
+Base.in(p::LatLon, lbr::LatBeltRegion) = lbr.lim[1] < p.lat < lbr.lim[2]
 
 ## centroid()
 # Define ad-hoc methods for GeoRegion - using centroid definition of CountriesBorders.jl

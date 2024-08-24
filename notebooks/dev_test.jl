@@ -163,7 +163,7 @@ gr = let
    ita = GeoRegion(; name="ITA", admin="Italy")
     eu = GeoRegion(; name="EU", continent="Europe")
     poly = PolyRegion("POLY", [LatLon(10°, -5°), LatLon(10°, 15°), LatLon(27°, 15°), LatLon(27°, -5°)])
-    belt = LatBeltRegion(; name="BELT", latLim=(-60°, 60°))
+    belt = LatBeltRegion(; name="BELT", lim=(-60°, 60°))
     
     sample_in_ita = [LatLon(43.727878°, 12.843441°), LatLon(43.714933°, 10.399326°), LatLon(37.485829°, 14.328285°), LatLon(39.330460°, 8.430780°), LatLon(45.918388°, 10.886654°)]
     sample_in_poly = [LatLon(14°, 1°), LatLon(26.9°, -4.9°), LatLon(10.1°, 14.9°)]
@@ -223,14 +223,14 @@ end
 
 # ╔═╡ 3d6cfaea-c17e-4008-a0f8-ba262b1e7408
 let 
-	reg = LatBeltRegion(latLim=(-10,10))
+	reg = LatBeltRegion(lim=(-10,10))
 	centers,ngon = generate_tesselation(reg, 400000, ICO(;correction=val), EO())
 	plot_geo_cells(centers,ngon)
 end
 
 # ╔═╡ a0f1257d-467a-4875-aad7-1b763d608ab4
 let 
-	reg = LatBeltRegion(latLim=(-10,10))
+	reg = LatBeltRegion(lim=(-10,10))
 	centers,ngon = generate_tesselation(reg, 400000, ICO(;pattern=:hex), EO())
 	plot_geo_cells(centers,ngon)	
 end
@@ -323,14 +323,14 @@ end
 
 # ╔═╡ f66c2264-8477-47ab-819f-7f956e7dfb5b
 let 
-	reg = LatBeltRegion(latLim=(-10,10))
+	reg = LatBeltRegion(lim=(-10,10))
 	centers = generate_tesselation(reg, 400000, ICO(;correction=val))
 	testcenters(centers)
 end
 
 # ╔═╡ 6e67a703-4aca-42b6-9bbe-e05a6b3d59d5
 let 
-	reg = LatBeltRegion(latLim=(-10,10))
+	reg = LatBeltRegion(lim=(-10,10))
 	centers = generate_tesselation(reg, 400000, ICO())
 	testcenters(centers)
 end

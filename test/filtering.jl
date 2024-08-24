@@ -37,13 +37,13 @@ end
 end
 
 @testitem "LatBeltRegion Test" tags = [:filtering] begin
-    belt = LatBeltRegion(; name="test", latLim=(-60°, 60°))
+    belt = LatBeltRegion(; name="test", lim=(-60°, 60°))
     sample_in = [LatLon(14°, 1°), LatLon(26.9°, -65°), LatLon(10.1°, 70°)]
     sample_out = [LatLon(90°, 1°), LatLon(60.1°, 1°), LatLon(-62°, -4.9°), LatLon(-60.1°, 14.9°)]
 
     @test belt isa LatBeltRegion
-    @test LatBeltRegion(; name="test", latLim=(0°,90°)) isa LatBeltRegion
-    @test LatBeltRegion(; latLim=(0°,90°)) isa LatBeltRegion
+    @test LatBeltRegion(; name="test", lim=(0°,90°)) isa LatBeltRegion
+    @test LatBeltRegion(; lim=(0°,90°)) isa LatBeltRegion
     @test LatBeltRegion("test", (0°,90°)) isa LatBeltRegion
     
     a = LatBeltRegion("test", (0°,90°))
@@ -52,17 +52,17 @@ end
     @test a isa LatBeltRegion
     @test b isa LatBeltRegion
     @test c isa LatBeltRegion
-    @test a.latLim == b.latLim == c.latLim == (0°,90°)
+    @test a.lim == b.lim == c.lim == (0°,90°)
 
-    @test_throws "UndefKeywordError: keyword argument `latLim` not assigned" LatBeltRegion()
+    @test_throws "UndefKeywordError: keyword argument `lim` not assigned" LatBeltRegion()
     @test_throws "LAT provided as numbers must be expressed in radians and satisfy -90 ≤ x ≤ 90. 
 Consider using `°` (or `rad`) from `Unitful` if you want to pass numbers in degrees (or rad), by doing `x * °` (or `x * rad`)." LatBeltRegion("test", (0°,91°))
     @test_throws "LAT provided as numbers must be expressed in radians and satisfy -90 ≤ x ≤ 90. 
 Consider using `°` (or `rad`) from `Unitful` if you want to pass numbers in degrees (or rad), by doing `x * °` (or `x * rad`)." LatBeltRegion("test", (-91°,91°))
     @test_throws "LAT provided as numbers must be expressed in radians and satisfy -90 ≤ x ≤ 90. 
 Consider using `°` (or `rad`) from `Unitful` if you want to pass numbers in degrees (or rad), by doing `x * °` (or `x * rad`)." LatBeltRegion("test", (-91°,0°))
-    @test_throws "The first LAT limit must be lower than the second one..." LatBeltRegion(; latLim=((π/2)rad, 0rad))
-    @test_throws "The first LAT limit must be different than the second one..." LatBeltRegion(; latLim=(90, 90))
+    @test_throws "The first LAT limit must be lower than the second one..." LatBeltRegion(; lim=((π/2)rad, 0rad))
+    @test_throws "The first LAT limit must be different than the second one..." LatBeltRegion(; lim=(90, 90))
     
     @test filter_points([LatLon(14°, 1°), LatLon(90°, 1°), LatLon(60.1°, 1°), LatLon(26.9°, -65°), LatLon(-62°, -4.9°), LatLon(-60.1°, 14.9°), LatLon(10.1°, 70°)], belt) == sample_in
     @test filter_points(map(x -> Point(x), [LatLon(14°, 1°), LatLon(90°, 1°), LatLon(60.1°, 1°), LatLon(26.9°, -65°), LatLon(-62°, -4.9°), LatLon(-60.1°, 14.9°), LatLon(10.1°, 70°)]), belt) == map(x -> Point(x), sample_in) # Additional test for type Point(LatLon())
@@ -74,7 +74,7 @@ end
     ita = GeoRegion(; name="ITA", admin="Italy")
     eu = GeoRegion(; name="EU", continent="Europe")
     poly = PolyRegion("POLY", [LatLon(10°, -5°), LatLon(10°, 15°), LatLon(27°, 15°), LatLon(27°, -5°)])
-    belt = LatBeltRegion(; name="BELT", latLim=(0°, 5°))
+    belt = LatBeltRegion(; name="BELT", lim=(0°, 5°))
     
     sample_in_ita = [LatLon(43.727878°, 12.843441°), LatLon(43.714933°, 10.399326°), LatLon(37.485829°, 14.328285°), LatLon(39.330460°, 8.430780°), LatLon(45.918388°, 10.886654°)]
     sample_in_poly = [LatLon(14°, 1°), LatLon(26.9°, -4.9°), LatLon(10.1°, 14.9°)]
