@@ -160,10 +160,10 @@ end
 
 # ╔═╡ 56005d86-0377-4d40-b63b-d5597acddc32
 gr = let
-   ita = GeoRegion(; regionName="ITA", admin="Italy")
-    eu = GeoRegion(; regionName="EU", continent="Europe")
+   ita = GeoRegion(; name="ITA", admin="Italy")
+    eu = GeoRegion(; name="EU", continent="Europe")
     poly = PolyRegion("POLY", [LatLon(10°, -5°), LatLon(10°, 15°), LatLon(27°, 15°), LatLon(27°, -5°)])
-    belt = LatBeltRegion(; regionName="BELT", latLim=(-60°, 60°))
+    belt = LatBeltRegion(; name="BELT", latLim=(-60°, 60°))
     
     sample_in_ita = [LatLon(43.727878°, 12.843441°), LatLon(43.714933°, 10.399326°), LatLon(37.485829°, 14.328285°), LatLon(39.330460°, 8.430780°), LatLon(45.918388°, 10.886654°)]
     sample_in_poly = [LatLon(14°, 1°), LatLon(26.9°, -4.9°), LatLon(10.1°, 14.9°)]
@@ -188,14 +188,14 @@ Point[]
 
 # ╔═╡ e0b2c99d-c689-48fb-91d5-6a3b4ee4d044
 let 
-	reg = GeoRegion(; regionName="Tassellation", admin="Spain")
+	reg = GeoRegion(; name="Tassellation", admin="Spain")
 	centers, ngon = generate_tesselation(reg, 40000, HEX(;pattern=:circ), EO())
 	plot_geo_cells(centers, ngon)
 end
 
 # ╔═╡ ad9016de-1cce-4dc8-bdbf-2a2d65a4319f
 let 
-	reg = GeoRegion(; regionName="Tassellation", admin="Spain")
+	reg = GeoRegion(; name="Tassellation", admin="Spain")
 	centers, ngon = generate_tesselation(reg, 40000, HEX(;pattern=:circ), EO())
 	plot_geo_cells(centers, ngon)
 end
@@ -244,7 +244,7 @@ end
 
 # ╔═╡ c0cbcd3e-183d-425a-a534-06b2d52f1819
 let 
-	reg = GeoRegion(; regionName="Tassellation", admin="Spain")
+	reg = GeoRegion(; name="Tassellation", admin="Spain")
 	centers, ngon = generate_tesselation(reg, 40000, ICO(), EO())
 	plot_geo_cells(centers,ngon)
 end
@@ -287,7 +287,7 @@ end
 
 # ╔═╡ 7df04689-55fd-4659-b251-2100bf565580
 aaa=let
-	reg = GeoRegion(; regionName="Tassellation", test_pair...)
+	reg = GeoRegion(; name="Tassellation", test_pair...)
 	centroid(LatLon,reg)
 	centers = generate_tesselation(reg, 40000, HEX())
 	testcenters(centers)
@@ -295,7 +295,7 @@ end
 
 # ╔═╡ 3603a9e3-03cd-4861-a9af-b9d5657be13e
 let 
-	reg = GeoRegion(; regionName="Tassellation", test_pair...)
+	reg = GeoRegion(; name="Tassellation", test_pair...)
 	centers = generate_tesselation(reg, 40000, HEX(;pattern=:circ))
 	testcenters(centers)
 end
@@ -344,7 +344,7 @@ end
 
 # ╔═╡ dc7902d2-c46f-4afd-831b-92d5d4c3bc93
 let 
-	reg = GeoRegion(; regionName="Tassellation", admin="Spain")
+	reg = GeoRegion(; name="Tassellation", admin="Spain")
 	centers = generate_tesselation(reg, 40000, ICO())
 	testcenters(centers)
 end

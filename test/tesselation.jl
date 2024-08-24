@@ -10,7 +10,7 @@
     samples = [LatLon(43.2693, -8.83691), LatLon(43.6057, -8.11563), LatLon(36.808, -5.06421), LatLon(36.792, -2.3703)] # LatLon{WGS84Latest} coordinates
     corresponding_idxs = [1, 2, 121, 122]
 
-    reg = GeoRegion(; regionName="Tassellation", admin="Spain")
+    reg = GeoRegion(; name="Tassellation", admin="Spain")
     centers = generate_tesselation(reg, 40000, HEX())
 
     @test length(centers) == 122
@@ -24,7 +24,7 @@ end
     samples = [LatLon(43.2693, -8.83691), LatLon(43.6057, -8.11563), LatLon(36.808, -5.06421), LatLon(36.792, -2.3703)] # LatLon{WGS84Latest} coordinates
     corresponding_idxs = [1, 2, 121, 122]
 
-    reg = GeoRegion(; regionName="Tassellation", admin="Spain")
+    reg = GeoRegion(; name="Tassellation", admin="Spain")
     centers = generate_tesselation(reg, 40000, HEX(; pattern=:circ))
 
     @test length(centers) == 122
@@ -42,7 +42,7 @@ end
     # an hardcoded test like the previous cases using a circular tesselation.
     # For the moment being we decreased the tolerance to 1 (degrees of latitude 
     # and longitude) to allow for the randomness in the tessellation.
-    reg = GeoRegion(; regionName="Tassellation", admin="Spain")
+    reg = GeoRegion(; name="Tassellation", admin="Spain")
     centers, ngon = generate_tesselation(reg, 40000, HEX(), EO())
 
     @test length(centers) == 122
@@ -54,7 +54,7 @@ end
     [LatLon(36.4876,-2.64153), LatLon(36.4735,-2.11589), LatLon(36.7875,-1.96157), LatLon(37.0961,-2.09562), LatLon(37.1107,-2.62807), LatLon(36.7972,-2.77902), LatLon(36.4876,-2.64153)]] 
     corresponding_idxs_ngon = [1, 122]
 
-    reg = GeoRegion(; regionName="Tassellation", admin="Spain")
+    reg = GeoRegion(; name="Tassellation", admin="Spain")
 	centers, ngon = generate_tesselation(reg, 40000, HEX(), EO())
 
     @test length(centers) == 122
@@ -80,7 +80,7 @@ end
         [LatLon(36.4322, -2.3703), LatLon(36.4498, -2.23211), LatLon(36.5006, -2.10727), LatLon(36.58, -2.00789), LatLon(36.68, -1.94371), LatLon(36.7911, -1.9211), LatLon(36.9024, -1.94247), LatLon(37.0029, -2.00588), LatLon(37.0827, -2.10526), LatLon(37.134, -2.23087), LatLon(37.1517, -2.3703), LatLon(37.134, -2.50974), LatLon(37.0827, -2.63535), LatLon(37.0029, -2.73472), LatLon(36.9024, -2.79814), LatLon(36.7911, -2.8195), LatLon(36.68, -2.7969), LatLon(36.58, -2.73272), LatLon(36.5006, -2.63334), LatLon(36.4498, -2.5085), LatLon(36.4322, -2.3703), LatLon(36.4322, -2.3703)]]
     corresponding_idxs_ngon = [1, 122]
 
-    reg = GeoRegion(; regionName="Tassellation", admin="Spain")
+    reg = GeoRegion(; name="Tassellation", admin="Spain")
     centers, ngon = generate_tesselation(reg, 40000, HEX(; pattern=:circ), EO())
 
     @test length(centers) == 122
@@ -109,7 +109,7 @@ end
     samples = [LatLon(42.8428, -9.06506), LatLon(43.4251, -7.82139), LatLon(37.5057, -1.64231), LatLon(36.459, -4.77773),]
     corresponding_idxs = [1, 2, 117, 118]
 
-    reg = GeoRegion(; regionName="Tassellation", admin="Spain")
+    reg = GeoRegion(; name="Tassellation", admin="Spain")
     centers = generate_tesselation(reg, 40000, HEX(; direction=:flat))
 
     @test length(centers) == 118
@@ -284,7 +284,7 @@ end
     samples = [LatLon(43.5772, -7.50902), LatLon(43.4468, -5.70002), LatLon(36.6657, -3.58858), LatLon(36.285, -5.82463)]
     corresponding_idxs = [1, 2, 103, 104]
 
-    reg = GeoRegion(; regionName="Tassellation", admin="Spain")
+    reg = GeoRegion(; name="Tassellation", admin="Spain")
     centers = generate_tesselation(reg, 40000, ICO())
 
     @test length(centers) == 104
@@ -301,7 +301,7 @@ end
         [LatLon(35.9252, -5.82463), LatLon(35.9428, -5.68733), LatLon(35.9937, -5.56329), LatLon(36.073, -5.46457), LatLon(36.1731, -5.40081), LatLon(36.2841, -5.37836), LatLon(36.3954, -5.3996), LatLon(36.4959, -5.46261), LatLon(36.5757, -5.56134), LatLon(36.627, -5.68612), LatLon(36.6447, -5.82463), LatLon(36.627, -5.96314), LatLon(36.5757, -6.08792), LatLon(36.4959, -6.18665), LatLon(36.3954, -6.24966), LatLon(36.2841, -6.27089), LatLon(36.1731, -6.24845), LatLon(36.073, -6.18469), LatLon(35.9937, -6.08597), LatLon(35.9428, -5.96193), LatLon(35.9252, -5.82463), LatLon(35.9252, -5.82463)]]
     corresponding_idxs_ngon = [1, 104]
 
-    reg = GeoRegion(; regionName="Tassellation", admin="Spain")
+    reg = GeoRegion(; name="Tassellation", admin="Spain")
     centers, ngon = generate_tesselation(reg, 40000, ICO(), EO())
 
     @test length(centers) == 104

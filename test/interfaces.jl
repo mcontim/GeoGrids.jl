@@ -3,7 +3,7 @@
     sample_ita = [LatLon{WGS84Latest}(43.727878°, 12.843441°), LatLon{WGS84Latest}(43.714933°, 10.399326°), LatLon{WGS84Latest}(37.485829°, 14.328285°), LatLon{WGS84Latest}(39.330460°, 8.430780°), LatLon{WGS84Latest}(45.918388°, 10.886654°)]
     sample_eu = [LatLon{WGS84Latest}(52.218550°, 4.420621°), LatLon{WGS84Latest}(41.353144°, 2.167639°), LatLon{WGS84Latest}(42.670341°, 23.322592°)]
 
-    ita = GeoRegion(regionName="ITA", admin="Italy")
+    ita = GeoRegion(name="ITA", admin="Italy")
     eu = GeoRegion(; continent="Europe")
 
     @test all(map(x -> in(x, ita), sample_ita)) # Test LatLon()
@@ -37,7 +37,7 @@ end
 end
 
 @testitem "Test Base.in LatBeltRegion" tags = [:interface] begin
-    belt = LatBeltRegion(; regionName="test", latLim=(-60°, 60°))
+    belt = LatBeltRegion(; name="test", latLim=(-60°, 60°))
     sample_in = [LatLon(14°, 1°), LatLon(26.9°, -65°), LatLon(10.1°, 70°)]
     sample_out = [LatLon(90°, 1°), LatLon(60.1°, 1°), LatLon(-62°, -4.9°), LatLon(-60.1°, 14.9°)]
 
@@ -52,7 +52,7 @@ end
 
 ## borders()
 @testitem "Test borders for GeoRegion" tags = [:interface] begin
-    reg = GeoRegion(regionName="ITA", admin="Italy;Spain")
+    reg = GeoRegion(name="ITA", admin="Italy;Spain")
 
     @test borders(reg) == map(x -> x.latlon, reg.domain)
     @test borders(LatLon, reg) == map(x -> x.latlon, reg.domain)
@@ -69,7 +69,7 @@ end
 
 ## centroid()
 @testitem "Test centroid for GeoRegion" tags = [:interface] begin
-    reg = GeoRegion(; regionName="Tassellation", admin="Spain;Italy")
+    reg = GeoRegion(; name="Tassellation", admin="Spain;Italy")
     testPoint_cart = Point(Cartesian{WGS84Latest}(1.914719f0, 40.225365f0))
     testPoint_latlon = Point(LatLon{WGS84Latest}(40.225365f0, 1.914719f0))
     let
@@ -121,6 +121,6 @@ end
 
 ## Helpers
 @testitem "Helper Functions" tags = [:general] begin
-    r = GeoRegion(regionName="ITA", admin="Italy")
+    r = GeoRegion(name="ITA", admin="Italy")
     @test extract_countries(r) == r.domain
 end

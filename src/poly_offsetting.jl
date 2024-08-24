@@ -1,23 +1,15 @@
-# mutable struct GeoRegionEnlarged <: AbstractRegion
-#     standardRegion::GeoRegion
-#     enlargedRegion::GeoRegion
-
-#     function GeoRegionEnlarged(standardRegion::GeoRegion, delta::Real)
-#         # Add code for enlargement of the region
-
-#         # new(standardRegion, enlargedRegion)
-#     end
-# end
-# //NOTE: Alternative definition as a subtype of GeoRegion
-mutable struct GeoRegionEnlarged <: GeoRegion
-    original::GeoRegion
+mutable struct GeoRegionEnlarged{D} <: GeoRegion
+    original::GeoRegion{D}
+    name::String
     domain::Multi
+    convexhull::PolyArea
+end
+function GeoRegionEnlarged(delta_km; name="enlarged_rgion", continent="", subregion="", admin="", refRadius=constants.Re_mean, magnitude=3, precision=7)
+    gr = GeoRegion(; name, continent, subregion, admin)
+    offsetRegion = offset_region(gr, delta_km; refRadius, magnitude, precision)
+    convexhull = convexhull(offsetRegion)
 
-    function GeoRegionEnlarged(original::GeoRegion, delta::Real)
-        # Add code for enlargement of the region
-
-        # new(standardRegion, enlargedRegion)
-    end
+    GeoRegionEnlarged(gr, name, offsetRegion, convexhull)
 end
 
 function _offset_polygon(poly::PolyArea, delta; magnitude=3, precision=7)

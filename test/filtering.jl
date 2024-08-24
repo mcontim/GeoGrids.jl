@@ -2,7 +2,7 @@
     sample_ita = [LatLon(43.727878°, 12.843441°), LatLon(43.714933°, 10.399326°), LatLon(37.485829°, 14.328285°), LatLon(39.330460°, 8.430780°), LatLon(45.918388°, 10.886654°)]
     sample_eu = [LatLon(52.218550°, 4.420621°), LatLon(41.353144°, 2.167639°), LatLon(42.670341°, 23.322592°)]
 
-    ita = GeoRegion(regionName="ITA", admin="Italy")
+    ita = GeoRegion(name="ITA", admin="Italy")
     eu = GeoRegion(; continent="Europe")
 
     @test ita isa GeoRegion
@@ -28,7 +28,7 @@ end
 
     @test poly isa PolyRegion
     @test PolyRegion(;domain=vertex) isa PolyRegion
-    @test PolyRegion(;regionName="Test",domain=vertex) isa PolyRegion
+    @test PolyRegion(;name="Test",domain=vertex) isa PolyRegion
     @test PolyRegion("Test", vertex) isa PolyRegion
     @test_throws "UndefKeywordError: keyword argument `domain` not assigned" PolyRegion()
     
@@ -37,12 +37,12 @@ end
 end
 
 @testitem "LatBeltRegion Test" tags = [:filtering] begin
-    belt = LatBeltRegion(; regionName="test", latLim=(-60°, 60°))
+    belt = LatBeltRegion(; name="test", latLim=(-60°, 60°))
     sample_in = [LatLon(14°, 1°), LatLon(26.9°, -65°), LatLon(10.1°, 70°)]
     sample_out = [LatLon(90°, 1°), LatLon(60.1°, 1°), LatLon(-62°, -4.9°), LatLon(-60.1°, 14.9°)]
 
     @test belt isa LatBeltRegion
-    @test LatBeltRegion(; regionName="test", latLim=(0°,90°)) isa LatBeltRegion
+    @test LatBeltRegion(; name="test", latLim=(0°,90°)) isa LatBeltRegion
     @test LatBeltRegion(; latLim=(0°,90°)) isa LatBeltRegion
     @test LatBeltRegion("test", (0°,90°)) isa LatBeltRegion
     
@@ -71,10 +71,10 @@ end
 @testitem "Group By Test" tags = [:filtering] begin
     using Meshes: 🌐, WGS84Latest
 
-    ita = GeoRegion(; regionName="ITA", admin="Italy")
-    eu = GeoRegion(; regionName="EU", continent="Europe")
+    ita = GeoRegion(; name="ITA", admin="Italy")
+    eu = GeoRegion(; name="EU", continent="Europe")
     poly = PolyRegion("POLY", [LatLon(10°, -5°), LatLon(10°, 15°), LatLon(27°, 15°), LatLon(27°, -5°)])
-    belt = LatBeltRegion(; regionName="BELT", latLim=(0°, 5°))
+    belt = LatBeltRegion(; name="BELT", latLim=(0°, 5°))
     
     sample_in_ita = [LatLon(43.727878°, 12.843441°), LatLon(43.714933°, 10.399326°), LatLon(37.485829°, 14.328285°), LatLon(39.330460°, 8.430780°), LatLon(45.918388°, 10.886654°)]
     sample_in_poly = [LatLon(14°, 1°), LatLon(26.9°, -4.9°), LatLon(10.1°, 14.9°)]

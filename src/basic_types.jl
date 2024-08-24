@@ -17,14 +17,14 @@ struct GlobalRegion <: AbstractRegion end
 
 "Type of geographical region based on CountriesBorders."
 mutable struct GeoRegion{D} <: AbstractRegion
-    regionName::String
+    name::String
     continent::String
     subregion::String
     admin::String
     domain::D
     convexhull::PolyArea
 end
-function GeoRegion(; regionName="region_name", continent="", subregion="", admin="")
+function GeoRegion(; name="region_name", continent="", subregion="", admin="")
     all(isempty(v) for v in (continent, subregion, admin)) && error("Input at least one argument between continent, subregion and admin...")
 
     nt = (; continent, subregion, admin)
@@ -32,7 +32,7 @@ function GeoRegion(; regionName="region_name", continent="", subregion="", admin
     domain = CountriesBorders.extract_countries(; kwargs...)
     convexhull = convexhull(domain)
 
-    GeoRegion(regionName, continent, subregion, admin, domain, convexhull)
+    GeoRegion(name, continent, subregion, admin, domain, convexhull)
 end
 
 struct PolyBorder{T} <: Geometry{🌐,LATLON{T}}
@@ -49,18 +49,18 @@ end
 
 "Type of polygonal region based on PolyArea."
 mutable struct PolyRegion{T} <: AbstractRegion
-    regionName::String
+    name::String
     domain::PolyBorder{T}
 end
-PolyRegion(regionName, domain::Vector{<:LatLon}) = PolyRegion(regionName, PolyBorder(PolyArea(map(Point, domain))))
-PolyRegion(; regionName::String="region_name", domain) = PolyRegion(regionName, domain)
+PolyRegion(name, domain::Vector{<:LatLon}) = PolyRegion(name, PolyBorder(PolyArea(map(Point, domain))))
+PolyRegion(; name::String="region_name", domain) = PolyRegion(name, domain)
 
 "Type of region representinga a latitude belt region."
 mutable struct LatBeltRegion <: AbstractRegion
-    regionName::String
+    name::String
     latLim::Tuple{ValidAngle,ValidAngle} # [rad] 
 
-    function LatBeltRegion(regionName::String, latLim::Tuple{ValidAngle,ValidAngle})
+    function LatBeltRegion(name::String, latLim::Tuple{ValidAngle,ValidAngle})
         # Inputs validation    
         _latLim = map(latLim) do l
             l isa Real ? l * ° : l |> u"°" # Convert to Uniful °
@@ -77,10 +77,10 @@ Consider using `°` (or `rad`) from `Unitful` if you want to pass numbers in deg
         _latLim[1] > _latLim[2] && error("The first LAT limit must be lower than the second one...")
         _latLim[1] == _latLim[2] && error("The first LAT limit must be different than the second one...")
 
-        new(regionName, _latLim)
+        new(name, _latLim)
     end
 end
-LatBeltRegion(; regionName::String="region_name", latLim) = LatBeltRegion(regionName, latLim)
+LatBeltRegion(; name::String="region_name", latLim) = LatBeltRegion(name, latLim)
 
 ## Define Tessellation Types
 abstract type AbstractTiling end

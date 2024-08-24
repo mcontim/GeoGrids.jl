@@ -16,7 +16,7 @@ end
 @testitem "plot_geo_points" tags = [:general] begin
     using PlotlyBase
 
-    reg = GeoRegion(; regionName="Tassellation", admin="Spain")
+    reg = GeoRegion(; name="Tassellation", admin="Spain")
 	
     # Multi Point
     centers, ngon = generate_tesselation(reg, 40000, HEX(;pattern=:circ), EO())

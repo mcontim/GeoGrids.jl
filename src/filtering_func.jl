@@ -37,7 +37,7 @@ Group points by regions defined in the `domains` array.
 ## Arguments
 - `points`: An array of points. Points are of type `LatLon`.
 - `domains`: An array of domains which can contain `GeoRegion`, `PolyRegion`, \
-`LatBeltRegion` or a mix of the three. Each domain should have a `regionName` \
+`LatBeltRegion` or a mix of the three. Each domain should have a `name` \
 attribute.
 - `unique`: A boolean flag. If `true`, a point is assigned to the first region \
 it belongs to and is not considered for subsequent regions. If `false`, a \
@@ -58,14 +58,14 @@ region.
 """
 function group_by_domain(points::AbstractVector{<:Union{LatLon, Point{🌐,<:LatLon{WGS84Latest}}}}, domains::AbstractVector; flagUnique=true)
     # Check region names validity
-    names = map(x -> x.regionName, domains)
+    names = map(x -> x.name, domains)
     length(unique(names)) == length(names) || error("The region names passed to group_by must be unique...")
 
-    groups = Dictionary(map(x -> x.regionName, domains), map(_ -> eltype(points)[], domains))
+    groups = Dictionary(map(x -> x.name, domains), map(_ -> eltype(points)[], domains))
 
     for p in points
         for dom in domains
-            vec = groups[dom.regionName]
+            vec = groups[dom.name]
             if p in dom
                 push!(vec, p)
                 flagUnique && break
