@@ -35,9 +35,6 @@ md"""
 # Tests with GeoGrids
 """
 
-# ╔═╡ 31c93a18-3dd0-4b6b-9670-81bf2876f306
-append!([1,2,3],[4,5,6])
-
 # ╔═╡ 2745410e-d76d-426f-8316-fb4b269d013a
 md"""
 # Additional Functions
@@ -108,7 +105,7 @@ w=let
 	push!(polygon, IntPoint(0.0,1.0,3,6))
 	push!(polygon, IntPoint(1.0,1.0,3,6))
 	push!(polygon, IntPoint(1.0,0.0,3,6))
-	push!(polygon, IntPoint(0.0,0.0,3,6))
+	# push!(polygon, IntPoint(0.0,0.0,3,6))
 	
 	co = ClipperOffset()
 	add_path!(co, polygon, JoinTypeMiter, EndTypeClosedPolygon)
@@ -177,32 +174,27 @@ e=let
 	# polygon
 end
 
-# ╔═╡ 73551bce-eaea-4a72-acc0-7e16d45ca840
-Multi([PolyArea([(60,-5), (80,0), (80,10), (60,15)]), PolyArea([(60,-5), (80,0), (80,10), (60,15)])])
+# ╔═╡ fc287325-920d-4f8d-8e8f-75ecbca02343
+let 
+	polygon = IntPoint[]
+	push!(polygon, IntPoint(0.0,0.0,3,6)) # 3 integer, 6 total values preserved
+	push!(polygon, IntPoint(0.0,1.0,3,6))
+	push!(polygon, IntPoint(1.0,1.0,3,6))
+	push!(polygon, IntPoint(1.0,0.0,3,6))
+end
+
+# ╔═╡ 51ad65d7-49a5-4144-bbce-f9fe9fdf31d3
+let
+	map(1:5) do i
+		IntPoint(1.0,1.0,3,6)
+	end
+end
+
+# ╔═╡ 5d94f474-78fa-46ad-a337-dead795484db
+tofloat(IntPoint(2.0,1.0,3,6),3,6)[1]
 
 # ╔═╡ 7365e5ac-3a12-4b55-b356-47da19f14555
 r = GeoRegion(; admin="Italy;Spain")
-
-# ╔═╡ 04cc3d77-9f6c-451b-8728-71f94877be86
-r.convexhull
-
-# ╔═╡ bcf0814b-f803-4c95-b426-431c02191859
-typeof(r.domain)
-
-# ╔═╡ 7e490595-bdb4-4edd-827e-b0db8daf95c8
-r.domain[2].latlon.geoms
-
-# ╔═╡ d2c00b5f-eed0-47e7-9ece-866e067978fd
-r.domain[1].latlon.geoms
-
-# ╔═╡ cee3b432-40f6-4477-ac7d-8479d787a814
-convexhull(r.domain)
-
-# ╔═╡ 381ce043-63c7-40f5-b640-57718db3eb33
-get_lat(vertices(r.domain[2].latlon.geoms[2])[1])
-
-# ╔═╡ f2ce0357-fca8-4d42-93c4-27433d91c288
-get_lat(vertices(r.domain[1].latlon.geoms[1])[1]) |> ustrip
 
 # ╔═╡ 2e51773a-06e3-4f0a-b409-28f93846803c
 cb=let
@@ -212,33 +204,24 @@ cb=let
 	CountryBorder(admin, latlon, valid_polyareas;  resolution, table_idx)
 end
 
-# ╔═╡ 68cda3b3-fb48-466e-b751-3387578a358d
-SubDomain(GeometrySet([cb,cb]), [1,2])
+# ╔═╡ b0991e3d-3452-4df0-989b-1b8dd7d7db0e
+GeoRegionEnlarged(10.0; admin="Italy;Spain")
 
-# ╔═╡ 47c55315-2a6f-4ce8-94b7-017b1d482ff8
-n1=extract_countries("norway"; skip_areas=SKIP_NONCONTINENTAL_EU)[1]
+# ╔═╡ b2d4a333-5e49-4a14-891e-681098745b03
+PolyArea([Point(LatLon(10°, -5°)), Point(LatLon(10°, 15°)), Point(LatLon(27°, 15°))])
 
-# ╔═╡ 33b1b4f1-a2ca-4406-bee5-9826c0d96e3f
-n2=extract_countries("norway")[1]
+# ╔═╡ c826e1de-a63b-4528-b0bb-f663841a82a0
+let
+	pa = PolyRegion(; domain=[LatLon(10°, -5°), LatLon(10°, 15°), LatLon(27°, 15°), LatLon(27°, -5°)])
 
-# ╔═╡ de63e2d8-85b5-4056-8e63-5704c2c3bd85
-n2.latlon.geoms
-
-# ╔═╡ d2d830de-8848-4094-876f-454f9899415e
-length(GeoRegion(; continent="Europe").domain)
-
-# ╔═╡ 4cc508b7-06ef-435d-9ec7-46c90cd37f69
-r2 = GeoRegion(; continent="Europe")
-
-# ╔═╡ 5a3f34c9-ea54-468a-8dcc-9b38ad52054e
-typeof(r2.domain) == typeof(SubDomain(GeometrySet([cb,cb]), [1,2]))
-
-# ╔═╡ bd54c49c-bad2-4f87-ba74-fdcb9d61c8a7
-length(GeoRegion(; admin="Italy").domain)
-
-# ╔═╡ aaa6174e-d7c8-48c4-9d62-9fad93b9c773
-PolyRegion(;domain=[LatLon(60,-5), LatLon(80,0), LatLon(80,10), LatLon(60,15)]).domain
-
+	poly = pa.domain.latlon
+	
+	intPoly = map([vertices(poly)...]) do vertex
+        y = get_lat(vertex) |> ustrip 
+        x = get_lon(vertex) |> ustrip
+        IntPoint(x, y, 3, 7) # Consider LON as X and LAT as Y
+    end
+end
 
 # ╔═╡ 00000000-0000-0000-0000-000000000001
 PLUTO_PROJECT_TOML_CONTENTS = """
@@ -695,27 +678,15 @@ version = "17.4.0+2"
 # ╠═4c756d1e-efb0-4941-82a5-554542cbb6f4
 # ╠═1e0e6150-57e7-40a2-aa7c-c2d43f4d9182
 # ╠═cb64a9f6-d6b5-441b-a7ca-3ae918849e47
+# ╠═fc287325-920d-4f8d-8e8f-75ecbca02343
+# ╠═51ad65d7-49a5-4144-bbce-f9fe9fdf31d3
+# ╠═5d94f474-78fa-46ad-a337-dead795484db
 # ╟─c432437c-2c21-4e92-b664-cb253ad77892
-# ╠═31c93a18-3dd0-4b6b-9670-81bf2876f306
-# ╠═73551bce-eaea-4a72-acc0-7e16d45ca840
 # ╠═7365e5ac-3a12-4b55-b356-47da19f14555
-# ╠═04cc3d77-9f6c-451b-8728-71f94877be86
-# ╠═bcf0814b-f803-4c95-b426-431c02191859
-# ╠═cee3b432-40f6-4477-ac7d-8479d787a814
-# ╠═381ce043-63c7-40f5-b640-57718db3eb33
-# ╠═7e490595-bdb4-4edd-827e-b0db8daf95c8
-# ╠═d2c00b5f-eed0-47e7-9ece-866e067978fd
-# ╠═f2ce0357-fca8-4d42-93c4-27433d91c288
 # ╠═2e51773a-06e3-4f0a-b409-28f93846803c
-# ╠═68cda3b3-fb48-466e-b751-3387578a358d
-# ╠═47c55315-2a6f-4ce8-94b7-017b1d482ff8
-# ╠═33b1b4f1-a2ca-4406-bee5-9826c0d96e3f
-# ╠═de63e2d8-85b5-4056-8e63-5704c2c3bd85
-# ╠═d2d830de-8848-4094-876f-454f9899415e
-# ╠═4cc508b7-06ef-435d-9ec7-46c90cd37f69
-# ╠═5a3f34c9-ea54-468a-8dcc-9b38ad52054e
-# ╠═bd54c49c-bad2-4f87-ba74-fdcb9d61c8a7
-# ╠═aaa6174e-d7c8-48c4-9d62-9fad93b9c773
+# ╠═b0991e3d-3452-4df0-989b-1b8dd7d7db0e
+# ╠═b2d4a333-5e49-4a14-891e-681098745b03
+# ╠═c826e1de-a63b-4528-b0bb-f663841a82a0
 # ╟─2745410e-d76d-426f-8316-fb4b269d013a
 # ╟─61a7aab7-3726-4027-ab5b-416ef57545c1
 # ╠═b58ca732-3892-415c-99e0-877befe7a26d

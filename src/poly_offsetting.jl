@@ -4,33 +4,37 @@ mutable struct GeoRegionEnlarged{D} <: AbstractRegion
     domain::Multi
     convexhull::PolyArea
 end
-
 function GeoRegionEnlarged(delta_km; name="enlarged_region", continent="", subregion="", admin="", refRadius=constants.Re_mean, magnitude=3, precision=7)
     gr = GeoRegion(; name, continent, subregion, admin)
-    offsetRegion = offset_region(gr, delta_km; refRadius, magnitude, precision)
-    convexhull = convexhull(offsetRegion)
+    or = offset_region(gr, delta_km; refRadius, magnitude, precision)
+    ch = convexhull(or)
 
-    GeoRegionEnlarged(gr, name, offsetRegion, convexhull)
+    GeoRegionEnlarged(gr, name, or, ch)
+end
+function GeoRegionEnlarged(gr::GeoRegion, delta_km; name="enlarged_region", refRadius=constants.Re_mean, magnitude=3, precision=7)
+    or = offset_region(gr, delta_km; refRadius, magnitude, precision)
+    ch = convexhull(or)
+
+    GeoRegionEnlarged(gr, name, or, ch)
 end
 
 function _offset_polygon(poly::PolyArea, delta; magnitude=3, precision=7)
-    intPoly = map(vertices(poly)) do vertex
+    intPoly = map([vertices(poly)...]) do vertex # Avoid CircularVector as output from map
         y = get_lat(vertex) |> ustrip 
         x = get_lon(vertex) |> ustrip
         IntPoint(x, y, magnitude, precision) # Consider LON as X and LAT as Y
     end
     co = ClipperOffset()
     add_path!(co, intPoly, JoinTypeMiter, EndTypeClosedPolygon) # We fix JoinTypeMiter, EndTypeClosedPolygon because it works well with complex polygons, look at Clipper documentation for details.
-    offset_polygons = execute(co, delta)
+    offset_polygons = execute(co, delta) # Clipper polygon
     # We can end up with multiple polygons even when starting from a single
     # PolyArea. So we will return all the polygons for this country as a vector
     # of PolyArea.
     geoms = PolyArea[]
     for i in eachindex(offset_polygons)
         ring = map(offset_polygons[i]) do vertex
-            lat = tofloat(vertex.Y, magnitude, precision)
-            lon = tofloat(vertex.X, magnitude, precision)
-            LatLon{WGS84Latest}(lat, lon) |> Point
+            lonlat = tofloat(vertex, magnitude, precision)
+            LatLon{WGS84Latest}(lonlat[2], lonlat[1]) |> Point
         end
         push!(geoms, PolyArea(ring))
     end
@@ -49,7 +53,7 @@ function offset_region(originalRegion::GeoRegion, delta_km; refRadius=constants.
 
     # Compute the delta value to be used in the offsetting process
     delta = delta_km / refRadius
-    intDelta = IntPoint(delta, delta, magnitude, precision).X # We use IntPoint to exploit the conversion to IntPoint in Clipping, then we can use either X or Y as delta value.
+    intDelta = Float64(IntPoint(delta, delta, magnitude, precision).X) # We use IntPoint to exploit the conversion to IntPoint in Clipping, then we can use either X or Y as delta value.
 
     numCountries = length(originalRegion.domain) # Number of Countries in GeoRegion
     allGeoms = PolyArea[]
