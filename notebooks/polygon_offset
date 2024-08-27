@@ -42,6 +42,35 @@ map(1:2) do i
 	end |> splat(vcat)
 end |> splat(vcat)
 
+# ╔═╡ 7365e5ac-3a12-4b55-b356-47da19f14555
+# ╠═╡ disabled = true
+#=╠═╡
+r = GeoRegion(; admin="Italy;Spain;France")
+  ╠═╡ =#
+
+# ╔═╡ eb7ea8be-0475-474a-89e7-f8249edbcd63
+#=╠═╡
+ zio = offset_region(r,10)
+  ╠═╡ =#
+
+# ╔═╡ 32a6262d-f535-4fd9-b3f4-cf29583cb180
+#=╠═╡
+convexhull(zio)
+  ╠═╡ =#
+
+# ╔═╡ 2e51773a-06e3-4f0a-b409-28f93846803c
+#=╠═╡
+cb=let
+	country = r.domain[1]
+	resolution = CountriesBorders.resolution(country)
+	(; admin, latlon, resolution, table_idx, valid_polyareas) = country
+	CountryBorder(admin, latlon, valid_polyareas;  resolution, table_idx)
+end
+  ╠═╡ =#
+
+# ╔═╡ e57cb982-684f-4b63-a04a-f3f53c29857d
+
+
 # ╔═╡ 2745410e-d76d-426f-8316-fb4b269d013a
 md"""
 # Additional Functions
@@ -200,43 +229,17 @@ end
 # ╔═╡ 5d94f474-78fa-46ad-a337-dead795484db
 tofloat(IntPoint(2.0,1.0,3,6),3,6)[1]
 
-# ╔═╡ 7365e5ac-3a12-4b55-b356-47da19f14555
-# ╠═╡ disabled = true
-#=╠═╡
-r = GeoRegion(; admin="Italy;Spain;France")
-  ╠═╡ =#
-
-# ╔═╡ eb7ea8be-0475-474a-89e7-f8249edbcd63
-#=╠═╡
- zio = offset_region(r,10)
-  ╠═╡ =#
-
-# ╔═╡ 32a6262d-f535-4fd9-b3f4-cf29583cb180
-#=╠═╡
-convexhull(zio)
-  ╠═╡ =#
-
-# ╔═╡ 2e51773a-06e3-4f0a-b409-28f93846803c
-#=╠═╡
-cb=let
-	country = r.domain[1]
-	resolution = CountriesBorders.resolution(country)
-	(; admin, latlon, resolution, table_idx, valid_polyareas) = country
-	CountryBorder(admin, latlon, valid_polyareas;  resolution, table_idx)
-end
-  ╠═╡ =#
-
 # ╔═╡ b0991e3d-3452-4df0-989b-1b8dd7d7db0e
-GeoRegionEnlarged(10.0; admin="Italy;Spain")
+ereg = GeoRegionEnlarged(10.0; admin="Italy;Spain")
+
+# ╔═╡ 86d1c573-c834-49b0-9b5d-e71e0175da98
+convexhull(ereg.domain.cart)
+
+# ╔═╡ f4798806-0377-4c17-a1ae-e32a12d5843e
+ereg.domain isa MULTI_LATLON
 
 # ╔═╡ 0bc85da5-d08d-4659-9a90-573eb13f9b74
 reg=GeoRegion(; admin="Italy;Spain")
-
-# ╔═╡ a06c0d32-18f6-4b5f-b97e-ba7c6fb062d5
-rings(reg.convexhull)
-
-# ╔═╡ d14513d2-164a-43e7-aada-36e5f21bb6d0
-cartesian_geometry(Multi([reg.convexhull]))
 
 # ╔═╡ d13cd812-29e8-457c-86fc-8e074771b8ed
 parent(Multi([reg.convexhull]))
@@ -728,9 +731,10 @@ version = "17.4.0+2"
 # ╠═32a6262d-f535-4fd9-b3f4-cf29583cb180
 # ╠═2e51773a-06e3-4f0a-b409-28f93846803c
 # ╠═b0991e3d-3452-4df0-989b-1b8dd7d7db0e
+# ╠═86d1c573-c834-49b0-9b5d-e71e0175da98
+# ╠═f4798806-0377-4c17-a1ae-e32a12d5843e
+# ╠═e57cb982-684f-4b63-a04a-f3f53c29857d
 # ╠═0bc85da5-d08d-4659-9a90-573eb13f9b74
-# ╠═a06c0d32-18f6-4b5f-b97e-ba7c6fb062d5
-# ╠═d14513d2-164a-43e7-aada-36e5f21bb6d0
 # ╠═d13cd812-29e8-457c-86fc-8e074771b8ed
 # ╠═b2d4a333-5e49-4a14-891e-681098745b03
 # ╠═f66370ee-54e1-438b-b1ee-3802ecacaeb4

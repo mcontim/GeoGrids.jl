@@ -2,19 +2,22 @@
 mutable struct GeoRegionEnlarged{D} <: AbstractRegion
     original::GeoRegion{D}
     name::String
-    domain::Multi
-    convexhull::PolyArea
+    domain::MultiBorder
+    convexhull::PolyBorder
 end
 function GeoRegionEnlarged(delta_km; name="enlarged_region", continent="", subregion="", admin="", refRadius=constants.Re_mean, magnitude=3, precision=7)
     gr = GeoRegion(; name, continent, subregion, admin)
-    or = offset_region(gr, delta_km; refRadius, magnitude, precision)
-    # ch = convexhull(or)
-ch = PolyArea[]
-    GeoRegionEnlarged(gr, name, or, ch)
+
+    GeoRegionEnlarged(gr, delta_km; name, refRadius, magnitude, precision)
 end
 function GeoRegionEnlarged(gr::GeoRegion, delta_km; name="enlarged_region", refRadius=constants.Re_mean, magnitude=3, precision=7)
-    or = offset_region(gr, delta_km; refRadius, magnitude, precision)
-    ch = convexhull(or)
+    orLatLon = offset_region(gr, delta_km; refRadius, magnitude, precision)
+    orCart = cartesian_geometry(orLatLon)
+    or = MultiBorder(orLatLon, orCart)
+
+    chCart = convexhull(orCart)
+    chLatlon = latlon_geometry(chCart)
+    ch = PolyBorder(chLatlon, chCart)
 
     GeoRegionEnlarged(gr, name, or, ch)
 end
@@ -56,17 +59,6 @@ function offset_region(originalRegion::GeoRegion, delta_km; refRadius=constants.
     intDelta = Float64(IntPoint(delta, delta, magnitude, precision).X) # We use IntPoint to exploit the conversion to IntPoint in Clipping, then we can use either X or Y as delta value.
 
     numCountries = length(originalRegion.domain) # Number of Countries in GeoRegion
-    # allGeoms = PolyArea[]
-    # for idxCountry in 1:numCountries
-    #     # Perform the processing per CountryBorder.
-    #     thisCountryGeoms = originalRegion.domain[idxCountry].latlon.geoms
-    #     for idxGeom in eachindex(thisCountryGeoms)
-    #         # Get the offsetted version of each of the PolyArea composing this Country
-    #         # Perform processing per single PolyArea.
-    #         offsetGeom = _offset_polygon(thisCountryGeoms[idxGeom], intDelta; magnitude, precision)
-    #         append!(allGeoms, offsetGeom)
-    #     end
-    # end
     allGeoms = map(1:numCountries) do idxCountry
         # Perform the processing per CountryBorder.
         thisCountryGeoms = originalRegion.domain[idxCountry].latlon.geoms

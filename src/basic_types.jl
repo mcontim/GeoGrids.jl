@@ -22,11 +22,10 @@ Fields:
 struct PolyBorder{T} <: Geometry{🌐,LATLON{T}}
     latlon::POLY_LATLON{T}
     cart::POLY_CART{T}
-
-    function PolyBorder(latlon::POLY_LATLON{T}) where {T}
-        cart = cartesian_geometry(latlon)
-        new{T}(latlon, cart)
-    end
+end
+function PolyBorder(latlon::POLY_LATLON{T}) where {T}
+    cart = cartesian_geometry(latlon)
+    PolyBorder{T}(latlon, cart)
 end
 
 """
@@ -41,11 +40,10 @@ Fields:
 struct MultiBorder{T} <: Geometry{🌐,LATLON{T}}
     latlon::MULTI_LATLON{T}
     cart::MULTI_CART{T}
-
-    function MultiBorder(latlon::MULTI_LATLON{T}) where {T}
-        cart = cartesian_geometry(latlon)
-        new{T}(latlon, cart)
-    end
+end
+function MultiBorder(latlon::MULTI_LATLON{T}) where {T}
+    cart = cartesian_geometry(latlon)
+    MultiBorder{T}(latlon, cart)
 end
 
 abstract type AbstractRegion end
@@ -90,8 +88,6 @@ function GeoRegion(; name="region_name", continent="", subregion="", admin="")
     ch = PolyBorder(latlon, cart)
     GeoRegion(name, continent, subregion, admin, d, ch)
 end
-
-
 
 """
     PolyRegion{T} <: AbstractRegion

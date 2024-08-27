@@ -133,4 +133,3 @@ function latlon_geometry(poly::PolyArea{𝔼{2},<:CART})
     end |> splat(PolyArea)
 end
 latlon_geometry(multi::Multi{𝔼{2},<:CART}) = map(latlon_geometry, parent(multi)) |> Multi
-
