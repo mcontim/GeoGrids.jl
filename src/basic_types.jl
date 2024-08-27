@@ -77,7 +77,7 @@ mutable struct GeoRegion{D} <: AbstractRegion
     subregion::String
     admin::String
     domain::D
-    convexhull::PolyArea
+    convexhull::PolyBorder
 end
 function GeoRegion(; name="region_name", continent="", subregion="", admin="")
     all(isempty(v) for v in (continent, subregion, admin)) && error("Input at least one argument between continent, subregion and admin...")
@@ -85,8 +85,9 @@ function GeoRegion(; name="region_name", continent="", subregion="", admin="")
     nt = (; continent, subregion, admin)
     kwargs = (k => v for (k, v) in pairs(nt) if !isempty(v))
     d = CountriesBorders.extract_countries(; kwargs...)
-    ch = convexhull(d) # Using convexhull() method from CountriesBorders
-
+    cart = convexhull(d) # Using convexhull() method from CountriesBorders
+    latlon = latlon_geometry(cart)
+    ch = PolyBorder(latlon, cart)
     GeoRegion(name, continent, subregion, admin, d, ch)
 end
 

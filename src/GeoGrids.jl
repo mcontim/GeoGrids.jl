@@ -5,7 +5,7 @@ using Clipper
 using CoordRefSystems
 using CoordRefSystems: Deg
 using CountriesBorders
-using CountriesBorders.GeoTablesConversion: LATLON, CART, POLY_LATLON, POLY_CART, MULTI_LATLON, MULTI_CART, cartesian_geometry
+using CountriesBorders.GeoTablesConversion: LATLON, CART, POLY_LATLON, POLY_CART, MULTI_LATLON, MULTI_CART
 using Dictionaries
 using LinearAlgebra
 using Meshes

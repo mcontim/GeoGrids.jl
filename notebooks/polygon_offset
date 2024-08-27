@@ -236,7 +236,7 @@ reg=GeoRegion(; admin="Italy;Spain")
 rings(reg.convexhull)
 
 # ╔═╡ d14513d2-164a-43e7-aada-36e5f21bb6d0
-change_geometry(Multi([reg.convexhull]))
+cartesian_geometry(Multi([reg.convexhull]))
 
 # ╔═╡ d13cd812-29e8-457c-86fc-8e074771b8ed
 parent(Multi([reg.convexhull]))
