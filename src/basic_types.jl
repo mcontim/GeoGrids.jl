@@ -10,6 +10,44 @@ const constants = (
 )
 
 ## Define Region Types
+"""
+    PolyBorder{T} <: Geometry{🌐,LATLON{T}}
+
+Struct representing a PolyArea in both LatLon and Cartesian coordinates.
+
+Fields:
+- `latlon::POLY_LATLON{T}`: The borders in LatLon CRS
+- `cart::POLY_CART{T}`: The borders in Cartesian2D CRS
+"""
+struct PolyBorder{T} <: Geometry{🌐,LATLON{T}}
+    latlon::POLY_LATLON{T}
+    cart::POLY_CART{T}
+
+    function PolyBorder(latlon::POLY_LATLON{T}) where {T}
+        cart = cartesian_geometry(latlon)
+        new{T}(latlon, cart)
+    end
+end
+
+"""
+    MultiBorder{T} <: Geometry{🌐,LATLON{T}}
+
+Struct representing a Multi in both LatLon and Cartesian coordinates.
+
+Fields:
+- `latlon::MULTI_LATLON{T}`: The borders in LatLon CRS
+- `cart::MULTI_CART{T}`: The borders in Cartesian2D CRS
+"""
+struct MultiBorder{T} <: Geometry{🌐,LATLON{T}}
+    latlon::MULTI_LATLON{T}
+    cart::MULTI_CART{T}
+
+    function MultiBorder(latlon::MULTI_LATLON{T}) where {T}
+        cart = cartesian_geometry(latlon)
+        new{T}(latlon, cart)
+    end
+end
+
 abstract type AbstractRegion end
 
 """
@@ -17,6 +55,7 @@ abstract type AbstractRegion end
 
 Type representing a global region.
 """
+
 struct GlobalRegion <: AbstractRegion end
 
 """
@@ -51,26 +90,7 @@ function GeoRegion(; name="region_name", continent="", subregion="", admin="")
     GeoRegion(name, continent, subregion, admin, d, ch)
 end
 
-"""
-    PolyBorder{T} <: Geometry{🌐,LATLON{T}}
 
-Struct representing a polygon border in both LatLon and Cartesian coordinates.
-
-Fields:
-- `latlon::POLY_LATLON{T}`: The borders in LatLon CRS
-- `cart::POLY_CART{T}`: The borders in Cartesian2D CRS
-"""
-struct PolyBorder{T} <: Geometry{🌐,LATLON{T}}
-    "The borders in LatLon CRS"
-    latlon::POLY_LATLON{T}
-    "The borders in Cartesian2D CRS"
-    cart::POLY_CART{T}
-
-    function PolyBorder(latlon::POLY_LATLON{T}) where {T}
-        cart = cartesian_geometry(latlon)
-        new{T}(latlon, cart)
-    end
-end
 
 """
     PolyRegion{T} <: AbstractRegion

@@ -91,3 +91,46 @@ function _add_angular_offset(inputθϕ, offsetθϕ)
 
     return (θ=θ, ϕ=ϕ) # [deg] ALBERTO: ?? Is it deg though? as the acos and atan return values in radians
 end
+
+"""
+    change_geometry(poly::PolyArea{🌐,<:LATLON})
+    change_geometry(multi::Multi{🌐,<:LATLON})
+
+Convert geometries from LatLon to Cartesian coordinate systems.
+
+## Arguments
+- `poly::PolyArea{🌐,<:LATLON}`: A polygon in LatLon coordinates.
+- `multi::Multi{🌐,<:LATLON}`: A multi-geometry in LatLon coordinates.
+
+## Returns
+- `PolyArea` or `Multi`: The converted geometry in Cartesian coordinate system.
+"""
+function change_geometry(poly::PolyArea{🌐,<:LATLON})
+    map(rings(poly)) do r
+        map(Meshes.flat, vertices(r)) |> Ring
+    end |> splat(PolyArea)
+end
+change_geometry(multi::Multi{🌐,<:LATLON}) = map(cartesian_geometry, parent(multi)) |> Multi
+
+"""
+    change_geometry(poly::PolyArea{𝔼{2},<:CART})
+    change_geometry(multi::Multi{𝔼{2},<:CART})
+
+Convert geometries from Cartesian to LatLon coordinate systems.
+
+## Arguments
+- `poly::PolyArea{𝔼{2},<:CART}`: A polygon in Cartesian coordinates.
+- `multi::Multi{𝔼{2},<:CART}`: A multi-geometry in Cartesian coordinates.
+
+## Returns
+- `PolyArea` or `Multi`: The converted geometry in LatLon coordinate system.
+"""
+function change_geometry(poly::PolyArea{𝔼{2},<:CART})
+    map(rings(poly)) do r
+        map(vertices(r)) do v
+            LatLon{WGS84Latest}(coords(v).y |> ustrip, coords(v).x |> ustrip) |> Point
+        end |> Ring
+    end |> splat(PolyArea)
+end
+change_geometry(multi::Multi{𝔼{2},<:CART}) = map(change_geometry, parent(multi)) |> Multi
+

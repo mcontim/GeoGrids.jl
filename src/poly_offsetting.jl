@@ -1,3 +1,4 @@
+
 mutable struct GeoRegionEnlarged{D} <: AbstractRegion
     original::GeoRegion{D}
     name::String
@@ -7,8 +8,8 @@ end
 function GeoRegionEnlarged(delta_km; name="enlarged_region", continent="", subregion="", admin="", refRadius=constants.Re_mean, magnitude=3, precision=7)
     gr = GeoRegion(; name, continent, subregion, admin)
     or = offset_region(gr, delta_km; refRadius, magnitude, precision)
-    ch = convexhull(or)
-
+    # ch = convexhull(or)
+ch = PolyArea[]
     GeoRegionEnlarged(gr, name, or, ch)
 end
 function GeoRegionEnlarged(gr::GeoRegion, delta_km; name="enlarged_region", refRadius=constants.Re_mean, magnitude=3, precision=7)
@@ -30,13 +31,12 @@ function _offset_polygon(poly::PolyArea, delta; magnitude=3, precision=7)
     # We can end up with multiple polygons even when starting from a single
     # PolyArea. So we will return all the polygons for this country as a vector
     # of PolyArea.
-    geoms = PolyArea[]
-    for i in eachindex(offset_polygons)
+    geoms = map(eachindex(offset_polygons)) do i
         ring = map(offset_polygons[i]) do vertex
             lonlat = tofloat(vertex, magnitude, precision)
             LatLon{WGS84Latest}(lonlat[2], lonlat[1]) |> Point
         end
-        push!(geoms, PolyArea(ring))
+        PolyArea(ring)
     end
  
     # Return a vector of PolyArea.
@@ -56,36 +56,26 @@ function offset_region(originalRegion::GeoRegion, delta_km; refRadius=constants.
     intDelta = Float64(IntPoint(delta, delta, magnitude, precision).X) # We use IntPoint to exploit the conversion to IntPoint in Clipping, then we can use either X or Y as delta value.
 
     numCountries = length(originalRegion.domain) # Number of Countries in GeoRegion
-    allGeoms = PolyArea[]
-    for idxCountry in 1:numCountries
+    # allGeoms = PolyArea[]
+    # for idxCountry in 1:numCountries
+    #     # Perform the processing per CountryBorder.
+    #     thisCountryGeoms = originalRegion.domain[idxCountry].latlon.geoms
+    #     for idxGeom in eachindex(thisCountryGeoms)
+    #         # Get the offsetted version of each of the PolyArea composing this Country
+    #         # Perform processing per single PolyArea.
+    #         offsetGeom = _offset_polygon(thisCountryGeoms[idxGeom], intDelta; magnitude, precision)
+    #         append!(allGeoms, offsetGeom)
+    #     end
+    # end
+    allGeoms = map(1:numCountries) do idxCountry
         # Perform the processing per CountryBorder.
         thisCountryGeoms = originalRegion.domain[idxCountry].latlon.geoms
-        for idxGeom in eachindex(thisCountryGeoms)
+        map(eachindex(thisCountryGeoms)) do idxGeom
             # Get the offsetted version of each of the PolyArea composing this Country
             # Perform processing per single PolyArea.
-            offsetGeom = _offset_polygon(thisCountryGeoms[idxGeom], intDelta; magnitude, precision)
-            append!(allGeoms, offsetGeom)
-        end
-    end
+            _offset_polygon(thisCountryGeoms[idxGeom], intDelta; magnitude, precision)
+        end |> splat(vcat)
+    end |> splat(vcat)
 
-    return Multi(allGeoms)
+    return Multi(map(identity,allGeoms))
 end
-
-# //NOTE: NExt Step: 
-# [x] Use Clipping.jl for offsetting the polygon
-# [x] Starting from the example notebook `polygon_offset.jl`, understand the relation between the value δ and the increase/decrease in polygon area
-# [] Test the package with CountriesBorders to see if it works with those domains
-# [] Map the value of δ to a Lat-Lon quantity for enlargement/decrease in area
-# [] Write an interface function between CountriesBorders/Meshes and Clipping.jl
-
-# [] Investigate alternative packages for polygon offsetting:
-#    - GeometryBasics.jl: Provides basic geometric types and operations
-#    - Meshes.jl: Offers advanced mesh processing capabilities
-#    - LazySets.jl: Includes polygon operations and may support offsetting
-#    - Clipper.jl: A Julia wrapper for the Clipper library, which supports polygon offsetting
-# [] Compare the features and performance of these packages with Clipping.jl
-# [] Choose the most suitable package for our polygon offsetting needs
-
-
-
-
