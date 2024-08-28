@@ -35,6 +35,33 @@ md"""
 # Tests with GeoGrids
 """
 
+# ╔═╡ 57f2c12d-66d9-443a-9fe0-83f8504d765c
+const defaultLayoutGeo = (;
+    geo=attr(
+        projection=attr(
+            type="robinson",
+        ),
+        showocean=true,
+        # oceancolor =  "rgb(0, 255, 255)",
+        oceancolor="rgb(255, 255, 255)",
+        showland=true,
+        # landcolor =  "rgb(230, 145, 56)",
+        landcolor="rgb(217, 217, 217)",
+        showlakes=true,
+        # lakecolor =  "rgb(0, 255, 255)",
+        lakecolor="rgb(255, 255, 255)",
+        showcountries=true,
+        lonaxis=attr(
+            showgrid=true,
+            gridcolor="rgb(102, 102, 102)"
+        ),
+        lataxis=attr(
+            showgrid=true,
+            gridcolor="rgb(102, 102, 102)"
+        )
+    )
+)
+
 # ╔═╡ ac48f00e-a7af-4558-b2ed-c0752f3c9cd3
 map(1:2) do i
 	map(1:2) do j
@@ -42,33 +69,7 @@ map(1:2) do i
 	end |> splat(vcat)
 end |> splat(vcat)
 
-# ╔═╡ 7365e5ac-3a12-4b55-b356-47da19f14555
-# ╠═╡ disabled = true
-#=╠═╡
-r = GeoRegion(; admin="Italy;Spain;France")
-  ╠═╡ =#
-
-# ╔═╡ eb7ea8be-0475-474a-89e7-f8249edbcd63
-#=╠═╡
- zio = offset_region(r,10)
-  ╠═╡ =#
-
-# ╔═╡ 32a6262d-f535-4fd9-b3f4-cf29583cb180
-#=╠═╡
-convexhull(zio)
-  ╠═╡ =#
-
-# ╔═╡ 2e51773a-06e3-4f0a-b409-28f93846803c
-#=╠═╡
-cb=let
-	country = r.domain[1]
-	resolution = CountriesBorders.resolution(country)
-	(; admin, latlon, resolution, table_idx, valid_polyareas) = country
-	CountryBorder(admin, latlon, valid_polyareas;  resolution, table_idx)
-end
-  ╠═╡ =#
-
-# ╔═╡ e57cb982-684f-4b63-a04a-f3f53c29857d
+# ╔═╡ 8abc20ea-0928-4393-8195-f67c58e45015
 
 
 # ╔═╡ 2745410e-d76d-426f-8316-fb4b269d013a
@@ -229,8 +230,40 @@ end
 # ╔═╡ 5d94f474-78fa-46ad-a337-dead795484db
 tofloat(IntPoint(2.0,1.0,3,6),3,6)[1]
 
+# ╔═╡ 7365e5ac-3a12-4b55-b356-47da19f14555
+r = GeoRegion(; admin="Italy")
+# r = GeoRegion(; continent="Europe")
+
+# ╔═╡ eb7ea8be-0475-474a-89e7-f8249edbcd63
+plot_geo_poly(r.convexhull.latlon; kwargs_scatter=(;mode="lines"), camera=:threedim)
+
+# ╔═╡ f52aa40f-e283-4804-8abe-ce3bbb9b47ea
+pp=icogrid(sepAng=3)
+
+# ╔═╡ 8722c85a-60f6-450f-a044-60416ec35f4a
+plot_geo_points(pp)
+
+# ╔═╡ 0e26896b-b8d5-4b6f-8fa5-92185056587d
+scattergeo(;
+        lat=map(x -> GeoGrids.get_lat(x), vertices(r.convexhull.latlon)), # Vectorize such to be sure to avoid matrices.
+        lon=map(x -> GeoGrids.get_lon(x), vertices(r.convexhull.latlon)), # Vectorize such to be sure to avoid matrices.
+        # defaultScatterPoints...,
+        # kwargs...
+    )
+
+# ╔═╡ 2e51773a-06e3-4f0a-b409-28f93846803c
+cb=let
+	country = r.domain[1]
+	resolution = CountriesBorders.resolution(country)
+	(; admin, latlon, resolution, table_idx, valid_polyareas) = country
+	CountryBorder(admin, latlon, valid_polyareas;  resolution, table_idx)
+end
+
 # ╔═╡ b0991e3d-3452-4df0-989b-1b8dd7d7db0e
-ereg = GeoRegionEnlarged(10.0; admin="Italy;Spain")
+ereg = GeoRegionEnlarged(-10.0; admin="Spain")
+
+# ╔═╡ f75960d6-13bc-4398-967d-fda3e57302f0
+plot_geo_poly(ereg.domain.latlon.geoms[1])
 
 # ╔═╡ 86d1c573-c834-49b0-9b5d-e71e0175da98
 convexhull(ereg.domain.cart)
@@ -725,15 +758,19 @@ version = "17.4.0+2"
 # ╠═51ad65d7-49a5-4144-bbce-f9fe9fdf31d3
 # ╠═5d94f474-78fa-46ad-a337-dead795484db
 # ╟─c432437c-2c21-4e92-b664-cb253ad77892
+# ╠═57f2c12d-66d9-443a-9fe0-83f8504d765c
 # ╠═ac48f00e-a7af-4558-b2ed-c0752f3c9cd3
 # ╠═7365e5ac-3a12-4b55-b356-47da19f14555
 # ╠═eb7ea8be-0475-474a-89e7-f8249edbcd63
-# ╠═32a6262d-f535-4fd9-b3f4-cf29583cb180
+# ╠═f52aa40f-e283-4804-8abe-ce3bbb9b47ea
+# ╠═8722c85a-60f6-450f-a044-60416ec35f4a
+# ╠═0e26896b-b8d5-4b6f-8fa5-92185056587d
 # ╠═2e51773a-06e3-4f0a-b409-28f93846803c
 # ╠═b0991e3d-3452-4df0-989b-1b8dd7d7db0e
+# ╠═f75960d6-13bc-4398-967d-fda3e57302f0
+# ╠═8abc20ea-0928-4393-8195-f67c58e45015
 # ╠═86d1c573-c834-49b0-9b5d-e71e0175da98
 # ╠═f4798806-0377-4c17-a1ae-e32a12d5843e
-# ╠═e57cb982-684f-4b63-a04a-f3f53c29857d
 # ╠═0bc85da5-d08d-4659-9a90-573eb13f9b74
 # ╠═d13cd812-29e8-457c-86fc-8e074771b8ed
 # ╠═b2d4a333-5e49-4a14-891e-681098745b03

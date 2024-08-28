@@ -3,7 +3,7 @@ module PlotlyBaseExt
 using PlotlyExtensionsHelper
 using PlotlyBase
 using Unitful: ustrip
-using Meshes: Ngon, 🌐, WGS84Latest
+using Meshes: vertices, Ngon, 🌐, WGS84Latest
 
 using GeoGrids
 
@@ -264,6 +264,20 @@ function GeoGrids.plot_geo_cells(cellCenters::AbstractVector{<:Union{LatLon,Poin
     plotly_plot([scatterContours, scatterCenters], layout)
 end
 GeoGrids.plot_geo_cells(cellCenter::Union{LatLon,Point{🌐,<:LatLon{WGS84Latest}}}, cellContour::AbstractVector{<:Union{LatLon,Point{🌐,<:LatLon{WGS84Latest}}}}; kwargs...) = GeoGrids.plot_geo_cells([cellCenter], [cellContour]; kwargs...)
+
+
+
+
+function GeoGrids.plot_geo_poly(poly::PolyArea; title="Polygon GEO Map", camera::Symbol=:twodim, kwargs_scatter=(;), kwargs_layout=(;))
+    # Extract the vertices of the polygon
+    v = vertices(poly)
+    k = (; mode="lines", line_color="red", kwargs_scatter...)
+    GeoGrids.plot_geo_points(v; title, camera, kwargs_scatter=k, kwargs_layout)
+end
+
+
+
+
 
 """
     plot_unitarysphere(points_cart)

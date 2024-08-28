@@ -1,5 +1,5 @@
 ### A Pluto.jl notebook ###
-# v0.19.45
+# v0.19.46
 
 using Markdown
 using InteractiveUtils
@@ -30,70 +30,6 @@ ExtendedTableOfContents()
 md"""
 # New Tests
 """
-
-# ╔═╡ 3ce21344-e0ea-4e41-b78e-cf92dc9ac2e7
-md"""
-# Definitions
-"""
-
-# ╔═╡ 222fb774-1693-4b3c-b2ef-5fd38eca773c
-md"""
-# HEX Tessellation
-"""
-
-# ╔═╡ ca4efc79-7cf3-46de-b03e-643c29254818
-md"""
-## GeoRegion
-"""
-
-# ╔═╡ b12ae026-8fbb-4687-98df-f7a2fe9672b6
-md"""
-## PolyRegion
-"""
-
-# ╔═╡ 8f4f76bb-261f-412e-8b5f-005c0f469204
-md"""
-# ICO Tesselation
-"""
-
-# ╔═╡ 0c539be0-ebed-4f8f-bbd8-7efd206d1bac
-md"""
-## GlobalRegion
-"""
-
-# ╔═╡ 51c10eff-64a3-4883-a426-178edd3ec90e
-md"""
-## LatBeltRegion
-"""
-
-# ╔═╡ 62c46d72-8698-4e06-85a0-f2a5040a0c48
-val=3/2
-
-# ╔═╡ 23ce7f6e-4629-453b-9b7d-783a4620df7e
-md"""
-## PolyRegion
-"""
-
-# ╔═╡ e6860038-91c3-4fd9-b39e-4622963fa7a0
-md"""
-## GeoRegion
-"""
-
-# ╔═╡ d272905a-dfd4-4ade-88bd-ca10abf86f77
-md"""
-# Additional Functions
-"""
-
-# ╔═╡ b94c71b6-0601-4a4c-ac92-417f0c372334
-md"""
-# Packages
-"""
-
-# ╔═╡ bf20cace-b64b-4155-90c1-1ec3644510d7
-@fromparent begin
-	import ^: * # to eport all functions from parent package
-	import >.CoordRefSystems
-end
 
 # ╔═╡ 31202468-8ba1-4d04-b630-1fcdd4bab97b
 begin
@@ -135,6 +71,12 @@ function plot_two_polyareas(poly1::PolyArea, poly2::PolyArea;
     plot(Plot([trace1, trace2], layout))
 end
 
+# ╔═╡ 800e216c-5122-4198-b980-4288c951b116
+vertices(poly)
+
+# ╔═╡ 26ccaacf-de9e-47f2-8040-9c192985b77d
+vertices(poly2)
+
 # ╔═╡ c82aa8c1-7d6b-4f52-a0c5-4616c48b9e70
 let
 	original = poly
@@ -142,11 +84,10 @@ let
 	plot_two_polyareas(original, enlarged, name1="Original", name2="Enlarged")
 end
 
-# ╔═╡ 800e216c-5122-4198-b980-4288c951b116
-vertices(poly)
-
-# ╔═╡ 26ccaacf-de9e-47f2-8040-9c192985b77d
-vertices(poly2)
+# ╔═╡ 3ce21344-e0ea-4e41-b78e-cf92dc9ac2e7
+md"""
+# Definitions
+"""
 
 # ╔═╡ a34e4ff6-51f9-4d6b-af28-5e856adea1ed
 begin
@@ -186,6 +127,16 @@ Point[]
     sample_in_ita = [LatLon(43.727878°, 12.843441°), LatLon(43.714933°, 10.399326°), LatLon(37.485829°, 14.328285°), LatLon(39.330460°, 8.430780°), LatLon(45.918388°, 10.886654°)]
 
 
+# ╔═╡ 222fb774-1693-4b3c-b2ef-5fd38eca773c
+md"""
+# HEX Tessellation
+"""
+
+# ╔═╡ ca4efc79-7cf3-46de-b03e-643c29254818
+md"""
+## GeoRegion
+"""
+
 # ╔═╡ e0b2c99d-c689-48fb-91d5-6a3b4ee4d044
 let 
 	reg = GeoRegion(; name="Tassellation", admin="Spain")
@@ -199,6 +150,11 @@ let
 	centers, ngon = generate_tesselation(reg, 40000, HEX(;pattern=:circ), EO())
 	plot_geo_cells(centers, ngon)
 end
+
+# ╔═╡ b12ae026-8fbb-4687-98df-f7a2fe9672b6
+md"""
+## PolyRegion
+"""
 
 # ╔═╡ f6c86dbf-a076-4905-8b34-d0587f153e3c
 let 
@@ -214,12 +170,30 @@ let
 	plot_geo_cells(centers, ngon)
 end
 
+# ╔═╡ 8f4f76bb-261f-412e-8b5f-005c0f469204
+md"""
+# ICO Tesselation
+"""
+
+# ╔═╡ 0c539be0-ebed-4f8f-bbd8-7efd206d1bac
+md"""
+## GlobalRegion
+"""
+
 # ╔═╡ efe29293-38f2-49c1-a426-25cdbe0d78c3
 let 
 	reg = GlobalRegion()
 	centers,ngon = generate_tesselation(reg, 1000000, ICO(;pattern=:hex), EO())
 	plot_geo_cells(centers,ngon)
 end
+
+# ╔═╡ 51c10eff-64a3-4883-a426-178edd3ec90e
+md"""
+## LatBeltRegion
+"""
+
+# ╔═╡ 62c46d72-8698-4e06-85a0-f2a5040a0c48
+val=3/2
 
 # ╔═╡ 3d6cfaea-c17e-4008-a0f8-ba262b1e7408
 let 
@@ -235,6 +209,11 @@ let
 	plot_geo_cells(centers,ngon)	
 end
 
+# ╔═╡ 23ce7f6e-4629-453b-9b7d-783a4620df7e
+md"""
+## PolyRegion
+"""
+
 # ╔═╡ f55e4340-0cb6-4fc5-9685-ccbbc3fedd15
 let 
 	reg = polyReg	
@@ -242,12 +221,22 @@ let
 	plot_geo_cells(centers,ngon)
 end
 
+# ╔═╡ e6860038-91c3-4fd9-b39e-4622963fa7a0
+md"""
+## GeoRegion
+"""
+
 # ╔═╡ c0cbcd3e-183d-425a-a534-06b2d52f1819
 let 
 	reg = GeoRegion(; name="Tassellation", admin="Spain")
 	centers, ngon = generate_tesselation(reg, 40000, ICO(), EO())
 	plot_geo_cells(centers,ngon)
 end
+
+# ╔═╡ d272905a-dfd4-4ade-88bd-ca10abf86f77
+md"""
+# Additional Functions
+"""
 
 # ╔═╡ d12aece5-8625-4667-9f65-6588f63849c4
 function pattern_distance(pattern)
@@ -349,37 +338,42 @@ let
 	testcenters(centers)
 end
 
-# ╔═╡ d9c8e6e6-ace3-41dd-a58c-3f768f7ed6c2
+# ╔═╡ 42d4f2ee-1ba1-45f5-a7a2-58ea31bf1493
 """
-    line_intersection(p1::Point, p2::Point, p3::Point, p4::Point) -> Point
+    offset_polyarea(poly::PolyArea, offset::Real, direction::Symbol=:outward) -> PolyArea
 
-Calculate the intersection point of two lines defined by two points each.
+Offset a PolyArea by a given amount in the specified direction.
 
 # Arguments
-- `p1::Point`, `p2::Point`: Two points defining the first line.
-- `p3::Point`, `p4::Point`: Two points defining the second line.
+- `poly::PolyArea`: The input polygon to be offset.
+- `offset::Real`: The distance by which to offset the polygon.
+- `direction::Symbol`: The direction of the offset, either `:outward` (default) or `:inward`.
 
 # Returns
-- `Point`: The intersection point of the two lines.
+- `PolyArea`: A new PolyArea that is the result of offsetting the input polygon.
+
+# Note
+This function attempts to preserve the shape of the original polygon as much as possible.
+For complex polygons or large offsets, some simplification may occur.
 """
-function line_intersection(p1::Point, p2::Point, p3::Point, p4::Point)
-    x1, y1 = p1.x, p1.y
-    x2, y2 = p2.x, p2.y
-    x3, y3 = p3.x, p3.y
-    x4, y4 = p4.x, p4.y
+function offset_polyarea(poly::PolyArea, offset::Real, direction::Symbol=:outward)
+    # Ensure the direction is valid
+    direction in [:outward, :inward] || throw(ArgumentError("Direction must be either :outward or :inward"))
     
-    den = (x1 - x2) * (y3 - y4) - (y1 - y2) * (x3 - x4)
-    if den == 0
-        # Lines are parallel, return midpoint
-        return Point((x1 + x2 + x3 + x4) / 4, (y1 + y2 + y3 + y4) / 4)
-    end
+    # Convert PolyArea to a polygon
+    polygon = Polygon(poly)
     
-    t = ((x1 - x3) * (y3 - y4) - (y1 - y3) * (x3 - x4)) / den
+    # Determine the sign of the offset based on the direction
+    offset_sign = direction == :outward ? 1 : -1
     
-    x = x1 + t * (x2 - x1)
-    y = y1 + t * (y2 - y1)
+    # Get the boundary of the polygon
+    boundary = GeoInterface.coordinates(polygon)[1]
     
-    Point(x, y)
+    # Offset each edge of the polygon
+    offsetted_points = offset_polygon_edges(boundary, offset * offset_sign)
+    
+    # Create a new PolyArea from the offsetted points
+    PolyArea([Point(p) for p in offsetted_points])
 end
 
 # ╔═╡ 8f72b4d2-d32d-46d6-a935-97882c583f91
@@ -425,42 +419,37 @@ function offset_polygon_edges(points::Vector{<:Point}, offset::Real)
     offsetted_points
 end
 
-# ╔═╡ 42d4f2ee-1ba1-45f5-a7a2-58ea31bf1493
+# ╔═╡ d9c8e6e6-ace3-41dd-a58c-3f768f7ed6c2
 """
-    offset_polyarea(poly::PolyArea, offset::Real, direction::Symbol=:outward) -> PolyArea
+    line_intersection(p1::Point, p2::Point, p3::Point, p4::Point) -> Point
 
-Offset a PolyArea by a given amount in the specified direction.
+Calculate the intersection point of two lines defined by two points each.
 
 # Arguments
-- `poly::PolyArea`: The input polygon to be offset.
-- `offset::Real`: The distance by which to offset the polygon.
-- `direction::Symbol`: The direction of the offset, either `:outward` (default) or `:inward`.
+- `p1::Point`, `p2::Point`: Two points defining the first line.
+- `p3::Point`, `p4::Point`: Two points defining the second line.
 
 # Returns
-- `PolyArea`: A new PolyArea that is the result of offsetting the input polygon.
-
-# Note
-This function attempts to preserve the shape of the original polygon as much as possible.
-For complex polygons or large offsets, some simplification may occur.
+- `Point`: The intersection point of the two lines.
 """
-function offset_polyarea(poly::PolyArea, offset::Real, direction::Symbol=:outward)
-    # Ensure the direction is valid
-    direction in [:outward, :inward] || throw(ArgumentError("Direction must be either :outward or :inward"))
+function line_intersection(p1::Point, p2::Point, p3::Point, p4::Point)
+    x1, y1 = p1.x, p1.y
+    x2, y2 = p2.x, p2.y
+    x3, y3 = p3.x, p3.y
+    x4, y4 = p4.x, p4.y
     
-    # Convert PolyArea to a polygon
-    polygon = Polygon(poly)
+    den = (x1 - x2) * (y3 - y4) - (y1 - y2) * (x3 - x4)
+    if den == 0
+        # Lines are parallel, return midpoint
+        return Point((x1 + x2 + x3 + x4) / 4, (y1 + y2 + y3 + y4) / 4)
+    end
     
-    # Determine the sign of the offset based on the direction
-    offset_sign = direction == :outward ? 1 : -1
+    t = ((x1 - x3) * (y3 - y4) - (y1 - y3) * (x3 - x4)) / den
     
-    # Get the boundary of the polygon
-    boundary = GeoInterface.coordinates(polygon)[1]
+    x = x1 + t * (x2 - x1)
+    y = y1 + t * (y2 - y1)
     
-    # Offset each edge of the polygon
-    offsetted_points = offset_polygon_edges(boundary, offset * offset_sign)
-    
-    # Create a new PolyArea from the offsetted points
-    PolyArea([Point(p) for p in offsetted_points])
+    Point(x, y)
 end
 
 # ╔═╡ 791e2437-51c4-4145-99db-a456566d6f3a
@@ -524,6 +513,17 @@ let
 
     # Plot the original and enlarged polygons
     plot_offset_comparison(original, enlarged)
+end
+
+# ╔═╡ b94c71b6-0601-4a4c-ac92-417f0c372334
+md"""
+# Packages
+"""
+
+# ╔═╡ bf20cace-b64b-4155-90c1-1ec3644510d7
+@fromparent begin
+	import ^: * # to eport all functions from parent package
+	import >.CoordRefSystems
 end
 
 # ╔═╡ 00000000-0000-0000-0000-000000000001
