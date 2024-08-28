@@ -3,7 +3,7 @@ module PlotlyBaseExt
 using PlotlyExtensionsHelper
 using PlotlyBase
 using Unitful: ustrip
-using Meshes: vertices, Ngon, 🌐, WGS84Latest
+using Meshes: vertices, Multi, Ngon, 🌐, WGS84Latest
 
 using GeoGrids
 
@@ -125,6 +125,37 @@ function _get_scatter_cellcontour(polygons::AbstractVector{<:AbstractVector{<:Un
         lat=map(x -> first(x), polygonsTrace),
         lon=map(x -> last(x), polygonsTrace),
         defaultScatterCellContour...,
+        kwargs...
+    )
+end
+
+"""
+    _get_scatter_poly(poly::PolyArea{🌐,<:LatLon{WGS84Latest}}; kwargs...)
+
+This function creates a geographic scatter plot of a polygon's boundary.
+
+## Arguments
+- `poly::PolyArea{🌐,<:LatLon{WGS84Latest}}`: A polygon object representing the \
+area to be plotted.
+
+## Keyword Arguments
+- `kwargs...`: Additional keyword arguments to customize the scatter plot. These \
+are passed directly to the `scattergeo` function.
+
+## Returns
+- A `scattergeo` plot object: The scatter plot visualization of the polygon's \
+boundary, ready for rendering in a geographic plot.
+"""
+function _get_scatter_poly(poly::PolyArea{🌐,<:LatLon{WGS84Latest}}; kwargs...)
+    # scatter line
+    temp = vertices(poly)
+    v = vcat(temp, temp[1])
+    return scattergeo(;
+        lat=map(x -> GeoGrids.get_lat(x), v), # Vectorize such to be sure to avoid matrices.
+        lon=map(x -> GeoGrids.get_lon(x), v), # Vectorize such to be sure to avoid matrices.
+        mode="lines",
+        line_color="red",
+        showlegend=false,
         kwargs...
     )
 end
@@ -265,20 +296,52 @@ function GeoGrids.plot_geo_cells(cellCenters::AbstractVector{<:Union{LatLon,Poin
 end
 GeoGrids.plot_geo_cells(cellCenter::Union{LatLon,Point{🌐,<:LatLon{WGS84Latest}}}, cellContour::AbstractVector{<:Union{LatLon,Point{🌐,<:LatLon{WGS84Latest}}}}; kwargs...) = GeoGrids.plot_geo_cells([cellCenter], [cellContour]; kwargs...)
 
+"""
+    plot_geo_poly(polys::AbstractVector{<:PolyArea{🌐,<:LatLon{WGS84Latest}}}; title="Polygon GEO Map", camera::Symbol=:twodim, kwargs_scatter=(;), kwargs_layout=(;))
+    plot_geo_poly(poly::PolyArea{🌐,<:LatLon{WGS84Latest}}; kwargs...)
+    plot_geo_poly(multi::Multi{🌐,<:LatLon{WGS84Latest}}; kwargs...)
+    plot_geo_poly(b::Union{<:GeoGrids.PolyBorder, <:GeoGrids.MultiBorder}; kwargs...)
 
+Plot geographical polygons on a map.
 
+## Arguments
+- `polys::AbstractVector{<:PolyArea{🌐,<:LatLon{WGS84Latest}}}`: A vector of \
+polygon areas to be plotted.
+- `poly::PolyArea{🌐,<:LatLon{WGS84Latest}}`: A single polygon area to be \
+plotted.
+- `multi::Multi{🌐,<:LatLon{WGS84Latest}}`: A multi-polygon object to be \
+plotted.
+- `b::Union{<:GeoGrids.PolyBorder, <:GeoGrids.MultiBorder}`: A polygon border or \
+multi-border object to be plotted.
 
-function GeoGrids.plot_geo_poly(poly::PolyArea; title="Polygon GEO Map", camera::Symbol=:twodim, kwargs_scatter=(;), kwargs_layout=(;))
+- `title::String`: Title of the plot. Default is `"Polygon GEO Map"`.
+- `camera::Symbol`: Camera view for the plot. Default is `:twodim`.
+- `kwargs_scatter::NamedTuple`: Additional options for customizing the \
+appearance of the polygons.
+- `kwargs_layout::NamedTuple`: Additional options for customizing the overall \
+layout of the plot.
+- `kwargs...`: Additional keyword arguments forwarded to the underlying plotting \
+functions.
+
+## Return Value
+- Returns a plot object displaying the specified geographical polygons on a map.
+
+See also: [`_get_scatter_poly`](@ref), [`_default_geolayout`](@ref),
+[`plot_geo_cells`](@ref)
+"""
+function GeoGrids.plot_geo_poly(polys::AbstractVector{<:PolyArea{🌐,<:LatLon{WGS84Latest}}}; title="Polygon GEO Map", camera::Symbol=:twodim, kwargs_scatter=(;), kwargs_layout=(;))
     # Extract the vertices of the polygon
-    v = vertices(poly)
-    k = (; mode="lines", line_color="red", kwargs_scatter...)
-    GeoGrids.plot_geo_points(v; title, camera, kwargs_scatter=k, kwargs_layout)
+    scattersPoly = map(x -> _get_scatter_poly(x; kwargs_scatter...), polys)
+
+    layout = _default_geolayout(; title, camera, kwargs_layout...)
+
+    plotly_plot([scattersPoly...], layout)
 end
+GeoGrids.plot_geo_poly(poly::PolyArea{🌐,<:LatLon{WGS84Latest}}; kwargs...) = GeoGrids.plot_geo_poly([poly]; kwargs...)
+GeoGrids.plot_geo_poly(multi::Multi{🌐,<:LatLon{WGS84Latest}}; kwargs...) = GeoGrids.plot_geo_poly(multi.geoms; kwargs...)
+GeoGrids.plot_geo_poly(b::Union{<:GeoGrids.PolyBorder,<:GeoGrids.MultiBorder}; kwargs...) = GeoGrids.plot_geo_poly(b.latlon; kwargs...)
 
-
-
-
-
+## Additional Functions
 """
     plot_unitarysphere(points_cart)
 

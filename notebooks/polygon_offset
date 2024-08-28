@@ -69,9 +69,6 @@ map(1:2) do i
 	end |> splat(vcat)
 end |> splat(vcat)
 
-# ╔═╡ 8abc20ea-0928-4393-8195-f67c58e45015
-
-
 # ╔═╡ 2745410e-d76d-426f-8316-fb4b269d013a
 md"""
 # Additional Functions
@@ -234,6 +231,9 @@ tofloat(IntPoint(2.0,1.0,3,6),3,6)[1]
 r = GeoRegion(; admin="Italy")
 # r = GeoRegion(; continent="Europe")
 
+# ╔═╡ d3ea32e7-5247-4636-b5eb-ea58655be334
+r
+
 # ╔═╡ eb7ea8be-0475-474a-89e7-f8249edbcd63
 plot_geo_poly(r.convexhull.latlon; kwargs_scatter=(;mode="lines"), camera=:threedim)
 
@@ -260,10 +260,22 @@ cb=let
 end
 
 # ╔═╡ b0991e3d-3452-4df0-989b-1b8dd7d7db0e
-ereg = GeoRegionEnlarged(10e3; admin="Spain")
+ereg = GeoRegionEnlarged(10e3; admin="Spain; Italy")
+
+# ╔═╡ c70c01d3-3b9c-4c0e-ac98-9124843a44f9
+ereg.domain.latlon.geoms
+
+# ╔═╡ d2f52430-ccc5-4438-9cf6-cb329580f1e7
+typeof(ereg.domain.latlon.geoms[1])
 
 # ╔═╡ f75960d6-13bc-4398-967d-fda3e57302f0
-plot_geo_poly(ereg.domain.latlon.geoms[1])
+plot_geo_poly(ereg.domain)
+
+# ╔═╡ d2692782-a591-433b-bca5-1743ca4f5d9e
+methods(plot_geo_poly)
+
+# ╔═╡ b047b786-e7de-45b1-972f-668754358817
+ereg.domain.latlon.geoms[1] isa PolyArea{🌐,<:LatLon{WGS84Latest}}
 
 # ╔═╡ 86d1c573-c834-49b0-9b5d-e71e0175da98
 convexhull(ereg.domain.cart)
@@ -767,8 +779,12 @@ version = "17.4.0+2"
 # ╠═0e26896b-b8d5-4b6f-8fa5-92185056587d
 # ╠═2e51773a-06e3-4f0a-b409-28f93846803c
 # ╠═b0991e3d-3452-4df0-989b-1b8dd7d7db0e
+# ╠═d3ea32e7-5247-4636-b5eb-ea58655be334
+# ╠═c70c01d3-3b9c-4c0e-ac98-9124843a44f9
 # ╠═f75960d6-13bc-4398-967d-fda3e57302f0
-# ╠═8abc20ea-0928-4393-8195-f67c58e45015
+# ╠═d2692782-a591-433b-bca5-1743ca4f5d9e
+# ╠═d2f52430-ccc5-4438-9cf6-cb329580f1e7
+# ╠═b047b786-e7de-45b1-972f-668754358817
 # ╠═86d1c573-c834-49b0-9b5d-e71e0175da98
 # ╠═f4798806-0377-4c17-a1ae-e32a12d5843e
 # ╠═0bc85da5-d08d-4659-9a90-573eb13f9b74
