@@ -5,13 +5,13 @@ mutable struct GeoRegionEnlarged{D} <: AbstractRegion
     domain::MultiBorder
     convexhull::PolyBorder
 end
-function GeoRegionEnlarged(delta_km; name="enlarged_region", continent="", subregion="", admin="", refRadius=constants.Re_mean, magnitude=3, precision=7)
+function GeoRegionEnlarged(deltaDist; name="enlarged_region", continent="", subregion="", admin="", refRadius=constants.Re_mean, magnitude=3, precision=7)
     gr = GeoRegion(; name, continent, subregion, admin)
 
-    GeoRegionEnlarged(gr, delta_km; name, refRadius, magnitude, precision)
+    GeoRegionEnlarged(gr, deltaDist; name, refRadius, magnitude, precision)
 end
-function GeoRegionEnlarged(gr::GeoRegion, delta_km; name="enlarged_region", refRadius=constants.Re_mean, magnitude=3, precision=7)
-    orLatLon = offset_region(gr, delta_km; refRadius, magnitude, precision)
+function GeoRegionEnlarged(gr::GeoRegion, deltaDist; name="enlarged_region", refRadius=constants.Re_mean, magnitude=3, precision=7)
+    orLatLon = offset_region(gr, deltaDist; refRadius, magnitude, precision)
     orCart = cartesian_geometry(orLatLon)
     or = MultiBorder(orLatLon, orCart)
 
@@ -23,6 +23,7 @@ function GeoRegionEnlarged(gr::GeoRegion, delta_km; name="enlarged_region", refR
 end
 
 function _offset_polygon(poly::PolyArea, delta; magnitude=3, precision=7)
+    # delta translated in deg wrt the Earrth radius
     intPoly = map([vertices(poly)...]) do vertex # Avoid CircularVector as output from map
         y = get_lat(vertex) |> ustrip 
         x = get_lon(vertex) |> ustrip
@@ -46,16 +47,16 @@ function _offset_polygon(poly::PolyArea, delta; magnitude=3, precision=7)
     return geoms
 end
 
-function offset_region(originalRegion::GeoRegion, delta_km; refRadius=constants.Re_mean, magnitude=3, precision=7)
+function offset_region(originalRegion::GeoRegion, deltaDist; refRadius=constants.Re_mean, magnitude=3, precision=7)
     # `magnitude` represents the number of integer digits while `precision` the
     # total number of digits that will be considered for each of the coordinates
     # for the `IntPoint` conversion. Look at Clipper documentation for more
     # details. `delta` is the distance to offset the polygon by, it is a
     # positive value for enlargement or negative number for shrinking. The value
-    # should be expressed in km.
+    # should be expressed in m.
 
-    # Compute the delta value to be used in the offsetting process
-    delta = delta_km / refRadius
+    # Compute the delta value to be used in the offsetting process (in deg)
+    delta = rad2deg(deltaDist / refRadius)
     intDelta = Float64(IntPoint(delta, delta, magnitude, precision).X) # We use IntPoint to exploit the conversion to IntPoint in Clipping, then we can use either X or Y as delta value.
 
     numCountries = length(originalRegion.domain) # Number of Countries in GeoRegion

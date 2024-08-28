@@ -260,7 +260,7 @@ cb=let
 end
 
 # ╔═╡ b0991e3d-3452-4df0-989b-1b8dd7d7db0e
-ereg = GeoRegionEnlarged(-10.0; admin="Spain")
+ereg = GeoRegionEnlarged(10e3; admin="Spain")
 
 # ╔═╡ f75960d6-13bc-4398-967d-fda3e57302f0
 plot_geo_poly(ereg.domain.latlon.geoms[1])
