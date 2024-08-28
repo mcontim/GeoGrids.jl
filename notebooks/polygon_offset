@@ -228,8 +228,8 @@ end
 tofloat(IntPoint(2.0,1.0,3,6),3,6)[1]
 
 # ╔═╡ 7365e5ac-3a12-4b55-b356-47da19f14555
-r = GeoRegion(; admin="Italy")
-# r = GeoRegion(; continent="Europe")
+# r = GeoRegion(; admin="Italy")
+r = GeoRegion(; continent="Europe")
 
 # ╔═╡ d3ea32e7-5247-4636-b5eb-ea58655be334
 r
@@ -238,10 +238,16 @@ r
 plot_geo_poly(r.convexhull.latlon; kwargs_scatter=(;mode="lines"), camera=:threedim)
 
 # ╔═╡ f52aa40f-e283-4804-8abe-ce3bbb9b47ea
-pp=icogrid(sepAng=3)
+pp=icogrid(sepAng=2)
 
 # ╔═╡ 8722c85a-60f6-450f-a044-60416ec35f4a
 plot_geo_points(pp)
+
+# ╔═╡ 80ffa48a-ec3c-46da-b465-827b828d889a
+fp = filter_points_fast(pp, GeoRegion(; continent="Europe", admin="-Russia"))
+
+# ╔═╡ fd4341d7-1ef6-404e-a609-d2ffb711d453
+plot_geo_points(fp)
 
 # ╔═╡ 0e26896b-b8d5-4b6f-8fa5-92185056587d
 scattergeo(;
@@ -776,6 +782,8 @@ version = "17.4.0+2"
 # ╠═eb7ea8be-0475-474a-89e7-f8249edbcd63
 # ╠═f52aa40f-e283-4804-8abe-ce3bbb9b47ea
 # ╠═8722c85a-60f6-450f-a044-60416ec35f4a
+# ╠═80ffa48a-ec3c-46da-b465-827b828d889a
+# ╠═fd4341d7-1ef6-404e-a609-d2ffb711d453
 # ╠═0e26896b-b8d5-4b6f-8fa5-92185056587d
 # ╠═2e51773a-06e3-4f0a-b409-28f93846803c
 # ╠═b0991e3d-3452-4df0-989b-1b8dd7d7db0e

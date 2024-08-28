@@ -83,7 +83,7 @@ function GeoRegion(; name="region_name", continent="", subregion="", admin="")
     nt = (; continent, subregion, admin)
     kwargs = (k => v for (k, v) in pairs(nt) if !isempty(v))
     d = CountriesBorders.extract_countries(; kwargs...)
-    cart = convexhull(d) # Using convexhull() method from CountriesBorders
+    cart = convexhull(d) # Using convexhull() method from CountriesBorders. Convexhull always give a PolyArea.
     latlon = latlon_geometry(cart)
     ch = PolyBorder(latlon, cart)
     GeoRegion(name, continent, subregion, admin, d, ch)
