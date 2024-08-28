@@ -243,8 +243,23 @@ pp=icogrid(sepAng=2)
 # ╔═╡ 8722c85a-60f6-450f-a044-60416ec35f4a
 plot_geo_points(pp)
 
+# ╔═╡ e4cfa264-3a08-47e6-9ac2-c2ead4f4ff2e
+@benchmark filter_points($pp, GeoRegion(; continent="Europe", admin="-Russia"))
+
 # ╔═╡ 80ffa48a-ec3c-46da-b465-827b828d889a
-fp = filter_points_fast(pp, GeoRegion(; continent="Europe", admin="-Russia"))
+@benchmark filter_points_fast($pp, GeoRegion(; continent="Europe", admin="-Russia"))
+
+# ╔═╡ bd7bcd09-2320-4235-8358-9b597747a3e9
+filter_points(pp, GeoRegion(; continent="Europe", admin="-Russia")) == filter_points_fast(pp, GeoRegion(; continent="Europe", admin="-Russia"))
+
+# ╔═╡ 5d1ad162-57e3-4dfd-b90c-8ae06a03a88a
+@benchmark group_by_domain($pp, [GeoRegion(; name="spain", admin="Spain"), GeoRegion(; name="italy", admin="Italy")])
+
+# ╔═╡ cf6d4d21-d6aa-4e55-93df-34ca8c58acf2
+@benchmark group_by_domain_fast($pp, [GeoRegion(; name="spain", admin="Spain"), GeoRegion(; name="italy", admin="Italy")])
+
+# ╔═╡ 3a29cf7a-0e8b-40ec-94fd-63ab9e18e975
+group_by_domain(pp, [GeoRegion(; name="spain", admin="Spain"), GeoRegion(; name="italy", admin="Italy")]) == group_by_domain_fast(pp, [GeoRegion(; name="spain", admin="Spain"), GeoRegion(; name="italy", admin="Italy")])
 
 # ╔═╡ fd4341d7-1ef6-404e-a609-d2ffb711d453
 plot_geo_points(fp)
@@ -782,7 +797,12 @@ version = "17.4.0+2"
 # ╠═eb7ea8be-0475-474a-89e7-f8249edbcd63
 # ╠═f52aa40f-e283-4804-8abe-ce3bbb9b47ea
 # ╠═8722c85a-60f6-450f-a044-60416ec35f4a
+# ╠═e4cfa264-3a08-47e6-9ac2-c2ead4f4ff2e
 # ╠═80ffa48a-ec3c-46da-b465-827b828d889a
+# ╠═bd7bcd09-2320-4235-8358-9b597747a3e9
+# ╠═5d1ad162-57e3-4dfd-b90c-8ae06a03a88a
+# ╠═cf6d4d21-d6aa-4e55-93df-34ca8c58acf2
+# ╠═3a29cf7a-0e8b-40ec-94fd-63ab9e18e975
 # ╠═fd4341d7-1ef6-404e-a609-d2ffb711d453
 # ╠═0e26896b-b8d5-4b6f-8fa5-92185056587d
 # ╠═2e51773a-06e3-4f0a-b409-28f93846803c
