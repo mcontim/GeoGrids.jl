@@ -11,39 +11,39 @@ const constants = (
 
 ## Define Region Types
 """
-    PolyBorder{T} <: Geometry{🌐,LATLON{T}}
+    PolyBorder <: Geometry{🌐,LATLON}
 
 Struct representing a PolyArea in both LatLon and Cartesian coordinates.
 
 Fields:
-- `latlon::POLY_LATLON{T}`: The borders in LatLon CRS
-- `cart::POLY_CART{T}`: The borders in Cartesian2D CRS
+- `latlon::POLY_LATLON`: The borders in LatLon CRS
+- `cart::POLY_CART`: The borders in Cartesian2D CRS
 """
-struct PolyBorder{T} <: Geometry{🌐,LATLON{T}}
-    latlon::POLY_LATLON{T}
-    cart::POLY_CART{T}
+struct PolyBorder <: Geometry{🌐,LATLON}
+    latlon::POLY_LATLON
+    cart::POLY_CART
 end
-function PolyBorder(latlon::POLY_LATLON{T}) where {T}
+function PolyBorder(latlon::POLY_LATLON) 
     cart = cartesian_geometry(latlon)
-    PolyBorder{T}(latlon, cart)
+    PolyBorder(latlon, cart)
 end
 
 """
-    MultiBorder{T} <: Geometry{🌐,LATLON{T}}
+    MultiBorder <: Geometry{🌐,LATLON}
 
 Struct representing a Multi in both LatLon and Cartesian coordinates.
 
 Fields:
-- `latlon::MULTI_LATLON{T}`: The borders in LatLon CRS
-- `cart::MULTI_CART{T}`: The borders in Cartesian2D CRS
+- `latlon::MULTI_LATLON`: The borders in LatLon CRS
+- `cart::MULTI_CART`: The borders in Cartesian2D CRS
 """
-struct MultiBorder{T} <: Geometry{🌐,LATLON{T}}
-    latlon::MULTI_LATLON{T}
-    cart::MULTI_CART{T}
+struct MultiBorder <: Geometry{🌐,LATLON}
+    latlon::MULTI_LATLON
+    cart::MULTI_CART
 end
-function MultiBorder(latlon::MULTI_LATLON{T}) where {T}
+function MultiBorder(latlon::MULTI_LATLON) 
     cart = cartesian_geometry(latlon)
-    MultiBorder{T}(latlon, cart)
+    MultiBorder(latlon, cart)
 end
 
 abstract type AbstractRegion end
@@ -68,13 +68,13 @@ Fields:
 - `domain::D`: Domain of the region
 - `convexhull::PolyArea`: Convex hull of the region
 """
-mutable struct GeoRegion{D,T} <: AbstractRegion
+mutable struct GeoRegion{D} <: AbstractRegion
     name::String
     continent::String
     subregion::String
     admin::String
     domain::D
-    convexhull::PolyBorder{T}
+    convexhull::PolyBorder
 end
 function GeoRegion(; name="region_name", continent="", subregion="", admin="")
     all(isempty(v) for v in (continent, subregion, admin)) && error("Input at least one argument between continent, subregion and admin...")
@@ -89,17 +89,17 @@ function GeoRegion(; name="region_name", continent="", subregion="", admin="")
 end
 
 """
-    PolyRegion{T} <: AbstractRegion
+    PolyRegion <: AbstractRegion
 
 Type representing a polygonal region based on PolyArea.
 
 Fields:
 - `name::String`: Name of the region
-- `domain::PolyBorder{T}`: Domain of the region as a PolyBorder
+- `domain::PolyBorder`: Domain of the region as a PolyBorder
 """
-mutable struct PolyRegion{T} <: AbstractRegion
+mutable struct PolyRegion <: AbstractRegion
     name::String
-    domain::PolyBorder{T}
+    domain::PolyBorder
 end
 PolyRegion(name, domain::Vector{<:LatLon}) = PolyRegion(name, PolyBorder(PolyArea(map(Point, domain))))
 PolyRegion(; name::String="region_name", domain) = PolyRegion(name, domain)
