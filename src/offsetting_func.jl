@@ -36,7 +36,7 @@ function offset_region(originalRegion::GeoRegion, deltaDist; refRadius=constants
         map(eachindex(thisCountryGeoms)) do idxGeom
             # Get the offsetted version of each of the PolyArea composing this Country
             # Perform processing per single PolyArea.
-            _offset_polygon(thisCountryGeoms[idxGeom], intDelta; magnitude, precision)
+            _offset_polyarea(thisCountryGeoms[idxGeom], intDelta; magnitude, precision)
         end |> splat(vcat)
     end |> splat(vcat)
 
@@ -44,7 +44,7 @@ function offset_region(originalRegion::GeoRegion, deltaDist; refRadius=constants
 end
 
 """
-    _offset_polygon(poly::PolyArea, delta; magnitude=3, precision=7)
+    _offset_polyarea(poly::PolyArea, delta; magnitude=3, precision=7)
 
 Offset a polygon by a given delta value. This function uses the Clipper library
 for polygon offsetting. It may return multiple polygons even when starting from
@@ -61,9 +61,11 @@ coordinate in IntPoint conversion.
 ## Returns
 - Vector of `PolyArea`: The resulting offset polygons.
 """
-function _offset_polygon(poly::PolyArea{🌐,<:LatLon{WGS84Latest}}, delta; magnitude=3, precision=7)
+function _offset_polyarea(poly::PolyArea{🌐,<:LatLon{WGS84Latest}}, delta; magnitude=3, precision=7)
     # delta translated in deg wrt the Earrth radius
-    intPoly = map([vertices(poly)...]) do vertex # Avoid CircularVector as output from map
+    ringsPoly = rings(poly)
+    # //NOTE: Only outer ring is considered for the enlargement. We avoid considering the inner rings in this version
+    intPoly = map([vertices(ringsPoly[1])...]) do vertex # Use splat to avoid CircularVector as output from map
         y = get_lat(vertex) |> ustrip
         x = get_lon(vertex) |> ustrip
         IntPoint(x, y, magnitude, precision) # Consider LON as X and LAT as Y

@@ -68,13 +68,13 @@ Fields:
 - `domain::D`: Domain of the region
 - `convexhull::PolyArea`: Convex hull of the region
 """
-mutable struct GeoRegion{D} <: AbstractRegion
+mutable struct GeoRegion{D,T} <: AbstractRegion
     name::String
     continent::String
     subregion::String
     admin::String
     domain::D
-    convexhull::PolyBorder
+    convexhull::PolyBorder{T}
 end
 function GeoRegion(; name="region_name", continent="", subregion="", admin="")
     all(isempty(v) for v in (continent, subregion, admin)) && error("Input at least one argument between continent, subregion and admin...")

@@ -32,7 +32,7 @@ Create an enlarged GeoRegion either from scratch or from an existing GeoRegion.
 ## Returns
 - `GeoRegionEnlarged`: The enlarged geographical region
 """
-mutable struct GeoRegionEnlarged{D} <: AbstractRegion
+mutable struct GeoRegionEnlarged{D,T} <: AbstractRegion
     original::GeoRegion{D}
     name::String
     domain::MultiBorder
@@ -56,3 +56,14 @@ function GeoRegionEnlarged(gr::GeoRegion, deltaDist; name="enlarged_region", ref
 
     GeoRegionEnlarged(gr, name, or, ch)
 end
+
+
+################
+
+# mutable struct PolyRegionEnlarged{T} <: AbstractRegion
+#     original::PolyRegion{T}
+#     name::String
+#     domain::PolyBorder{T}
+# end
+# PolyRegion(name, domain::Vector{<:LatLon}) = PolyRegion(name, PolyBorder(PolyArea(map(Point, domain))))
+# PolyRegion(; name::String="region_name", domain) = PolyRegion(name, domain)

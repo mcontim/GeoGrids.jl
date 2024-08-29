@@ -16,25 +16,25 @@ indices of the filtered points (wrt the input).
 - A vector of points that fall within the specified domain, subsection of the \
 input vector. The output is of the same type as the input.
 """
-function filter_points(points::AbstractVector{<:Union{LatLon, Point{🌐,<:LatLon{WGS84Latest}}}}, domain::Union{GeoRegion,PolyRegion,LatBeltRegion})
-    filtered = filter(x -> in(x, domain), points)
+# function filter_points(points::AbstractVector{<:Union{LatLon, Point{🌐,<:LatLon{WGS84Latest}}}}, domain::Union{GeoRegion,PolyRegion,LatBeltRegion})
+#     filtered = filter(x -> in(x, domain), points)
 
-    return filtered
-end
-function filter_points_fast(points::AbstractVector{<:Union{LatLon, Point{🌐,<:LatLon{WGS84Latest}}}}, domain::Union{GeoRegion,PolyRegion,LatBeltRegion})
+#     return filtered
+# end
+function filter_points(points::AbstractVector{<:Union{LatLon, Point{🌐,<:LatLon{WGS84Latest}}}}, domain::Union{GeoRegion,PolyRegion,LatBeltRegion})
     intermediateFilter = filter(x -> in(x, domain.convexhull), points) # quick check over the convexhull
     filtered = filter(x -> in(x, domain), intermediateFilter) # accurate check over the actual domain
 
     return filtered
 end
 
-function filter_points(points::AbstractVector{<:Union{LatLon, Point{🌐,<:LatLon{WGS84Latest}}}}, domain::Union{GeoRegion,PolyRegion,LatBeltRegion}, ::EO)
-    # filt = filter(x -> in(x, domain), points)
-    indices = findall(x -> in(x, domain), points)
+# function filter_points(points::AbstractVector{<:Union{LatLon, Point{🌐,<:LatLon{WGS84Latest}}}}, domain::Union{GeoRegion,PolyRegion,LatBeltRegion}, ::EO)
+#     # filt = filter(x -> in(x, domain), points)
+#     indices = findall(x -> in(x, domain), points)
 
-    return points[indices], indices
-end
-function filter_points_fast(points::AbstractVector{<:Union{LatLon, Point{🌐,<:LatLon{WGS84Latest}}}}, domain::Union{GeoRegion,PolyRegion,LatBeltRegion}, ::EO)
+#     return points[indices], indices
+# end
+function filter_points(points::AbstractVector{<:Union{LatLon, Point{🌐,<:LatLon{WGS84Latest}}}}, domain::Union{GeoRegion,PolyRegion,LatBeltRegion}, ::EO)
     # filt = filter(x -> in(x, domain), points)
     intermediateFilter = findall(x -> in(x, domain.convexhull), points) # quick check over the convexhull
     indices = findall(x -> in(x, domain), intermediateFilter) # accurate check over the actual domain
@@ -69,26 +69,26 @@ assigned to regions in the order they appear in the `domains` array.
 - The function uses the `in` function to determine if a point belongs to a \
 region.
 """
+# function group_by_domain(points::AbstractVector{<:Union{LatLon, Point{🌐,<:LatLon{WGS84Latest}}}}, domains::AbstractVector; flagUnique=true)
+#     # Check region names validity
+#     names = map(x -> x.name, domains)
+#     length(unique(names)) == length(names) || error("The region names passed to group_by must be unique...")
+
+#     groups = Dictionary(map(x -> x.name, domains), map(_ -> eltype(points)[], domains))
+
+#     for p in points
+#         for dom in domains
+#             vec = groups[dom.name]
+#             if p in dom
+#                 push!(vec, p)
+#                 flagUnique && break
+#             end
+#         end
+#     end
+
+#     return groups
+# end
 function group_by_domain(points::AbstractVector{<:Union{LatLon, Point{🌐,<:LatLon{WGS84Latest}}}}, domains::AbstractVector; flagUnique=true)
-    # Check region names validity
-    names = map(x -> x.name, domains)
-    length(unique(names)) == length(names) || error("The region names passed to group_by must be unique...")
-
-    groups = Dictionary(map(x -> x.name, domains), map(_ -> eltype(points)[], domains))
-
-    for p in points
-        for dom in domains
-            vec = groups[dom.name]
-            if p in dom
-                push!(vec, p)
-                flagUnique && break
-            end
-        end
-    end
-
-    return groups
-end
-function group_by_domain_fast(points::AbstractVector{<:Union{LatLon, Point{🌐,<:LatLon{WGS84Latest}}}}, domains::AbstractVector; flagUnique=true)
     # Check region names validity
     names = map(x -> x.name, domains)
     length(unique(names)) == length(names) || error("The region names passed to group_by must be unique...")
