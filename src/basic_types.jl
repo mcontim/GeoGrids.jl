@@ -10,6 +10,10 @@ const constants = (
 )
 
 ## Define Region Types
+# //NOTE: 
+# We assume Float64 as the default precision for LATLON and CART in this
+# version. Could be uppdated to parametric in the future (like in
+# CountriesBorders.jl)
 """
     PolyBorder <: Geometry{🌐,LATLON}
 
@@ -20,8 +24,8 @@ Fields:
 - `cart::POLY_CART`: The borders in Cartesian2D CRS
 """
 struct PolyBorder <: Geometry{🌐,LATLON}
-    latlon::POLY_LATLON
-    cart::POLY_CART
+    latlon::POLY_LATLON{Float64}
+    cart::POLY_CART{Float64}
 end
 function PolyBorder(latlon::POLY_LATLON) 
     cart = cartesian_geometry(latlon)
@@ -38,8 +42,8 @@ Fields:
 - `cart::MULTI_CART`: The borders in Cartesian2D CRS
 """
 struct MultiBorder <: Geometry{🌐,LATLON}
-    latlon::MULTI_LATLON
-    cart::MULTI_CART
+    latlon::MULTI_LATLON{Float64}
+    cart::MULTI_CART{Float64}
 end
 function MultiBorder(latlon::MULTI_LATLON) 
     cart = cartesian_geometry(latlon)

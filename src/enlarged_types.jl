@@ -32,7 +32,7 @@ Create an enlarged GeoRegion either from scratch or from an existing GeoRegion.
 ## Returns
 - `GeoRegionEnlarged`: The enlarged geographical region
 """
-mutable struct GeoRegionEnlarged{D,T} <: AbstractRegion
+mutable struct GeoRegionEnlarged{D} <: AbstractRegion
     original::GeoRegion{D}
     name::String
     domain::MultiBorder
@@ -60,10 +60,11 @@ end
 
 ################
 
-# mutable struct PolyRegionEnlarged{T} <: AbstractRegion
-#     original::PolyRegion{T}
-#     name::String
-#     domain::PolyBorder{T}
-# end
-# PolyRegion(name, domain::Vector{<:LatLon}) = PolyRegion(name, PolyBorder(PolyArea(map(Point, domain))))
-# PolyRegion(; name::String="region_name", domain) = PolyRegion(name, domain)
+mutable struct PolyRegionEnlarged <: AbstractRegion
+    original::PolyRegion
+    name::String
+    domain::PolyBorder
+    # No convexhull needed for PolyRegion, it is always a single polygon, fast for filtering functions.
+end
+PolyRegion(name, domain::Vector{<:LatLon}) = PolyRegion(name, PolyBorder(PolyArea(map(Point, domain))))
+PolyRegion(; name::String="region_name", domain) = PolyRegion(name, domain)
