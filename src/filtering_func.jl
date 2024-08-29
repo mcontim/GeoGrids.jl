@@ -16,25 +16,25 @@ indices of the filtered points (wrt the input).
 - A vector of points that fall within the specified domain, subsection of the \
 input vector. The output is of the same type as the input.
 """
-# function filter_points(points::AbstractVector{<:Union{LatLon, Point{🌐,<:LatLon{WGS84Latest}}}}, domain::Union{GeoRegion,PolyRegion,LatBeltRegion})
-#     filtered = filter(x -> in(x, domain), points)
+function filter_points(points::AbstractVector{<:Union{LatLon, Point{🌐,<:LatLon{WGS84Latest}}}}, domain::Union{PolyRegion,LatBeltRegion})
+    filtered = filter(x -> in(x, domain), points)
 
-#     return filtered
-# end
-function filter_points(points::AbstractVector{<:Union{LatLon, Point{🌐,<:LatLon{WGS84Latest}}}}, domain::Union{GeoRegion,PolyRegion,LatBeltRegion})
+    return filtered
+end
+function filter_points(points::AbstractVector{<:Union{LatLon, Point{🌐,<:LatLon{WGS84Latest}}}}, domain::GeoRegion)
     intermediateFilter = filter(x -> in(x, domain.convexhull), points) # quick check over the convexhull
     filtered = filter(x -> in(x, domain), intermediateFilter) # accurate check over the actual domain
 
     return filtered
 end
 
-# function filter_points(points::AbstractVector{<:Union{LatLon, Point{🌐,<:LatLon{WGS84Latest}}}}, domain::Union{GeoRegion,PolyRegion,LatBeltRegion}, ::EO)
-#     # filt = filter(x -> in(x, domain), points)
-#     indices = findall(x -> in(x, domain), points)
+function filter_points(points::AbstractVector{<:Union{LatLon, Point{🌐,<:LatLon{WGS84Latest}}}}, domain::Union{PolyRegion,LatBeltRegion}, ::EO)
+    # filt = filter(x -> in(x, domain), points)
+    indices = findall(x -> in(x, domain), points)
 
-#     return points[indices], indices
-# end
-function filter_points(points::AbstractVector{<:Union{LatLon, Point{🌐,<:LatLon{WGS84Latest}}}}, domain::Union{GeoRegion,PolyRegion,LatBeltRegion}, ::EO)
+    return points[indices], indices
+end
+function filter_points(points::AbstractVector{<:Union{LatLon, Point{🌐,<:LatLon{WGS84Latest}}}}, domain::GeoRegion, ::EO)
     # filt = filter(x -> in(x, domain), points)
     intermediateFilter = findall(x -> in(x, domain.convexhull), points) # quick check over the convexhull
     indices = findall(x -> in(x, domain), intermediateFilter) # accurate check over the actual domain
