@@ -98,14 +98,30 @@ function group_by_domain(points::AbstractVector{<:Union{LatLon, Point{🌐,<:Lat
     for p in points
         for dom in domains
             vec = groups[dom.name]            
-            if p in dom.convexhull # quick check over the convexhull
-                if p in dom # accurate check over the actual domain
-                    push!(vec, p)
-                    flagUnique && break
-                end
+            if _check_in(p, dom)
+                push!(vec, p)
+                flagUnique && break
             end
         end
     end
 
     return groups
+end
+
+function _check_in(p, dom::GeoRegion)
+    if p in dom.convexhull # quick check over the convexhull
+        if p in dom # accurate check over the actual domain
+            return true
+        end
+    end
+
+    return false
+end
+
+function _check_in(p, dom::Union{PolyRegion,LatBeltRegion})
+    if p in dom # accurate check over the actual domain
+        return true
+    end
+
+    return false
 end
