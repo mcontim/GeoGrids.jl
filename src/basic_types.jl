@@ -53,7 +53,6 @@ abstract type AbstractRegion end
 
 Type representing a global region.
 """
-
 struct GlobalRegion <: AbstractRegion end
 
 """

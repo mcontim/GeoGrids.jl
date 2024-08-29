@@ -69,6 +69,24 @@ map(1:2) do i
 	end |> splat(vcat)
 end |> splat(vcat)
 
+# ╔═╡ e4cfa264-3a08-47e6-9ac2-c2ead4f4ff2e
+# @benchmark filter_points($pp, GeoRegion(; continent="Europe", admin="-Russia"))
+
+# ╔═╡ 80ffa48a-ec3c-46da-b465-827b828d889a
+# @benchmark filter_points_fast($pp, GeoRegion(; continent="Europe", admin="-Russia"))
+
+# ╔═╡ bd7bcd09-2320-4235-8358-9b597747a3e9
+# filter_points(pp, GeoRegion(; continent="Europe", admin="-Russia")) == filter_points_fast(pp, GeoRegion(; continent="Europe", admin="-Russia"))
+
+# ╔═╡ 5d1ad162-57e3-4dfd-b90c-8ae06a03a88a
+# @benchmark group_by_domain($pp, [GeoRegion(; name="spain", admin="Spain"), GeoRegion(; name="italy", admin="Italy")])
+
+# ╔═╡ cf6d4d21-d6aa-4e55-93df-34ca8c58acf2
+# @benchmark group_by_domain_fast($pp, [GeoRegion(; name="spain", admin="Spain"), GeoRegion(; name="italy", admin="Italy")])
+
+# ╔═╡ 3a29cf7a-0e8b-40ec-94fd-63ab9e18e975
+# group_by_domain(pp, [GeoRegion(; name="spain", admin="Spain"), GeoRegion(; name="italy", admin="Italy")]) == group_by_domain_fast(pp, [GeoRegion(; name="spain", admin="Spain"), GeoRegion(; name="italy", admin="Italy")])
+
 # ╔═╡ 2745410e-d76d-426f-8316-fb4b269d013a
 md"""
 # Additional Functions
@@ -243,24 +261,6 @@ pp=icogrid(sepAng=2)
 # ╔═╡ 8722c85a-60f6-450f-a044-60416ec35f4a
 plot_geo_points(pp)
 
-# ╔═╡ e4cfa264-3a08-47e6-9ac2-c2ead4f4ff2e
-@benchmark filter_points($pp, GeoRegion(; continent="Europe", admin="-Russia"))
-
-# ╔═╡ 80ffa48a-ec3c-46da-b465-827b828d889a
-@benchmark filter_points_fast($pp, GeoRegion(; continent="Europe", admin="-Russia"))
-
-# ╔═╡ bd7bcd09-2320-4235-8358-9b597747a3e9
-filter_points(pp, GeoRegion(; continent="Europe", admin="-Russia")) == filter_points_fast(pp, GeoRegion(; continent="Europe", admin="-Russia"))
-
-# ╔═╡ 5d1ad162-57e3-4dfd-b90c-8ae06a03a88a
-@benchmark group_by_domain($pp, [GeoRegion(; name="spain", admin="Spain"), GeoRegion(; name="italy", admin="Italy")])
-
-# ╔═╡ cf6d4d21-d6aa-4e55-93df-34ca8c58acf2
-@benchmark group_by_domain_fast($pp, [GeoRegion(; name="spain", admin="Spain"), GeoRegion(; name="italy", admin="Italy")])
-
-# ╔═╡ 3a29cf7a-0e8b-40ec-94fd-63ab9e18e975
-group_by_domain(pp, [GeoRegion(; name="spain", admin="Spain"), GeoRegion(; name="italy", admin="Italy")]) == group_by_domain_fast(pp, [GeoRegion(; name="spain", admin="Spain"), GeoRegion(; name="italy", admin="Italy")])
-
 # ╔═╡ fd4341d7-1ef6-404e-a609-d2ffb711d453
 plot_geo_points(fp)
 
@@ -311,10 +311,15 @@ reg=GeoRegion(; admin="Italy;Spain")
 parent(Multi([reg.convexhull]))
 
 # ╔═╡ b2d4a333-5e49-4a14-891e-681098745b03
+# ╠═╡ disabled = true
+#=╠═╡
 a=PolyArea([Point(LatLon{WGS84Latest}(10°, -5°)), Point(LatLon{WGS84Latest}(10°, 15°)), Point(LatLon{WGS84Latest}(27°, 15°))])
+  ╠═╡ =#
 
 # ╔═╡ f66370ee-54e1-438b-b1ee-3802ecacaeb4
+#=╠═╡
 typeof(a)
+  ╠═╡ =#
 
 # ╔═╡ 42f94eb9-adab-4c5a-b10e-88cf6564322e
 PolyArea{🌐,LatLon{WGS84Latest}}[]
@@ -330,6 +335,37 @@ let
         x = get_lon(vertex) |> ustrip
         IntPoint(x, y, 3, 7) # Consider LON as X and LAT as Y
     end
+end
+
+# ╔═╡ de4f5c1e-7ce4-42c8-a118-de096a49b01c
+let
+	outer = [Point(LatLon{WGS84Latest}(0, 0)), Point(LatLon{WGS84Latest}(1, 0)), Point(LatLon{WGS84Latest}(1, 1)), Point(LatLon{WGS84Latest}(0, 1))]
+	hole1 = [Point(LatLon{WGS84Latest}(0.2, 0.2)), Point(LatLon{WGS84Latest}(0.2, 0.4)), Point(LatLon{WGS84Latest}(0.4, 0.4)), Point(LatLon{WGS84Latest}(0.4, 0.2))]
+	hole2 = [Point(LatLon{WGS84Latest}(0.6, 0.2)), Point(LatLon{WGS84Latest}(0.6, 0.4)), Point(LatLon{WGS84Latest}(0.8, 0.4)), Point(LatLon{WGS84Latest}(0.8, 0.2))]
+	poly  = PolyArea([outer, hole1, hole2])
+
+	# _offset_polygon(poly,0.5)
+	length(rings(poly))
+end
+
+# ╔═╡ ac596255-5c9b-426f-8f3a-aba8081bb752
+allCountries = extract_countries("*"; re)
+
+# ╔═╡ 88aaf4c9-e2e6-4bf8-a282-5822fda73f58
+for c in allCountries
+	geoms = c.latlon.geoms
+	for g in geoms
+		if length(rings(g)) > 1
+			@info c
+		end
+	end
+end
+
+# ╔═╡ f8ad8704-8299-4757-85ab-e52149a4c4df
+let 
+	r = GlobalRegion()
+	c,t = generate_tesselation(r, 700e3, ICO(), EO())
+	plot_geo_cells(c,t;title="Global Region cell layout")
 end
 
 # ╔═╡ 00000000-0000-0000-0000-000000000001
@@ -821,7 +857,11 @@ version = "17.4.0+2"
 # ╠═f66370ee-54e1-438b-b1ee-3802ecacaeb4
 # ╠═42f94eb9-adab-4c5a-b10e-88cf6564322e
 # ╠═c826e1de-a63b-4528-b0bb-f663841a82a0
+# ╠═de4f5c1e-7ce4-42c8-a118-de096a49b01c
+# ╠═ac596255-5c9b-426f-8f3a-aba8081bb752
+# ╠═88aaf4c9-e2e6-4bf8-a282-5822fda73f58
 # ╟─2745410e-d76d-426f-8316-fb4b269d013a
+# ╠═f8ad8704-8299-4757-85ab-e52149a4c4df
 # ╟─61a7aab7-3726-4027-ab5b-416ef57545c1
 # ╠═b58ca732-3892-415c-99e0-877befe7a26d
 # ╠═b73d8849-e08f-480f-9467-44f30a64144c

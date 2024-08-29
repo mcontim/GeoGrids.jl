@@ -7,71 +7,146 @@
 [![Aqua QA](https://raw.githubusercontent.com/JuliaTesting/Aqua.jl/master/badge.svg)](https://github.com/JuliaTesting/Aqua.jl)
 [![](https://img.shields.io/badge/%F0%9F%9B%A9%EF%B8%8F_tested_with-JET.jl-233f9a)](https://github.com/aviatesk/JET.jl)
 
-This is a package containing functions for Geographical Grids generation for example for terminals distribution for System Level Simulations. **In the next version support for Geo Surface tesselation for cell grid layout will be supported**.
+This is a package containing functions for Geographical Grids generation, for example for terminals distribution for System Level Simulations.
 
-## Exported Functions
+## v0.5.0 - Updates
 
-### Icogrid
+- Support for different type of regions.
+- Tessellation for creating cell grid layouts is supported on this version.
+- Faster computation of filtering and grouping of points in different regions.
+- Offsetting of regions is supported on this version.
 
-    icogrid(;N=nothing, sepAng=nothing, unit=:rad, height=nothing, type=:lla)
+## Basic Types
 
-This function returns a `Vector` of `Point2` or `LLA` elements, for a `N` points Global grid built with the **Fibonacci Spiral** method.
+- `AbstractRegion`: Abstract type representing a geographical region.
+  - `GlobalRegion`: Represents the entire globe.
+  - `LatBeltRegion`: Represents a latitude belt defined by minimum and maximum latitudes.
+  - `GeoRegion`: Represents a geographical region defined by a country or a list of countries.
+  - `PolyRegion`: Represents a region defined by a polygon of latitude-longitude coordinates.
 
-The grid can be generated starting fom the number of point requested on the grid (`N`) or by the minimum separation angle requested for the points (`sepAng`).
+- `AbstractTiling`: Abstract type for different tessellation methods.
+  - `HEX`: Hexagonal tessellation with specified direction (`:pointy` or `:flat`).
+  - `ICO`: Icosahedral grid tessellation with specified correction factor and pattern (`:hex` or `:circle`).
+  - `H3`: Uber's H3 hexagonal hierarchical geospatial indexing system (not implemented in current version).
+
+These types provide a flexible framework for defining geographical regions and tessellation methods for creating grid layouts in GeoGrids.jl. They allow users to specify different types of regions (global, latitude belts, country-based, or custom polygons) and choose appropriate tessellation methods for their specific needs.
+
+
+## Icosahedral Grid
+
+  icogrid(; N::Union{Int,Nothing}=nothing, sepAng::Union{ValidAngle,Nothing}=nothing) -> Vector{Point{🌐,<:LatLon{WGS84Latest}}}
+
+At least one of `N`, the number of points to generate, or `sepAng`, the separation angle between points, must be provided.
+
+This function returns a `Vector` of `Point{🌐,<:LatLon{WGS84Latest}}` elements, representing a global grid built with an icosahedral-based method.
+
+The grid is generated based on the specified `radius` and `type` parameters. The `type` parameter is an `ICO` struct that defines the correction factor and pattern (hexagonal or circular) for the grid.
 
 The problem of how to evenly distribute points on a sphere has a very long history. Unfortunately, except for a small handful of cases, it still has not been exactly solved. Therefore, in nearly all situations, we can merely hope to find near-optimal solutions to this problem.
 
-Of these near-optimal solutions, one of the most common simple methods is one based on the **Fibonacci lattice** or **Golden Spiral** or **Fibonacci Spiral**. Furthermore, unlike many of the other iterative or randomised methods such a simulated annealing, the Fibonacci spiral is one of the few direct construction methods that works for arbitrary `N`.
+Of these near-optimal solutions, the icosahedral grid is one approach that provides a more uniform distribution of points on a sphere compared to simple latitude-longitude grids. It starts with a regular icosahedron inscribed in a sphere and then subdivides its faces to create a finer mesh.
 
-This method of points distribution is **Area Preserving** but not distance preserving.
+This method of point distribution aims to provide a more uniform coverage of the Earth's surface, which can be particularly useful for global-scale simulations or analyses.
 
-When the selected output type is `Point2`, as convention it has been considered: `LAT=x`, `LON=y` and the output can be returned either in `:deg` or `:rad` units.
+The function returns points in the WGS84 coordinate system, represented as latitude-longitude pairs.
 
 <p align="center">
   <img src="./docs/img/ico.png" alt="Icogrid"/>
 </p>
 
----
+## Rectangular Grid
 
-### Meshgrid
+  rectgrid(xRes::ValidAngle; yRes::ValidAngle=xRes) -> Array{Point{🌐,<:LatLon{WGS84Latest}}, 2}
 
-	rectgrid(xRes::ValidAngle; yRes::ValidAngle=xRes, height=nothing, unit=:rad, type=:lla)
+This function generates a rectangular grid of points on the Earth's surface. It returns a `Matrix` of `Point{🌐,<:LatLon{WGS84Latest}}` elements, representing a global grid with the specified parameters.
 
-This function returns a `Matrix` of `Point2` or `LLA` elements representing a 2D Global grid of coordinates with the specified resolutions `xRes` and `yRes` respectively for x and y axes. This function return the `LAT`, `LON` meshgrid similar to the namesake MATLAB function.
+At least `xRes` must be provided, which is the resolution for the latitude grid spacing.
 
-When the selected output type is `Point2`, as convention it has been considered: `LAT=x`, `LON=y` and the output can be returned either in `:deg` or `:rad` units.
+The function generates a grid of regularly spaced points on the Earth's surface.
+The grid points are returned as `Point{🌐,<:LatLon{WGS84Latest}}` objects, representing latitude-longitude coordinates in the WGS84 coordinate system.
+
+This rectangular grid can be useful for various geospatial applications, such as creating evenly spaced sampling points across the globe or defining a regular grid for data analysis and visualization.
 
 <p align="center">
   <img src="./docs/img/mesh.png" alt="Meshgrid"/>
 </p>
 
----
+## Vector Grid
 
-### Filtering
+    vecgrid(gridRes::ValidAngle) -> Vector{Point{🌐,<:LatLon{WGS84Latest}}}
 
-    in_region(p::Union{LLA, Point2, AbstractVector, Tuple}, domain::Union{GeometrySet, PolyArea}) -> Bool
-    in_region(p::Union{LLA, Point2, AbstractVector, Tuple}, domain::Union{GeoRegion, PolyRegion}) -> Bool
-    in_region(points::Array{<:Union{LLA, Point2, AbstractVector, Tuple}}, domain::Union{GeometrySet, PolyArea}) -> Array{Bool}
-    in_region(points::Array{<:Union{LLA, Point2, AbstractVector, Tuple}}, domain::Union{GeoRegion, PolyRegion}) -> Array{Bool}
+This function generates a vector of latitude points from the equator to the North Pole with a specified resolution. It returns a `Vector` of `Point{🌐,<:LatLon{WGS84Latest}}` elements, representing a grid of latitudes with the specified resolution.
 
-This function determines if a given point belongs to a 2-dimensional `Meshes.Domain` object. The `Meshes.Domain` object represents a geometric domain, which is essentially a 2D region in space, specified by its bounds and discretization. 
+The `gridRes` parameter must be provided, which is the resolution for the latitude grid spacing. This can be a real number (interpreted as degrees) or a `ValidAngle`.
 
-The function first converts the input tuple into a `Point` object, which is then checked if it falls inside the given `Meshes.Domain` object.
-The `Meshes.Domain` can be either a `GeometrySet` or a `PolyArea` object.
+The function generates a vector of latitude points ranging from 0° (the equator) to 90° (the North Pole). Each point is represented as a `Point{🌐,<:LatLon{WGS84Latest}}` object with a fixed longitude of 0°.
 
----
+This vector grid can be useful for various applications that require sampling or analysis along a meridian, such as studying latitudinal variations in climate data, or creating a basis for more complex grid structures.
 
-    filter_points(points::Union{Vector{LLA}, Vector{AbstractVector}, Vector{Point2}, Vector{Tuple}}, domain::Union{GeometrySet, PolyArea}) -> Vector{Input Type}
-    filter_points(points::Union{Vector{LLA}, Vector{AbstractVector}, Vector{Point2}, Vector{Tuple}}, domain::Union{GeoRegion, PolyRegion}) -> Vector{Input Type}
-    
-Returns the list of of points based on whether they fall within a specified geographical domain.
+## Filtering
+
+    in(p::Union{LatLon, Point{🌐,<:LatLon{WGS84Latest}}}, domain::AbstractRegion) -> Bool
+    in(points::AbstractVector{<:Union{LatLon, Point{🌐,<:LatLon{WGS84Latest}}}}, domain::AbstractRegion) -> Vector{Bool}
+
+This function determines if a given point or vector of points belongs to an `AbstractRegion`. The `AbstractRegion` can be a `GlobalRegion`, `GeoRegion`, `GeoRegionEnlarged`, `PolyRegion`, or `LatBeltRegion`.
+
+For a single point, the function returns a boolean indicating whether the point is inside the region.
+For a vector of points, it returns a vector of booleans, each indicating whether the corresponding point is inside the region.
+
+The function checks if each point falls inside the given region using the appropriate method for that region type.
+
+    filter_points(points::AbstractVector{<:Union{LatLon, Point{🌐,<:LatLon{WGS84Latest}}}}, domain::AbstractRegion) -> Vector{eltype(points)}
+
+This function filters a vector of points based on whether they fall within a specified region. It returns a new vector containing only the points that are inside the region.
+
+    filter_points_fast(points::AbstractVector{<:Union{LatLon, Point{🌐,<:LatLon{WGS84Latest}}}}, domain::AbstractRegion) -> Vector{eltype(points)}
+
+This is a faster version of `filter_points` that uses a different algorithm for checking point inclusion. It's particularly efficient for large numbers of points.
+
+    group_by_domain(points::AbstractVector{<:Union{LatLon, Point{🌐,<:LatLon{WGS84Latest}}}}, domains::AbstractVector{<:AbstractRegion}) -> Dictionary{String, Vector{eltype(points)}}
+
+This function groups points based on which region they belong to. It returns a dictionary where the keys are names of the domains, and the values are vectors of points that fall within each domain.
+
+    group_by_domain_fast(points::AbstractVector{<:Union{LatLon, Point{🌐,<:LatLon{WGS84Latest}}}}, domains::AbstractVector{<:AbstractRegion}) -> Dictionary{String, Vector{eltype(points)}}
+
+This is a faster version of `group_by_domain` that uses the same efficient algorithm as `filter_points_fast`.
 
 <p align="center">
   <img src="./docs/img/poly_filt.png" alt="Poly Filter"/>
 </p>
+
 <p align="center">
   <img src="./docs/img/geo_filt.png" alt="Geo Filter"/>
 </p>
+
+## Tessellation
+
+  generate_tesselation(region::Union{GeoRegion, PolyRegion}, radius::Number, type::HEX; refRadius::Number=constants.Re_mean, kwargs_lattice...) -> AbstractVector{<:Point{🌐,<:LatLon{WGS84Latest}}}
+  generate_tesselation(region::Union{GeoRegion, PolyRegion}, radius::Number, type::HEX, ::EO; refRadius::Number=constants.Re_mean, kwargs_lattice...) -> AbstractVector{<:Point{🌐,<:LatLon{WGS84Latest}}}, AbstractVector{<:AbstractVector{<:Point{🌐,<:LatLon{WGS84Latest}}}}
+  generate_tesselation(region::GlobalRegion, radius::Number, type::ICO; refRadius::Number=constants.Re_mean) -> AbstractVector{<:LatLon}
+  generate_tesselation(region::GlobalRegion, radius::Number, type::ICO, ::EO; refRadius::Number=constants.Re_mean) -> AbstractVector{<:LatLon}, AbstractVector{<:AbstractVector{<:LatLon}}
+  generate_tesselation(region::Union{LatBeltRegion, GeoRegion, PolyRegion}, radius::Number, type::ICO; refRadius::Number=constants.Re_mean) -> AbstractVector{<:LatLon}
+  generate_tesselation(region::Union{LatBeltRegion, GeoRegion, PolyRegion}, radius::Number, type::ICO, ::EO; refRadius::Number=constants.Re_mean) -> AbstractVector{<:LatLon}, AbstractVector{<:AbstractVector{<:LatLon}}
+
+This function generates a tessellation pattern around a given center point. It creates a geometric arrangement of points based on the specified pattern type and parameters. The function takes a center point, a radius (in meters), and a pattern type as its main arguments. The pattern can be either hexagonal (`:hex`) or circular (`:circle`).
+
+The function returns a vector of `Point{🌐,<:LatLon{WGS84Latest}}` objects, representing the centers of each of the tiles. When called with the `EO` argument, it additionally returns a vector of vectors containing the indices of points representing the contour of each of the tiles.
+
+This function can be particularly useful for generating tessellations for cell layouts in various applications. It provides a flexible way to create regular point patterns on a spherical surface, which can be beneficial in fields such as telecommunications for planning cell tower placements, environmental studies for creating sampling grids, or in any geospatial analysis requiring a structured arrangement of points.
+
+### Examples:
+
+```julia
+  r = GlobalRegion()
+  c,t = generate_tesselation(r, 700e3, ICO(), EO())
+  plot_geo_cells(c,t;title="Global Region cell layout")
+```
+
+<p align="center">
+  <img src="./docs/img/global_cell_layout.png" alt="Global Cell Layout"/>
+</p>
+
+## Useful Additional Functions
 
 ---
 
@@ -85,22 +160,6 @@ This function is an overload of `GeoGrids.extract_countries` that takes a `GeoRe
 
 ---
 
-## Useful Internal Functions
-
-    _meshgrid(xin,yin)
-
-Create a 2D grid of coordinates using the input vectors `xin` and `yin`.
-The output, in the form of `SVector(xout,yout)`, contains all possible combinations of the elements of `xin` and `yin`, with `xout` corresponding to the horizontal coordinates and `yout` corresponding to the vertical coordinates.
-
----
-
-    _icogrid(N::Int; coord::Symbol=:sphe, spheRadius=1.0)	
-
-This is the base function used by `icogrid`. This function generates `N` uniformly distributed points on the surface of a unitary sphere using the classic Fibonacci Spiral.
-
-The output can be returned as a `SVector` of either, spherical or cartesian coordinates.
-
----
 
 	plot_geo_points(points; title="Point Position GEO Map", camera::Symbol=:twodim, kwargs_scatter=(;), kwargs_layout=(;))
 
