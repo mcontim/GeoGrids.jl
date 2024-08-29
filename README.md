@@ -29,6 +29,10 @@ This is a package containing functions for Geographical Grids generation, for ex
   - `ICO`: Icosahedral grid tessellation with specified correction factor and pattern (`:hex` or `:circle`).
   - `H3`: Uber's H3 hexagonal hierarchical geospatial indexing system (not implemented in current version).
 
+### Enlarged Regions
+
+- `GeoRegionEnlarged`: Represents a geographical region defined by a country or a list of countries, with an additional field `:enlarged` that can be set to `true` to indicate that the region is enlarged.
+  
 These types provide a flexible framework for defining geographical regions and tessellation methods for creating grid layouts in GeoGrids.jl. They allow users to specify different types of regions (global, latitude belts, country-based, or custom polygons) and choose appropriate tessellation methods for their specific needs.
 
 
@@ -205,21 +209,24 @@ This function can be particularly useful for generating tessellations for cell l
 
 ## Useful Additional Functions
 
----
-
-    extract_countries(r::GeoRegion)
-
-Extracts the countries from a given region. The output represents the field `domain` of `GeoRegion`.
-
-It first gets the field names of the `GeoRegion` type, excluding the `:name`, then maps these field names to their corresponding values in the `GeoRegion` instance `r`, creating a collection of pairs. It filters out any pairs where the value is empty. It converts this collection of pairs into a `NamedTuple`, finally, it calls `GeoGrids.extract_countries` with the `NamedTuple` as keyword arguments.
-
-This function is an overload of `GeoGrids.extract_countries` that takes a `GeoRegion` object as input. It extracts the countries from the given region and returns them.    
-
----
-
-
 	  plot_geo_points(points; title="Point Position GEO Map", camera::Symbol=:twodim, kwargs_scatter=(;), kwargs_layout=(;))
 
-This function takes an `Array` of `Union{Point2,LLA,AbstractVector,Tuple}` of LAT-LON coordinates and generates a plot on a world map projection using the PlotlyJS package.
+This function takes an `Array` of `Union{Point{🌐,<:LatLon{WGS84Latest}},LatLon,AbstractVector,Tuple}` of LAT-LON coordinates and generates a plot on a world map projection using the PlotlyJS package.
 
-The input is checked and the angles converted in deg if passed as `Unitful` and interpreted as rad if passed as `Real` values.
+The input is checked and the angles converted to degrees if passed as `Unitful` and interpreted as degrees if passed as `Real` values.
+
+	  plot_geo_cells(centers, tessellation; title="Cell Layout GEO Map", camera::Symbol=:twodim, kwargs_scatter=(;), kwargs_layout=(;))
+
+This function takes an `Array` of cell centers and a corresponding tessellation, and generates a plot of the cell layout on a world map projection using the PlotlyJS package.
+
+	  plot_geo_poly(poly::AbstractRegion; title="Polygon GEO Map", camera::Symbol=:twodim, kwargs_scatter=(;), kwargs_layout=(;))
+
+This function takes an `AbstractRegion` (which can be a `PolyRegion`, `GeoRegion`, or other types that inherit from `AbstractRegion`) and generates a plot of the region's boundaries on a world map projection using the PlotlyJS package.
+
+    plot_unitarysphere(points; title="Points on Unitary Sphere", camera::Symbol=:threedim, kwargs_scatter=(;), kwargs_layout=(;))
+
+This function takes an `Array` of 3D Cartesian coordinates and generates a plot of these points on a unitary sphere using the PlotlyJS package.
+
+For all these functions:
+- `camera` can be set to `:twodim` for a 2D view or `:threedim` for a 3D view.
+- `kwargs_scatter` and `kwargs_layout` allow you to pass additional keyword arguments to customize the scatter plot and layout respectively.
