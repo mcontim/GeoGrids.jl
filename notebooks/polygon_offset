@@ -89,7 +89,7 @@ end |> splat(vcat)
 
 # ╔═╡ 2745410e-d76d-426f-8316-fb4b269d013a
 md"""
-# Additional Functions
+# Documentation Preparation
 """
 
 # ╔═╡ 61a7aab7-3726-4027-ab5b-416ef57545c1
@@ -361,11 +361,56 @@ for c in allCountries
 	end
 end
 
+# ╔═╡ ac5b6c1e-6766-4e93-b938-a39cb2df1f4a
+let 
+	p = icogrid(;sepAng=1)
+	r = GeoRegion(;admin="Italy;Spain")
+	f = filter_points(p,r)
+	plot_geo_points(f; title="Geo Region Filtering")
+end
+
+# ╔═╡ 37cdcc89-16c2-4ab7-a1db-abb12355037b
+let 
+	p = icogrid(;sepAng=4)
+	r = LatBeltRegion(;lim=(-10,10))
+	f = filter_points(p,r)
+	plot_geo_points(f; title="Lat Belt Region Filtering")
+end
+
+# ╔═╡ faec3613-d7ff-4c68-b907-b7aefacb9a2f
+let 
+	p = rectgrid(2)
+	r = PolyRegion(domain=[LatLon(10°, -5°), LatLon(10°, 15°), LatLon(27°, 15°), LatLon(27°, -5°)])
+	f = filter_points(p[:],r)
+	plot_geo_points(f; title="Poly Region Filtering")
+end
+
 # ╔═╡ f8ad8704-8299-4757-85ab-e52149a4c4df
 let 
 	r = GlobalRegion()
 	c,t = generate_tesselation(r, 700e3, ICO(), EO())
 	plot_geo_cells(c,t;title="Global Region cell layout")
+end
+
+# ╔═╡ 5f018481-d80b-428b-848c-1b3fdca242fb
+let 
+	r = GeoRegion(;admin="Italy;Spain")
+	c,t = generate_tesselation(r, 50e3, HEX(), EO())
+	plot_geo_cells(c,t;title="Geo Region cell layout")
+end
+
+# ╔═╡ fd134513-cc3e-4b6b-9f42-25c7fd7e9ea9
+let 
+	r = PolyRegion(domain=[LatLon(10°, -5°), LatLon(10°, 15°), LatLon(27°, 15°), LatLon(27°, -5°)])
+	c,t = generate_tesselation(r, 100e3, HEX(), EO())
+	plot_geo_cells(c,t;title="Poly Region cell layout")
+end
+
+# ╔═╡ 621d2459-42cb-4173-9c33-e1c834e097d9
+let 
+	r = LatBeltRegion(;lim=(-10,10))
+	c,t = generate_tesselation(r, 500e3, ICO(), EO())
+	plot_geo_cells(c,t;title="Lat Belt Region cell layout")
 end
 
 # ╔═╡ 00000000-0000-0000-0000-000000000001
@@ -860,8 +905,14 @@ version = "17.4.0+2"
 # ╠═de4f5c1e-7ce4-42c8-a118-de096a49b01c
 # ╠═ac596255-5c9b-426f-8f3a-aba8081bb752
 # ╠═88aaf4c9-e2e6-4bf8-a282-5822fda73f58
-# ╟─2745410e-d76d-426f-8316-fb4b269d013a
+# ╠═2745410e-d76d-426f-8316-fb4b269d013a
+# ╠═ac5b6c1e-6766-4e93-b938-a39cb2df1f4a
+# ╠═37cdcc89-16c2-4ab7-a1db-abb12355037b
+# ╠═faec3613-d7ff-4c68-b907-b7aefacb9a2f
 # ╠═f8ad8704-8299-4757-85ab-e52149a4c4df
+# ╠═5f018481-d80b-428b-848c-1b3fdca242fb
+# ╠═fd134513-cc3e-4b6b-9f42-25c7fd7e9ea9
+# ╠═621d2459-42cb-4173-9c33-e1c834e097d9
 # ╟─61a7aab7-3726-4027-ab5b-416ef57545c1
 # ╠═b58ca732-3892-415c-99e0-877befe7a26d
 # ╠═b73d8849-e08f-480f-9467-44f30a64144c

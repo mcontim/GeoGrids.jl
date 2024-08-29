@@ -34,7 +34,7 @@ These types provide a flexible framework for defining geographical regions and t
 
 ## Icosahedral Grid
 
-  icogrid(; N::Union{Int,Nothing}=nothing, sepAng::Union{ValidAngle,Nothing}=nothing) -> Vector{Point{🌐,<:LatLon{WGS84Latest}}}
+    icogrid(; N::Union{Int,Nothing}=nothing, sepAng::Union{ValidAngle,Nothing}=nothing) -> Vector{Point{🌐,<:LatLon{WGS84Latest}}}
 
 At least one of `N`, the number of points to generate, or `sepAng`, the separation angle between points, must be provided.
 
@@ -56,7 +56,7 @@ The function returns points in the WGS84 coordinate system, represented as latit
 
 ## Rectangular Grid
 
-  rectgrid(xRes::ValidAngle; yRes::ValidAngle=xRes) -> Array{Point{🌐,<:LatLon{WGS84Latest}}, 2}
+    rectgrid(xRes::ValidAngle; yRes::ValidAngle=xRes) -> Array{Point{🌐,<:LatLon{WGS84Latest}}, 2}
 
 This function generates a rectangular grid of points on the Earth's surface. It returns a `Matrix` of `Point{🌐,<:LatLon{WGS84Latest}}` elements, representing a global grid with the specified parameters.
 
@@ -111,22 +111,49 @@ This function groups points based on which region they belong to. It returns a d
 
 This is a faster version of `group_by_domain` that uses the same efficient algorithm as `filter_points_fast`.
 
-<p align="center">
-  <img src="./docs/img/poly_filt.png" alt="Poly Filter"/>
-</p>
+### Examples:
+
+```julia
+  p = icogrid(;sepAng=1)
+  r = GeoRegion(;admin="Italy;Spain")
+  f = filter_points(p,r)
+  plot_geo_points(f; title="Geo Region Filtering")
+```
 
 <p align="center">
-  <img src="./docs/img/geo_filt.png" alt="Geo Filter"/>
+  <img src="./docs/img/geo_filtering.png" alt="Geo Filtering"/>
+</p>
+
+```julia
+  p = icogrid(;sepAng=4)
+  r = LatBeltRegion(;lim=(-10,10))
+  f = filter_points(p,r)
+  plot_geo_points(f; title="Lat Belt Region Filtering")
+```
+
+<p align="center">
+  <img src="./docs/img/latbelt_filtering.png" alt="Lat Belt Filtering"/>
+</p>
+
+```julia
+  p = rectgrid(2)
+  r = PolyRegion(domain=[LatLon(10°, -5°), LatLon(10°, 15°), LatLon(27°, 15°), LatLon(27°, -5°)])
+  f = filter_points(p[:],r)
+  plot_geo_points(f; title="Poly Region Filtering")
+```
+
+<p align="center">
+  <img src="./docs/img/poly_filtering.png" alt="Poly Filtering"/>$s$
 </p>
 
 ## Tessellation
 
-  generate_tesselation(region::Union{GeoRegion, PolyRegion}, radius::Number, type::HEX; refRadius::Number=constants.Re_mean, kwargs_lattice...) -> AbstractVector{<:Point{🌐,<:LatLon{WGS84Latest}}}
-  generate_tesselation(region::Union{GeoRegion, PolyRegion}, radius::Number, type::HEX, ::EO; refRadius::Number=constants.Re_mean, kwargs_lattice...) -> AbstractVector{<:Point{🌐,<:LatLon{WGS84Latest}}}, AbstractVector{<:AbstractVector{<:Point{🌐,<:LatLon{WGS84Latest}}}}
-  generate_tesselation(region::GlobalRegion, radius::Number, type::ICO; refRadius::Number=constants.Re_mean) -> AbstractVector{<:LatLon}
-  generate_tesselation(region::GlobalRegion, radius::Number, type::ICO, ::EO; refRadius::Number=constants.Re_mean) -> AbstractVector{<:LatLon}, AbstractVector{<:AbstractVector{<:LatLon}}
-  generate_tesselation(region::Union{LatBeltRegion, GeoRegion, PolyRegion}, radius::Number, type::ICO; refRadius::Number=constants.Re_mean) -> AbstractVector{<:LatLon}
-  generate_tesselation(region::Union{LatBeltRegion, GeoRegion, PolyRegion}, radius::Number, type::ICO, ::EO; refRadius::Number=constants.Re_mean) -> AbstractVector{<:LatLon}, AbstractVector{<:AbstractVector{<:LatLon}}
+    generate_tesselation(region::Union{GeoRegion, PolyRegion}, radius::Number, type::HEX; refRadius::Number=constants.Re_mean, kwargs_lattice...) -> AbstractVector{<:Point{🌐,<:LatLon{WGS84Latest}}}
+    generate_tesselation(region::Union{GeoRegion, PolyRegion}, radius::Number, type::HEX, ::EO; refRadius::Number=constants.Re_mean, kwargs_lattice...) -> AbstractVector{<:Point{🌐,<:LatLon{WGS84Latest}}}, AbstractVector{<:AbstractVector{<:Point{🌐,<:LatLon{WGS84Latest}}}}
+    generate_tesselation(region::GlobalRegion, radius::Number, type::ICO; refRadius::Number=constants.Re_mean) -> AbstractVector{<:LatLon}
+    generate_tesselation(region::GlobalRegion, radius::Number, type::ICO, ::EO; refRadius::Number=constants.Re_mean) -> AbstractVector{<:LatLon}, AbstractVector{<:AbstractVector{<:LatLon}}
+    generate_tesselation(region::Union{LatBeltRegion, GeoRegion, PolyRegion}, radius::Number, type::ICO; refRadius::Number=constants.Re_mean) -> AbstractVector{<:LatLon}
+    generate_tesselation(region::Union{LatBeltRegion, GeoRegion, PolyRegion}, radius::Number, type::ICO, ::EO; refRadius::Number=constants.Re_mean) -> AbstractVector{<:LatLon}, AbstractVector{<:AbstractVector{<:LatLon}}
 
 This function generates a tessellation pattern around a given center point. It creates a geometric arrangement of points based on the specified pattern type and parameters. The function takes a center point, a radius (in meters), and a pattern type as its main arguments. The pattern can be either hexagonal (`:hex`) or circular (`:circle`).
 
@@ -146,6 +173,36 @@ This function can be particularly useful for generating tessellations for cell l
   <img src="./docs/img/global_cell_layout.png" alt="Global Cell Layout"/>
 </p>
 
+```julia 
+  r = GeoRegion(;admin="Italy;Spain")
+  c,t = generate_tesselation(r, 50e3, HEX(), EO())
+  plot_geo_cells(c,t;title="Geo Region cell layout")
+```
+
+<p align="center">
+  <img src="./docs/img/geo_cell_layout.png" alt="Geo Cell Layout"/>
+</p>
+
+```julia 
+  r = LatBeltRegion(;lim=(-10,10))
+  c,t = generate_tesselation(r, 500e3, ICO(), EO())
+  plot_geo_cells(c,t;title="Lat Belt Region cell layout")
+```
+
+<p align="center">
+  <img src="./docs/img/latbelt_cell_layout.png" alt="Lat Belt Cell Layout"/>
+</p>
+
+```julia 
+  r = PolyRegion(domain=[LatLon(10°, -5°), LatLon(10°, 15°), LatLon(27°, 15°), LatLon(27°, -5°)])
+  c,t = generate_tesselation(r, 100e3, HEX(), EO())
+  plot_geo_cells(c,t;title="Poly Region cell layout")
+```
+
+<p align="center">
+  <img src="./docs/img/poly_cell_layout.png" alt="Poly Cell Layout"/>
+</p>
+
 ## Useful Additional Functions
 
 ---
@@ -161,7 +218,7 @@ This function is an overload of `GeoGrids.extract_countries` that takes a `GeoRe
 ---
 
 
-	plot_geo_points(points; title="Point Position GEO Map", camera::Symbol=:twodim, kwargs_scatter=(;), kwargs_layout=(;))
+	  plot_geo_points(points; title="Point Position GEO Map", camera::Symbol=:twodim, kwargs_scatter=(;), kwargs_layout=(;))
 
 This function takes an `Array` of `Union{Point2,LLA,AbstractVector,Tuple}` of LAT-LON coordinates and generates a plot on a world map projection using the PlotlyJS package.
 
