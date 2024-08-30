@@ -1,11 +1,12 @@
 """
     offset_region(originalRegion::GeoRegion, deltaDist; refRadius=constants.Re_mean, magnitude=3, precision=7)
+    offset_region(originalRegion::PolyRegion, deltaDist; refRadius=constants.Re_mean, magnitude=3, precision=7)
 
-Offset a GeoRegion by a given distance. This function offsets each polygon in
-the GeoRegion separately and combines the results into a Multi geometry.
+Offset a GeoRegion or PolyRegion by a given distance. This function offsets each polygon in
+the region separately and combines the results into a Multi geometry.
 
 ## Arguments
-- `originalRegion::GeoRegion`: The original region to be offset.
+- `originalRegion::Union{GeoRegion,PolyRegion}`: The original region to be offset.
 - `deltaDist`: The distance to offset the region by, in meters. Positive for \
 enlargement, negative for shrinking.
 - `refRadius::Float64=constants.Re_mean`: The reference radius to use for the \
@@ -16,6 +17,11 @@ coordinate in IntPoint conversion.
 
 ## Returns
 - `Multi`: A Multi geometry containing the offset polygons.
+
+## Notes
+- For GeoRegion, only the outer ring of each polygon is considered for offsetting.
+- For PolyRegion, if multiple outer rings are produced, inner rings are ignored \
+and separate PolyAreas are created for each outer ring.
 """
 function offset_region(originalRegion::GeoRegion, deltaDist; refRadius=constants.Re_mean, magnitude=3, precision=7)
     # `magnitude` represents the number of integer digits while `precision` the
@@ -34,38 +40,78 @@ function offset_region(originalRegion::GeoRegion, deltaDist; refRadius=constants
         # Perform the processing per CountryBorder.
         thisCountryGeoms = originalRegion.domain[idxCountry].latlon.geoms
         map(eachindex(thisCountryGeoms)) do idxGeom
-            # Get the offsetted version of each of the PolyArea composing this Country
-            # Perform processing per single PolyArea.
-            _offset_polyarea(thisCountryGeoms[idxGeom], intDelta; magnitude, precision)
+            # Perform processing per single PolyArea. Get the offsetted version
+            # of each of the PolyArea composing this Country. 
+            # //NOTE: 
+            # Only outer ring (i.e., [1] is considered for the enlargement of the
+            # GeoRegion. We avoid considering the inner rings since they are not
+            # relevant for our application.
+            outerRing = rings(thisCountryGeoms[idxGeom])[1]
+            offsetRings = _offset_ring(outerRing, intDelta; magnitude, precision)
+            # Create a separate PolyArea for each of the offset rings.
+            map(offsetRings) do ring
+                PolyArea(ring)
+            end
         end |> splat(vcat)
     end |> splat(vcat)
 
     return Multi(map(identity, allGeoms))
 end
 
-"""
-    _offset_polyarea(poly::PolyArea, delta; magnitude=3, precision=7)
+function offset_region(originalRegion::PolyRegion, deltaDist; refRadius=constants.Re_mean, magnitude=3, precision=7)
+    delta = rad2deg(deltaDist / refRadius)
+    intDelta = Float64(IntPoint(delta, delta, magnitude, precision).X) # We use IntPoint to exploit the conversion to IntPoint in Clipping, then we can use either X or Y as delta value.
 
-Offset a polygon by a given delta value. This function uses the Clipper library
-for polygon offsetting. It may return multiple polygons even when starting from
-a single PolyArea.
+    vecRings = rings(originalRegion.domain.latlon)
+    numRings = length(vecRings) # Number of Countries in GeoRegion
+
+    allGeoms = if numRings == 1
+        outerRing = _offset_ring(vecRings[1], intDelta; magnitude, precision)
+        PolyArea(outerRing)
+    else
+        # Create outer ring.
+        outerRing = _offset_ring(vecRings[1], intDelta; magnitude, precision)
+        if length(outerRing) > 1
+            # Multiple outer rings: we create a separate PolyArea for each of the outer rings.
+            @warn "The offsetting of the PolyRegion produced multiple outer rings. All the inner rings will be ignored and separte PolyArea will be created for each of the outer ring."
+            map(outerRing) do ring
+                PolyArea(ring)
+            end
+        else
+            # Single outer ring: we create a single PolyArea with the outer ring and all the inner rings.
+            # Process inner rings.
+            holes = map(vecRings[2:numRings]) do ring
+                _offset_ring(ring, -intDelta; magnitude, precision) # delta for inner rings is the opposite of the delta for the outer ring.
+            end
+            PolyArea([outerRing, holes...])
+        end
+    end
+
+    return Multi(map(identity, allGeoms))
+end
+
+"""
+    _offset_ring(ring::Ring{🌐,<:LatLon{WGS84Latest}}, delta; magnitude=3, precision=7, rings=false)
+
+Offset a ring by a given delta value. This function uses the Clipper library
+for polygon offsetting. It may return multiple rings even when starting from
+a single Ring.
 
 ## Arguments
-- `poly::PolyArea`: The polygon to be offset.
-- `delta`: The distance to offset the polygon by. Positive for enlargement, \
+- `ring::Ring{🌐,<:LatLon{WGS84Latest}}`: The ring to be offset.
+- `delta`: The distance to offset the ring by. Positive for enlargement, \
 negative for shrinking.
 - `magnitude::Int=3`: The number of integer digits for IntPoint conversion.
 - `precision::Int=7`: The total number of digits to be considered for each \
 coordinate in IntPoint conversion.
+- `rings::Bool=false`: Unused parameter, kept for backwards compatibility.
 
 ## Returns
-- Vector of `PolyArea`: The resulting offset polygons.
+- Vector of `Ring{🌐,<:LatLon{WGS84Latest}}`: The resulting offset rings.
 """
-function _offset_polyarea(poly::PolyArea{🌐,<:LatLon{WGS84Latest}}, delta; magnitude=3, precision=7)
+function _offset_ring(ring::Ring{🌐,<:LatLon{WGS84Latest}}, delta; magnitude=3, precision=7, rings=false)
     # delta translated in deg wrt the Earrth radius
-    ringsPoly = rings(poly)
-    # //NOTE: Only outer ring is considered for the enlargement. We avoid considering the inner rings in this version
-    intPoly = map([vertices(ringsPoly[1])...]) do vertex # Use splat to avoid CircularVector as output from map
+    intPoly = map([vertices(ring)...]) do vertex # Use splat to avoid CircularVector as output from map
         y = get_lat(vertex) |> ustrip
         x = get_lon(vertex) |> ustrip
         IntPoint(x, y, magnitude, precision) # Consider LON as X and LAT as Y
@@ -74,16 +120,15 @@ function _offset_polyarea(poly::PolyArea{🌐,<:LatLon{WGS84Latest}}, delta; mag
     add_path!(co, intPoly, JoinTypeMiter, EndTypeClosedPolygon) # We fix JoinTypeMiter, EndTypeClosedPolygon because it works well with complex polygons, look at Clipper documentation for details.
     offset_polygons = execute(co, delta) # Clipper polygon
     # We can end up with multiple polygons even when starting from a single
-    # PolyArea. So we will return all the polygons for this country as a vector
-    # of PolyArea.
-    geoms = map(eachindex(offset_polygons)) do i
-        ring = map(offset_polygons[i]) do vertex
+    # Ring. So we will return all the polygons generate for this Ring as A#
+    # a vector of Rings. Afterwards they will be used as outer or inner rings.
+    outRings = map(eachindex(offset_polygons)) do i
+        map(offset_polygons[i]) do vertex
             lonlat = tofloat(vertex, magnitude, precision)
             LatLon{WGS84Latest}(lonlat[2], lonlat[1]) |> Point
-        end
-        PolyArea(ring)
+        end |> Ring
     end
 
-    # Return a vector of PolyArea.
-    return geoms
+    # Return a vector of Ring.
+    return outRings
 end

@@ -344,7 +344,7 @@ let
 	hole2 = [Point(LatLon{WGS84Latest}(0.6, 0.2)), Point(LatLon{WGS84Latest}(0.6, 0.4)), Point(LatLon{WGS84Latest}(0.8, 0.4)), Point(LatLon{WGS84Latest}(0.8, 0.2))]
 	poly  = PolyArea([outer, hole1, hole2])
 
-	# _offset_polyarea(poly,0.5)
+	# _offset_ring(poly,0.5)
 	length(rings(poly))
 end
 
@@ -362,7 +362,25 @@ for i in eachindex(allCountries)
 end
 
 # ╔═╡ 3d995ef4-80c3-40f3-8da6-e3b68fd1ff2b
-rings(allCountries[7].latlon.geoms[1])
+typeof(rings(allCountries[7].latlon.geoms[1])[1])
+
+# ╔═╡ dc0f871d-6b4c-4c76-8522-323e8d24d367
+rings(allCountries[7].latlon.geoms[1])[1] isa Ring{🌐,<:LatLon{WGS84Latest}}
+
+# ╔═╡ 6ceb5a47-7030-423a-9b22-24980080b6bb
+pa,ring=let 
+	pa = PolyRegion(domain=[LatLon(10°, -5°), LatLon(10°, 15°), LatLon(27°, 15°), LatLon(27°, -5°)])
+	r = rings(pa.domain.latlon)
+
+	r2 = map([vertices(r[1])...]) do v
+		v
+	end
+
+	pa, Ring(r2)
+end
+
+# ╔═╡ f0538692-4208-41ec-9a39-8c7c2875af27
+pa.domain.latlon == PolyArea(ring)
 
 # ╔═╡ ac5b6c1e-6766-4e93-b938-a39cb2df1f4a
 let 
@@ -909,6 +927,9 @@ version = "17.4.0+2"
 # ╠═ac596255-5c9b-426f-8f3a-aba8081bb752
 # ╠═88aaf4c9-e2e6-4bf8-a282-5822fda73f58
 # ╠═3d995ef4-80c3-40f3-8da6-e3b68fd1ff2b
+# ╠═dc0f871d-6b4c-4c76-8522-323e8d24d367
+# ╠═6ceb5a47-7030-423a-9b22-24980080b6bb
+# ╠═f0538692-4208-41ec-9a39-8c7c2875af27
 # ╠═2745410e-d76d-426f-8316-fb4b269d013a
 # ╠═ac5b6c1e-6766-4e93-b938-a39cb2df1f4a
 # ╠═37cdcc89-16c2-4ab7-a1db-abb12355037b

@@ -39,13 +39,13 @@ mutable struct GeoRegionEnlarged{D} <: AbstractRegion
     convexhull::PolyBorder
 end
 
-function GeoRegionEnlarged(deltaDist; name="enlarged_region", continent="", subregion="", admin="", refRadius=constants.Re_mean, magnitude=3, precision=7)
+function GeoRegionEnlarged(deltaDist; name="enlarged_georegion", continent="", subregion="", admin="", refRadius=constants.Re_mean, magnitude=3, precision=7)
     gr = GeoRegion(; name, continent, subregion, admin)
 
     GeoRegionEnlarged(gr, deltaDist; name, refRadius, magnitude, precision)
 end
 
-function GeoRegionEnlarged(gr::GeoRegion, deltaDist; name="enlarged_region", refRadius=constants.Re_mean, magnitude=3, precision=7)
+function GeoRegionEnlarged(gr::GeoRegion, deltaDist; name="enlarged_georegion", refRadius=constants.Re_mean, magnitude=3, precision=7)
     orLatLon = offset_region(gr, deltaDist; refRadius, magnitude, precision)
     orCart = cartesian_geometry(orLatLon)
     or = MultiBorder(orLatLon, orCart)
@@ -66,5 +66,20 @@ mutable struct PolyRegionEnlarged <: AbstractRegion
     domain::PolyBorder
     # No convexhull needed for PolyRegion, it is always a single polygon, fast for filtering functions.
 end
-PolyRegion(name, domain::Vector{<:LatLon}) = PolyRegion(name, PolyBorder(PolyArea(map(Point, domain))))
-PolyRegion(; name::String="region_name", domain) = PolyRegion(name, domain)
+
+function PolyRegionEnlarged(deltaDist; name="enlarged_polyregion", domain, refRadius=constants.Re_mean, magnitude=3, precision=7)
+    pr = PolyRegion(name, domain)
+
+    PolyRegionEnlarged(pr, deltaDist; name, refRadius, magnitude, precision)
+end
+
+function PolyRegionEnlarged(pr::PolyRegion, deltaDist; name="enlarged_polyregion", refRadius=constants.Re_mean, magnitude=3, precision=7)
+    orLatLon = offset_region(pr, deltaDist; refRadius, magnitude, precision)
+    orCart = cartesian_geometry(orLatLon)
+    or = PolyBorder(orLatLon, orCart)
+
+    PolyRegionEnlarged(pr, name, or)
+end
+
+# PolyRegion(name, domain::Vector{<:LatLon}) = PolyRegion(name, PolyBorder(PolyArea(map(Point, domain))))
+# PolyRegion(; name::String="region_name", domain) = PolyRegion(name, domain)
