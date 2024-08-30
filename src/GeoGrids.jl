@@ -35,8 +35,7 @@ export icogrid, rectgrid, vecgrid,
     extract_countries, filter_points, group_by_domain,
     gen_hex_lattice, generate_tesselation, _tesselate, gen_circle_pattern, gen_hex_pattern,
     borders, centroid, in, get_lat, get_lon, latlon_geometry, cartesian_geometry,
-    offset_region, 
-    filter_points_fast, group_by_domain_fast
+    offset_region
 
 export °, rad, ustrip,
     LatLon, Cartesian, WGS84Latest, coords, PolyArea, Point,

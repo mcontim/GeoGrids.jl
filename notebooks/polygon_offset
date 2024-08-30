@@ -87,6 +87,17 @@ end |> splat(vcat)
 # ╔═╡ 3a29cf7a-0e8b-40ec-94fd-63ab9e18e975
 # group_by_domain(pp, [GeoRegion(; name="spain", admin="Spain"), GeoRegion(; name="italy", admin="Italy")]) == group_by_domain_fast(pp, [GeoRegion(; name="spain", admin="Spain"), GeoRegion(; name="italy", admin="Italy")])
 
+# ╔═╡ b2d4a333-5e49-4a14-891e-681098745b03
+# ╠═╡ disabled = true
+#=╠═╡
+a=PolyArea([Point(LatLon{WGS84Latest}(10°, -5°)), Point(LatLon{WGS84Latest}(10°, 15°)), Point(LatLon{WGS84Latest}(27°, 15°))])
+  ╠═╡ =#
+
+# ╔═╡ f66370ee-54e1-438b-b1ee-3802ecacaeb4
+#=╠═╡
+typeof(a)
+  ╠═╡ =#
+
 # ╔═╡ 2745410e-d76d-426f-8316-fb4b269d013a
 md"""
 # Documentation Preparation
@@ -249,8 +260,8 @@ tofloat(IntPoint(2.0,1.0,3,6),3,6)[1]
 # r = GeoRegion(; admin="Italy")
 r = GeoRegion(; continent="Europe")
 
-# ╔═╡ d3ea32e7-5247-4636-b5eb-ea58655be334
-r
+# ╔═╡ 41740685-feda-4daf-a10b-4815e7a146dc
+typeof(r)
 
 # ╔═╡ eb7ea8be-0475-474a-89e7-f8249edbcd63
 plot_geo_poly(r.convexhull.latlon; kwargs_scatter=(;mode="lines"), camera=:threedim)
@@ -286,6 +297,9 @@ ereg.domain.latlon.geoms
 # ╔═╡ d2f52430-ccc5-4438-9cf6-cb329580f1e7
 typeof(ereg.domain.latlon.geoms[1])
 
+# ╔═╡ d3ea32e7-5247-4636-b5eb-ea58655be334
+GeoRegionEnlarged(r,20e3)
+
 # ╔═╡ f75960d6-13bc-4398-967d-fda3e57302f0
 plot_geo_poly(ereg.domain)
 
@@ -306,17 +320,6 @@ reg=GeoRegion(; admin="Italy;Spain")
 
 # ╔═╡ d13cd812-29e8-457c-86fc-8e074771b8ed
 parent(Multi([reg.convexhull]))
-
-# ╔═╡ b2d4a333-5e49-4a14-891e-681098745b03
-# ╠═╡ disabled = true
-#=╠═╡
-a=PolyArea([Point(LatLon{WGS84Latest}(10°, -5°)), Point(LatLon{WGS84Latest}(10°, 15°)), Point(LatLon{WGS84Latest}(27°, 15°))])
-  ╠═╡ =#
-
-# ╔═╡ f66370ee-54e1-438b-b1ee-3802ecacaeb4
-#=╠═╡
-typeof(a)
-  ╠═╡ =#
 
 # ╔═╡ 42f94eb9-adab-4c5a-b10e-88cf6564322e
 PolyArea{🌐,LatLon{WGS84Latest}}[]
@@ -347,6 +350,30 @@ end
 
 # ╔═╡ ac596255-5c9b-426f-8f3a-aba8081bb752
 allCountries = extract_countries(CountriesBorders.get_geotable(; resolution = 10); admin="*")
+
+# ╔═╡ a478bf12-b3c3-45c6-8bd9-593beef3361e
+pa_latlon = PolyArea([Point(LatLon{WGS84Latest}(10°, -5°)), Point(LatLon{WGS84Latest}(10°, 15°)), Point(LatLon{WGS84Latest}(27°, 15°)), Point(LatLon{WGS84Latest}(27°, -5°))])
+
+# ╔═╡ 9963e3e0-5898-49c9-82c7-658a20ca37bc
+pa_cartesian = PolyArea([Point{𝔼{2}}(Cartesian{WGS84Latest}(-5, 10)), Point{𝔼{2}}(Cartesian{WGS84Latest}(15, 10)), Point{𝔼{2}}(Cartesian{WGS84Latest}(15, 27)), Point{𝔼{2}}(Cartesian{WGS84Latest}(-5, 27))])
+
+# ╔═╡ d15a875d-e4a1-42b6-8af4-a5dbc1f4e671
+cartesian_geometry(pa_latlon).rings[1].vertices[1] |> typeof
+
+# ╔═╡ e38679a5-f20f-4505-ac67-6fd551d8429a
+latlon_geometry(pa_cartesian)
+
+# ╔═╡ 11da2012-1728-4ab9-9f7f-e4856667e759
+typeof(convexhull(cartesian_geometry(pa_latlon)))
+
+# ╔═╡ df7f2573-096b-45a3-9bd7-fc463d356689
+convexhull(pa_cartesian) |> typeof
+
+# ╔═╡ c3461a65-aac1-4a68-a304-5a06ef2fc104
+latlon_geometry(convexhull(cartesian_geometry(pa_latlon)))
+
+# ╔═╡ 559a0966-d4ab-44fe-9abb-917b65514253
+latlon_geometry(pa_cartesian)
 
 # ╔═╡ 88aaf4c9-e2e6-4bf8-a282-5822fda73f58
 for i in eachindex(allCountries)
@@ -906,6 +933,7 @@ version = "17.4.0+2"
 # ╠═2e51773a-06e3-4f0a-b409-28f93846803c
 # ╠═b0991e3d-3452-4df0-989b-1b8dd7d7db0e
 # ╠═d3ea32e7-5247-4636-b5eb-ea58655be334
+# ╠═41740685-feda-4daf-a10b-4815e7a146dc
 # ╠═c70c01d3-3b9c-4c0e-ac98-9124843a44f9
 # ╠═f75960d6-13bc-4398-967d-fda3e57302f0
 # ╠═d2692782-a591-433b-bca5-1743ca4f5d9e
@@ -921,6 +949,14 @@ version = "17.4.0+2"
 # ╠═c826e1de-a63b-4528-b0bb-f663841a82a0
 # ╠═de4f5c1e-7ce4-42c8-a118-de096a49b01c
 # ╠═ac596255-5c9b-426f-8f3a-aba8081bb752
+# ╠═a478bf12-b3c3-45c6-8bd9-593beef3361e
+# ╠═9963e3e0-5898-49c9-82c7-658a20ca37bc
+# ╠═d15a875d-e4a1-42b6-8af4-a5dbc1f4e671
+# ╠═e38679a5-f20f-4505-ac67-6fd551d8429a
+# ╠═11da2012-1728-4ab9-9f7f-e4856667e759
+# ╠═df7f2573-096b-45a3-9bd7-fc463d356689
+# ╠═c3461a65-aac1-4a68-a304-5a06ef2fc104
+# ╠═559a0966-d4ab-44fe-9abb-917b65514253
 # ╠═88aaf4c9-e2e6-4bf8-a282-5822fda73f58
 # ╠═3d995ef4-80c3-40f3-8da6-e3b68fd1ff2b
 # ╠═dc0f871d-6b4c-4c76-8522-323e8d24d367

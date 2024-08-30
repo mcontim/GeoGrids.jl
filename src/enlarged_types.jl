@@ -11,13 +11,13 @@ Fields:
 
 # Constructors
 
-    GeoRegionEnlarged(deltaDist; kwargs...)
-    GeoRegionEnlarged(gr::GeoRegion, deltaDist; kwargs...)
+    GeoRegionEnlarged(delta; kwargs...)
+    GeoRegionEnlarged(gr::GeoRegion, delta; kwargs...)
 
 Create an enlarged GeoRegion either from scratch or from an existing GeoRegion.
 
 ## Arguments
-- `deltaDist`: Distance to enlarge the region by, in meters
+- `delta`: Distance to enlarge the region by, in meters
 - `gr::GeoRegion`: The original GeoRegion to enlarge (for the second constructor)
 
 ## Keyword Arguments
@@ -40,14 +40,15 @@ mutable struct GeoRegionEnlarged{D,P} <: AbstractRegion
     convexhull::PolyBorder{P}
 end
 
-function GeoRegionEnlarged(deltaDist; name="enlarged_georegion", continent="", subregion="", admin="", resolution=110, refRadius=constants.Re_mean, magnitude=3, precision=7)
+function GeoRegionEnlarged(delta::Number; name="enlarged_georegion", continent="", subregion="", admin="", resolution=110, refRadius=constants.Re_mean, magnitude=3, precision=7)
     gr = GeoRegion(; name, continent, subregion, admin, resolution)
 
-    GeoRegionEnlarged(gr, deltaDist; name, refRadius, magnitude, precision)
+    @info gr
+    # GeoRegionEnlarged(gr, delta; name, refRadius, magnitude, precision)
 end
 
-function GeoRegionEnlarged(gr::GeoRegion, deltaDist; name="enlarged_georegion", refRadius=constants.Re_mean, magnitude=3, precision=7)
-    orLatLon = offset_region(gr, deltaDist; refRadius, magnitude, precision)
+function GeoRegionEnlarged(gr::GeoRegion{D,P}, delta::Number; name="enlarged_georegion", refRadius=constants.Re_mean, magnitude=3, precision=7) where {D,P}
+    orLatLon = offset_region(gr, delta; refRadius, magnitude, precision)
     orCart = cartesian_geometry(orLatLon)
     or = MultiBorder(orLatLon, orCart)
 
