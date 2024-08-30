@@ -42,3 +42,11 @@ export °, rad, ustrip,
     SVector
 
 end # module GeoGrids 
+
+# //TODO:
+# [] Add tests for enlarged types and offsetting functions.
+# [] Add tests for plotting functions for enlarged regions.
+# [] Add documetnation on README for region enlargement.
+# [] Merge PR.
+# [] Add ValidDistance support (Issue)
+# [] Version bump to 0.5.0
