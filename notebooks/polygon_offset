@@ -70,13 +70,13 @@ map(1:2) do i
 end |> splat(vcat)
 
 # ╔═╡ e4cfa264-3a08-47e6-9ac2-c2ead4f4ff2e
-# @benchmark filter_points($pp, GeoRegion(; continent="Europe", admin="-Russia"))
+# @benchmark filter_points($pp, GeoRegion(; continent="Europe", admin="-Russia"), EO())
 
 # ╔═╡ 80ffa48a-ec3c-46da-b465-827b828d889a
-# @benchmark filter_points_fast($pp, GeoRegion(; continent="Europe", admin="-Russia"))
+# @benchmark filter_points_fast($pp, GeoRegion(; continent="Europe", admin="-Russia"), EO())
 
 # ╔═╡ bd7bcd09-2320-4235-8358-9b597747a3e9
-# filter_points(pp, GeoRegion(; continent="Europe", admin="-Russia")) == filter_points_fast(pp, GeoRegion(; continent="Europe", admin="-Russia"))
+# filter_points(pp, GeoRegion(; continent="Europe", admin="-Russia"), EO()) == filter_points_fast(pp, GeoRegion(; continent="Europe", admin="-Russia"), EO())
 
 # ╔═╡ 5d1ad162-57e3-4dfd-b90c-8ae06a03a88a
 # @benchmark group_by_domain($pp, [GeoRegion(; name="spain", admin="Spain"), GeoRegion(; name="italy", admin="Italy")])

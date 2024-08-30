@@ -29,17 +29,15 @@ function filter_points(points::AbstractVector{<:Union{LatLon,Point{🌐,<:LatLon
 end
 
 function filter_points(points::AbstractVector{<:Union{LatLon,Point{🌐,<:LatLon{WGS84Latest}}}}, domain::Union{PolyRegion,LatBeltRegion}, ::EO)
-    # filt = filter(x -> in(x, domain), points)
     indices = findall(x -> in(x, domain), points)
 
     return points[indices], indices
 end
 function filter_points(points::AbstractVector{<:Union{LatLon,Point{🌐,<:LatLon{WGS84Latest}}}}, domain::GeoRegion, ::EO)
-    # filt = filter(x -> in(x, domain), points)
-    intermediateFilter = findall(x -> in(x, domain.convexhull), points) # quick check over the convexhull
-    indices = findall(x -> in(x, domain), intermediateFilter) # accurate check over the actual domain
+    originalIdxInConvexhull = findall(x -> in(x, domain.convexhull), points) # quick check over the convexhull
+    finalIdx = findall(x -> in(x, domain), points[originalIdxInConvexhull]) # accurate check over the actual domain
 
-    return points[indices], indices
+    return points[originalIdxInConvexhull[finalIdx]], originalIdxInConvexhull[finalIdx]
 end
 
 """
