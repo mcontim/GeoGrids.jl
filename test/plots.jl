@@ -13,7 +13,7 @@
     @test plot_geo_points(LatLon(10,10); camera=:threedim) isa Plot
 end
 
-@testitem "plot_geo_points" tags = [:general] begin
+@testitem "plot_geo_cells" tags = [:general] begin
     using PlotlyBase
 
     reg = GeoRegion(; name="Tassellation", admin="Spain")

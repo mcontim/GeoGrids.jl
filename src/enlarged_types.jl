@@ -4,7 +4,7 @@
 Type representing an enlarged geographical region based on a GeoRegion.
 
 Fields:
-- `original::GeoRegion{D}`: The original GeoRegion
+- `original::GeoRegion{D,P}`: The original GeoRegion
 - `name::String`: Name of the enlarged region
 - `domain::MultiBorder{P}`: Domain of the enlarged region
 - `convexhull::PolyBorder{P}`: Convex hull of the enlarged region
@@ -76,7 +76,7 @@ Fields:
 Create an enlarged PolyRegion either from scratch or from an existing PolyRegion.
 
 ## Arguments
-- `deltaDist`: Distance to enlarge the region by
+- `deltaDist`: Distance to enlarge the region by, in meters
 - `pr::PolyRegion`: The original PolyRegion to enlarge (for the second constructor)
 
 ## Keyword Arguments
@@ -89,11 +89,10 @@ Create an enlarged PolyRegion either from scratch or from an existing PolyRegion
 ## Returns
 - `PolyRegionEnlarged`: The enlarged polygonal region
 """
-mutable struct PolyRegionEnlarged{P} <: AbstractRegion # Use parametric precision (e.g., Float32, Float64) for the coordinates.
+mutable struct PolyRegionEnlarged{P} <: AbstractRegion
     original::PolyRegion{P}
     name::String
     domain::MultiBorder{P}
-    # No convexhull needed for PolyRegion, it is always a single polygon, fast for filtering functions.
 end
 
 function PolyRegionEnlarged(deltaDist; name="enlarged_polyregion", domain, refRadius=constants.Re_mean, magnitude=3, precision=7)

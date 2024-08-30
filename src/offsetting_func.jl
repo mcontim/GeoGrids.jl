@@ -91,7 +91,7 @@ function offset_region(originalRegion::PolyRegion, deltaDist; refRadius=constant
 end
 
 """
-    _offset_ring(ring::Ring{🌐,<:LatLon{WGS84Latest}}, delta; magnitude=3, precision=7, rings=false)
+    _offset_ring(ring::Ring{🌐,<:LatLon{WGS84Latest}}, delta; magnitude=3, precision=7)
 
 Offset a ring by a given delta value. This function uses the Clipper library
 for polygon offsetting. It may return multiple rings even when starting from
@@ -104,12 +104,11 @@ negative for shrinking.
 - `magnitude::Int=3`: The number of integer digits for IntPoint conversion.
 - `precision::Int=7`: The total number of digits to be considered for each \
 coordinate in IntPoint conversion.
-- `rings::Bool=false`: Unused parameter, kept for backwards compatibility.
 
 ## Returns
 - Vector of `Ring{🌐,<:LatLon{WGS84Latest}}`: The resulting offset rings.
 """
-function _offset_ring(ring::RING_LATLON{T}, delta; magnitude=3, precision=7, rings=false) where T
+function _offset_ring(ring::RING_LATLON{T}, delta; magnitude=3, precision=7) where {T}
     # delta translated in deg wrt the Earrth radius
     intPoly = map([vertices(ring)...]) do vertex # Use splat to avoid CircularVector as output from map
         y = get_lat(vertex) |> ustrip

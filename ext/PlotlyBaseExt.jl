@@ -143,21 +143,31 @@ area to be plotted.
 are passed directly to the `scattergeo` function.
 
 ## Returns
-- A `scattergeo` plot object: The scatter plot visualization of the polygon's \
-boundary, ready for rendering in a geographic plot.
+- A vector of `scattergeo` plot objects: Each element represents a ring of the \
+polygon, ready for rendering in a geographic plot.
+
+## Notes
+- The function processes each ring of the polygon separately, creating a trace \
+for each.
+- The first and last points of each ring are connected to close the polygon.
+- By default, the lines are colored red and have no legend entry.
 """
 function _get_scatter_poly(poly::PolyArea{🌐,<:LatLon{WGS84Latest}}; kwargs...)
     # scatter line
-    temp = vertices(poly)
-    v = vcat(temp, temp[1])
-    return scattergeo(;
-        lat=map(x -> GeoGrids.get_lat(x), v), # Vectorize such to be sure to avoid matrices.
-        lon=map(x -> GeoGrids.get_lon(x), v), # Vectorize such to be sure to avoid matrices.
-        mode="lines",
-        line_color="red",
-        showlegend=false,
-        kwargs...
-    )
+    r = rings(poly)
+    out = map(r) do ring
+        # Each ring will be a separate trace.
+        temp = vertices(ring)
+        v = vcat(temp, temp[1])
+        scattergeo(;
+            lat=map(x -> GeoGrids.get_lat(x), v), # Vectorize such to be sure to avoid matrices.
+            lon=map(x -> GeoGrids.get_lon(x), v), # Vectorize such to be sure to avoid matrices.
+            mode="lines",
+            line_color="red",
+            showlegend=false,
+            kwargs...
+        )
+    end
 end
 
 """
