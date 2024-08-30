@@ -33,14 +33,11 @@ Create an enlarged GeoRegion either from scratch or from an existing GeoRegion.
 ## Returns
 - `GeoRegionEnlarged`: The enlarged geographical region
 """
-mutable struct GeoRegionEnlarged{D,P,T} <: AbstractRegion
-    # //NOTE: 
-    # Not clear why but we cannot use the same parametric type for the
-    # precision inside GeoRegion and MultiBorder/PolyBorder.
+mutable struct GeoRegionEnlarged{D,P} <: AbstractRegion
     original::GeoRegion{D,P}
     name::String
-    domain::MultiBorder{T}
-    convexhull::PolyBorder{T}
+    domain::MultiBorder{P}
+    convexhull::PolyBorder{P}
 end
 
 function GeoRegionEnlarged(delta::Number; name="enlarged_georegion", continent="", subregion="", admin="", resolution=110, refRadius=constants.Re_mean, magnitude=3, precision=7)

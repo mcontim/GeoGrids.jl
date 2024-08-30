@@ -23,7 +23,7 @@ coordinate in IntPoint conversion.
 - For PolyRegion, if multiple outer rings are produced, inner rings are ignored \
 and separate PolyAreas are created for each outer ring.
 """
-function offset_region(originalRegion::GeoRegion, deltaDist; refRadius=constants.Re_mean, magnitude=3, precision=7)
+function offset_region(originalRegion::GeoRegion{D,P}, deltaDist; refRadius=constants.Re_mean, magnitude=3, precision=7) where {D,P}
     # `magnitude` represents the number of integer digits while `precision` the
     # total number of digits that will be considered for each of the coordinates
     # for the `IntPoint` conversion. Look at Clipper documentation for more
@@ -33,7 +33,7 @@ function offset_region(originalRegion::GeoRegion, deltaDist; refRadius=constants
 
     # Compute the delta value to be used in the offsetting process (in deg)
     delta = rad2deg(deltaDist / refRadius)
-    intDelta = Float64(IntPoint(delta, delta, magnitude, precision).X) # We use IntPoint to exploit the conversion to IntPoint in Clipping, then we can use either X or Y as delta value.
+    intDelta = Float64(IntPoint(delta, delta, magnitude, precision).X) # We use IntPoint to exploit the conversion to IntPoint in Clipping, then we can use either X or Y as delta value. Clipper wants Float64
 
     numCountries = length(originalRegion.domain) # Number of Countries in GeoRegion
     allGeoms = map(1:numCountries) do idxCountry
@@ -109,7 +109,7 @@ coordinate in IntPoint conversion.
 ## Returns
 - Vector of `Ring{🌐,<:LatLon{WGS84Latest}}`: The resulting offset rings.
 """
-function _offset_ring(ring::Ring{🌐,<:LatLon{WGS84Latest}}, delta; magnitude=3, precision=7, rings=false)
+function _offset_ring(ring::RING_LATLON{T}, delta; magnitude=3, precision=7, rings=false) where T
     # delta translated in deg wrt the Earrth radius
     intPoly = map([vertices(ring)...]) do vertex # Use splat to avoid CircularVector as output from map
         y = get_lat(vertex) |> ustrip
@@ -125,7 +125,7 @@ function _offset_ring(ring::Ring{🌐,<:LatLon{WGS84Latest}}, delta; magnitude=3
     outRings = map(eachindex(offset_polygons)) do i
         map(offset_polygons[i]) do vertex
             lonlat = tofloat(vertex, magnitude, precision)
-            LatLon{WGS84Latest}(lonlat[2], lonlat[1]) |> Point
+            LatLon{WGS84Latest}(lonlat[2] |> T, lonlat[1] |> T) |> Point # Use consistent type precision for the coordinates.
         end |> Ring
     end
 

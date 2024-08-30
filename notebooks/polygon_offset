@@ -300,6 +300,9 @@ typeof(ereg.domain.latlon.geoms[1])
 # ╔═╡ d3ea32e7-5247-4636-b5eb-ea58655be334
 GeoRegionEnlarged(r,20e3)
 
+# ╔═╡ 1e5871bb-f8df-4cc0-a85c-7dc8930f35ca
+Point(LatLon{WGS84Latest}(10 |> Float32, 10 |> Float32))
+
 # ╔═╡ f75960d6-13bc-4398-967d-fda3e57302f0
 plot_geo_poly(ereg.domain)
 
@@ -934,6 +937,7 @@ version = "17.4.0+2"
 # ╠═b0991e3d-3452-4df0-989b-1b8dd7d7db0e
 # ╠═d3ea32e7-5247-4636-b5eb-ea58655be334
 # ╠═41740685-feda-4daf-a10b-4815e7a146dc
+# ╠═1e5871bb-f8df-4cc0-a85c-7dc8930f35ca
 # ╠═c70c01d3-3b9c-4c0e-ac98-9124843a44f9
 # ╠═f75960d6-13bc-4398-967d-fda3e57302f0
 # ╠═d2692782-a591-433b-bca5-1743ca4f5d9e
