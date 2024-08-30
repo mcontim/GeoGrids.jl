@@ -261,9 +261,6 @@ pp=icogrid(sepAng=2)
 # ╔═╡ 8722c85a-60f6-450f-a044-60416ec35f4a
 plot_geo_points(pp)
 
-# ╔═╡ fd4341d7-1ef6-404e-a609-d2ffb711d453
-plot_geo_points(fp)
-
 # ╔═╡ 0e26896b-b8d5-4b6f-8fa5-92185056587d
 scattergeo(;
         lat=map(x -> GeoGrids.get_lat(x), vertices(r.convexhull.latlon)), # Vectorize such to be sure to avoid matrices.
@@ -905,7 +902,6 @@ version = "17.4.0+2"
 # ╠═5d1ad162-57e3-4dfd-b90c-8ae06a03a88a
 # ╠═cf6d4d21-d6aa-4e55-93df-34ca8c58acf2
 # ╠═3a29cf7a-0e8b-40ec-94fd-63ab9e18e975
-# ╠═fd4341d7-1ef6-404e-a609-d2ffb711d453
 # ╠═0e26896b-b8d5-4b6f-8fa5-92185056587d
 # ╠═2e51773a-06e3-4f0a-b409-28f93846803c
 # ╠═b0991e3d-3452-4df0-989b-1b8dd7d7db0e

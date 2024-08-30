@@ -9,11 +9,6 @@ const constants = (
     b = 6356752.315 # [m] WGS84 semi-minor axis
 )
 
-## Define Region Types
-# //NOTE: 
-# We assume Float64 as the default precision for LATLON and CART in this
-# version. Could be uppdated to parametric in the future (like in
-# CountriesBorders.jl)
 """
     PolyBorder <: Geometry{🌐,LATLON}
 
@@ -23,9 +18,9 @@ Fields:
 - `latlon::POLY_LATLON`: The borders in LatLon CRS
 - `cart::POLY_CART`: The borders in Cartesian2D CRS
 """
-struct PolyBorder <: Geometry{🌐,LATLON}
-    latlon::POLY_LATLON{Float64}
-    cart::POLY_CART{Float64}
+struct PolyBorder{P} <: Geometry{🌐,LATLON} # Use parameetric precision (e.g., Float32, Float64) for the coordinates.
+    latlon::POLY_LATLON{P}
+    cart::POLY_CART{P}
 end
 function PolyBorder(latlon::POLY_LATLON) 
     cart = cartesian_geometry(latlon)
@@ -41,9 +36,9 @@ Fields:
 - `latlon::MULTI_LATLON`: The borders in LatLon CRS
 - `cart::MULTI_CART`: The borders in Cartesian2D CRS
 """
-struct MultiBorder <: Geometry{🌐,LATLON}
-    latlon::MULTI_LATLON{Float64}
-    cart::MULTI_CART{Float64}
+struct MultiBorder{P} <: Geometry{🌐,LATLON} # Use parameetric precision (e.g., Float32, Float64) for the coordinates.
+    latlon::MULTI_LATLON{P}
+    cart::MULTI_CART{P}
 end
 function MultiBorder(latlon::MULTI_LATLON) 
     cart = cartesian_geometry(latlon)
@@ -72,13 +67,13 @@ Fields:
 - `domain::D`: Domain of the region
 - `convexhull::PolyArea`: Convex hull of the region
 """
-mutable struct GeoRegion{D} <: AbstractRegion
+mutable struct GeoRegion{D,P} <: AbstractRegion
     name::String
     continent::String
     subregion::String
     admin::String
     domain::D
-    convexhull::PolyBorder
+    convexhull::PolyBorder{P}
 end
 function GeoRegion(; name="region_name", continent="", subregion="", admin="")
     all(isempty(v) for v in (continent, subregion, admin)) && error("Input at least one argument between continent, subregion and admin...")
@@ -101,9 +96,9 @@ Fields:
 - `name::String`: Name of the region
 - `domain::PolyBorder`: Domain of the region as a PolyBorder
 """
-mutable struct PolyRegion <: AbstractRegion
+mutable struct PolyRegion{P} <: AbstractRegion
     name::String
-    domain::PolyBorder
+    domain::PolyBorder{P}
 end
 PolyRegion(name, domain::Vector{<:LatLon}) = PolyRegion(name, PolyBorder(PolyArea(map(Point, domain))))
 PolyRegion(; name::String="region_name", domain) = PolyRegion(name, domain)

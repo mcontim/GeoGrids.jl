@@ -32,11 +32,11 @@ Create an enlarged GeoRegion either from scratch or from an existing GeoRegion.
 ## Returns
 - `GeoRegionEnlarged`: The enlarged geographical region
 """
-mutable struct GeoRegionEnlarged{D} <: AbstractRegion
+mutable struct GeoRegionEnlarged{D,P} <: AbstractRegion # Use parametric precision (e.g., Float32, Float64) for the coordinates.
     original::GeoRegion{D}
     name::String
-    domain::MultiBorder
-    convexhull::PolyBorder
+    domain::MultiBorder{P}
+    convexhull::PolyBorder{P}
 end
 
 function GeoRegionEnlarged(deltaDist; name="enlarged_georegion", continent="", subregion="", admin="", refRadius=constants.Re_mean, magnitude=3, precision=7)
@@ -57,13 +57,10 @@ function GeoRegionEnlarged(gr::GeoRegion, deltaDist; name="enlarged_georegion", 
     GeoRegionEnlarged(gr, name, or, ch)
 end
 
-
-################
-
-mutable struct PolyRegionEnlarged <: AbstractRegion
-    original::PolyRegion
+mutable struct PolyRegionEnlarged{P} <: AbstractRegion # Use parametric precision (e.g., Float32, Float64) for the coordinates.
+    original::PolyRegion{P}
     name::String
-    domain::PolyBorder
+    domain::MultiBorder{P}
     # No convexhull needed for PolyRegion, it is always a single polygon, fast for filtering functions.
 end
 
@@ -76,7 +73,7 @@ end
 function PolyRegionEnlarged(pr::PolyRegion, deltaDist; name="enlarged_polyregion", refRadius=constants.Re_mean, magnitude=3, precision=7)
     orLatLon = offset_region(pr, deltaDist; refRadius, magnitude, precision)
     orCart = cartesian_geometry(orLatLon)
-    or = PolyBorder(orLatLon, orCart)
+    or = MultiBorder(orLatLon, orCart)
 
     PolyRegionEnlarged(pr, name, or)
 end
