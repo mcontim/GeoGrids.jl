@@ -55,11 +55,11 @@ end
     @test a.lim == b.lim == c.lim == (0°,90°)
 
     @test_throws "UndefKeywordError: keyword argument `lim` not assigned" LatBeltRegion()
-    @test_throws "LAT provided as numbers must be expressed in radians and satisfy -90 ≤ x ≤ 90. 
+    @test_throws "LAT provided as numbers must be expressed in degrees and satisfy -90 ≤ x ≤ 90. 
 Consider using `°` (or `rad`) from `Unitful` if you want to pass numbers in degrees (or rad), by doing `x * °` (or `x * rad`)." LatBeltRegion("test", (0°,91°))
-    @test_throws "LAT provided as numbers must be expressed in radians and satisfy -90 ≤ x ≤ 90. 
+    @test_throws "LAT provided as numbers must be expressed in degrees and satisfy -90 ≤ x ≤ 90. 
 Consider using `°` (or `rad`) from `Unitful` if you want to pass numbers in degrees (or rad), by doing `x * °` (or `x * rad`)." LatBeltRegion("test", (-91°,91°))
-    @test_throws "LAT provided as numbers must be expressed in radians and satisfy -90 ≤ x ≤ 90. 
+    @test_throws "LAT provided as numbers must be expressed in degrees and satisfy -90 ≤ x ≤ 90. 
 Consider using `°` (or `rad`) from `Unitful` if you want to pass numbers in degrees (or rad), by doing `x * °` (or `x * rad`)." LatBeltRegion("test", (-91°,0°))
     @test_throws "The first LAT limit must be lower than the second one..." LatBeltRegion(; lim=((π/2)rad, 0rad))
     @test_throws "The first LAT limit must be different than the second one..." LatBeltRegion(; lim=(90, 90))
