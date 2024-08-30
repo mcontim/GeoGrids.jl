@@ -1,13 +1,13 @@
 """
-    GeoRegionEnlarged{D} <: AbstractRegion
+    GeoRegionEnlarged{D,P} <: AbstractRegion
 
 Type representing an enlarged geographical region based on a GeoRegion.
 
 Fields:
 - `original::GeoRegion{D}`: The original GeoRegion
 - `name::String`: Name of the enlarged region
-- `domain::MultiBorder`: Domain of the enlarged region
-- `convexhull::PolyBorder`: Convex hull of the enlarged region
+- `domain::MultiBorder{P}`: Domain of the enlarged region
+- `convexhull::PolyBorder{P}`: Convex hull of the enlarged region
 
 # Constructors
 
@@ -17,7 +17,7 @@ Fields:
 Create an enlarged GeoRegion either from scratch or from an existing GeoRegion.
 
 ## Arguments
-- `deltaDist`: Distance to enlarge the region by
+- `deltaDist`: Distance to enlarge the region by, in meters
 - `gr::GeoRegion`: The original GeoRegion to enlarge (for the second constructor)
 
 ## Keyword Arguments
@@ -25,6 +25,7 @@ Create an enlarged GeoRegion either from scratch or from an existing GeoRegion.
 - `continent::String=""`: Continent of the region (only for the first constructor)
 - `subregion::String=""`: Subregion within the continent (only for the first constructor)
 - `admin::String=""`: Administrative area (only for the first constructor)
+- `resolution::Int=110`: Resolution of the geographical data (only for the first constructor)
 - `refRadius::Float64=constants.Re_mean`: Reference radius of the Earth
 - `magnitude::Int=3`: Magnitude for polygon offsetting
 - `precision::Int=7`: Precision for polygon offsetting
@@ -32,8 +33,8 @@ Create an enlarged GeoRegion either from scratch or from an existing GeoRegion.
 ## Returns
 - `GeoRegionEnlarged`: The enlarged geographical region
 """
-mutable struct GeoRegionEnlarged{D,P} <: AbstractRegion # Use parametric precision (e.g., Float32, Float64) for the coordinates.
-    original::GeoRegion{D}
+mutable struct GeoRegionEnlarged{D,P} <: AbstractRegion
+    original::GeoRegion{D,P}
     name::String
     domain::MultiBorder{P}
     convexhull::PolyBorder{P}
@@ -57,6 +58,37 @@ function GeoRegionEnlarged(gr::GeoRegion, deltaDist; name="enlarged_georegion", 
     GeoRegionEnlarged(gr, name, or, ch)
 end
 
+"""
+    PolyRegionEnlarged{P} <: AbstractRegion
+
+Struct representing an enlarged polygonal region.
+
+Fields:
+- `original::PolyRegion{P}`: The original PolyRegion
+- `name::String`: Name of the enlarged region
+- `domain::MultiBorder{P}`: Domain of the enlarged region as a MultiBorder
+
+# Constructors
+
+    PolyRegionEnlarged(deltaDist; kwargs...)
+    PolyRegionEnlarged(pr::PolyRegion, deltaDist; kwargs...)
+
+Create an enlarged PolyRegion either from scratch or from an existing PolyRegion.
+
+## Arguments
+- `deltaDist`: Distance to enlarge the region by
+- `pr::PolyRegion`: The original PolyRegion to enlarge (for the second constructor)
+
+## Keyword Arguments
+- `name::String="enlarged_polyregion"`: Name of the enlarged region
+- `domain`: Domain of the region (only for the first constructor)
+- `refRadius::Float64=constants.Re_mean`: Reference radius of the Earth
+- `magnitude::Int=3`: Magnitude for polygon offsetting
+- `precision::Int=7`: Precision for polygon offsetting
+
+## Returns
+- `PolyRegionEnlarged`: The enlarged polygonal region
+"""
 mutable struct PolyRegionEnlarged{P} <: AbstractRegion # Use parametric precision (e.g., Float32, Float64) for the coordinates.
     original::PolyRegion{P}
     name::String
@@ -77,6 +109,3 @@ function PolyRegionEnlarged(pr::PolyRegion, deltaDist; name="enlarged_polyregion
 
     PolyRegionEnlarged(pr, name, or)
 end
-
-# PolyRegion(name, domain::Vector{<:LatLon}) = PolyRegion(name, PolyBorder(PolyArea(map(Point, domain))))
-# PolyRegion(; name::String="region_name", domain) = PolyRegion(name, domain)

@@ -87,9 +87,6 @@ end |> splat(vcat)
 # ╔═╡ 3a29cf7a-0e8b-40ec-94fd-63ab9e18e975
 # group_by_domain(pp, [GeoRegion(; name="spain", admin="Spain"), GeoRegion(; name="italy", admin="Italy")]) == group_by_domain_fast(pp, [GeoRegion(; name="spain", admin="Spain"), GeoRegion(; name="italy", admin="Italy")])
 
-# ╔═╡ 3cc999b6-bb6c-4d40-b42e-b5d94fdfc11c
-
-
 # ╔═╡ 2745410e-d76d-426f-8316-fb4b269d013a
 md"""
 # Documentation Preparation
@@ -281,7 +278,7 @@ cb=let
 end
 
 # ╔═╡ b0991e3d-3452-4df0-989b-1b8dd7d7db0e
-ereg = GeoRegionEnlarged(10e3; admin="Spain; Italy")
+ereg = GeoRegionEnlarged(20e3; admin="Spain; Italy", resolution=110)
 
 # ╔═╡ c70c01d3-3b9c-4c0e-ac98-9124843a44f9
 ereg.domain.latlon.geoms
@@ -924,7 +921,6 @@ version = "17.4.0+2"
 # ╠═c826e1de-a63b-4528-b0bb-f663841a82a0
 # ╠═de4f5c1e-7ce4-42c8-a118-de096a49b01c
 # ╠═ac596255-5c9b-426f-8f3a-aba8081bb752
-# ╠═3cc999b6-bb6c-4d40-b42e-b5d94fdfc11c
 # ╠═88aaf4c9-e2e6-4bf8-a282-5822fda73f58
 # ╠═3d995ef4-80c3-40f3-8da6-e3b68fd1ff2b
 # ╠═dc0f871d-6b4c-4c76-8522-323e8d24d367
