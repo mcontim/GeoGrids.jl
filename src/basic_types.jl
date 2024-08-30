@@ -2,7 +2,7 @@
 const UnitfulAngleType = Union{typeof(°),typeof(rad)}
 const UnitfulAngleQuantity = Quantity{<:Real,<:Any,<:UnitfulAngleType}
 const ValidAngle = Union{UnitfulAngleQuantity,Real}
-const ValidDistance = Union{Unitful.Length, Real}
+const ValidDistance = Union{Length, Real}
 
 const constants = (
     Re_mean = 6371e3, # Mean Earth Radius [m]

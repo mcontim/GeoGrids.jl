@@ -3,7 +3,7 @@ module PlotlyBaseExt
 using PlotlyExtensionsHelper
 using PlotlyBase
 using Unitful: ustrip
-using Meshes: vertices, Multi, Ngon, 🌐, WGS84Latest
+using Meshes: vertices, rings, Multi, Ngon, 🌐, WGS84Latest
 
 using GeoGrids
 
@@ -341,7 +341,7 @@ See also: [`_get_scatter_poly`](@ref), [`_default_geolayout`](@ref),
 """
 function GeoGrids.plot_geo_poly(polys::AbstractVector{<:PolyArea{🌐,<:LatLon{WGS84Latest}}}; title="Polygon GEO Map", camera::Symbol=:twodim, kwargs_scatter=(;), kwargs_layout=(;))
     # Extract the vertices of the polygon
-    scattersPoly = map(x -> _get_scatter_poly(x; kwargs_scatter...), polys)
+    scattersPoly = map(x -> _get_scatter_poly(x; kwargs_scatter...) |> splat(vcat), polys) |> splat(vcat)
 
     layout = _default_geolayout(; title, camera, kwargs_layout...)
 

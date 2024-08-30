@@ -12,7 +12,7 @@ using Meshes
 using Meshes: 🌐, WGS84Latest, coords
 using PlotlyExtensionsHelper
 using StaticArrays
-using Unitful: °, rad, Quantity, @u_str, ustrip
+using Unitful: °, rad, Quantity, Length, @u_str, ustrip
 
 include("basic_types.jl")
 include("enlarged_types.jl")

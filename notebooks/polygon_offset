@@ -260,9 +260,6 @@ tofloat(IntPoint(2.0,1.0,3,6),3,6)[1]
 # r = GeoRegion(; admin="Italy")
 r = GeoRegion(; continent="Europe")
 
-# ╔═╡ 41740685-feda-4daf-a10b-4815e7a146dc
-typeof(r)
-
 # ╔═╡ eb7ea8be-0475-474a-89e7-f8249edbcd63
 plot_geo_poly(r.convexhull.latlon; kwargs_scatter=(;mode="lines"), camera=:threedim)
 
@@ -292,7 +289,7 @@ end
 ereg = GeoRegionEnlarged(20e3; admin="Spain; Italy", resolution=110)
 
 # ╔═╡ c70c01d3-3b9c-4c0e-ac98-9124843a44f9
-ereg.domain.latlon.geoms
+ereg.domain.latlon.geoms[1]
 
 # ╔═╡ d2f52430-ccc5-4438-9cf6-cb329580f1e7
 typeof(ereg.domain.latlon.geoms[1])
@@ -300,8 +297,41 @@ typeof(ereg.domain.latlon.geoms[1])
 # ╔═╡ d3ea32e7-5247-4636-b5eb-ea58655be334
 GeoRegionEnlarged(r,20e3)
 
-# ╔═╡ 1e5871bb-f8df-4cc0-a85c-7dc8930f35ca
-Point(LatLon{WGS84Latest}(10 |> Float32, 10 |> Float32))
+# ╔═╡ 61a493fe-241a-40fa-8a0a-d3fe82ce9250
+function _get_scatter_poly(poly::PolyArea{🌐,<:LatLon{WGS84Latest}}; kwargs...)
+    # scatter line
+    r = rings(poly)
+    out = map(r) do ring
+        # Each ring will be a separate trace.
+        temp = vertices(ring)
+        v = vcat(temp, temp[1])
+        scattergeo(;
+            lat=map(x -> GeoGrids.get_lat(x), v), # Vectorize such to be sure to avoid matrices.
+            lon=map(x -> GeoGrids.get_lon(x), v), # Vectorize such to be sure to avoid matrices.
+            mode="lines",
+            line_color="red",
+            showlegend=false,
+            kwargs...
+        )
+    end
+end
+
+# ╔═╡ 2dd307aa-5b00-4d51-8a7c-e9958e150305
+patest = let
+	outer = [Point(LatLon{WGS84Latest}(10°, -5°)), Point(LatLon{WGS84Latest}(10°, 15°)), Point(LatLon{WGS84Latest}(27°, 15°)), Point(LatLon{WGS84Latest}(27°, -5°))]
+inner = [Point(LatLon{WGS84Latest}(15°, -3°)), Point(LatLon{WGS84Latest}(15°, 10°)), Point(LatLon{WGS84Latest}(18°, 10°)), Point(LatLon{WGS84Latest}(18°, -3°))]
+PolyArea(outer, inner)
+end
+
+# ╔═╡ aebffc55-3b97-409d-a1c0-ae2e6e65fb70
+map(x -> _get_scatter_poly(x) |> splat(vcat), [patest,patest]) |> splat(vcat)
+
+# ╔═╡ 1b08831b-3f5c-4aca-b704-9ebb4c957dde
+map([patest,patest]) do p1
+	map([patest,patest]) do p2
+		p2
+	end |> splat(vcat)
+end |> splat(vcat)
 
 # ╔═╡ f75960d6-13bc-4398-967d-fda3e57302f0
 plot_geo_poly(ereg.domain)
@@ -936,9 +966,11 @@ version = "17.4.0+2"
 # ╠═2e51773a-06e3-4f0a-b409-28f93846803c
 # ╠═b0991e3d-3452-4df0-989b-1b8dd7d7db0e
 # ╠═d3ea32e7-5247-4636-b5eb-ea58655be334
-# ╠═41740685-feda-4daf-a10b-4815e7a146dc
-# ╠═1e5871bb-f8df-4cc0-a85c-7dc8930f35ca
 # ╠═c70c01d3-3b9c-4c0e-ac98-9124843a44f9
+# ╠═61a493fe-241a-40fa-8a0a-d3fe82ce9250
+# ╠═aebffc55-3b97-409d-a1c0-ae2e6e65fb70
+# ╠═1b08831b-3f5c-4aca-b704-9ebb4c957dde
+# ╠═2dd307aa-5b00-4d51-8a7c-e9958e150305
 # ╠═f75960d6-13bc-4398-967d-fda3e57302f0
 # ╠═d2692782-a591-433b-bca5-1743ca4f5d9e
 # ╠═d2f52430-ccc5-4438-9cf6-cb329580f1e7
