@@ -39,8 +39,8 @@ mutable struct GeoRegionEnlarged{D,P} <: AbstractRegion # Use parametric precisi
     convexhull::PolyBorder{P}
 end
 
-function GeoRegionEnlarged(deltaDist; name="enlarged_georegion", continent="", subregion="", admin="", refRadius=constants.Re_mean, magnitude=3, precision=7)
-    gr = GeoRegion(; name, continent, subregion, admin)
+function GeoRegionEnlarged(deltaDist; name="enlarged_georegion", continent="", subregion="", admin="", resolution=110, refRadius=constants.Re_mean, magnitude=3, precision=7)
+    gr = GeoRegion(; name, continent, subregion, admin, resolution)
 
     GeoRegionEnlarged(gr, deltaDist; name, refRadius, magnitude, precision)
 end
