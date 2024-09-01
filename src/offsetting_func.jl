@@ -67,7 +67,7 @@ function offset_region(originalRegion::PolyRegion, deltaDist; refRadius=constant
 
     allGeoms = if numRings == 1
         outerRing = _offset_ring(vecRings[1], intDelta; magnitude, precision)
-        PolyArea(outerRing)
+        [PolyArea(outerRing)]
     else
         # Create outer ring.
         outerRing = _offset_ring(vecRings[1], intDelta; magnitude, precision)
@@ -83,7 +83,7 @@ function offset_region(originalRegion::PolyRegion, deltaDist; refRadius=constant
             holes = map(vecRings[2:numRings]) do ring
                 _offset_ring(ring, -intDelta; magnitude, precision) # delta for inner rings is the opposite of the delta for the outer ring.
             end
-            PolyArea([outerRing, holes...])
+            [PolyArea([outerRing, holes...])]
         end
     end
 

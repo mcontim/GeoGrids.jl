@@ -40,7 +40,7 @@ mutable struct GeoRegionEnlarged{D,P} <: AbstractRegion
     convexhull::PolyBorder{P}
 end
 
-function GeoRegionEnlarged(delta::Number; name="enlarged_georegion", continent="", subregion="", admin="", resolution=110, refRadius=constants.Re_mean, magnitude=3, precision=7)
+function GeoRegionEnlarged(; name="enlarged_georegion", continent="", subregion="", admin="", delta::Number, resolution=110, refRadius=constants.Re_mean, magnitude=3, precision=7)
     gr = GeoRegion(; name, continent, subregion, admin, resolution)
 
     GeoRegionEnlarged(gr, delta; name, refRadius, magnitude, precision)
@@ -95,14 +95,14 @@ mutable struct PolyRegionEnlarged{P} <: AbstractRegion
     domain::MultiBorder{P}
 end
 
-function PolyRegionEnlarged(deltaDist; name="enlarged_polyregion", domain, refRadius=constants.Re_mean, magnitude=3, precision=7)
+function PolyRegionEnlarged(; name="enlarged_polyregion", domain, delta::Number, refRadius=constants.Re_mean, magnitude=3, precision=7)
     pr = PolyRegion(name, domain)
 
-    PolyRegionEnlarged(pr, deltaDist; name, refRadius, magnitude, precision)
+    PolyRegionEnlarged(pr, delta; name, refRadius, magnitude, precision)
 end
 
-function PolyRegionEnlarged(pr::PolyRegion, deltaDist; name="enlarged_polyregion", refRadius=constants.Re_mean, magnitude=3, precision=7)
-    orLatLon = offset_region(pr, deltaDist; refRadius, magnitude, precision)
+function PolyRegionEnlarged(pr::PolyRegion, delta::Number; name="enlarged_polyregion", refRadius=constants.Re_mean, magnitude=3, precision=7)
+    orLatLon = offset_region(pr, delta; refRadius, magnitude, precision)
     orCart = cartesian_geometry(orLatLon)
     or = MultiBorder(orLatLon, orCart)
 
