@@ -298,16 +298,13 @@ ereg.domain.latlon.geoms[1]
 typeof(ereg.domain.latlon.geoms[1])
 
 # ╔═╡ d3ea32e7-5247-4636-b5eb-ea58655be334
-epoly = PolyRegionEnlarged(delta=20e3, domain=[LatLon(10°, -5°), LatLon(10°, 15°), LatLon(27°, 15°), LatLon(27°, -5°)])
+epoly = PolyRegionEnlarged(delta=100e3, domain=[LatLon(10°, -5°), LatLon(10°, 15°), LatLon(27°, 15°), LatLon(27°, -5°)])
 
-# ╔═╡ 54e4a50a-c83c-4992-b862-62219d3ecd92
-op = PolyRegion(domain=[LatLon(10°, -5°), LatLon(10°, 15°), LatLon(27°, 15°), LatLon(27°, -5°)])
+# ╔═╡ 51725022-0c8c-4300-8438-53a55286ffd8
+epoly.original.domain.latlon
 
-# ╔═╡ cd414c8a-0ea5-43e0-915e-2314c1cb5075
-offset_region(op, 10e3)
-
-# ╔═╡ 00884c13-3e8e-4569-b169-489d0b549997
-offset_region(og,20e3)
+# ╔═╡ 745dce84-edc1-4ed1-ab1a-599d5a654158
+epoly.domain.latlon.geoms
 
 # ╔═╡ 61a493fe-241a-40fa-8a0a-d3fe82ce9250
 function _get_scatter_poly(poly::PolyArea{🌐,<:LatLon{WGS84Latest}}; kwargs...)
@@ -349,7 +346,10 @@ end |> splat(vcat)
 plot_geo_poly(ereg.domain)
 
 # ╔═╡ 461c7dda-ac84-4beb-8247-8e72214c77d6
-plot_geo_poly([epoly.domain, epoly.original.domain])
+plot_geo_poly([epoly.domain.latlon.geoms..., epoly.original.domain.latlon])
+
+# ╔═╡ 9d207ac1-a2af-4b91-8e15-bba385e21871
+plot_geo_poly(epoly.domain)
 
 # ╔═╡ d2692782-a591-433b-bca5-1743ca4f5d9e
 methods(plot_geo_poly)
@@ -982,9 +982,6 @@ version = "17.4.0+2"
 # ╠═a308e23c-ff0e-4ab5-86c6-55fcd5ac1d07
 # ╠═b0991e3d-3452-4df0-989b-1b8dd7d7db0e
 # ╠═d3ea32e7-5247-4636-b5eb-ea58655be334
-# ╠═54e4a50a-c83c-4992-b862-62219d3ecd92
-# ╠═cd414c8a-0ea5-43e0-915e-2314c1cb5075
-# ╠═00884c13-3e8e-4569-b169-489d0b549997
 # ╠═c70c01d3-3b9c-4c0e-ac98-9124843a44f9
 # ╠═61a493fe-241a-40fa-8a0a-d3fe82ce9250
 # ╠═aebffc55-3b97-409d-a1c0-ae2e6e65fb70
@@ -992,6 +989,9 @@ version = "17.4.0+2"
 # ╠═2dd307aa-5b00-4d51-8a7c-e9958e150305
 # ╠═f75960d6-13bc-4398-967d-fda3e57302f0
 # ╠═461c7dda-ac84-4beb-8247-8e72214c77d6
+# ╠═9d207ac1-a2af-4b91-8e15-bba385e21871
+# ╠═51725022-0c8c-4300-8438-53a55286ffd8
+# ╠═745dce84-edc1-4ed1-ab1a-599d5a654158
 # ╠═d2692782-a591-433b-bca5-1743ca4f5d9e
 # ╠═d2f52430-ccc5-4438-9cf6-cb329580f1e7
 # ╠═b047b786-e7de-45b1-972f-668754358817

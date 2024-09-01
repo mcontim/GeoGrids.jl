@@ -25,7 +25,8 @@ include("filtering_func.jl")
 include("tessellation_func.jl")
 include("plot_func.jl")
 
-export AbstractRegion, GlobalRegion, GeoRegion, GeoRegionEnlarged, PolyRegion, LatBeltRegion,
+export AbstractRegion, GlobalRegion, GeoRegion, PolyRegion, LatBeltRegion,
+    GeoRegionEnlarged, PolyRegionEnlarged,
     MultiBorder, PolyBorder,
     AbstractTiling, ICO, HEX, H3,
     EO
@@ -44,8 +45,8 @@ export °, rad, ustrip,
 end # module GeoGrids 
 
 # //TODO:
-# [] Add tests for enlarged types and offsetting functions.
-# [] Add tests for plotting functions for enlarged regions.
+# [x] Add tests for enlarged types and offsetting functions.
+# [x] Add tests for plotting functions for enlarged regions.
 # [] Add documetnation on README for region enlargement.
 # [] Merge PR.
 # [] Add ValidDistance support (Issue)
