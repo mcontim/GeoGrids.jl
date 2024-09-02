@@ -32,6 +32,7 @@ This is a package containing functions for Geographical Grids generation, for ex
 ### Enlarged Regions
 
 - `GeoRegionEnlarged`: Represents a geographical region defined by a country or a list of countries, with an additional field `:enlarged` that can be set to `true` to indicate that the region is enlarged.
+- `PolyRegionEnlarged`: Represents a region defined by a polygon of latitude-longitude coordinates, with an additional field `:enlarged` that can be set to `true` to indicate that the region is enlarged.
   
 These types provide a flexible framework for defining geographical regions and tessellation methods for creating grid layouts in GeoGrids.jl. They allow users to specify different types of regions (global, latitude belts, country-based, or custom polygons) and choose appropriate tessellation methods for their specific needs.
 
@@ -54,8 +55,14 @@ This method of point distribution aims to provide a more uniform coverage of the
 
 The function returns points in the WGS84 coordinate system, represented as latitude-longitude pairs.
 
+### Example:
+
+```julia
+	plot_geo_points(icogrid(sepAng=5); title="Ico Grid")
+```
+
 <p align="center">
-  <img src="./docs/img/ico.png" alt="Icogrid"/>
+  <img src="./docs/img/icogrid.png" alt="Icogrid"/>
 </p>
 
 ## Rectangular Grid
@@ -71,8 +78,14 @@ The grid points are returned as `Point{🌐,<:LatLon{WGS84Latest}}` objects, rep
 
 This rectangular grid can be useful for various geospatial applications, such as creating evenly spaced sampling points across the globe or defining a regular grid for data analysis and visualization.
 
+### Example:
+
+```julia
+	plot_geo_points(rectgrid(5)[:]; title="Rect Grid")
+```
+
 <p align="center">
-  <img src="./docs/img/mesh.png" alt="Meshgrid"/>
+  <img src="./docs/img/rectgrid.png" alt="Rect Grid"/>
 </p>
 
 ## Vector Grid
@@ -205,6 +218,36 @@ This function can be particularly useful for generating tessellations for cell l
 
 <p align="center">
   <img src="./docs/img/poly_cell_layout.png" alt="Poly Cell Layout"/>
+</p>
+
+## Region Enlargement and Offsetting
+
+GeoGrids.jl provides functionality to enlarge or offset regions, which can be useful for various applications such as creating buffer zones or expanding coverage areas.
+
+    offset_region(originalRegion::Union{GeoRegion, PolyRegion}, deltaDist; refRadius=constants.Re_mean, magnitude=3, precision=7)
+
+This function takes an original region (either a `GeoRegion` or a `PolyRegion`) and offsets it by a specified distance. The offset can be positive (to enlarge the region) or negative (to shrink it).
+
+As default usage you should use directly the `GeoRegionEnlarged` and `PolyRegionEnlarged` types.
+
+```julia
+  # Enlarge the selected GEO region by 50km
+  ereg = GeoRegionEnlarged(delta=50e3, admin="Spain; Italy", resolution=110)
+  plot_geo_poly(ereg.domain; title="Geo Region Enlarged")
+```	
+
+<p align="center">
+  <img src="./docs/img/georegion_enlarged.png" alt="Geo Region Enlarged"/>
+</p>
+
+```julia
+  # Enlarge the selected POLY region by 100km
+  epoly = PolyRegionEnlarged(delta=100e3, domain=[LatLon(10°, -5°), LatLon(10°, 15°), LatLon(27°, 15°), LatLon(27°, -5°)])
+  plot_geo_poly([epoly.domain.latlon.geoms..., epoly.original.domain.latlon]; title="Normal and Enlarged PolyRegion")
+```	
+
+<p align="center">
+  <img src="./docs/img/poly_enlarged.png" alt="Normal and Enlarged PolyRegion"/>
 </p>
 
 ## Useful Additional Functions

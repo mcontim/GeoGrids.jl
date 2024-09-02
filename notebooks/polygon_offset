@@ -36,7 +36,7 @@ md"""
 """
 
 # ╔═╡ 57f2c12d-66d9-443a-9fe0-83f8504d765c
-const defaultLayoutGeo = (;
+const DEFAULT_GEOLAYOUT = (;
     geo=attr(
         projection=attr(
             type="robinson",
@@ -86,6 +86,9 @@ end |> splat(vcat)
 
 # ╔═╡ 3a29cf7a-0e8b-40ec-94fd-63ab9e18e975
 # group_by_domain(pp, [GeoRegion(; name="spain", admin="Spain"), GeoRegion(; name="italy", admin="Italy")]) == group_by_domain_fast(pp, [GeoRegion(; name="spain", admin="Spain"), GeoRegion(; name="italy", admin="Italy")])
+
+# ╔═╡ d3ea32e7-5247-4636-b5eb-ea58655be334
+
 
 # ╔═╡ b2d4a333-5e49-4a14-891e-681098745b03
 # ╠═╡ disabled = true
@@ -267,13 +270,19 @@ plot_geo_poly(r.convexhull.latlon; kwargs_scatter=(;mode="lines"), camera=:three
 pp=icogrid(sepAng=2)
 
 # ╔═╡ 8722c85a-60f6-450f-a044-60416ec35f4a
-plot_geo_points(pp)
+let 
+	p = plot_geo_points(icogrid(sepAng=5); title="Ico Grid")
+	change_image_options!(p; scale=3)
+end
+
+# ╔═╡ c437fbc7-3e4b-4239-a2a8-7491af3716e8
+rectgrid(5)
 
 # ╔═╡ 0e26896b-b8d5-4b6f-8fa5-92185056587d
 scattergeo(;
         lat=map(x -> GeoGrids.get_lat(x), vertices(r.convexhull.latlon)), # Vectorize such to be sure to avoid matrices.
         lon=map(x -> GeoGrids.get_lon(x), vertices(r.convexhull.latlon)), # Vectorize such to be sure to avoid matrices.
-        # defaultScatterPoints...,
+        # DEFAULT_POINT...,
         # kwargs...
     )
 
@@ -297,17 +306,8 @@ ereg.domain.latlon.geoms[1]
 # ╔═╡ d2f52430-ccc5-4438-9cf6-cb329580f1e7
 typeof(ereg.domain.latlon.geoms[1])
 
-# ╔═╡ d3ea32e7-5247-4636-b5eb-ea58655be334
-epoly = PolyRegionEnlarged(delta=100e3, domain=[LatLon(10°, -5°), LatLon(10°, 15°), LatLon(27°, 15°), LatLon(27°, -5°)])
-
-# ╔═╡ 51725022-0c8c-4300-8438-53a55286ffd8
-epoly.original.domain.latlon
-
-# ╔═╡ 745dce84-edc1-4ed1-ab1a-599d5a654158
-epoly.domain.latlon.geoms
-
 # ╔═╡ 61a493fe-241a-40fa-8a0a-d3fe82ce9250
-function _get_scatter_poly(poly::PolyArea{🌐,<:LatLon{WGS84Latest}}; kwargs...)
+function GeoGrids._get_scatter_poly(poly::PolyArea{🌐,<:LatLon{WGS84Latest}}; kwargs...)
     # scatter line
     r = rings(poly)
     out = map(r) do ring
@@ -333,7 +333,7 @@ PolyArea(outer, inner)
 end
 
 # ╔═╡ aebffc55-3b97-409d-a1c0-ae2e6e65fb70
-map(x -> _get_scatter_poly(x) |> splat(vcat), [patest,patest]) |> splat(vcat)
+map(x -> GeoGrids._get_scatter_poly(x) |> splat(vcat), [patest,patest]) |> splat(vcat)
 
 # ╔═╡ 1b08831b-3f5c-4aca-b704-9ebb4c957dde
 map([patest,patest]) do p1
@@ -343,13 +343,19 @@ map([patest,patest]) do p1
 end |> splat(vcat)
 
 # ╔═╡ f75960d6-13bc-4398-967d-fda3e57302f0
-plot_geo_poly(ereg.domain)
+let
+	# Enlarge the selected region by 50km
+	ereg = GeoRegionEnlarged(delta=50e3, admin="Spain; Italy", resolution=110)
+	p = plot_geo_poly(ereg.domain; title="Geo Region Enlarged")
+	change_image_options!(p; scale=3)
+end
 
 # ╔═╡ 461c7dda-ac84-4beb-8247-8e72214c77d6
-plot_geo_poly([epoly.domain.latlon.geoms..., epoly.original.domain.latlon])
-
-# ╔═╡ 9d207ac1-a2af-4b91-8e15-bba385e21871
-plot_geo_poly(epoly.domain)
+let 
+	epoly = PolyRegionEnlarged(delta=100e3, domain=[LatLon(10°, -5°), LatLon(10°, 15°), LatLon(27°, 15°), LatLon(27°, -5°)])
+	p = plot_geo_poly([epoly.domain.latlon.geoms..., epoly.original.domain.latlon]; title="Normal and Enlarged PolyRegion")
+	change_image_options!(p; scale=3)
+end
 
 # ╔═╡ d2692782-a591-433b-bca5-1743ca4f5d9e
 methods(plot_geo_poly)
@@ -459,7 +465,8 @@ let
 	p = icogrid(;sepAng=1)
 	r = GeoRegion(;admin="Italy;Spain")
 	f = filter_points(p,r)
-	plot_geo_points(f; title="Geo Region Filtering")
+	pp = plot_geo_points(f; title="Geo Region Filtering")
+	change_image_options!(pp; scale=3)
 end
 
 # ╔═╡ 37cdcc89-16c2-4ab7-a1db-abb12355037b
@@ -467,7 +474,8 @@ let
 	p = icogrid(;sepAng=4)
 	r = LatBeltRegion(;lim=(-10,10))
 	f = filter_points(p,r)
-	plot_geo_points(f; title="Lat Belt Region Filtering")
+	pp = plot_geo_points(f; title="Lat Belt Region Filtering")
+	change_image_options!(pp; scale=3)
 end
 
 # ╔═╡ faec3613-d7ff-4c68-b907-b7aefacb9a2f
@@ -475,35 +483,40 @@ let
 	p = rectgrid(2)
 	r = PolyRegion(domain=[LatLon(10°, -5°), LatLon(10°, 15°), LatLon(27°, 15°), LatLon(27°, -5°)])
 	f = filter_points(p[:],r)
-	plot_geo_points(f; title="Poly Region Filtering")
+	pp = plot_geo_points(f; title="Poly Region Filtering")
+	change_image_options!(pp; scale=3)
 end
 
 # ╔═╡ f8ad8704-8299-4757-85ab-e52149a4c4df
 let 
 	r = GlobalRegion()
 	c,t = generate_tesselation(r, 700e3, ICO(), EO())
-	plot_geo_cells(c,t;title="Global Region cell layout")
+	p = plot_geo_cells(c,t;title="Global Region cell layout")
+	change_image_options!(p; scale=3)
 end
 
 # ╔═╡ 5f018481-d80b-428b-848c-1b3fdca242fb
 let 
 	r = GeoRegion(;admin="Italy;Spain")
 	c,t = generate_tesselation(r, 50e3, HEX(), EO())
-	plot_geo_cells(c,t;title="Geo Region cell layout")
+	p = plot_geo_cells(c,t;title="Geo Region cell layout")
+	change_image_options!(p; scale=3)
 end
 
 # ╔═╡ fd134513-cc3e-4b6b-9f42-25c7fd7e9ea9
 let 
 	r = PolyRegion(domain=[LatLon(10°, -5°), LatLon(10°, 15°), LatLon(27°, 15°), LatLon(27°, -5°)])
 	c,t = generate_tesselation(r, 100e3, HEX(), EO())
-	plot_geo_cells(c,t;title="Poly Region cell layout")
+	p = plot_geo_cells(c,t;title="Poly Region cell layout")
+	change_image_options!(p; scale=3)
 end
 
 # ╔═╡ 621d2459-42cb-4173-9c33-e1c834e097d9
 let 
 	r = LatBeltRegion(;lim=(-10,10))
 	c,t = generate_tesselation(r, 500e3, ICO(), EO())
-	plot_geo_cells(c,t;title="Lat Belt Region cell layout")
+	p = plot_geo_cells(c,t;title="Lat Belt Region cell layout")
+	change_image_options!(p; scale=3)
 end
 
 # ╔═╡ 00000000-0000-0000-0000-000000000001
@@ -971,6 +984,7 @@ version = "17.4.0+2"
 # ╠═eb7ea8be-0475-474a-89e7-f8249edbcd63
 # ╠═f52aa40f-e283-4804-8abe-ce3bbb9b47ea
 # ╠═8722c85a-60f6-450f-a044-60416ec35f4a
+# ╠═c437fbc7-3e4b-4239-a2a8-7491af3716e8
 # ╠═e4cfa264-3a08-47e6-9ac2-c2ead4f4ff2e
 # ╠═80ffa48a-ec3c-46da-b465-827b828d889a
 # ╠═bd7bcd09-2320-4235-8358-9b597747a3e9
@@ -989,9 +1003,6 @@ version = "17.4.0+2"
 # ╠═2dd307aa-5b00-4d51-8a7c-e9958e150305
 # ╠═f75960d6-13bc-4398-967d-fda3e57302f0
 # ╠═461c7dda-ac84-4beb-8247-8e72214c77d6
-# ╠═9d207ac1-a2af-4b91-8e15-bba385e21871
-# ╠═51725022-0c8c-4300-8438-53a55286ffd8
-# ╠═745dce84-edc1-4ed1-ab1a-599d5a654158
 # ╠═d2692782-a591-433b-bca5-1743ca4f5d9e
 # ╠═d2f52430-ccc5-4438-9cf6-cb329580f1e7
 # ╠═b047b786-e7de-45b1-972f-668754358817

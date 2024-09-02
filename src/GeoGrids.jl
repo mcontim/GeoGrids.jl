@@ -47,7 +47,8 @@ end # module GeoGrids
 # //TODO:
 # [x] Add tests for enlarged types and offsetting functions.
 # [x] Add tests for plotting functions for enlarged regions.
-# [] Add documetnation on README for region enlargement.
+# [x] Add documetnation on README for region enlargement.
+# [] Add filtering and grouping functions for enlarged regions.
 # [] Merge PR.
 # [] Add ValidDistance support (Issue)
 # [] Version bump to 0.5.0
