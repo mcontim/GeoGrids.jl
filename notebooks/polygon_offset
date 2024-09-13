@@ -350,11 +350,31 @@ let
 	change_image_options!(p; scale=3)
 end
 
+# ╔═╡ 0e2010a8-6b84-4b6f-bc84-5d4591c19e26
+let
+	sample_ita = [LatLon(43.727878°, 12.843441°), LatLon(43.714933°, 10.399326°), LatLon(37.485829°, 14.328285°), LatLon(39.330460°, 8.430780°), LatLon(45.918388°, 10.886654°)]
+	# Enlarge the selected region by 50km
+	ereg = GeoRegionEnlarged(delta=50e3, admin="Spain; Italy", resolution=110)
+
+	sample_ita[1] in ereg.domain
+end
+
 # ╔═╡ 461c7dda-ac84-4beb-8247-8e72214c77d6
 let 
 	epoly = PolyRegionEnlarged(delta=100e3, domain=[LatLon(10°, -5°), LatLon(10°, 15°), LatLon(27°, 15°), LatLon(27°, -5°)])
 	p = plot_geo_poly([epoly.domain.latlon.geoms..., epoly.original.domain.latlon]; title="Normal and Enlarged PolyRegion")
 	change_image_options!(p; scale=3)
+end
+
+# ╔═╡ 73cb8797-2053-4b06-8c03-a55900e71a08
+let 
+	sample_in = [LatLon(14°, 1°), LatLon(26.9°, -4.9°), LatLon(10.1°, 14.9°)]
+	epoly = PolyRegionEnlarged(delta=100e3, domain=[LatLon(10°, -5°), LatLon(10°, 15°), LatLon(27°, 15°), LatLon(27°, -5°)])
+
+	
+	epoly.original.domain
+	epoly.domain.latlon.geoms
+
 end
 
 # ╔═╡ d2692782-a591-433b-bca5-1743ca4f5d9e
@@ -535,16 +555,16 @@ PlotlyBase = "~0.8.19"
 PlutoDevMacros = "~0.9.0"
 PlutoExtras = "~0.7.13"
 PlutoPlotly = "~0.5.0"
-PlutoUI = "~0.7.59"
+PlutoUI = "~0.7.60"
 """
 
 # ╔═╡ 00000000-0000-0000-0000-000000000002
 PLUTO_MANIFEST_TOML_CONTENTS = """
 # This file is machine-generated - editing it directly is not advised
 
-julia_version = "1.11.0-rc2"
+julia_version = "1.11.0-rc3"
 manifest_format = "2.0"
-project_hash = "4891b6c78619985171e4bf167fb13589ac8b0945"
+project_hash = "83a30b00c2ccd4c1e42f988fa815af6587ab73c7"
 
 [[deps.AbstractPlutoDingetjes]]
 deps = ["Pkg"]
@@ -679,9 +699,9 @@ version = "0.21.4"
 
 [[deps.JuliaInterpreter]]
 deps = ["CodeTracking", "InteractiveUtils", "Random", "UUIDs"]
-git-tree-sha1 = "7ae67d8567853d367e3463719356b8989e236069"
+git-tree-sha1 = "2984284a8abcfcc4784d95a9e2ea4e352dd8ede7"
 uuid = "aa1ae85d-cabe-5617-a682-6adf51b2e16a"
-version = "0.9.34"
+version = "0.9.36"
 
 [[deps.LaTeXStrings]]
 git-tree-sha1 = "50901ebc375ed41dbf8058da26f9de442febbbec"
@@ -824,9 +844,9 @@ version = "0.5.0"
 
 [[deps.PlutoUI]]
 deps = ["AbstractPlutoDingetjes", "Base64", "ColorTypes", "Dates", "FixedPointNumbers", "Hyperscript", "HypertextLiteral", "IOCapture", "InteractiveUtils", "JSON", "Logging", "MIMEs", "Markdown", "Random", "Reexport", "URIs", "UUIDs"]
-git-tree-sha1 = "ab55ee1510ad2af0ff674dbcced5e94921f867a9"
+git-tree-sha1 = "eba4810d5e6a01f612b948c9fa94f905b49087b0"
 uuid = "7f904dfe-b85e-4ff6-b463-dae2292396a8"
-version = "0.7.59"
+version = "0.7.60"
 
 [[deps.PrecompileTools]]
 deps = ["Preferences"]
@@ -951,7 +971,7 @@ version = "1.2.13+1"
 [[deps.libblastrampoline_jll]]
 deps = ["Artifacts", "Libdl"]
 uuid = "8e850b90-86db-534c-a0d3-1478176c7d93"
-version = "5.10.1+0"
+version = "5.11.0+0"
 
 [[deps.nghttp2_jll]]
 deps = ["Artifacts", "Libdl"]
@@ -1002,7 +1022,9 @@ version = "17.4.0+2"
 # ╠═1b08831b-3f5c-4aca-b704-9ebb4c957dde
 # ╠═2dd307aa-5b00-4d51-8a7c-e9958e150305
 # ╠═f75960d6-13bc-4398-967d-fda3e57302f0
+# ╠═0e2010a8-6b84-4b6f-bc84-5d4591c19e26
 # ╠═461c7dda-ac84-4beb-8247-8e72214c77d6
+# ╠═73cb8797-2053-4b06-8c03-a55900e71a08
 # ╠═d2692782-a591-433b-bca5-1743ca4f5d9e
 # ╠═d2f52430-ccc5-4438-9cf6-cb329580f1e7
 # ╠═b047b786-e7de-45b1-972f-668754358817
