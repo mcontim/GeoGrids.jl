@@ -87,8 +87,17 @@ end |> splat(vcat)
 # ╔═╡ 3a29cf7a-0e8b-40ec-94fd-63ab9e18e975
 # group_by_domain(pp, [GeoRegion(; name="spain", admin="Spain"), GeoRegion(; name="italy", admin="Italy")]) == group_by_domain_fast(pp, [GeoRegion(; name="spain", admin="Spain"), GeoRegion(; name="italy", admin="Italy")])
 
+# ╔═╡ b0991e3d-3452-4df0-989b-1b8dd7d7db0e
+ereg = GeoRegionOffset(delta=20e3, admin="Spain; Italy", resolution=110)
+
 # ╔═╡ d3ea32e7-5247-4636-b5eb-ea58655be334
 
+
+# ╔═╡ c70c01d3-3b9c-4c0e-ac98-9124843a44f9
+ereg.domain.latlon.geoms[1]
+
+# ╔═╡ d2f52430-ccc5-4438-9cf6-cb329580f1e7
+typeof(ereg.domain.latlon.geoms[1])
 
 # ╔═╡ b2d4a333-5e49-4a14-891e-681098745b03
 # ╠═╡ disabled = true
@@ -297,15 +306,6 @@ end
 # ╔═╡ a308e23c-ff0e-4ab5-86c6-55fcd5ac1d07
 og = GeoRegion(admin="Spain; Italy", resolution=110)
 
-# ╔═╡ b0991e3d-3452-4df0-989b-1b8dd7d7db0e
-ereg = GeoRegionEnlarged(delta=20e3, admin="Spain; Italy", resolution=110)
-
-# ╔═╡ c70c01d3-3b9c-4c0e-ac98-9124843a44f9
-ereg.domain.latlon.geoms[1]
-
-# ╔═╡ d2f52430-ccc5-4438-9cf6-cb329580f1e7
-typeof(ereg.domain.latlon.geoms[1])
-
 # ╔═╡ 61a493fe-241a-40fa-8a0a-d3fe82ce9250
 function GeoGrids._get_scatter_poly(poly::PolyArea{🌐,<:LatLon{WGS84Latest}}; kwargs...)
     # scatter line
@@ -345,7 +345,7 @@ end |> splat(vcat)
 # ╔═╡ f75960d6-13bc-4398-967d-fda3e57302f0
 let
 	# Enlarge the selected region by 50km
-	ereg = GeoRegionEnlarged(delta=50e3, admin="Spain; Italy", resolution=110)
+	ereg = GeoRegionOffset(delta=50e3, admin="Spain; Italy", resolution=110)
 	p = plot_geo_poly(ereg.domain; title="Geo Region Enlarged")
 	change_image_options!(p; scale=3)
 end
@@ -354,14 +354,14 @@ end
 let
 	sample_ita = [LatLon(43.727878°, 12.843441°), LatLon(43.714933°, 10.399326°), LatLon(37.485829°, 14.328285°), LatLon(39.330460°, 8.430780°), LatLon(45.918388°, 10.886654°)]
 	# Enlarge the selected region by 50km
-	ereg = GeoRegionEnlarged(delta=50e3, admin="Spain; Italy", resolution=110)
+	ereg = GeoRegionOffset(delta=50e3, admin="Spain; Italy", resolution=110)
 
 	sample_ita[1] in ereg.domain
 end
 
 # ╔═╡ 461c7dda-ac84-4beb-8247-8e72214c77d6
 let 
-	epoly = PolyRegionEnlarged(delta=100e3, domain=[LatLon(10°, -5°), LatLon(10°, 15°), LatLon(27°, 15°), LatLon(27°, -5°)])
+	epoly = PolyRegionOffset(delta=100e3, domain=[LatLon(10°, -5°), LatLon(10°, 15°), LatLon(27°, 15°), LatLon(27°, -5°)])
 	p = plot_geo_poly([epoly.domain.latlon.geoms..., epoly.original.domain.latlon]; title="Normal and Enlarged PolyRegion")
 	change_image_options!(p; scale=3)
 end
@@ -369,7 +369,7 @@ end
 # ╔═╡ 73cb8797-2053-4b06-8c03-a55900e71a08
 let 
 	sample_in = [LatLon(14°, 1°), LatLon(26.9°, -4.9°), LatLon(10.1°, 14.9°)]
-	epoly = PolyRegionEnlarged(delta=100e3, domain=[LatLon(10°, -5°), LatLon(10°, 15°), LatLon(27°, 15°), LatLon(27°, -5°)])
+	epoly = PolyRegionOffset(delta=100e3, domain=[LatLon(10°, -5°), LatLon(10°, 15°), LatLon(27°, 15°), LatLon(27°, -5°)])
 
 	
 	epoly.original.domain
@@ -555,16 +555,16 @@ PlotlyBase = "~0.8.19"
 PlutoDevMacros = "~0.9.0"
 PlutoExtras = "~0.7.13"
 PlutoPlotly = "~0.5.0"
-PlutoUI = "~0.7.60"
+PlutoUI = "~0.7.59"
 """
 
 # ╔═╡ 00000000-0000-0000-0000-000000000002
 PLUTO_MANIFEST_TOML_CONTENTS = """
 # This file is machine-generated - editing it directly is not advised
 
-julia_version = "1.11.0-rc3"
+julia_version = "1.11.0-rc2"
 manifest_format = "2.0"
-project_hash = "83a30b00c2ccd4c1e42f988fa815af6587ab73c7"
+project_hash = "4891b6c78619985171e4bf167fb13589ac8b0945"
 
 [[deps.AbstractPlutoDingetjes]]
 deps = ["Pkg"]
@@ -699,9 +699,9 @@ version = "0.21.4"
 
 [[deps.JuliaInterpreter]]
 deps = ["CodeTracking", "InteractiveUtils", "Random", "UUIDs"]
-git-tree-sha1 = "2984284a8abcfcc4784d95a9e2ea4e352dd8ede7"
+git-tree-sha1 = "7ae67d8567853d367e3463719356b8989e236069"
 uuid = "aa1ae85d-cabe-5617-a682-6adf51b2e16a"
-version = "0.9.36"
+version = "0.9.34"
 
 [[deps.LaTeXStrings]]
 git-tree-sha1 = "50901ebc375ed41dbf8058da26f9de442febbbec"
@@ -844,9 +844,9 @@ version = "0.5.0"
 
 [[deps.PlutoUI]]
 deps = ["AbstractPlutoDingetjes", "Base64", "ColorTypes", "Dates", "FixedPointNumbers", "Hyperscript", "HypertextLiteral", "IOCapture", "InteractiveUtils", "JSON", "Logging", "MIMEs", "Markdown", "Random", "Reexport", "URIs", "UUIDs"]
-git-tree-sha1 = "eba4810d5e6a01f612b948c9fa94f905b49087b0"
+git-tree-sha1 = "ab55ee1510ad2af0ff674dbcced5e94921f867a9"
 uuid = "7f904dfe-b85e-4ff6-b463-dae2292396a8"
-version = "0.7.60"
+version = "0.7.59"
 
 [[deps.PrecompileTools]]
 deps = ["Preferences"]
@@ -971,7 +971,7 @@ version = "1.2.13+1"
 [[deps.libblastrampoline_jll]]
 deps = ["Artifacts", "Libdl"]
 uuid = "8e850b90-86db-534c-a0d3-1478176c7d93"
-version = "5.11.0+0"
+version = "5.10.1+0"
 
 [[deps.nghttp2_jll]]
 deps = ["Artifacts", "Libdl"]

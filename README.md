@@ -31,8 +31,8 @@ This is a package containing functions for Geographical Grids generation, for ex
 
 ### Enlarged Regions
 
-- `GeoRegionEnlarged`: Represents a geographical region defined by a country or a list of countries, with an additional field `:enlarged` that can be set to `true` to indicate that the region is enlarged.
-- `PolyRegionEnlarged`: Represents a region defined by a polygon of latitude-longitude coordinates, with an additional field `:enlarged` that can be set to `true` to indicate that the region is enlarged.
+- `GeoRegionOffset`: Represents a geographical region defined by a country or a list of countries, with an additional field `:enlarged` that can be set to `true` to indicate that the region is enlarged.
+- `PolyRegionOffset`: Represents a region defined by a polygon of latitude-longitude coordinates, with an additional field `:enlarged` that can be set to `true` to indicate that the region is enlarged.
   
 These types provide a flexible framework for defining geographical regions and tessellation methods for creating grid layouts in GeoGrids.jl. They allow users to specify different types of regions (global, latitude belts, country-based, or custom polygons) and choose appropriate tessellation methods for their specific needs.
 
@@ -105,7 +105,7 @@ This vector grid can be useful for various applications that require sampling or
     in(p::Union{LatLon, Point{🌐,<:LatLon{WGS84Latest}}}, domain::AbstractRegion) -> Bool
     in(points::AbstractVector{<:Union{LatLon, Point{🌐,<:LatLon{WGS84Latest}}}}, domain::AbstractRegion) -> Vector{Bool}
 
-This function determines if a given point or vector of points belongs to an `AbstractRegion`. The `AbstractRegion` can be a `GlobalRegion`, `GeoRegion`, `GeoRegionEnlarged`, `PolyRegion`, or `LatBeltRegion`.
+This function determines if a given point or vector of points belongs to an `AbstractRegion`. The `AbstractRegion` can be a `GlobalRegion`, `GeoRegion`, `GeoRegionOffset`, `PolyRegion`, or `LatBeltRegion`.
 
 For a single point, the function returns a boolean indicating whether the point is inside the region.
 For a vector of points, it returns a vector of booleans, each indicating whether the corresponding point is inside the region.
@@ -228,11 +228,11 @@ GeoGrids.jl provides functionality to enlarge or offset regions, which can be us
 
 This function takes an original region (either a `GeoRegion` or a `PolyRegion`) and offsets it by a specified distance. The offset can be positive (to enlarge the region) or negative (to shrink it).
 
-As default usage you should use directly the `GeoRegionEnlarged` and `PolyRegionEnlarged` types.
+As default usage you should use directly the `GeoRegionOffset` and `PolyRegionOffset` types.
 
 ```julia
   # Enlarge the selected GEO region by 50km
-  ereg = GeoRegionEnlarged(delta=50e3, admin="Spain; Italy", resolution=110)
+  ereg = GeoRegionOffset(delta=50e3, admin="Spain; Italy", resolution=110)
   plot_geo_poly(ereg.domain; title="Geo Region Enlarged")
 ```	
 
@@ -242,7 +242,7 @@ As default usage you should use directly the `GeoRegionEnlarged` and `PolyRegion
 
 ```julia
   # Enlarge the selected POLY region by 100km
-  epoly = PolyRegionEnlarged(delta=100e3, domain=[LatLon(10°, -5°), LatLon(10°, 15°), LatLon(27°, 15°), LatLon(27°, -5°)])
+  epoly = PolyRegionOffset(delta=100e3, domain=[LatLon(10°, -5°), LatLon(10°, 15°), LatLon(27°, 15°), LatLon(27°, -5°)])
   plot_geo_poly([epoly.domain.latlon.geoms..., epoly.original.domain.latlon]; title="Normal and Enlarged PolyRegion")
 ```	
 

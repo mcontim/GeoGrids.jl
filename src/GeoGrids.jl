@@ -26,7 +26,7 @@ include("tessellation_func.jl")
 include("plot_func.jl")
 
 export AbstractRegion, GlobalRegion, GeoRegion, PolyRegion, LatBeltRegion,
-    GeoRegionEnlarged, PolyRegionEnlarged,
+    GeoRegionOffset, PolyRegionOffset,
     MultiBorder, PolyBorder,
     AbstractTiling, ICO, HEX, H3,
     EO

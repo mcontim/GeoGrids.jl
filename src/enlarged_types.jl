@@ -1,5 +1,5 @@
 """
-    GeoRegionEnlarged{D,P} <: AbstractRegion
+    GeoRegionOffset{D,P} <: AbstractRegion
 
 Type representing an enlarged geographical region based on a GeoRegion.
 
@@ -11,8 +11,8 @@ Fields:
 
 # Constructors
 
-    GeoRegionEnlarged(delta; kwargs...)
-    GeoRegionEnlarged(gr::GeoRegion, delta; kwargs...)
+    GeoRegionOffset(delta; kwargs...)
+    GeoRegionOffset(gr::GeoRegion, delta; kwargs...)
 
 Create an enlarged GeoRegion either from scratch or from an existing GeoRegion.
 
@@ -31,22 +31,22 @@ Create an enlarged GeoRegion either from scratch or from an existing GeoRegion.
 - `precision::Int=7`: Precision for polygon offsetting
 
 ## Returns
-- `GeoRegionEnlarged`: The enlarged geographical region
+- `GeoRegionOffset`: The enlarged geographical region
 """
-mutable struct GeoRegionEnlarged{D,P} <: AbstractRegion
+mutable struct GeoRegionOffset{D,P} <: AbstractRegion
     original::GeoRegion{D,P}
     name::String
     domain::MultiBorder{P}
     convexhull::PolyBorder{P}
 end
 
-function GeoRegionEnlarged(; name="enlarged_georegion", continent="", subregion="", admin="", delta::Number, resolution=110, refRadius=constants.Re_mean, magnitude=3, precision=7)
+function GeoRegionOffset(; name="enlarged_georegion", continent="", subregion="", admin="", delta::Number, resolution=110, refRadius=constants.Re_mean, magnitude=3, precision=7)
     gr = GeoRegion(; name, continent, subregion, admin, resolution)
 
-    GeoRegionEnlarged(gr, delta; name, refRadius, magnitude, precision)
+    GeoRegionOffset(gr, delta; name, refRadius, magnitude, precision)
 end
 
-function GeoRegionEnlarged(gr::GeoRegion, delta::Number; name="enlarged_georegion", refRadius=constants.Re_mean, magnitude=3, precision=7)
+function GeoRegionOffset(gr::GeoRegion, delta::Number; name="enlarged_georegion", refRadius=constants.Re_mean, magnitude=3, precision=7)
     orLatLon = offset_region(gr, delta; refRadius, magnitude, precision)
     orCart = cartesian_geometry(orLatLon)
     or = MultiBorder(orLatLon, orCart)
@@ -55,11 +55,11 @@ function GeoRegionEnlarged(gr::GeoRegion, delta::Number; name="enlarged_georegio
     chLatlon = latlon_geometry(chCart)
     ch = PolyBorder(chLatlon, chCart)
 
-    GeoRegionEnlarged(gr, name, or, ch)
+    GeoRegionOffset(gr, name, or, ch)
 end
 
 """
-    PolyRegionEnlarged{P} <: AbstractRegion
+    PolyRegionOffset{P} <: AbstractRegion
 
 Struct representing an enlarged polygonal region.
 
@@ -70,8 +70,8 @@ Fields:
 
 # Constructors
 
-    PolyRegionEnlarged(deltaDist; kwargs...)
-    PolyRegionEnlarged(pr::PolyRegion, deltaDist; kwargs...)
+    PolyRegionOffset(deltaDist; kwargs...)
+    PolyRegionOffset(pr::PolyRegion, deltaDist; kwargs...)
 
 Create an enlarged PolyRegion either from scratch or from an existing PolyRegion.
 
@@ -87,24 +87,24 @@ Create an enlarged PolyRegion either from scratch or from an existing PolyRegion
 - `precision::Int=7`: Precision for polygon offsetting
 
 ## Returns
-- `PolyRegionEnlarged`: The enlarged polygonal region
+- `PolyRegionOffset`: The enlarged polygonal region
 """
-mutable struct PolyRegionEnlarged{P} <: AbstractRegion
+mutable struct PolyRegionOffset{P} <: AbstractRegion
     original::PolyRegion{P}
     name::String
     domain::MultiBorder{P}
 end
 
-function PolyRegionEnlarged(; name="enlarged_polyregion", domain, delta::Number, refRadius=constants.Re_mean, magnitude=3, precision=7)
+function PolyRegionOffset(; name="enlarged_polyregion", domain, delta::Number, refRadius=constants.Re_mean, magnitude=3, precision=7)
     pr = PolyRegion(name, domain)
 
-    PolyRegionEnlarged(pr, delta; name, refRadius, magnitude, precision)
+    PolyRegionOffset(pr, delta; name, refRadius, magnitude, precision)
 end
 
-function PolyRegionEnlarged(pr::PolyRegion, delta::Number; name="enlarged_polyregion", refRadius=constants.Re_mean, magnitude=3, precision=7)
+function PolyRegionOffset(pr::PolyRegion, delta::Number; name="enlarged_polyregion", refRadius=constants.Re_mean, magnitude=3, precision=7)
     orLatLon = offset_region(pr, delta; refRadius, magnitude, precision)
     orCart = cartesian_geometry(orLatLon)
     or = MultiBorder(orLatLon, orCart)
 
-    PolyRegionEnlarged(pr, name, or)
+    PolyRegionOffset(pr, name, or)
 end
