@@ -87,17 +87,11 @@ end |> splat(vcat)
 # ╔═╡ 3a29cf7a-0e8b-40ec-94fd-63ab9e18e975
 # group_by_domain(pp, [GeoRegion(; name="spain", admin="Spain"), GeoRegion(; name="italy", admin="Italy")]) == group_by_domain_fast(pp, [GeoRegion(; name="spain", admin="Spain"), GeoRegion(; name="italy", admin="Italy")])
 
-# ╔═╡ b0991e3d-3452-4df0-989b-1b8dd7d7db0e
-ereg = GeoRegionOffset(delta=20e3, admin="Spain; Italy", resolution=110)
-
 # ╔═╡ d3ea32e7-5247-4636-b5eb-ea58655be334
 
 
-# ╔═╡ c70c01d3-3b9c-4c0e-ac98-9124843a44f9
-ereg.domain.latlon.geoms[1]
+# ╔═╡ e3ad7b79-cee3-437c-8c21-612ad928777e
 
-# ╔═╡ d2f52430-ccc5-4438-9cf6-cb329580f1e7
-typeof(ereg.domain.latlon.geoms[1])
 
 # ╔═╡ b2d4a333-5e49-4a14-891e-681098745b03
 # ╠═╡ disabled = true
@@ -306,6 +300,18 @@ end
 # ╔═╡ a308e23c-ff0e-4ab5-86c6-55fcd5ac1d07
 og = GeoRegion(admin="Spain; Italy", resolution=110)
 
+# ╔═╡ b0991e3d-3452-4df0-989b-1b8dd7d7db0e
+ereg = GeoRegionOffset(delta=20e3, admin="Spain; Italy", resolution=110)
+
+# ╔═╡ c70c01d3-3b9c-4c0e-ac98-9124843a44f9
+ereg.domain.latlon.geoms[1]
+
+# ╔═╡ 774f303f-bc02-490b-bcee-b0505d734c63
+ereg.domain
+
+# ╔═╡ d2f52430-ccc5-4438-9cf6-cb329580f1e7
+typeof(ereg.domain.latlon.geoms[1])
+
 # ╔═╡ 61a493fe-241a-40fa-8a0a-d3fe82ce9250
 function GeoGrids._get_scatter_poly(poly::PolyArea{🌐,<:LatLon{WGS84Latest}}; kwargs...)
     # scatter line
@@ -356,8 +362,34 @@ let
 	# Enlarge the selected region by 50km
 	ereg = GeoRegionOffset(delta=50e3, admin="Spain; Italy", resolution=110)
 
-	sample_ita[1] in ereg.domain
+	sample_ita[1] in ereg.domain.cart.geoms
 end
+
+# ╔═╡ b9b40bcb-aaf7-4f98-af58-b9cfbb4d7e65
+epoly = PolyRegionOffset(delta=100e3, domain=[LatLon(10°, -5°), LatLon(10°, 15°), LatLon(27°, 15°), LatLon(27°, -5°)])
+
+# ╔═╡ 519bb5db-7b90-486f-b508-370c50fa91d3
+epoly.original.domain.cart
+
+# ╔═╡ a61f1782-13c0-4102-9679-642ed2bff7ff
+epoly.domain.cart
+
+# ╔═╡ 434a1598-d0e8-4682-9edf-b9cd88971814
+epoly.original.domain
+
+# ╔═╡ dbbea70b-8420-4e0c-8ee5-f202a3b34f38
+borders(Cartesian, epoly.original.domain)
+
+# ╔═╡ c157999d-d515-44ee-abbf-854dfea25f6c
+let
+	sample_ita = [LatLon(43.727878°, 12.843441°), LatLon(43.714933°, 10.399326°), LatLon(37.485829°, 14.328285°), LatLon(39.330460°, 8.430780°), LatLon(45.918388°, 10.886654°)]
+	
+	# in(Meshes.flat(sample_ita[1]), [epoly.original.domain.cart])
+	in(Meshes.flat(sample_ita[1]), [borders(Cartesian,epoly.original.domain)])
+end
+
+# ╔═╡ 2e8970e7-6369-4542-9581-cd7a9b6a41ae
+Point(LatLon{WGS84Latest,Deg{Float32}}(43.727878°, 12.843441°)) in epoly.domain.cart
 
 # ╔═╡ 461c7dda-ac84-4beb-8247-8e72214c77d6
 let 
@@ -1023,6 +1055,15 @@ version = "17.4.0+2"
 # ╠═2dd307aa-5b00-4d51-8a7c-e9958e150305
 # ╠═f75960d6-13bc-4398-967d-fda3e57302f0
 # ╠═0e2010a8-6b84-4b6f-bc84-5d4591c19e26
+# ╠═774f303f-bc02-490b-bcee-b0505d734c63
+# ╠═b9b40bcb-aaf7-4f98-af58-b9cfbb4d7e65
+# ╠═dbbea70b-8420-4e0c-8ee5-f202a3b34f38
+# ╠═c157999d-d515-44ee-abbf-854dfea25f6c
+# ╠═519bb5db-7b90-486f-b508-370c50fa91d3
+# ╠═2e8970e7-6369-4542-9581-cd7a9b6a41ae
+# ╠═a61f1782-13c0-4102-9679-642ed2bff7ff
+# ╠═434a1598-d0e8-4682-9edf-b9cd88971814
+# ╠═e3ad7b79-cee3-437c-8c21-612ad928777e
 # ╠═461c7dda-ac84-4beb-8247-8e72214c77d6
 # ╠═73cb8797-2053-4b06-8c03-a55900e71a08
 # ╠═d2692782-a591-433b-bca5-1743ca4f5d9e

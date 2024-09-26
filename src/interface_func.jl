@@ -8,16 +8,19 @@ get_lon(p::Point{🌐,<:LatLon{WGS84Latest}}) = coords(p).lon
 get_lon(p::LatLon) = p.lon
 
 ## boders()
-# Define borders for PolyRegion
+# Define borders for PolyBorder
 borders(::Type{LatLon}, pb::PolyBorder) = pb.latlon
 borders(::Type{Cartesian}, pb::PolyBorder) = pb.cart
 borders(pb::PolyBorder) = borders(LatLon, pb)
-
+# Define borders for MultiBorder
+borders(::Type{LatLon}, mb::MultiBorder) = mb.latlon
+borders(::Type{Cartesian}, mb::MultiBorder) = mb.cart
+borders(mb::MultiBorder) = borders(LatLon, mb)
+# Define borders for PolyRegion
 function borders(::Type{T}, pr::PolyRegion) where {T}
     borders(T, pr.domain)
 end
 borders(pr::PolyRegion) = borders(LatLon, pr)
-
 # Define borders for GeoRegion
 function borders(::Type{T}, gr::GeoRegion) where {T}
     map(x -> CountriesBorders.borders(T, x), gr.domain)
@@ -37,6 +40,13 @@ Base.in(p::LatLon, pb::PolyBorder) = in(Point(LatLon{WGS84Latest,Deg{Float32}}(p
 
 Base.in(p::Point{🌐,<:LatLon{WGS84Latest}}, pr::PolyRegion) = in(p, pr.domain)
 Base.in(p::LatLon, pr::PolyRegion) = in(p, pr.domain)
+# PolyRegionOffset()
+Base.in(p::Point{𝔼{2},<:Cartesian2D{WGS84Latest}}, mb::MultiBorder) = in(p, borders(Cartesian, mb))
+Base.in(p::Point{🌐,<:LatLon{WGS84Latest}}, mb::MultiBorder) = in(Meshes.flat(p), mb) # Flatten the point in Cartesian2D and call the method above
+Base.in(p::LatLon, mb::MultiBorder) = in(Point(LatLon{WGS84Latest,Deg{Float32}}(p.lat, p.lon)), mb)
+
+Base.in(p::Point{🌐,<:LatLon{WGS84Latest}}, pr::PolyRegionOffset) = in(p, pr.domain)
+Base.in(p::LatLon, pr::PolyRegionOffset) = in(p, pr.domain)
 # LatBeltRegion()
 Base.in(p::Point{🌐,<:LatLon{WGS84Latest}}, lbr::LatBeltRegion) = lbr.lim[1] < get_lat(p) < lbr.lim[2]
 Base.in(p::LatLon, lbr::LatBeltRegion) = lbr.lim[1] < p.lat < lbr.lim[2]

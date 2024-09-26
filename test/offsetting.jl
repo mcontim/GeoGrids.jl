@@ -7,7 +7,7 @@
     enlarged_geo = GeoRegionOffset(original_geo, 50e3)  # Enlarge by 50 km
     @test enlarged_geo isa GeoRegionOffset
     @test enlarged_geo.original === original_geo
-    @test enlarged_geo.name == "enlarged_georegion"
+    @test enlarged_geo.name == "offset_georegion"
     @test enlarged_geo.domain isa MultiBorder
     
     # Test constructor with custom name
@@ -27,7 +27,7 @@ end
     enlarged_poly = PolyRegionOffset(original_poly, 50e3)  # Enlarge by 50 km
     @test enlarged_poly isa PolyRegionOffset
     @test enlarged_poly.original === original_poly
-    @test enlarged_poly.name == "enlarged_polyregion"
+    @test enlarged_poly.name == "offset_polyregion"
     @test enlarged_poly.domain isa MultiBorder
     
     # Test constructor with custom name
