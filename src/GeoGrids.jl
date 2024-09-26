@@ -15,7 +15,7 @@ using StaticArrays
 using Unitful: °, rad, Quantity, Length, @u_str, ustrip
 
 include("basic_types.jl")
-include("enlarged_types.jl")
+include("offset_types.jl")
 include("interface_func.jl")
 include("helper_func.jl")
 include("offsetting_func.jl")
