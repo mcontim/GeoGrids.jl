@@ -16,8 +16,8 @@ indices of the filtered points (wrt the input).
 - A vector of points that fall within the specified domain, subsection of the \
 input vector. The output is of the same type as the input.
 """
-function filter_points(points::AbstractVector{<:Union{LatLon,Point{🌐,<:LatLon{WGS84Latest}}}}, domain::Union{PolyRegion,LatBeltRegion})
-    filtered = filter(x -> in(x, domain), points)
+function filter_points(points::AbstractVector{<:Union{LatLon,Point{🌐,<:LatLon{WGS84Latest}}}}, domain::Union{PolyRegion,LatBeltRegion,GeoRegionOffset,PolyRegionOffset})
+    filtered = filter(x -> in(x, domain), points) 
 
     return filtered
 end
@@ -28,7 +28,7 @@ function filter_points(points::AbstractVector{<:Union{LatLon,Point{🌐,<:LatLon
     return filtered
 end
 
-function filter_points(points::AbstractVector{<:Union{LatLon,Point{🌐,<:LatLon{WGS84Latest}}}}, domain::Union{PolyRegion,LatBeltRegion}, ::EO)
+function filter_points(points::AbstractVector{<:Union{LatLon,Point{🌐,<:LatLon{WGS84Latest}}}}, domain::Union{PolyRegion,LatBeltRegion,GeoRegionOffset,PolyRegionOffset}, ::EO)
     indices = findall(x -> in(x, domain), points)
 
     return points[indices], indices

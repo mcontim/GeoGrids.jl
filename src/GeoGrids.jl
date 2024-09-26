@@ -48,9 +48,9 @@ end # module GeoGrids
 # [x] Add tests for enlarged types and offsetting functions.
 # [x] Add tests for plotting functions for enlarged regions.
 # [x] Add documetnation on README for region enlargement.
-# [] Add interface functions for in for offset regions
-# [] Add interface functions for centroid for offset regions
-# [] Add interface functions for borders for offset regions (?)
+# [x] Add interface functions for in for offset regions
+# [x] Add interface functions for centroid for offset regions
+# [x] Add interface functions for borders for offset regions (?)
 # [] Add filtering and grouping functions for enlarged regions 
 # [] Merge PR.
 # [] Version bump to 0.5.0
