@@ -52,7 +52,7 @@ end # module GeoGrids
 # [x] Add interface functions for centroid for offset regions
 # [x] Add interface functions for borders for offset regions (?)
 # [x] Add filtering and grouping functions for enlarged regions 
-# [] Merge PR.
-# [] Version bump to 0.5.0
+# [x] Merge PR.
+# [x] Version bump to 0.5.0
 # [] Add ValidDistance support (Issue)
 # [] Add possibility for tasselation on offset region instead of nominal ones
