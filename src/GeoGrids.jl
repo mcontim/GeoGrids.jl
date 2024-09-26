@@ -51,7 +51,7 @@ end # module GeoGrids
 # [x] Add interface functions for in for offset regions
 # [x] Add interface functions for centroid for offset regions
 # [x] Add interface functions for borders for offset regions (?)
-# [] Add filtering and grouping functions for enlarged regions 
+# [x] Add filtering and grouping functions for enlarged regions 
 # [] Merge PR.
 # [] Version bump to 0.5.0
 # [] Add ValidDistance support (Issue)

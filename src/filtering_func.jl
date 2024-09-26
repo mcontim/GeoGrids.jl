@@ -1,5 +1,5 @@
 """
-    filter_points(points::AbstractVector{<:LatLon}, domain::Union{GeoRegion, PolyRegion, LatBeltRegion}) -> Vector{Input Type}
+    filter_points(points::AbstractVector{<:LatLon}, domain::Union{GeoRegion, PolyRegion, LatBeltRegion, GeoRegionOffset, PolyRegionOffset}) -> Vector{Input Type}
     
 Filters a list of points based on whether they fall within a specified
 geographical domain.
@@ -7,8 +7,8 @@ geographical domain.
 ## Arguments
 - `points`: An array of points. The points are `LatLon`.
 - `domain`: A geographical domain which can be of type `GeoRegion` or \
-`PolyRegion`, in alternative a `Meshes.Domain` of type `GeometrySet` or \
-`PolyArea`.
+`PolyRegion`, `LatBeltRegion`, `GeoRegionOffset`, or `PolyRegionOffset` \
+in alternative a `Meshes.Domain` of type `GeometrySet` or `PolyArea`.
 - `::EO`: An `EO` object for additional output containing the \
 indices of the filtered points (wrt the input).
 
