@@ -21,11 +21,21 @@ function borders(::Type{T}, pr::PolyRegion) where {T}
     borders(T, pr.domain)
 end
 borders(pr::PolyRegion) = borders(LatLon, pr)
+# Define borders for PolyRegionOffset
+function borders(::Type{T}, pr::PolyRegionOffset) where {T}
+    borders(T, pr.domain)
+end
+borders(pr::PolyRegionOffset) = borders(LatLon, pr)
 # Define borders for GeoRegion
 function borders(::Type{T}, gr::GeoRegion) where {T}
     map(x -> CountriesBorders.borders(T, x), gr.domain)
 end
 borders(gr::GeoRegion) = map(x -> CountriesBorders.borders(LatLon, x), gr.domain)
+# Define borders for GeoRegion
+function borders(::Type{T}, gr::GeoRegionOffset) where {T}
+    map(x -> CountriesBorders.borders(T, x), gr.domain)
+end
+borders(gr::GeoRegionOffset) = map(x -> CountriesBorders.borders(LatLon, x), gr.domain)
 
 ## Base.in()
 # //NOTE: Interface choice: no possbility to call Base.in on GeoRegion, PolyRegion, or LatBeltRegion with a Cartesian2D point. This is a safe choice of interface of users.
@@ -33,6 +43,9 @@ borders(gr::GeoRegion) = map(x -> CountriesBorders.borders(LatLon, x), gr.domain
 # Fallback on Base.in for CountryBorder defined in CountriesBorders
 Base.in(p::Point{🌐,<:LatLon{WGS84Latest}}, gr::GeoRegion) = in(p, gr.domain)
 Base.in(p::LatLon, gr::GeoRegion) = in(p, gr.domain)
+# GeoRegionOffset()
+Base.in(p::Point{🌐,<:LatLon{WGS84Latest}}, gr::GeoRegionOffset) = in(p, gr.domain)
+Base.in(p::LatLon, gr::GeoRegionOffset) = in(p, gr.domain)
 # PolyRegion()
 Base.in(p::Point{𝔼{2},<:Cartesian2D{WGS84Latest}}, pb::PolyBorder) = in(p, borders(Cartesian, pb))
 Base.in(p::Point{🌐,<:LatLon{WGS84Latest}}, pb::PolyBorder) = in(Meshes.flat(p), pb) # Flatten the point in Cartesian2D and call the method above
