@@ -11,8 +11,8 @@ Fields:
 
 # Constructors
 
-    GeoRegionOffset(delta; kwargs...)
-    GeoRegionOffset(gr::GeoRegion, delta; kwargs...)
+    GeoRegionOffset(; name="offset_georegion", continent="", subregion="", admin="", delta::Number, resolution=110, refRadius=constants.Re_mean, magnitude=3, precision=7)
+    GeoRegionOffset(gr::GeoRegion, delta::Number; name="offset_georegion", refRadius=constants.Re_mean, magnitude=3, precision=7)
 
 Create an enlarged GeoRegion either from scratch or from an existing GeoRegion.
 
@@ -70,8 +70,8 @@ Fields:
 
 # Constructors
 
-    PolyRegionOffset(deltaDist; kwargs...)
-    PolyRegionOffset(pr::PolyRegion, deltaDist; kwargs...)
+    PolyRegionOffset(delta::Number; kwargs...)
+    PolyRegionOffset(pr::PolyRegion, delta::Number; kwargs...)
 
 Create an enlarged PolyRegion either from scratch or from an existing PolyRegion.
 
