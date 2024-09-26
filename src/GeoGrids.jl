@@ -54,5 +54,6 @@ end # module GeoGrids
 # [x] Add filtering and grouping functions for enlarged regions 
 # [x] Merge PR.
 # [x] Version bump to 0.5.0
+# [] Add tessellation for offset regions
 # [] Add ValidDistance support (Issue)
 # [] Add possibility for tasselation on offset region instead of nominal ones
