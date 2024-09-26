@@ -1,4 +1,155 @@
 """
+    generate_tesselation(region::Union{GeoRegion, PolyRegion}, radius::Number, type::HEX; refRadius::Number=constants.Re_mean, kwargs_lattice...) -> AbstractVector{<:Point{🌐,<:LatLon{WGS84Latest}}}
+    generate_tesselation(region::Union{GeoRegion, PolyRegion}, radius::Number, type::HEX, ::EO; refRadius::Number=constants.Re_mean, kwargs_lattice...) -> AbstractVector{<:Point{🌐,<:LatLon{WGS84Latest}}}, AbstractVector{<:AbstractVector{<:Point{🌐,<:LatLon{WGS84Latest}}}}
+
+The `generate_tesselation` function generates a hexagonal cell layout for a given
+geographical region. It calculates the cell grid layout centered around the
+centroid of the main area of the region and returns the points within the
+specified region.
+A method for using hexagonal tesselation for GlobalRegion and LatBeltRegion is
+not provided because of the large size of surface to be covered, the local
+hexagonal tasellation would be inaccurate.
+
+## Arguments
+- `region::Union{GeoRegion, PolyRegion}`: The geographical region for which the
+cell layout is generated. Larger regions like global and LatBeltRegions are not
+supported because of the problem of regular tassellation of the sphere.
+- `radius::Number`: The radius of each hexagonal cell. Has to be intended as the \
+circumscribed circumference.
+- `type::HEX`: A parameter indicating the type of lattice (only HEX is \
+supported).
+- `refRadius::Number`: The radius of the Earth in meters (default is \
+`constants.Re_mean`).
+- `::EO`: an extra parameter enabling a `Vector{Ngon}` the contours of \
+each cell. The mesh originating these contours is obtained using \
+`VoronoiTesselation`.
+- `kwargs_lattice...`: Additional keyword arguments passed to the \
+`gen_hex_lattice` function.
+
+## Returns
+- `Vector{Point{🌐,<:LatLon{WGS84Latest}}}`: A Vecotr of points (`LatLon`) \
+representing the cell centers within the specified region.
+
+See also: [`gen_hex_lattice`](@ref), [`_generate_tesselation`](@ref),
+[`_hex_tesselation_centroids`](@ref), [`_tesselate`](@ref), [`HEX`](@ref),
+[`GeoRegion`](@ref), [`PolyRegion`](@ref)
+"""
+function generate_tesselation(region::Union{GeoRegion,PolyRegion}, radius::Number, type::HEX; refRadius::Number=constants.Re_mean, kwargs_lattice...)
+    # Generate the tassellation centroids.
+    origin = centroid(LatLon, region)
+    centroids = _hex_tesselation_centroids(origin, radius; direction=type.direction, refRadius, kwargs_lattice...)
+
+    # Filter centroids in the region.
+    return filter_points(centroids, region)
+end
+
+function generate_tesselation(region::Union{GeoRegion,PolyRegion}, radius::Number, type::HEX, ::EO; refRadius::Number=constants.Re_mean, kwargs_lattice...)
+    # Generate the tassellation centroids.
+    origin = centroid(LatLon, region)
+    centroids = _hex_tesselation_centroids(origin, radius; direction=type.direction, refRadius, kwargs_lattice...)
+
+    if type.pattern == :hex # Hexagonal pattern
+        # Create the tasselation from all the centroids.
+        mesh = _tesselate(centroids)
+        # Filter centroids in the region.
+        filtered, idxs = filter_points(centroids, region, EO())
+        # Create the hexagonal pattern from the filtered centroids.
+        hexagons = gen_hex_pattern(filtered, idxs, mesh)
+        return filtered, hexagons
+    else # Circular pattern
+        # Filter centroids in the region.
+        filtered = filter_points(centroids, region)
+        # Create the circular pattern from the filtered centroids.
+        circles = gen_circle_pattern(filtered, radius; refRadius, n=20)
+        return filtered, circles
+    end
+end
+
+"""
+    generate_tesselation(region::GlobalRegion, radius::Number, type::ICO; refRadius::Number=constants.Re_mean) -> AbstractVector{<:LatLon}
+    generate_tesselation(region::GlobalRegion, radius::Number, type::ICO, ::EO; refRadius::Number=constants.Re_mean) -> AbstractVector{<:LatLon}, AbstractVector{<:AbstractVector{<:LatLon}}
+    generate_tesselation(region::Union{LatBeltRegion, GeoRegion, PolyRegion}, radius::Number, type::ICO; refRadius::Number=constants.Re_mean) -> AbstractVector{<:LatLon}
+    generate_tesselation(region::Union{LatBeltRegion, GeoRegion, PolyRegion}, radius::Number, type::ICO, ::EO; refRadius::Number=constants.Re_mean) -> AbstractVector{<:LatLon}, AbstractVector{<:AbstractVector{<:LatLon}}
+
+The `generate_tesselation` function generates a cell layout using an icosahedral grid
+for a given geographical region. The function adapts the grid based on the
+specified radius and applies a correction factor (see `_adapted_icogrid`). The
+radius as to be intended as the semparation angle of the point on the
+icosahedral grid. It then filters the grid points to include only those within
+the specified region.
+
+## Arguments
+- `region::Union{LatBeltRegion, GeoRegion, PolyRegion}`: The geographical region \
+for which the cell layout is generated. This can be a `LatBeltRegion`, \
+`GeoRegion`, or `PolyRegion`.
+- `radius::Number`: The radius used to adapt the icosahedral grid.
+- `type::ICO`: An object specifying the type of icosahedral grid and its \
+correction factor.
+- `::EO`: an extra parameter enabling a `Vector{Ngon}` the contours of \
+each cell. The mesh originating these contours is obtained using \
+`VoronoiTesselation`.
+
+## Returns
+- `Vector{Point{🌐,<:LatLon{WGS84Latest}}}`: A Vecotr of points (`LatLon`) \
+representing the cell centers within the specified region.
+
+See also: [`_adapted_icogrid()`](@ref), [`icogrid()`](@ref),
+[`filter_points()`](@ref), [`GeoRegion`](@ref), [`LatBeltRegion`](@ref),
+[`PolyRegion`](@ref), [`GlobalRegion`](@ref), [`ICO`](@ref)
+"""
+function generate_tesselation(region::GlobalRegion, radius::Number, type::ICO; refRadius::Number=constants.Re_mean)
+    return _adapted_icogrid(radius; refRadius, correctionFactor=type.correction)
+end
+
+function generate_tesselation(region::GlobalRegion, radius::Number, type::ICO, ::EO; refRadius::Number=constants.Re_mean)
+    # Generate the tassellation centroids.
+    centroids = _adapted_icogrid(radius; refRadius, correctionFactor=type.correction)
+
+    if type.pattern == :hex # Hexagonal pattern
+        # Create the tasselation from all the centroids.
+        mesh = _tesselate(centroids)
+        # Create the hexagonal pattern from all centroids.
+        hexagons = gen_hex_pattern(centroids, collect(1:length(centroids)), mesh)
+        return centroids, hexagons
+    else # Circular pattern
+        # Create the circular pattern from all the centroids.
+        circles = gen_circle_pattern(centroids, radius; refRadius, n=20)
+        return centroids, circles
+    end
+end
+
+function generate_tesselation(region::Union{LatBeltRegion,GeoRegion,PolyRegion}, radius::Number, type::ICO; refRadius::Number=constants.Re_mean)
+    centroids = _adapted_icogrid(radius; refRadius, correctionFactor=type.correction)
+
+    return filter_points(centroids, region)
+end
+
+function generate_tesselation(region::Union{LatBeltRegion,GeoRegion,PolyRegion}, radius::Number, type::ICO, ::EO; refRadius::Number=constants.Re_mean)
+    # Generate the tassellation centroids.
+    centroids = _adapted_icogrid(radius; refRadius, correctionFactor=type.correction)
+
+    if type.pattern == :hex # Hexagonal pattern
+        # Create the tasselation from all the centroids.
+        mesh = _tesselate(centroids)
+        # Filter centroids in the region.
+        filtered, idxs = filter_points(centroids, region, EO())
+        # Create the hexagonal pattern from the filtered centroids.
+        hexagons = gen_hex_pattern(filtered, idxs, mesh)
+        return filtered, hexagons
+    else # Circular pattern
+        # Filter centroids in the region.
+        filtered = filter_points(centroids, region)
+        # Create the circular pattern from the filtered centroids.
+        circles = gen_circle_pattern(filtered, radius; refRadius, n=20)
+        return filtered, circles
+    end
+end
+
+function generate_tesselation(region::Union{GlobalRegion,LatBeltRegion,GeoRegion,PolyRegion}, radius::Number, type::H3; refRadius::Number=constants.Re_mean)
+    error("H3 tassellation is not yet implemented in this version...")
+end
+
+"""
     _gen_regular_lattice(dx::T, dy, ds; x0=zero(T), y0=zero(T), M::Int=100, N::Int=M) where {T}
 
 The `_gen_regular_lattice` function generates a regular lattice of points in a
@@ -173,157 +324,6 @@ function _hex_tesselation_centroids(origin::Point{🌐,<:LatLon{WGS84Latest}}, r
     end
 
     return newLattice[:]
-end
-
-"""
-    generate_tesselation(region::Union{GeoRegion, PolyRegion}, radius::Number, type::HEX; refRadius::Number=constants.Re_mean, kwargs_lattice...) -> AbstractVector{<:Point{🌐,<:LatLon{WGS84Latest}}}
-    generate_tesselation(region::Union{GeoRegion, PolyRegion}, radius::Number, type::HEX, ::EO; refRadius::Number=constants.Re_mean, kwargs_lattice...) -> AbstractVector{<:Point{🌐,<:LatLon{WGS84Latest}}}, AbstractVector{<:AbstractVector{<:Point{🌐,<:LatLon{WGS84Latest}}}}
-
-The `generate_tesselation` function generates a hexagonal cell layout for a given
-geographical region. It calculates the cell grid layout centered around the
-centroid of the main area of the region and returns the points within the
-specified region.
-A method for using hexagonal tesselation for GlobalRegion and LatBeltRegion is
-not provided because of the large size of surface to be covered, the local
-hexagonal tasellation would be inaccurate.
-
-## Arguments
-- `region::Union{GeoRegion, PolyRegion}`: The geographical region for which the
-cell layout is generated. Larger regions like global and LatBeltRegions are not
-supported because of the problem of regular tassellation of the sphere.
-- `radius::Number`: The radius of each hexagonal cell. Has to be intended as the \
-circumscribed circumference.
-- `type::HEX`: A parameter indicating the type of lattice (only HEX is \
-supported).
-- `refRadius::Number`: The radius of the Earth in meters (default is \
-`constants.Re_mean`).
-- `::EO`: an extra parameter enabling a `Vector{Ngon}` the contours of \
-each cell. The mesh originating these contours is obtained using \
-`VoronoiTesselation`.
-- `kwargs_lattice...`: Additional keyword arguments passed to the \
-`gen_hex_lattice` function.
-
-## Returns
-- `Vector{Point{🌐,<:LatLon{WGS84Latest}}}`: A Vecotr of points (`LatLon`) \
-representing the cell centers within the specified region.
-
-See also: [`gen_hex_lattice`](@ref), [`_generate_tesselation`](@ref),
-[`_hex_tesselation_centroids`](@ref), [`_tesselate`](@ref), [`HEX`](@ref),
-[`GeoRegion`](@ref), [`PolyRegion`](@ref)
-"""
-function generate_tesselation(region::Union{GeoRegion,PolyRegion}, radius::Number, type::HEX; refRadius::Number=constants.Re_mean, kwargs_lattice...)
-    # Generate the tassellation centroids.
-    origin = centroid(LatLon, region)
-    centroids = _hex_tesselation_centroids(origin, radius; direction=type.direction, refRadius, kwargs_lattice...)
-
-    # Filter centroids in the region.
-    return filter_points(centroids, region)
-end
-
-function generate_tesselation(region::Union{GeoRegion,PolyRegion}, radius::Number, type::HEX, ::EO; refRadius::Number=constants.Re_mean, kwargs_lattice...)
-    # Generate the tassellation centroids.
-    origin = centroid(LatLon, region)
-    centroids = _hex_tesselation_centroids(origin, radius; direction=type.direction, refRadius, kwargs_lattice...)
-
-    if type.pattern == :hex # Hexagonal pattern
-        # Create the tasselation from all the centroids.
-        mesh = _tesselate(centroids)
-        # Filter centroids in the region.
-        filtered, idxs = filter_points(centroids, region, EO())
-        # Create the hexagonal pattern from the filtered centroids.
-        hexagons = gen_hex_pattern(filtered, idxs, mesh)
-        return filtered, hexagons
-    else # Circular pattern
-        # Filter centroids in the region.
-        filtered = filter_points(centroids, region)
-        # Create the circular pattern from the filtered centroids.
-        circles = gen_circle_pattern(filtered, radius; refRadius, n=20)
-        return filtered, circles
-    end
-end
-
-"""
-    generate_tesselation(region::GlobalRegion, radius::Number, type::ICO; refRadius::Number=constants.Re_mean) -> AbstractVector{<:LatLon}
-    generate_tesselation(region::GlobalRegion, radius::Number, type::ICO, ::EO; refRadius::Number=constants.Re_mean) -> AbstractVector{<:LatLon}, AbstractVector{<:AbstractVector{<:LatLon}}
-    generate_tesselation(region::Union{LatBeltRegion, GeoRegion, PolyRegion}, radius::Number, type::ICO; refRadius::Number=constants.Re_mean) -> AbstractVector{<:LatLon}
-    generate_tesselation(region::Union{LatBeltRegion, GeoRegion, PolyRegion}, radius::Number, type::ICO, ::EO; refRadius::Number=constants.Re_mean) -> AbstractVector{<:LatLon}, AbstractVector{<:AbstractVector{<:LatLon}}
-
-The `generate_tesselation` function generates a cell layout using an icosahedral grid
-for a given geographical region. The function adapts the grid based on the
-specified radius and applies a correction factor (see `_adapted_icogrid`). The
-radius as to be intended as the semparation angle of the point on the
-icosahedral grid. It then filters the grid points to include only those within
-the specified region.
-
-## Arguments
-- `region::Union{LatBeltRegion, GeoRegion, PolyRegion}`: The geographical region \
-for which the cell layout is generated. This can be a `LatBeltRegion`, \
-`GeoRegion`, or `PolyRegion`.
-- `radius::Number`: The radius used to adapt the icosahedral grid.
-- `type::ICO`: An object specifying the type of icosahedral grid and its \
-correction factor.
-- `::EO`: an extra parameter enabling a `Vector{Ngon}` the contours of \
-each cell. The mesh originating these contours is obtained using \
-`VoronoiTesselation`.
-
-## Returns
-- `Vector{Point{🌐,<:LatLon{WGS84Latest}}}`: A Vecotr of points (`LatLon`) \
-representing the cell centers within the specified region.
-
-See also: [`_adapted_icogrid()`](@ref), [`icogrid()`](@ref),
-[`filter_points()`](@ref), [`GeoRegion`](@ref), [`LatBeltRegion`](@ref),
-[`PolyRegion`](@ref), [`GlobalRegion`](@ref), [`ICO`](@ref)
-"""
-function generate_tesselation(region::GlobalRegion, radius::Number, type::ICO; refRadius::Number=constants.Re_mean)
-    return _adapted_icogrid(radius; refRadius, correctionFactor=type.correction)
-end
-
-function generate_tesselation(region::GlobalRegion, radius::Number, type::ICO, ::EO; refRadius::Number=constants.Re_mean)
-    # Generate the tassellation centroids.
-    centroids = _adapted_icogrid(radius; refRadius, correctionFactor=type.correction)
-
-    if type.pattern == :hex # Hexagonal pattern
-        # Create the tasselation from all the centroids.
-        mesh = _tesselate(centroids)
-        # Create the hexagonal pattern from all centroids.
-        hexagons = gen_hex_pattern(centroids, collect(1:length(centroids)), mesh)
-        return centroids, hexagons
-    else # Circular pattern
-        # Create the circular pattern from all the centroids.
-        circles = gen_circle_pattern(centroids, radius; refRadius, n=20)
-        return centroids, circles
-    end
-end
-
-function generate_tesselation(region::Union{LatBeltRegion,GeoRegion,PolyRegion}, radius::Number, type::ICO; refRadius::Number=constants.Re_mean)
-    centroids = _adapted_icogrid(radius; refRadius, correctionFactor=type.correction)
-
-    return filter_points(centroids, region)
-end
-
-function generate_tesselation(region::Union{LatBeltRegion,GeoRegion,PolyRegion}, radius::Number, type::ICO, ::EO; refRadius::Number=constants.Re_mean)
-    # Generate the tassellation centroids.
-    centroids = _adapted_icogrid(radius; refRadius, correctionFactor=type.correction)
-
-    if type.pattern == :hex # Hexagonal pattern
-        # Create the tasselation from all the centroids.
-        mesh = _tesselate(centroids)
-        # Filter centroids in the region.
-        filtered, idxs = filter_points(centroids, region, EO())
-        # Create the hexagonal pattern from the filtered centroids.
-        hexagons = gen_hex_pattern(filtered, idxs, mesh)
-        return filtered, hexagons
-    else # Circular pattern
-        # Filter centroids in the region.
-        filtered = filter_points(centroids, region)
-        # Create the circular pattern from the filtered centroids.
-        circles = gen_circle_pattern(filtered, radius; refRadius, n=20)
-        return filtered, circles
-    end
-end
-
-function generate_tesselation(region::Union{GlobalRegion,LatBeltRegion,GeoRegion,PolyRegion}, radius::Number, type::H3; refRadius::Number=constants.Re_mean)
-    error("H3 tassellation is not yet implemented in this version...")
 end
 
 """

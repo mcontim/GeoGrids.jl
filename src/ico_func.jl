@@ -1,5 +1,5 @@
 """
-    icogrid(;N=nothing, sepAng=nothing, unit=:rad, type=:lla)
+    icogrid(;N=nothing, sepAng=nothing, unit=:rad, type=:lla) -> Vector{Point{🌐,<:LatLon{WGS84Latest}}}
 
 This function returns a vector `Nx2` of LAT, LON values for a `N` points grid
 built with the Fibonacci Spiral method.

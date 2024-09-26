@@ -1,5 +1,5 @@
 """
-    rectgrid(xRes::ValidAngle; yRes::ValidAngle=xRes) -> Array{LatLon, 2}
+    rectgrid(xRes::ValidAngle; yRes::ValidAngle=xRes) -> Array{Point{🌐,<:LatLon{WGS84Latest}}, 2}
 
 Create a rectangular grid of latitude and longitude points with a specified grid
 resolutions. The function validates the input resolutions to ensure they are
@@ -50,7 +50,7 @@ function rectgrid(xRes::ValidAngle; yRes::ValidAngle=xRes)
 end
 
 """
-    vecgrid(gridRes::ValidAngle) -> Vector{LatLon}
+    vecgrid(gridRes::ValidAngle) -> Vector{Point{🌐,<:LatLon{WGS84Latest}}}
 
 Generate a vector of latitude points from the equator to the North Pole with a
 specified resolution. The function validates the input resolution to ensure it

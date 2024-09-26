@@ -5,6 +5,7 @@ include("grids.jl")
 include("interfaces.jl")
 include("plots.jl")
 include("tesselation.jl")
+include("offsetting.jl")
 
 @testitem "Aqua" begin
     using Aqua

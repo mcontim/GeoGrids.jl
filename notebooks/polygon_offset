@@ -1,0 +1,928 @@
+### A Pluto.jl notebook ###
+# v0.19.46
+
+#> custom_attrs = ["hide-enabled"]
+
+using Markdown
+using InteractiveUtils
+
+# ╔═╡ b73d8849-e08f-480f-9467-44f30a64144c
+begin
+	using PlutoUI
+	using PlutoExtras
+	using PlutoExtras.StructBondModule
+	using PlutoDevMacros
+	using PlutoPlotly
+	using PlotlyBase
+end
+
+# ╔═╡ ef3c1fa2-5f08-11ef-3098-e19fc11c873b
+begin
+	# using Clipper
+	using BenchmarkTools
+end
+
+# ╔═╡ 0f5e1c9a-1922-422a-9441-dad539920d74
+ExtendedTableOfContents()
+
+# ╔═╡ a50dc497-b22c-4294-91ba-f1056248e448
+md"""
+# Initial Tests with Clipper
+"""
+
+# ╔═╡ c432437c-2c21-4e92-b664-cb253ad77892
+md"""
+# Tests with GeoGrids
+"""
+
+# ╔═╡ 57f2c12d-66d9-443a-9fe0-83f8504d765c
+const DEFAULT_GEOLAYOUT = (;
+    geo=attr(
+        projection=attr(
+            type="robinson",
+        ),
+        showocean=true,
+        # oceancolor =  "rgb(0, 255, 255)",
+        oceancolor="rgb(255, 255, 255)",
+        showland=true,
+        # landcolor =  "rgb(230, 145, 56)",
+        landcolor="rgb(217, 217, 217)",
+        showlakes=true,
+        # lakecolor =  "rgb(0, 255, 255)",
+        lakecolor="rgb(255, 255, 255)",
+        showcountries=true,
+        lonaxis=attr(
+            showgrid=true,
+            gridcolor="rgb(102, 102, 102)"
+        ),
+        lataxis=attr(
+            showgrid=true,
+            gridcolor="rgb(102, 102, 102)"
+        )
+    )
+)
+
+# ╔═╡ ac48f00e-a7af-4558-b2ed-c0752f3c9cd3
+map(1:2) do i
+	map(1:2) do j
+		rand(2)
+	end |> splat(vcat)
+end |> splat(vcat)
+
+# ╔═╡ e4cfa264-3a08-47e6-9ac2-c2ead4f4ff2e
+# @benchmark filter_points($pp, GeoRegion(; continent="Europe", admin="-Russia"), EO())
+
+# ╔═╡ 80ffa48a-ec3c-46da-b465-827b828d889a
+# @benchmark filter_points_fast($pp, GeoRegion(; continent="Europe", admin="-Russia"), EO())
+
+# ╔═╡ bd7bcd09-2320-4235-8358-9b597747a3e9
+# filter_points(pp, GeoRegion(; continent="Europe", admin="-Russia"), EO()) == filter_points_fast(pp, GeoRegion(; continent="Europe", admin="-Russia"), EO())
+
+# ╔═╡ 5d1ad162-57e3-4dfd-b90c-8ae06a03a88a
+# @benchmark group_by_domain($pp, [GeoRegion(; name="spain", admin="Spain"), GeoRegion(; name="italy", admin="Italy")])
+
+# ╔═╡ cf6d4d21-d6aa-4e55-93df-34ca8c58acf2
+# @benchmark group_by_domain_fast($pp, [GeoRegion(; name="spain", admin="Spain"), GeoRegion(; name="italy", admin="Italy")])
+
+# ╔═╡ 3a29cf7a-0e8b-40ec-94fd-63ab9e18e975
+# group_by_domain(pp, [GeoRegion(; name="spain", admin="Spain"), GeoRegion(; name="italy", admin="Italy")]) == group_by_domain_fast(pp, [GeoRegion(; name="spain", admin="Spain"), GeoRegion(; name="italy", admin="Italy")])
+
+# ╔═╡ d3ea32e7-5247-4636-b5eb-ea58655be334
+
+
+# ╔═╡ 2745410e-d76d-426f-8316-fb4b269d013a
+md"""
+# Documentation Preparation
+"""
+
+# ╔═╡ 61a7aab7-3726-4027-ab5b-416ef57545c1
+md"""
+# Packages
+"""
+
+# ╔═╡ b58ca732-3892-415c-99e0-877befe7a26d
+@fromparent begin
+	import ^: * # to eport all functions from parent package
+end
+
+# ╔═╡ a7566eeb-1963-4589-9263-a56df864cd32
+begin
+	polygon = IntPoint[]
+	push!(polygon, IntPoint(348,257))
+	push!(polygon, IntPoint(364,148))
+	push!(polygon, IntPoint(362,148))
+	push!(polygon, IntPoint(326,241))
+	push!(polygon, IntPoint(295,219))
+	push!(polygon, IntPoint(258,88))
+	push!(polygon, IntPoint(440,129))
+	push!(polygon, IntPoint(370,196))
+	push!(polygon, IntPoint(372,275))
+	
+	co = ClipperOffset()
+	add_path!(co, polygon, JoinTypeMiter, EndTypeClosedPolygon)
+	offset_polygons = execute(co, -7.0)
+end
+
+# ╔═╡ fca3afed-a824-476d-a6a1-372a31b84cbb
+let 
+	original = scatter(;
+		x = map(x -> x.X, [polygon..., polygon[1]]),
+		y = map(x -> x.Y, [polygon..., polygon[1]]),
+		mode="lines",
+	)
+
+	enlarged = []
+	for i in eachindex(offset_polygons)	
+		temp = scatter(;
+			x = map(x -> x.X, [offset_polygons[i]..., offset_polygons[i][1]]),
+			y = map(x -> x.Y, [offset_polygons[i]..., offset_polygons[i][1]]),
+			mode="lines",
+		)
+		push!(enlarged, temp)
+	end
+
+	plot([original, enlarged...])
+end
+
+# ╔═╡ 4c756d1e-efb0-4941-82a5-554542cbb6f4
+_,id = findmax(x -> length(x), offset_polygons)
+
+# ╔═╡ 1e0e6150-57e7-40a2-aa7c-c2d43f4d9182
+offset_polygons[1][1].X
+
+# ╔═╡ 2247243a-2c06-47a3-bef8-de103ec78be9
+typeof(IntPoint(0.5,0.5,3,6).X)
+
+# ╔═╡ 25fe2760-bbf0-46ba-b75a-47da868cac6c
+w=let
+	polygon = IntPoint[]
+	push!(polygon, IntPoint(0.0,0.0,3,6)) # 3 integer, 6 total values preserved
+	push!(polygon, IntPoint(0.0,1.0,3,6))
+	push!(polygon, IntPoint(1.0,1.0,3,6))
+	push!(polygon, IntPoint(1.0,0.0,3,6))
+	# push!(polygon, IntPoint(0.0,0.0,3,6))
+	
+	co = ClipperOffset()
+	add_path!(co, polygon, JoinTypeMiter, EndTypeClosedPolygon)
+	# Need to use quite high number of digit to preserve in order to fine tune the sizing.
+	# Use JoinTypeMiter for more accurate tipe of representation (less distortion of polygon shape, visible especially for simple polygons)
+	# Convert back values using tofloat()
+	offset_polygons = execute(co, 500.0)
+end
+
+# ╔═╡ cb64a9f6-d6b5-441b-a7ca-3ae918849e47
+e=let
+	polygon = IntPoint[]
+	push!(polygon, IntPoint(0.0,0.0,3,6)) # 3 integer, 6 total values preserved
+	push!(polygon, IntPoint(0.0,1.0,3,6))
+	push!(polygon, IntPoint(1.0,1.0,3,6))
+	push!(polygon, IntPoint(1.0,0.0,3,6))
+	push!(polygon, IntPoint(0.0,0.0,3,6))
+	
+	co = ClipperOffset()
+	add_path!(co, polygon, JoinTypeMiter, EndTypeClosedPolygon)
+	# Need to use quite high number of digit to preserve in order to fine tune the sizing.
+	# Use JoinTypeMiter for more accurate tipe of representation (less distortion of polygon shape, visible especially for simple polygons)
+	# Convert back values using tofloat()
+	offset_polygons = execute(co, 500.0)
+
+	orig = map(x -> tofloat(x,3,6), polygon)
+	original = scatter(;
+		# x = map(x -> x.X, [polygon..., polygon[1]]),
+		# y = map(x -> x.Y, [polygon..., polygon[1]]),
+		x = map(x -> x[1], [orig..., orig[1]]),
+		y = map(x -> x[2], [orig..., orig[1]]),
+		mode="lines",
+	)
+
+	enl = map(offset_polygons) do poly
+		map(poly) do point
+			tofloat(point,3,6)
+		end
+	end
+	enlarged = []
+	for i in eachindex(offset_polygons)	
+		temp = scatter(;
+			# x = map(x -> x.X, [offset_polygons[i]..., offset_polygons[i][1]]),
+			# y = map(x -> x.Y, [offset_polygons[i]..., offset_polygons[i][1]]),
+			x = map(x -> x[1], [enl[i]..., enl[i][1]]),
+			y = map(x -> x[2], [enl[i]..., enl[i][1]]),
+			mode="lines",
+		)
+		push!(enlarged, temp)
+	end
+
+	
+	layout = Layout(;
+	    xaxis = attr(;
+	        scaleanchor = "y",
+	        scaleratio = 1
+	    ),
+	    yaxis = attr(;
+	        scaleratio = 1
+		)
+	)
+
+	plot([original, enlarged...], layout)
+
+	# offset_polygons
+	# polygon
+end
+
+# ╔═╡ fc287325-920d-4f8d-8e8f-75ecbca02343
+let 
+	polygon = IntPoint[]
+	push!(polygon, IntPoint(0.0,0.0,3,6)) # 3 integer, 6 total values preserved
+	push!(polygon, IntPoint(0.0,1.0,3,6))
+	push!(polygon, IntPoint(1.0,1.0,3,6))
+	push!(polygon, IntPoint(1.0,0.0,3,6))
+end
+
+# ╔═╡ 51ad65d7-49a5-4144-bbce-f9fe9fdf31d3
+let
+	map(1:5) do i
+		IntPoint(1.0,1.0,3,6)
+	end
+end
+
+# ╔═╡ 5d94f474-78fa-46ad-a337-dead795484db
+tofloat(IntPoint(2.0,1.0,3,6),3,6)[1]
+
+# ╔═╡ 7365e5ac-3a12-4b55-b356-47da19f14555
+# r = GeoRegion(; admin="Italy")
+r = GeoRegion(; continent="Europe")
+
+# ╔═╡ eb7ea8be-0475-474a-89e7-f8249edbcd63
+plot_geo_poly(r.convexhull.latlon; kwargs_scatter=(;mode="lines"), camera=:threedim)
+
+# ╔═╡ f52aa40f-e283-4804-8abe-ce3bbb9b47ea
+pp=icogrid(sepAng=2)
+
+# ╔═╡ 8722c85a-60f6-450f-a044-60416ec35f4a
+let 
+	p = plot_geo_points(icogrid(sepAng=5); title="Ico Grid")
+	change_image_options!(p; scale=3)
+end
+
+# ╔═╡ 2cea8201-9d16-43e1-8981-732299db2699
+rectgrid(0.1)
+
+# ╔═╡ c437fbc7-3e4b-4239-a2a8-7491af3716e8
+rectgrid(5)
+
+# ╔═╡ 0e26896b-b8d5-4b6f-8fa5-92185056587d
+scattergeo(;
+        lat=map(x -> GeoGrids.get_lat(x), vertices(r.convexhull.latlon)), # Vectorize such to be sure to avoid matrices.
+        lon=map(x -> GeoGrids.get_lon(x), vertices(r.convexhull.latlon)), # Vectorize such to be sure to avoid matrices.
+        # DEFAULT_POINT...,
+        # kwargs...
+    )
+
+# ╔═╡ 2e51773a-06e3-4f0a-b409-28f93846803c
+cb=let
+	country = r.domain[1]
+	resolution = CountriesBorders.resolution(country)
+	(; admin, latlon, resolution, table_idx, valid_polyareas) = country
+	CountryBorder(admin, latlon, valid_polyareas;  resolution, table_idx)
+end
+
+# ╔═╡ a308e23c-ff0e-4ab5-86c6-55fcd5ac1d07
+og = GeoRegion(admin="Spain; Italy", resolution=110)
+
+# ╔═╡ b0991e3d-3452-4df0-989b-1b8dd7d7db0e
+ereg = GeoRegionOffset(delta=20e3, admin="Spain; Italy", resolution=110)
+
+# ╔═╡ c70c01d3-3b9c-4c0e-ac98-9124843a44f9
+ereg.domain.latlon.geoms[1]
+
+# ╔═╡ 61a493fe-241a-40fa-8a0a-d3fe82ce9250
+function GeoGrids._get_scatter_poly(poly::PolyArea{🌐,<:LatLon{WGS84Latest}}; kwargs...)
+    # scatter line
+    r = rings(poly)
+    out = map(r) do ring
+        # Each ring will be a separate trace.
+        temp = vertices(ring)
+        v = vcat(temp, temp[1])
+        scattergeo(;
+            lat=map(x -> GeoGrids.get_lat(x), v), # Vectorize such to be sure to avoid matrices.
+            lon=map(x -> GeoGrids.get_lon(x), v), # Vectorize such to be sure to avoid matrices.
+            mode="lines",
+            line_color="red",
+            showlegend=false,
+            kwargs...
+        )
+    end
+end
+
+# ╔═╡ 2dd307aa-5b00-4d51-8a7c-e9958e150305
+patest = let
+	outer = [Point(LatLon{WGS84Latest}(10°, -5°)), Point(LatLon{WGS84Latest}(10°, 15°)), Point(LatLon{WGS84Latest}(27°, 15°)), Point(LatLon{WGS84Latest}(27°, -5°))]
+inner = [Point(LatLon{WGS84Latest}(15°, -3°)), Point(LatLon{WGS84Latest}(15°, 10°)), Point(LatLon{WGS84Latest}(18°, 10°)), Point(LatLon{WGS84Latest}(18°, -3°))]
+PolyArea(outer, inner)
+end
+
+# ╔═╡ aebffc55-3b97-409d-a1c0-ae2e6e65fb70
+map(x -> GeoGrids._get_scatter_poly(x) |> splat(vcat), [patest,patest]) |> splat(vcat)
+
+# ╔═╡ 1b08831b-3f5c-4aca-b704-9ebb4c957dde
+map([patest,patest]) do p1
+	map([patest,patest]) do p2
+		p2
+	end |> splat(vcat)
+end |> splat(vcat)
+
+# ╔═╡ f75960d6-13bc-4398-967d-fda3e57302f0
+let
+	# Enlarge the selected region by 50km
+	ereg = GeoRegionOffset(delta=50e3, admin="Spain; Italy", resolution=110)
+	p = plot_geo_poly(ereg.domain; title="Geo Region Enlarged")
+	change_image_options!(p; scale=3)
+end
+
+# ╔═╡ 0e2010a8-6b84-4b6f-bc84-5d4591c19e26
+let
+	sample_ita = [LatLon(43.727878°, 12.843441°), LatLon(43.714933°, 10.399326°), LatLon(37.485829°, 14.328285°), LatLon(39.330460°, 8.430780°), LatLon(45.918388°, 10.886654°)]
+	# Enlarge the selected region by 50km
+	ereg = GeoRegionOffset(delta=50e3, admin="Spain; Italy", resolution=110)
+
+	filter_points(sample_ita, ereg)
+end
+
+# ╔═╡ 461c7dda-ac84-4beb-8247-8e72214c77d6
+let 
+	epoly = PolyRegionOffset(delta=100e3, domain=[LatLon(10°, -5°), LatLon(10°, 15°), LatLon(27°, 15°), LatLon(27°, -5°)])
+	p = plot_geo_poly([epoly.domain.latlon.geoms..., epoly.original.domain.latlon]; title="Normal and Enlarged PolyRegion")
+	change_image_options!(p; scale=3)
+end
+
+# ╔═╡ 73cb8797-2053-4b06-8c03-a55900e71a08
+let 
+	sample_in = [LatLon(14°, 1°), LatLon(26.9°, -4.9°), LatLon(10.1°, 14.9°)]
+	epoly = PolyRegionOffset(delta=100e3, domain=[LatLon(10°, -5°), LatLon(10°, 15°), LatLon(27°, 15°), LatLon(27°, -5°)])
+
+	filter_points(sample_in, epoly)
+
+end
+
+# ╔═╡ ac5b6c1e-6766-4e93-b938-a39cb2df1f4a
+let 
+	p = icogrid(;sepAng=1)
+	r = GeoRegion(;admin="Italy;Spain")
+	f = filter_points(p,r)
+	pp = plot_geo_points(f; title="Geo Region Filtering")
+	change_image_options!(pp; scale=3)
+end
+
+# ╔═╡ 37cdcc89-16c2-4ab7-a1db-abb12355037b
+let 
+	p = icogrid(;sepAng=4)
+	r = LatBeltRegion(;lim=(-10,10))
+	f = filter_points(p,r)
+	pp = plot_geo_points(f; title="Lat Belt Region Filtering")
+	change_image_options!(pp; scale=3)
+end
+
+# ╔═╡ faec3613-d7ff-4c68-b907-b7aefacb9a2f
+let 
+	p = rectgrid(2)
+	r = PolyRegion(domain=[LatLon(10°, -5°), LatLon(10°, 15°), LatLon(27°, 15°), LatLon(27°, -5°)])
+	f = filter_points(p[:],r)
+	pp = plot_geo_points(f; title="Poly Region Filtering")
+	change_image_options!(pp; scale=3)
+end
+
+# ╔═╡ f8ad8704-8299-4757-85ab-e52149a4c4df
+let 
+	r = GlobalRegion()
+	c,t = generate_tesselation(r, 700e3, ICO(), EO())
+	p = plot_geo_cells(c,t;title="Global Region cell layout")
+	change_image_options!(p; scale=3)
+end
+
+# ╔═╡ 5f018481-d80b-428b-848c-1b3fdca242fb
+let 
+	r = GeoRegion(;admin="Italy;Spain")
+	c,t = generate_tesselation(r, 50e3, HEX(), EO())
+	# p = plot_geo_cells(c,t;title="Geo Region cell layout")
+	# change_image_options!(p; scale=3)
+	c[1].coords.lat
+	get_lat(c[1])
+end
+
+# ╔═╡ fd134513-cc3e-4b6b-9f42-25c7fd7e9ea9
+let 
+	r = PolyRegion(domain=[LatLon(10°, -5°), LatLon(10°, 15°), LatLon(27°, 15°), LatLon(27°, -5°)])
+	c,t = generate_tesselation(r, 100e3, HEX(), EO())
+	p = plot_geo_cells(c,t;title="Poly Region cell layout")
+	change_image_options!(p; scale=3)
+end
+
+# ╔═╡ 621d2459-42cb-4173-9c33-e1c834e097d9
+let 
+	r = LatBeltRegion(;lim=(-10,10))
+	c,t = generate_tesselation(r, 500e3, ICO(), EO())
+	p = plot_geo_cells(c,t;title="Lat Belt Region cell layout")
+	change_image_options!(p; scale=3)
+end
+
+# ╔═╡ 00000000-0000-0000-0000-000000000001
+PLUTO_PROJECT_TOML_CONTENTS = """
+[deps]
+BenchmarkTools = "6e4b80f9-dd63-53aa-95a3-0cdb28fa8baf"
+PlotlyBase = "a03496cd-edff-5a9b-9e67-9cda94a718b5"
+PlutoDevMacros = "a0499f29-c39b-4c5c-807c-88074221b949"
+PlutoExtras = "ed5d0301-4775-4676-b788-cf71e66ff8ed"
+PlutoPlotly = "8e989ff0-3d88-8e9f-f020-2b208a939ff0"
+PlutoUI = "7f904dfe-b85e-4ff6-b463-dae2292396a8"
+
+[compat]
+BenchmarkTools = "~1.5.0"
+PlotlyBase = "~0.8.19"
+PlutoDevMacros = "~0.9.0"
+PlutoExtras = "~0.7.13"
+PlutoPlotly = "~0.5.0"
+PlutoUI = "~0.7.59"
+"""
+
+# ╔═╡ 00000000-0000-0000-0000-000000000002
+PLUTO_MANIFEST_TOML_CONTENTS = """
+# This file is machine-generated - editing it directly is not advised
+
+julia_version = "1.11.0-rc2"
+manifest_format = "2.0"
+project_hash = "4891b6c78619985171e4bf167fb13589ac8b0945"
+
+[[deps.AbstractPlutoDingetjes]]
+deps = ["Pkg"]
+git-tree-sha1 = "6e1d2a35f2f90a4bc7c2ed98079b2ba09c35b83a"
+uuid = "6e696c72-6542-2067-7265-42206c756150"
+version = "1.3.2"
+
+[[deps.ArgTools]]
+uuid = "0dad84c5-d112-42e6-8d28-ef12dabb789f"
+version = "1.1.2"
+
+[[deps.Artifacts]]
+uuid = "56f22d72-fd6d-98f1-02f0-08ddc0907c33"
+version = "1.11.0"
+
+[[deps.Base64]]
+uuid = "2a0f44e3-6c83-55bd-87e4-b1978d98bd5f"
+version = "1.11.0"
+
+[[deps.BaseDirs]]
+git-tree-sha1 = "cb25e4b105cc927052c2314f8291854ea59bf70a"
+uuid = "18cc8868-cbac-4acf-b575-c8ff214dc66f"
+version = "1.2.4"
+
+[[deps.BenchmarkTools]]
+deps = ["JSON", "Logging", "Printf", "Profile", "Statistics", "UUIDs"]
+git-tree-sha1 = "f1dff6729bc61f4d49e140da1af55dcd1ac97b2f"
+uuid = "6e4b80f9-dd63-53aa-95a3-0cdb28fa8baf"
+version = "1.5.0"
+
+[[deps.CodeTracking]]
+deps = ["InteractiveUtils", "UUIDs"]
+git-tree-sha1 = "7eee164f122511d3e4e1ebadb7956939ea7e1c77"
+uuid = "da1fd8a2-8d9e-5ec2-8556-3022fb5608a2"
+version = "1.3.6"
+
+[[deps.ColorSchemes]]
+deps = ["ColorTypes", "ColorVectorSpace", "Colors", "FixedPointNumbers", "PrecompileTools", "Random"]
+git-tree-sha1 = "b5278586822443594ff615963b0c09755771b3e0"
+uuid = "35d6a980-a343-548e-a6ea-1d62b119f2f4"
+version = "3.26.0"
+
+[[deps.ColorTypes]]
+deps = ["FixedPointNumbers", "Random"]
+git-tree-sha1 = "b10d0b65641d57b8b4d5e234446582de5047050d"
+uuid = "3da002f7-5984-5a60-b8a6-cbb66c0b333f"
+version = "0.11.5"
+
+[[deps.ColorVectorSpace]]
+deps = ["ColorTypes", "FixedPointNumbers", "LinearAlgebra", "Requires", "Statistics", "TensorCore"]
+git-tree-sha1 = "a1f44953f2382ebb937d60dafbe2deea4bd23249"
+uuid = "c3611d14-8923-5661-9e6a-0046d554d3a4"
+version = "0.10.0"
+
+    [deps.ColorVectorSpace.extensions]
+    SpecialFunctionsExt = "SpecialFunctions"
+
+    [deps.ColorVectorSpace.weakdeps]
+    SpecialFunctions = "276daf66-3868-5448-9aa4-cd146d93841b"
+
+[[deps.Colors]]
+deps = ["ColorTypes", "FixedPointNumbers", "Reexport"]
+git-tree-sha1 = "362a287c3aa50601b0bc359053d5c2468f0e7ce0"
+uuid = "5ae59095-9a9b-59fe-a467-6f913c188581"
+version = "0.12.11"
+
+[[deps.CompilerSupportLibraries_jll]]
+deps = ["Artifacts", "Libdl"]
+uuid = "e66e0078-7015-5450-92f7-15fbd957f2ae"
+version = "1.1.1+0"
+
+[[deps.Dates]]
+deps = ["Printf"]
+uuid = "ade2ca70-3891-5945-98fb-dc099432e06a"
+version = "1.11.0"
+
+[[deps.DelimitedFiles]]
+deps = ["Mmap"]
+git-tree-sha1 = "9e2f36d3c96a820c678f2f1f1782582fcf685bae"
+uuid = "8bb1440f-4735-579b-a4ab-409b98df4dab"
+version = "1.9.1"
+
+[[deps.DocStringExtensions]]
+deps = ["LibGit2"]
+git-tree-sha1 = "2fb1e02f2b635d0845df5d7c167fec4dd739b00d"
+uuid = "ffbed154-4ef7-542d-bbb7-c09d3a79fcae"
+version = "0.9.3"
+
+[[deps.Downloads]]
+deps = ["ArgTools", "FileWatching", "LibCURL", "NetworkOptions"]
+uuid = "f43a241f-c20a-4ad4-852c-f6b1247861c6"
+version = "1.6.0"
+
+[[deps.FileWatching]]
+uuid = "7b1f6079-737a-58dc-b8bc-7a2ca5c1b5ee"
+version = "1.11.0"
+
+[[deps.FixedPointNumbers]]
+deps = ["Statistics"]
+git-tree-sha1 = "05882d6995ae5c12bb5f36dd2ed3f61c98cbb172"
+uuid = "53c48c17-4a7d-5ca2-90c5-79b7896eea93"
+version = "0.8.5"
+
+[[deps.Hyperscript]]
+deps = ["Test"]
+git-tree-sha1 = "179267cfa5e712760cd43dcae385d7ea90cc25a4"
+uuid = "47d2ed2b-36de-50cf-bf87-49c2cf4b8b91"
+version = "0.0.5"
+
+[[deps.HypertextLiteral]]
+deps = ["Tricks"]
+git-tree-sha1 = "7134810b1afce04bbc1045ca1985fbe81ce17653"
+uuid = "ac1192a8-f4b3-4bfe-ba22-af5b92cd3ab2"
+version = "0.9.5"
+
+[[deps.IOCapture]]
+deps = ["Logging", "Random"]
+git-tree-sha1 = "b6d6bfdd7ce25b0f9b2f6b3dd56b2673a66c8770"
+uuid = "b5f81e59-6552-4d32-b1f0-c071b021bf89"
+version = "0.2.5"
+
+[[deps.InteractiveUtils]]
+deps = ["Markdown"]
+uuid = "b77e0a4c-d291-57a0-90e8-8db25a27a240"
+version = "1.11.0"
+
+[[deps.JSON]]
+deps = ["Dates", "Mmap", "Parsers", "Unicode"]
+git-tree-sha1 = "31e996f0a15c7b280ba9f76636b3ff9e2ae58c9a"
+uuid = "682c06a0-de6a-54ab-a142-c8b1cf79cde6"
+version = "0.21.4"
+
+[[deps.JuliaInterpreter]]
+deps = ["CodeTracking", "InteractiveUtils", "Random", "UUIDs"]
+git-tree-sha1 = "7ae67d8567853d367e3463719356b8989e236069"
+uuid = "aa1ae85d-cabe-5617-a682-6adf51b2e16a"
+version = "0.9.34"
+
+[[deps.LaTeXStrings]]
+git-tree-sha1 = "50901ebc375ed41dbf8058da26f9de442febbbec"
+uuid = "b964fa9f-0449-5b57-a5c2-d3ea65f4040f"
+version = "1.3.1"
+
+[[deps.LibCURL]]
+deps = ["LibCURL_jll", "MozillaCACerts_jll"]
+uuid = "b27032c2-a3e7-50c8-80cd-2d36dbcbfd21"
+version = "0.6.4"
+
+[[deps.LibCURL_jll]]
+deps = ["Artifacts", "LibSSH2_jll", "Libdl", "MbedTLS_jll", "Zlib_jll", "nghttp2_jll"]
+uuid = "deac9b47-8bc7-5906-a0fe-35ac56dc84c0"
+version = "8.6.0+0"
+
+[[deps.LibGit2]]
+deps = ["Base64", "LibGit2_jll", "NetworkOptions", "Printf", "SHA"]
+uuid = "76f85450-5226-5b5a-8eaa-529ad045b433"
+version = "1.11.0"
+
+[[deps.LibGit2_jll]]
+deps = ["Artifacts", "LibSSH2_jll", "Libdl", "MbedTLS_jll"]
+uuid = "e37daf67-58a4-590a-8e99-b0245dd2ffc5"
+version = "1.7.2+0"
+
+[[deps.LibSSH2_jll]]
+deps = ["Artifacts", "Libdl", "MbedTLS_jll"]
+uuid = "29816b5a-b9ab-546f-933c-edad1886dfa8"
+version = "1.11.0+1"
+
+[[deps.Libdl]]
+uuid = "8f399da3-3557-5675-b5ff-fb832c97cbdb"
+version = "1.11.0"
+
+[[deps.LinearAlgebra]]
+deps = ["Libdl", "OpenBLAS_jll", "libblastrampoline_jll"]
+uuid = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
+version = "1.11.0"
+
+[[deps.Logging]]
+uuid = "56ddb016-857b-54e1-b83d-db4d58db5568"
+version = "1.11.0"
+
+[[deps.MIMEs]]
+git-tree-sha1 = "65f28ad4b594aebe22157d6fac869786a255b7eb"
+uuid = "6c6e2e6c-3030-632d-7369-2d6c69616d65"
+version = "0.1.4"
+
+[[deps.MacroTools]]
+deps = ["Markdown", "Random"]
+git-tree-sha1 = "2fa9ee3e63fd3a4f7a9a4f4744a52f4856de82df"
+uuid = "1914dd2f-81c6-5fcd-8719-6d5c9610ff09"
+version = "0.5.13"
+
+[[deps.Markdown]]
+deps = ["Base64"]
+uuid = "d6f4376e-aef5-505a-96c1-9c027394607a"
+version = "1.11.0"
+
+[[deps.MbedTLS_jll]]
+deps = ["Artifacts", "Libdl"]
+uuid = "c8ffd9c3-330d-5841-b78e-0817d7145fa1"
+version = "2.28.6+0"
+
+[[deps.Mmap]]
+uuid = "a63ad114-7e13-5084-954f-fe012c677804"
+version = "1.11.0"
+
+[[deps.MozillaCACerts_jll]]
+uuid = "14a3606d-f60d-562e-9121-12d972cd8159"
+version = "2023.12.12"
+
+[[deps.NetworkOptions]]
+uuid = "ca575930-c2e3-43a9-ace4-1e988b2c1908"
+version = "1.2.0"
+
+[[deps.OpenBLAS_jll]]
+deps = ["Artifacts", "CompilerSupportLibraries_jll", "Libdl"]
+uuid = "4536629a-c528-5b80-bd46-f80d51c5b363"
+version = "0.3.27+1"
+
+[[deps.OrderedCollections]]
+git-tree-sha1 = "dfdf5519f235516220579f949664f1bf44e741c5"
+uuid = "bac558e1-5e72-5ebc-8fee-abe8a469f55d"
+version = "1.6.3"
+
+[[deps.Parameters]]
+deps = ["OrderedCollections", "UnPack"]
+git-tree-sha1 = "34c0e9ad262e5f7fc75b10a9952ca7692cfc5fbe"
+uuid = "d96e819e-fc66-5662-9728-84c9c7592b0a"
+version = "0.12.3"
+
+[[deps.Parsers]]
+deps = ["Dates", "PrecompileTools", "UUIDs"]
+git-tree-sha1 = "8489905bcdbcfac64d1daa51ca07c0d8f0283821"
+uuid = "69de0a69-1ddd-5017-9359-2bf0b02dc9f0"
+version = "2.8.1"
+
+[[deps.Pkg]]
+deps = ["Artifacts", "Dates", "Downloads", "FileWatching", "LibGit2", "Libdl", "Logging", "Markdown", "Printf", "Random", "SHA", "TOML", "Tar", "UUIDs", "p7zip_jll"]
+uuid = "44cfe95a-1eb2-52ea-b672-e2afdf69b78f"
+version = "1.11.0"
+weakdeps = ["REPL"]
+
+    [deps.Pkg.extensions]
+    REPLExt = "REPL"
+
+[[deps.PlotlyBase]]
+deps = ["ColorSchemes", "Dates", "DelimitedFiles", "DocStringExtensions", "JSON", "LaTeXStrings", "Logging", "Parameters", "Pkg", "REPL", "Requires", "Statistics", "UUIDs"]
+git-tree-sha1 = "56baf69781fc5e61607c3e46227ab17f7040ffa2"
+uuid = "a03496cd-edff-5a9b-9e67-9cda94a718b5"
+version = "0.8.19"
+
+[[deps.PlutoDevMacros]]
+deps = ["JuliaInterpreter", "Logging", "MacroTools", "Pkg", "TOML"]
+git-tree-sha1 = "72f65885168722413c7b9a9debc504c7e7df7709"
+uuid = "a0499f29-c39b-4c5c-807c-88074221b949"
+version = "0.9.0"
+
+[[deps.PlutoExtras]]
+deps = ["AbstractPlutoDingetjes", "DocStringExtensions", "HypertextLiteral", "InteractiveUtils", "Markdown", "PlutoUI", "REPL", "Random"]
+git-tree-sha1 = "681f89bdd5c1da76b31a524af798efb5eb332ee9"
+uuid = "ed5d0301-4775-4676-b788-cf71e66ff8ed"
+version = "0.7.13"
+
+[[deps.PlutoPlotly]]
+deps = ["AbstractPlutoDingetjes", "Artifacts", "BaseDirs", "Colors", "Dates", "Downloads", "HypertextLiteral", "InteractiveUtils", "LaTeXStrings", "Markdown", "Pkg", "PlotlyBase", "Reexport", "TOML"]
+git-tree-sha1 = "653b48f9c4170343c43c2ea0267e451b68d69051"
+uuid = "8e989ff0-3d88-8e9f-f020-2b208a939ff0"
+version = "0.5.0"
+
+    [deps.PlutoPlotly.extensions]
+    PlotlyKaleidoExt = "PlotlyKaleido"
+    UnitfulExt = "Unitful"
+
+    [deps.PlutoPlotly.weakdeps]
+    PlotlyKaleido = "f2990250-8cf9-495f-b13a-cce12b45703c"
+    Unitful = "1986cc42-f94f-5a68-af5c-568840ba703d"
+
+[[deps.PlutoUI]]
+deps = ["AbstractPlutoDingetjes", "Base64", "ColorTypes", "Dates", "FixedPointNumbers", "Hyperscript", "HypertextLiteral", "IOCapture", "InteractiveUtils", "JSON", "Logging", "MIMEs", "Markdown", "Random", "Reexport", "URIs", "UUIDs"]
+git-tree-sha1 = "ab55ee1510ad2af0ff674dbcced5e94921f867a9"
+uuid = "7f904dfe-b85e-4ff6-b463-dae2292396a8"
+version = "0.7.59"
+
+[[deps.PrecompileTools]]
+deps = ["Preferences"]
+git-tree-sha1 = "5aa36f7049a63a1528fe8f7c3f2113413ffd4e1f"
+uuid = "aea7be01-6a6a-4083-8856-8a6e6704d82a"
+version = "1.2.1"
+
+[[deps.Preferences]]
+deps = ["TOML"]
+git-tree-sha1 = "9306f6085165d270f7e3db02af26a400d580f5c6"
+uuid = "21216c6a-2e73-6563-6e65-726566657250"
+version = "1.4.3"
+
+[[deps.Printf]]
+deps = ["Unicode"]
+uuid = "de0858da-6303-5e67-8744-51eddeeeb8d7"
+version = "1.11.0"
+
+[[deps.Profile]]
+uuid = "9abbd945-dff8-562f-b5e8-e1ebf5ef1b79"
+version = "1.11.0"
+
+[[deps.REPL]]
+deps = ["InteractiveUtils", "Markdown", "Sockets", "StyledStrings", "Unicode"]
+uuid = "3fa0cd96-eef1-5676-8a61-b3b8758bbffb"
+version = "1.11.0"
+
+[[deps.Random]]
+deps = ["SHA"]
+uuid = "9a3f8284-a2c9-5f02-9a11-845980a1fd5c"
+version = "1.11.0"
+
+[[deps.Reexport]]
+git-tree-sha1 = "45e428421666073eab6f2da5c9d310d99bb12f9b"
+uuid = "189a3867-3050-52da-a836-e630ba90ab69"
+version = "1.2.2"
+
+[[deps.Requires]]
+deps = ["UUIDs"]
+git-tree-sha1 = "838a3a4188e2ded87a4f9f184b4b0d78a1e91cb7"
+uuid = "ae029012-a4dd-5104-9daa-d747884805df"
+version = "1.3.0"
+
+[[deps.SHA]]
+uuid = "ea8e919c-243c-51af-8825-aaa63cd721ce"
+version = "0.7.0"
+
+[[deps.Serialization]]
+uuid = "9e88b42a-f829-5b0c-bbe9-9e923198166b"
+version = "1.11.0"
+
+[[deps.Sockets]]
+uuid = "6462fe0b-24de-5631-8697-dd941f90decc"
+version = "1.11.0"
+
+[[deps.Statistics]]
+deps = ["LinearAlgebra"]
+git-tree-sha1 = "ae3bb1eb3bba077cd276bc5cfc337cc65c3075c0"
+uuid = "10745b16-79ce-11e8-11f9-7d13ad32a3b2"
+version = "1.11.1"
+
+    [deps.Statistics.extensions]
+    SparseArraysExt = ["SparseArrays"]
+
+    [deps.Statistics.weakdeps]
+    SparseArrays = "2f01184e-e22b-5df5-ae63-d93ebab69eaf"
+
+[[deps.StyledStrings]]
+uuid = "f489334b-da3d-4c2e-b8f0-e476e12c162b"
+version = "1.11.0"
+
+[[deps.TOML]]
+deps = ["Dates"]
+uuid = "fa267f1f-6049-4f14-aa54-33bafae1ed76"
+version = "1.0.3"
+
+[[deps.Tar]]
+deps = ["ArgTools", "SHA"]
+uuid = "a4e569a6-e804-4fa4-b0f3-eef7a1d5b13e"
+version = "1.10.0"
+
+[[deps.TensorCore]]
+deps = ["LinearAlgebra"]
+git-tree-sha1 = "1feb45f88d133a655e001435632f019a9a1bcdb6"
+uuid = "62fd8b95-f654-4bbd-a8a5-9c27f68ccd50"
+version = "0.1.1"
+
+[[deps.Test]]
+deps = ["InteractiveUtils", "Logging", "Random", "Serialization"]
+uuid = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
+version = "1.11.0"
+
+[[deps.Tricks]]
+git-tree-sha1 = "7822b97e99a1672bfb1b49b668a6d46d58d8cbcb"
+uuid = "410a4b4d-49e4-4fbc-ab6d-cb71b17b3775"
+version = "0.1.9"
+
+[[deps.URIs]]
+git-tree-sha1 = "67db6cc7b3821e19ebe75791a9dd19c9b1188f2b"
+uuid = "5c2747f8-b7ea-4ff2-ba2e-563bfd36b1d4"
+version = "1.5.1"
+
+[[deps.UUIDs]]
+deps = ["Random", "SHA"]
+uuid = "cf7118a7-6976-5b1a-9a39-7adc72f591a4"
+version = "1.11.0"
+
+[[deps.UnPack]]
+git-tree-sha1 = "387c1f73762231e86e0c9c5443ce3b4a0a9a0c2b"
+uuid = "3a884ed6-31ef-47d7-9d2a-63182c4928ed"
+version = "1.0.2"
+
+[[deps.Unicode]]
+uuid = "4ec0a83e-493e-50e2-b9ac-8f72acf5a8f5"
+version = "1.11.0"
+
+[[deps.Zlib_jll]]
+deps = ["Libdl"]
+uuid = "83775a58-1f1d-513f-b197-d71354ab007a"
+version = "1.2.13+1"
+
+[[deps.libblastrampoline_jll]]
+deps = ["Artifacts", "Libdl"]
+uuid = "8e850b90-86db-534c-a0d3-1478176c7d93"
+version = "5.10.1+0"
+
+[[deps.nghttp2_jll]]
+deps = ["Artifacts", "Libdl"]
+uuid = "8e850ede-7688-5339-a07c-302acd2aaf8d"
+version = "1.59.0+0"
+
+[[deps.p7zip_jll]]
+deps = ["Artifacts", "Libdl"]
+uuid = "3f19e933-33d8-53b3-aaab-bd5110c3b7a0"
+version = "17.4.0+2"
+"""
+
+# ╔═╡ Cell order:
+# ╠═0f5e1c9a-1922-422a-9441-dad539920d74
+# ╠═a50dc497-b22c-4294-91ba-f1056248e448
+# ╠═a7566eeb-1963-4589-9263-a56df864cd32
+# ╠═fca3afed-a824-476d-a6a1-372a31b84cbb
+# ╠═2247243a-2c06-47a3-bef8-de103ec78be9
+# ╠═25fe2760-bbf0-46ba-b75a-47da868cac6c
+# ╠═4c756d1e-efb0-4941-82a5-554542cbb6f4
+# ╠═1e0e6150-57e7-40a2-aa7c-c2d43f4d9182
+# ╠═cb64a9f6-d6b5-441b-a7ca-3ae918849e47
+# ╠═fc287325-920d-4f8d-8e8f-75ecbca02343
+# ╠═51ad65d7-49a5-4144-bbce-f9fe9fdf31d3
+# ╠═5d94f474-78fa-46ad-a337-dead795484db
+# ╟─c432437c-2c21-4e92-b664-cb253ad77892
+# ╠═57f2c12d-66d9-443a-9fe0-83f8504d765c
+# ╠═ac48f00e-a7af-4558-b2ed-c0752f3c9cd3
+# ╠═7365e5ac-3a12-4b55-b356-47da19f14555
+# ╠═eb7ea8be-0475-474a-89e7-f8249edbcd63
+# ╠═f52aa40f-e283-4804-8abe-ce3bbb9b47ea
+# ╠═8722c85a-60f6-450f-a044-60416ec35f4a
+# ╠═2cea8201-9d16-43e1-8981-732299db2699
+# ╠═c437fbc7-3e4b-4239-a2a8-7491af3716e8
+# ╠═e4cfa264-3a08-47e6-9ac2-c2ead4f4ff2e
+# ╠═80ffa48a-ec3c-46da-b465-827b828d889a
+# ╠═bd7bcd09-2320-4235-8358-9b597747a3e9
+# ╠═5d1ad162-57e3-4dfd-b90c-8ae06a03a88a
+# ╠═cf6d4d21-d6aa-4e55-93df-34ca8c58acf2
+# ╠═3a29cf7a-0e8b-40ec-94fd-63ab9e18e975
+# ╠═0e26896b-b8d5-4b6f-8fa5-92185056587d
+# ╠═2e51773a-06e3-4f0a-b409-28f93846803c
+# ╠═a308e23c-ff0e-4ab5-86c6-55fcd5ac1d07
+# ╠═b0991e3d-3452-4df0-989b-1b8dd7d7db0e
+# ╠═d3ea32e7-5247-4636-b5eb-ea58655be334
+# ╠═c70c01d3-3b9c-4c0e-ac98-9124843a44f9
+# ╠═61a493fe-241a-40fa-8a0a-d3fe82ce9250
+# ╠═aebffc55-3b97-409d-a1c0-ae2e6e65fb70
+# ╠═1b08831b-3f5c-4aca-b704-9ebb4c957dde
+# ╠═2dd307aa-5b00-4d51-8a7c-e9958e150305
+# ╠═f75960d6-13bc-4398-967d-fda3e57302f0
+# ╠═0e2010a8-6b84-4b6f-bc84-5d4591c19e26
+# ╠═461c7dda-ac84-4beb-8247-8e72214c77d6
+# ╠═73cb8797-2053-4b06-8c03-a55900e71a08
+# ╠═2745410e-d76d-426f-8316-fb4b269d013a
+# ╠═ac5b6c1e-6766-4e93-b938-a39cb2df1f4a
+# ╠═37cdcc89-16c2-4ab7-a1db-abb12355037b
+# ╠═faec3613-d7ff-4c68-b907-b7aefacb9a2f
+# ╠═f8ad8704-8299-4757-85ab-e52149a4c4df
+# ╠═5f018481-d80b-428b-848c-1b3fdca242fb
+# ╠═fd134513-cc3e-4b6b-9f42-25c7fd7e9ea9
+# ╠═621d2459-42cb-4173-9c33-e1c834e097d9
+# ╟─61a7aab7-3726-4027-ab5b-416ef57545c1
+# ╠═b58ca732-3892-415c-99e0-877befe7a26d
+# ╠═b73d8849-e08f-480f-9467-44f30a64144c
+# ╠═ef3c1fa2-5f08-11ef-3098-e19fc11c873b
+# ╟─00000000-0000-0000-0000-000000000001
+# ╟─00000000-0000-0000-0000-000000000002
