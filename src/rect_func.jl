@@ -19,7 +19,7 @@ optional and defaults to `xRes` if not provided. This can be a real number \
 - A 2D array of `Point{🌐,<:LatLon{WGS84Latest}}` objects representing the grid of latitude and \
 longitude points.
 """
-function rectgrid(xRes::ValidAngle; yRes::ValidAngle=xRes, xLim=(-180,180), yLim=(-90,90))
+function rectgrid(xRes::ValidAngle; yRes::ValidAngle=xRes, xLim=(-90,90), yLim=(-180,180))
     # Input Validation   
     _xRes = let
         x = xRes isa Real ? xRes * ° : xRes |> u"°" # Convert to Uniful °
@@ -34,9 +34,9 @@ function rectgrid(xRes::ValidAngle; yRes::ValidAngle=xRes, xLim=(-180,180), yLim
 
     _xLim = let
         x = first(xLim) isa Real ? first(xLim) * ° : first(xLim) |> u"°" # Convert to Uniful °
-        x < -180° || error("Value must be ≥ -180°...")
+        x ≥ -90° || error("Value must be ≥ -90°...")
         y = last(xLim) isa Real ? last(xLim) * ° : last(xLim) |> u"°" # Convert to Uniful °
-        y > 180° || error("Value must be ≤ 180°...")
+        y ≤ 90° || error("Value must be ≤ 90°...")
         (x,y)
     end
 
@@ -53,14 +53,13 @@ function rectgrid(xRes::ValidAngle; yRes::ValidAngle=xRes, xLim=(-180,180), yLim
 
     _yLim = let
         x = first(yLim) isa Real ? first(yLim) * ° : first(yLim) |> u"°" # Convert to Uniful °
-        x < -90° || error("Value must be ≥ -90°...")
+        x ≥ -180° || error("Value must be ≥ -180°...")
         y = last(yLim) isa Real ? last(yLim) * ° : last(yLim) |> u"°" # Convert to Uniful °
-        y > 90° || error("Value must be ≤ 90°...")
+        y ≤ 180° || error("Value must be ≤ 180°...")
         (x,y)
     end
 
     # Create the rectangular grid of elements LatLon
-    # mat = [LatLon{WGS84Latest}(x, y) |> Point for x in -90°:_xRes:90°, y in (-180°:_yRes:180°)[2:end]]
     mat = [LatLon{WGS84Latest}(x, y) |> Point for x in first(_xLim):_xRes:last(_xLim), y in (first(_yLim):_yRes:last(_yLim))[2:end]]
 
     return mat
@@ -85,7 +84,7 @@ be a real number (interpreted as degrees) or a `ValidAngle`.
 - A vector of `Point{🌐,<:LatLon{WGS84Latest}}` objects representing latitude points from the \
 equator (0°) to the North Pole (90°) with the specified resolution.
 """
-function vecgrid(gridRes::ValidAngle)
+function vecgrid(gridRes::ValidAngle; vecLim=(0,90))
     # Input Validation
     _gridRes = let
         x = gridRes isa Real ? gridRes * ° : gridRes |> u"°" # Convert to Uniful °
@@ -97,8 +96,17 @@ function vecgrid(gridRes::ValidAngle)
             x
         end
     end
+
+    _vecLim = let
+        x = first(vecLim) isa Real ? first(vecLim) * ° : first(vecLim) |> u"°" # Convert to Uniful °
+        x ≥ 0° || error("Value must be ≥ 0°...")
+        y = last(vecLim) isa Real ? last(vecLim) * ° : last(vecLim) |> u"°" # Convert to Uniful °
+        y ≤ 90° || error("Value must be ≤ 90°...")
+        (x,y)
+    end
+
     # Create LAT vector
-    vec = map(x -> LatLon{WGS84Latest}(x, 0°) |> Point, 0°:_gridRes:90°) # LAT vector from 0° to 90°
+    vec = map(x -> LatLon{WGS84Latest}(x, 0°) |> Point, first(_vecLim):_gridRes:last(_vecLim)) # LAT vector from 0° to 90°
 
     return vec
 end
