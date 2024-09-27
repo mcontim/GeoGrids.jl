@@ -16,24 +16,24 @@ indices of the filtered points (wrt the input).
 - A vector of points that fall within the specified domain, subsection of the \
 input vector. The output is of the same type as the input.
 """
-function filter_points(points::AbstractVector{<:Union{LatLon,Point{🌐,<:LatLon{WGS84Latest}}}}, domain::Union{PolyRegion,LatBeltRegion,GeoRegionOffset,PolyRegionOffset})
+function filter_points(points::AbstractVector{<:Union{LatLon,Point{🌐,<:LatLon{WGS84Latest}}}}, domain::Union{PolyRegion,LatBeltRegion,PolyRegionOffset})
     filtered = filter(x -> in(x, domain), points) 
 
     return filtered
 end
-function filter_points(points::AbstractVector{<:Union{LatLon,Point{🌐,<:LatLon{WGS84Latest}}}}, domain::GeoRegion)
+function filter_points(points::AbstractVector{<:Union{LatLon,Point{🌐,<:LatLon{WGS84Latest}}}}, domain::Union{GeoRegion,GeoRegionOffset})
     intermediateFilter = filter(x -> in(x, domain.convexhull), points) # quick check over the convexhull
     filtered = filter(x -> in(x, domain), intermediateFilter) # accurate check over the actual domain
 
     return filtered
 end
 
-function filter_points(points::AbstractVector{<:Union{LatLon,Point{🌐,<:LatLon{WGS84Latest}}}}, domain::Union{PolyRegion,LatBeltRegion,GeoRegionOffset,PolyRegionOffset}, ::EO)
+function filter_points(points::AbstractVector{<:Union{LatLon,Point{🌐,<:LatLon{WGS84Latest}}}}, domain::Union{PolyRegion,LatBeltRegion,PolyRegionOffset}, ::EO)
     indices = findall(x -> in(x, domain), points)
 
     return points[indices], indices
 end
-function filter_points(points::AbstractVector{<:Union{LatLon,Point{🌐,<:LatLon{WGS84Latest}}}}, domain::GeoRegion, ::EO)
+function filter_points(points::AbstractVector{<:Union{LatLon,Point{🌐,<:LatLon{WGS84Latest}}}}, domain::Union{GeoRegion,GeoRegionOffset}, ::EO)
     originalIdxInConvexhull = findall(x -> in(x, domain.convexhull), points) # quick check over the convexhull
     finalIdx = findall(x -> in(x, domain), points[originalIdxInConvexhull]) # accurate check over the actual domain
 
