@@ -19,7 +19,7 @@ optional and defaults to `xRes` if not provided. This can be a real number \
 - A 2D array of `Point{🌐,<:LatLon{WGS84Latest}}` objects representing the grid of latitude and \
 longitude points.
 """
-function rectgrid(xRes::ValidAngle; yRes::ValidAngle=xRes)
+function rectgrid(xRes::ValidAngle; yRes::ValidAngle=xRes, xLim=(-180,180), yLim=(-90,90))
     # Input Validation   
     _xRes = let
         x = xRes isa Real ? xRes * ° : xRes |> u"°" # Convert to Uniful °
@@ -30,6 +30,14 @@ function rectgrid(xRes::ValidAngle; yRes::ValidAngle=xRes)
         else
             x
         end
+    end
+
+    _xLim = let
+        x = first(xLim) isa Real ? first(xLim) * ° : first(xLim) |> u"°" # Convert to Uniful °
+        x < -180° || error("Value must be ≥ -180°...")
+        y = last(xLim) isa Real ? last(xLim) * ° : last(xLim) |> u"°" # Convert to Uniful °
+        y > 180° || error("Value must be ≤ 180°...")
+        (x,y)
     end
 
     _yRes = let
@@ -43,8 +51,17 @@ function rectgrid(xRes::ValidAngle; yRes::ValidAngle=xRes)
         end
     end
 
+    _yLim = let
+        x = first(yLim) isa Real ? first(yLim) * ° : first(yLim) |> u"°" # Convert to Uniful °
+        x < -90° || error("Value must be ≥ -90°...")
+        y = last(yLim) isa Real ? last(yLim) * ° : last(yLim) |> u"°" # Convert to Uniful °
+        y > 90° || error("Value must be ≤ 90°...")
+        (x,y)
+    end
+
     # Create the rectangular grid of elements LatLon
-    mat = [LatLon{WGS84Latest}(x, y) |> Point for x in -90°:_xRes:90°, y in (-180°:_yRes:180°)[2:end]]
+    # mat = [LatLon{WGS84Latest}(x, y) |> Point for x in -90°:_xRes:90°, y in (-180°:_yRes:180°)[2:end]]
+    mat = [LatLon{WGS84Latest}(x, y) |> Point for x in first(_xLim):_xRes:last(_xLim), y in (first(_yLim):_yRes:last(_yLim))[2:end]]
 
     return mat
 end

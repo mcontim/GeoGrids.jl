@@ -69,6 +69,12 @@ map(1:2) do i
 	end |> splat(vcat)
 end |> splat(vcat)
 
+# ╔═╡ ab80ce99-c124-4871-bf9b-35b9b4921b97
+let
+	a=(1,2)
+	first(a)
+end
+
 # ╔═╡ e4cfa264-3a08-47e6-9ac2-c2ead4f4ff2e
 # @benchmark filter_points($pp, GeoRegion(; continent="Europe", admin="-Russia"), EO())
 
@@ -415,12 +421,7 @@ end
 # ╔═╡ 46ae52a1-783a-46e7-8cd8-11f652327e02
 let 
 	r = GeoRegionOffset(delta=50e3, admin="Italy;Spain")
-	cart = convexhull(r.domain.cart)
-	latlon = latlon_geometry(cart)
-    ch = PolyBorder(latlon, cart)
-	c,t = generate_tesselation(ch, 50e3, HEX(), EO())
-	# p = plot_geo_cells(c,t;title="Geo Region cell layout")
-	# change_image_options!(p; scale=3)
+	filter_points(rectgrid(.1)[:], r)
 end
 
 # ╔═╡ fd134513-cc3e-4b6b-9f42-25c7fd7e9ea9
@@ -913,6 +914,7 @@ version = "17.4.0+2"
 # ╠═eb7ea8be-0475-474a-89e7-f8249edbcd63
 # ╠═f52aa40f-e283-4804-8abe-ce3bbb9b47ea
 # ╠═8722c85a-60f6-450f-a044-60416ec35f4a
+# ╠═ab80ce99-c124-4871-bf9b-35b9b4921b97
 # ╠═2cea8201-9d16-43e1-8981-732299db2699
 # ╠═c437fbc7-3e4b-4239-a2a8-7491af3716e8
 # ╠═e4cfa264-3a08-47e6-9ac2-c2ead4f4ff2e
