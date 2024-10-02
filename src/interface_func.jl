@@ -38,9 +38,11 @@ borders(gr::GeoRegion) = map(x -> CountriesBorders.borders(LatLon, x), gr.domain
 
 # Define borders for GeoRegionOffset
 function borders(::Type{T}, gr::GeoRegionOffset) where {T}
-    map(x -> CountriesBorders.borders(T, x), gr.domain)
+    # map(x -> CountriesBorders.borders(T, x), gr.domain)
+    borders(T, gr.domain)
 end
-borders(gr::GeoRegionOffset) = map(x -> CountriesBorders.borders(LatLon, x), gr.domain)
+# borders(gr::GeoRegionOffset) = map(x -> CountriesBorders.borders(LatLon, x), gr.domain)
+borders(gr::GeoRegionOffset) = borders(LatLon, gr)
 
 ## Base.in()
 # //NOTE: Interface choice: no possbility to call Base.in on GeoRegion, PolyRegion, or LatBeltRegion with a Cartesian2D point. This is a safe choice of interface of users.

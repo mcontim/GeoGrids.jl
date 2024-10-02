@@ -261,14 +261,8 @@ let
 	change_image_options!(p; scale=3)
 end
 
-# ╔═╡ 2cea8201-9d16-43e1-8981-732299db2699
-rectgrid(0.5;xLim=(-50,50), yLim=(-50,20))
-
-# ╔═╡ c437fbc7-3e4b-4239-a2a8-7491af3716e8
-rectgrid(5)
-
 # ╔═╡ b8bfb942-c8aa-4278-bc95-bf9d9071be46
-vecgrid(1; vecLim=(10,80))
+rectgrid(5; xLim=(-10,10))
 
 # ╔═╡ 0e26896b-b8d5-4b6f-8fa5-92185056587d
 scattergeo(;
@@ -445,6 +439,9 @@ let
 	p = plot_geo_cells(c,t;title="Lat Belt Region cell layout")
 	change_image_options!(p; scale=3)
 end
+
+# ╔═╡ e105c995-4289-46b6-a63f-10acc4d44d95
+rectgrid(5)
 
 # ╔═╡ 00000000-0000-0000-0000-000000000001
 PLUTO_PROJECT_TOML_CONTENTS = """
@@ -911,8 +908,6 @@ version = "17.4.0+2"
 # ╠═eb7ea8be-0475-474a-89e7-f8249edbcd63
 # ╠═f52aa40f-e283-4804-8abe-ce3bbb9b47ea
 # ╠═8722c85a-60f6-450f-a044-60416ec35f4a
-# ╠═2cea8201-9d16-43e1-8981-732299db2699
-# ╠═c437fbc7-3e4b-4239-a2a8-7491af3716e8
 # ╠═b8bfb942-c8aa-4278-bc95-bf9d9071be46
 # ╠═e4cfa264-3a08-47e6-9ac2-c2ead4f4ff2e
 # ╠═80ffa48a-ec3c-46da-b465-827b828d889a
@@ -944,6 +939,7 @@ version = "17.4.0+2"
 # ╠═fd134513-cc3e-4b6b-9f42-25c7fd7e9ea9
 # ╠═aba90363-7b7f-4edd-ad77-9c05268defed
 # ╠═621d2459-42cb-4173-9c33-e1c834e097d9
+# ╠═e105c995-4289-46b6-a63f-10acc4d44d95
 # ╟─61a7aab7-3726-4027-ab5b-416ef57545c1
 # ╠═b58ca732-3892-415c-99e0-877befe7a26d
 # ╠═b73d8849-e08f-480f-9467-44f30a64144c
