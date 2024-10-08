@@ -245,6 +245,12 @@ end
 # ╔═╡ 5d94f474-78fa-46ad-a337-dead795484db
 tofloat(IntPoint(2.0,1.0,3,6),3,6)[1]
 
+# ╔═╡ 529e93aa-4a1a-4197-a643-770021b5157f
+GeoRegion(;admin="France", resolution=10, skip_areas=SKIP_NONCONTINENTAL_EU)
+
+# ╔═╡ 32f3e2af-13ae-4486-922a-b7dec7f91c0b
+GeoRegionOffset(;delta=10e3, admin="France", resolution=10, skip_areas=SKIP_NONCONTINENTAL_EU)
+
 # ╔═╡ 7365e5ac-3a12-4b55-b356-47da19f14555
 # r = GeoRegion(; admin="Italy")
 r = GeoRegion(; continent="Europe")
@@ -466,7 +472,7 @@ PlutoUI = "~0.7.59"
 PLUTO_MANIFEST_TOML_CONTENTS = """
 # This file is machine-generated - editing it directly is not advised
 
-julia_version = "1.11.0-rc2"
+julia_version = "1.11.0-rc4"
 manifest_format = "2.0"
 project_hash = "4891b6c78619985171e4bf167fb13589ac8b0945"
 
@@ -875,7 +881,7 @@ version = "1.2.13+1"
 [[deps.libblastrampoline_jll]]
 deps = ["Artifacts", "Libdl"]
 uuid = "8e850b90-86db-534c-a0d3-1478176c7d93"
-version = "5.10.1+0"
+version = "5.11.0+0"
 
 [[deps.nghttp2_jll]]
 deps = ["Artifacts", "Libdl"]
@@ -902,6 +908,8 @@ version = "17.4.0+2"
 # ╠═51ad65d7-49a5-4144-bbce-f9fe9fdf31d3
 # ╠═5d94f474-78fa-46ad-a337-dead795484db
 # ╟─c432437c-2c21-4e92-b664-cb253ad77892
+# ╠═529e93aa-4a1a-4197-a643-770021b5157f
+# ╠═32f3e2af-13ae-4486-922a-b7dec7f91c0b
 # ╠═57f2c12d-66d9-443a-9fe0-83f8504d765c
 # ╠═ac48f00e-a7af-4558-b2ed-c0752f3c9cd3
 # ╠═7365e5ac-3a12-4b55-b356-47da19f14555

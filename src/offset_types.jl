@@ -40,8 +40,8 @@ mutable struct GeoRegionOffset{D,P} <: AbstractRegion
     convexhull::PolyBorder{P}
 end
 
-function GeoRegionOffset(; name="offset_georegion", continent="", subregion="", admin="", delta::Number, resolution=110, refRadius=constants.Re_mean, magnitude=3, precision=7)
-    gr = GeoRegion(; name, continent, subregion, admin, resolution)
+function GeoRegionOffset(; name="offset_georegion", continent="", subregion="", admin="", skip_areas=nothing, delta::Number, resolution=110, refRadius=constants.Re_mean, magnitude=3, precision=7)
+    gr = GeoRegion(; name, continent, subregion, admin, skip_areas, resolution)
 
     GeoRegionOffset(gr, delta; name, refRadius, magnitude, precision)
 end
