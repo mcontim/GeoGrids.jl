@@ -47,6 +47,7 @@ function GeoRegionOffset(; name="offset_georegion", continent="", subregion="", 
 end
 
 function GeoRegionOffset(gr::GeoRegion, delta::Number; name="offset_georegion", refRadius=constants.Re_mean, magnitude=3, precision=7)
+    # Resolution and Skip Areas must be set on the original GeoRegion definition, cannot be set a posteriori on the offset.
     orLatLon = offset_region(gr, delta; refRadius, magnitude, precision)
     orCart = cartesian_geometry(orLatLon)
     or = MultiBorder(orLatLon, orCart)
