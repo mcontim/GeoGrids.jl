@@ -51,3 +51,5 @@ SatConstellationVisual/notebooks/OUTPUT/*
 # /notebooks/
 # /notebooks/assets/
 /testenv/
+
+.vscode/
