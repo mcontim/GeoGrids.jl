@@ -85,7 +85,7 @@ mutable struct GeoRegion{D,P} <: AbstractRegion
     convexhull::PolyBorder{P}
 end
 
-function GeoRegion(; name="region_name", continent="", subregion="", admin="", skip_areas=nothing, resolution=110)
+function GeoRegion(; name="", continent="", subregion="", admin="", skip_areas=nothing, resolution=110)
     all(isempty(v) for v in (continent, subregion, admin)) && error("Input at least one argument between continent, subregion and admin...")
 
     nt = (; continent, subregion, admin)
@@ -94,6 +94,7 @@ function GeoRegion(; name="region_name", continent="", subregion="", admin="", s
     cart = convexhull(d) # Using convexhull() method from CountriesBorders. Convexhull always give a PolyArea.
     latlon = latlon_geometry(cart)
     ch = PolyBorder(latlon, cart)
+    name = isempty(name) ? (!isempty(admin) ? admin : "region_name") : name
     GeoRegion(name, continent, subregion, admin, d, ch)
 end
 

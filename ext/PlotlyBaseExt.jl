@@ -83,8 +83,8 @@ geographic points.
 function GeoGrids._get_scatter_points(points::AbstractVector{<:Union{LatLon,Point{🌐,<:LatLon{WGS84Latest}}}}; kwargs...)
     # Markers for the points
     return scattergeo(;
-        lat=map(x -> GeoGrids.get_lat(x), points), # Vectorize such to be sure to avoid matrices.
-        lon=map(x -> GeoGrids.get_lon(x), points), # Vectorize such to be sure to avoid matrices.
+        lat=map(x -> GeoGrids.get_lat(x) |> ustrip, points), # Vectorize such to be sure to avoid matrices.
+        lon=map(x -> GeoGrids.get_lon(x) |> ustrip, points), # Vectorize such to be sure to avoid matrices.
         DEFAULT_POINT...,
         kwargs...
     )
@@ -122,8 +122,8 @@ function GeoGrids._get_scatter_cellcontour(polygons::AbstractVector{<:AbstractVe
     end
 
     return scattergeo(;
-        lat=map(x -> first(x), polygonsTrace),
-        lon=map(x -> last(x), polygonsTrace),
+        lat=map(x -> first(x) |> ustrip, polygonsTrace),
+        lon=map(x -> last(x) |> ustrip, polygonsTrace),
         DEFAULT_CELL_CONTOUR...,
         kwargs...
     )
@@ -160,8 +160,8 @@ function GeoGrids._get_scatter_poly(poly::PolyArea{🌐,<:LatLon{WGS84Latest}}; 
         temp = vertices(ring)
         v = vcat(temp, temp[1])
         scattergeo(;
-            lat=map(x -> GeoGrids.get_lat(x), v), # Vectorize such to be sure to avoid matrices.
-            lon=map(x -> GeoGrids.get_lon(x), v), # Vectorize such to be sure to avoid matrices.
+            lat=map(x -> GeoGrids.get_lat(x) |> ustrip, v), # Vectorize such to be sure to avoid matrices.
+            lon=map(x -> GeoGrids.get_lon(x) |> ustrip, v), # Vectorize such to be sure to avoid matrices.
             mode="lines",
             line_color="red",
             showlegend=false,
@@ -239,7 +239,6 @@ See also: [`GeoGrids._get_scatter_points`](@ref), [`_default_geolayout`](@ref),
 function GeoGrids.plot_geo_points(points::AbstractVector{<:Union{LatLon,Point{🌐,<:LatLon{WGS84Latest}}}}; title="Point Position GEO Map", camera::Symbol=:twodim, kwargs_scatter=(;), kwargs_layout=(;))
     # Markers for the points
     scatterpoints = GeoGrids._get_scatter_points(points; kwargs_scatter...)
-
     layout = _default_geolayout(; title, camera, kwargs_layout...)
 
     plotly_plot([scatterpoints], layout)
