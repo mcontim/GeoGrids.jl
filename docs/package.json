@@ -1,0 +1,18 @@
+{
+  "devDependencies": {
+    "markdown-it": "^14.1.0",
+    "markdown-it-mathjax3": "^4.3.2",
+    "vitepress": "^1.5.0",
+    "vitepress-plugin-tabs": "^0.5.0",
+    "@types/plotly.js-dist-min": "^2.3.4"
+  },
+  "scripts": {
+    "docs:dev": "npx vitepress dev build",
+    "docs:build": "npx vitepress build build",
+    "docs:preview": "npx vitepress preview build"
+  },
+  "dependencies": {
+    "markdown-it-footnote": "^4.0.0",
+    "plotly.js-dist-min": "^2.35.3"
+  }
+}

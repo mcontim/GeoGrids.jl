@@ -1,6 +1,13 @@
 [deps]
-Documenter = "e30172f5-a6a5-5a46-863b-614d45cd2de4"
 GeoGrids = "22c7c615-cf67-4787-b800-cc81b4f1a63f"
+Documenter = "e30172f5-a6a5-5a46-863b-614d45cd2de4"
+DocumenterVitepress = "4710194d-e776-4893-9690-8d956a29c365"
+PlotlyBase = "a03496cd-edff-5a9b-9e67-9cda94a718b5"
+PlotlyDocumenter = "9b90f1cd-2639-4507-8b17-2fbe371ceceb"
 
 [compat]
 Documenter = "1.4"
+
+[sources]
+GeoGrids = { path = "../" }
+DocumenterVitepress = { url = "https://github.com/fnawratil/DocumenterVitepress.jl" }
