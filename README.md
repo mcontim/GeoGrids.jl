@@ -1,7 +1,7 @@
 # GeoGrids.jl
 
-[![Docs Stable](https://img.shields.io/badge/docs-stable-blue.svg)](https://tec-esc-tools.io.esa.int/GeoGrids.jl/stable)
-[![Docs Dev](https://img.shields.io/badge/docs-dev-blue.svg)](https://tec-esc-tools.io.esa.int/GeoGrids.jl/dev)
+[![Docs Stable](https://img.shields.io/badge/docs-stable-blue.svg)](https://mcontim.github.io/GeoGrids.jl/stable)
+[![Docs Dev](https://img.shields.io/badge/docs-dev-blue.svg)](https://mcontim.github.io/GeoGrids.jl/dev)
 [![Build Status](https://github.com/mcontim/GeoGrids.jl/actions/workflows/CI.yml/badge.svg?branch=main)](https://github.com/mcontim/GeoGrids.jl/actions/workflows/CI.yml?query=branch%3Amain)
 [![Coverage](https://codecov.io/gh/mcontim/GeoGrids.jl/branch/main/graph/badge.svg)](https://codecov.io/gh/mcontim/GeoGrids.jl)
 [![Aqua QA](https://raw.githubusercontent.com/JuliaTesting/Aqua.jl/master/badge.svg)](https://github.com/JuliaTesting/Aqua.jl)
