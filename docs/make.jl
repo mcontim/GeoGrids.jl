@@ -11,7 +11,7 @@ perf_page = get(ENV, "CI", "") === "true"
 # false if not present.
 should_deploy = get(ENV,"SHOULD_DEPLOY", get(ENV, "CI", "") === "true")
 
-repo = get(ENV, "REPOSITORY", "mcontim/GeoGrids.jl")
+repo = get(ENV, "REPOSITORY", "JuliaSatcomFramework/GeoGrids.jl")
 remote = Documenter.Remotes.GitHub(repo)
 authors = "Matteo Conti <matteo.conti@esa.int>"
 sitename = "GeoGrids.jl"
