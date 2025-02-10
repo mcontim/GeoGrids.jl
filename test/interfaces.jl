@@ -70,8 +70,8 @@ end
 ## centroid()
 @testitem "Test centroid for GeoRegion" tags = [:interface] begin
     reg = GeoRegion(; name="Tassellation", admin="Spain;Italy")
-    testPoint_cart = Point(Cartesian{WGS84Latest}(1.914719f0, 40.225365f0))
-    testPoint_latlon = Point(LatLon{WGS84Latest}(40.225365f0, 1.914719f0))
+    testPoint_cart = Point(Cartesian{WGS84Latest}(2.2774699f0, 41.078136f0))
+    testPoint_latlon = Point(LatLon{WGS84Latest}(41.078136f0, 2.2774699f0))
     let
         c = centroid(reg)
         @test abs(get_lat(c) - get_lat(testPoint_cart)) < 1e-2
